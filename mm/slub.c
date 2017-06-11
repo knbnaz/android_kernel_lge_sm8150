@@ -4337,7 +4337,7 @@ void __init kmem_cache_init(void)
 	kmem_cache = &boot_kmem_cache;
 
 	create_boot_cache(kmem_cache_node, "kmem_cache_node",
-		sizeof(struct kmem_cache_node), SLAB_HWCACHE_ALIGN);
+		sizeof(struct kmem_cache_node), SLAB_HWCACHE_ALIGN, 0, 0);
 
 	register_hotmemory_notifier(&slab_memory_callback_nb);
 
@@ -4347,7 +4347,7 @@ void __init kmem_cache_init(void)
 	create_boot_cache(kmem_cache, "kmem_cache",
 			offsetof(struct kmem_cache, node) +
 				nr_node_ids * sizeof(struct kmem_cache_node *),
-		       SLAB_HWCACHE_ALIGN);
+		       SLAB_HWCACHE_ALIGN, 0, 0);
 
 	kmem_cache = bootstrap(&boot_kmem_cache);
 
@@ -5230,6 +5230,12 @@ static ssize_t cache_dma_show(struct kmem_cache *s, char *buf)
 SLAB_ATTR_RO(cache_dma);
 #endif
 
+static ssize_t usersize_show(struct kmem_cache *s, char *buf)
+{
+	return sprintf(buf, "%zu\n", s->usersize);
+}
+SLAB_ATTR_RO(usersize);
+
 static ssize_t destroy_by_rcu_show(struct kmem_cache *s, char *buf)
 {
 	return sprintf(buf, "%d\n", !!(s->flags & SLAB_TYPESAFE_BY_RCU));
@@ -5607,6 +5613,7 @@ static struct attribute *slab_attrs[] = {
 #ifdef CONFIG_FAILSLAB
 	&failslab_attr.attr,
 #endif
+	&usersize_attr.attr,
 
 	NULL
 };
