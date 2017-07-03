@@ -189,7 +189,6 @@ out:
 	return ret;
 }
 
-
 static struct proto_ops algif_skcipher_ops = {
 	.family		=	PF_ALG,
 
