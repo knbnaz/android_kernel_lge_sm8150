@@ -1270,7 +1270,7 @@ SYSCALL_DEFINE3(getrandom, char __user *, ubuf, size_t, len, unsigned int, flags
 	return get_random_bytes_user(&iter);
 }
 
-static unsigned int random_poll(struct file *file, poll_table *wait)
+static __poll_t random_poll(struct file *file, poll_table *wait)
 {
 	poll_wait(file, &crng_init_wait, wait);
 	return crng_ready() ? POLLIN | POLLRDNORM : POLLOUT | POLLWRNORM;
