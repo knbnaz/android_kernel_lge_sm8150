@@ -70,7 +70,7 @@ static int mode;
 static char *tvmem[TVMEMSIZE];
 
 static char *check[] = {
-	"des", "md5", "des3_ede", "rot13", "sha1", "sha224", "sha256",
+	"des", "md5", "des3_ede", "rot13", "sha1", "sha224", "sha256", "sm3",
 	"blowfish", "twofish", "serpent", "sha384", "sha512", "md4", "aes",
 	"cast6", "arc4", "michael_mic", "deflate", "crc32c", "tea", "xtea",
 	"khazad", "wp512", "wp384", "wp256", "tnepres", "xeta",  "fcrypt",
@@ -1276,6 +1276,10 @@ static int do_test(const char *alg, u32 type, u32 mask, int m)
 		ret += tcrypt_test("sha3-512");
 		break;
 
+	case 52:
+		ret += tcrypt_test("sm3");
+		break;
+
 	case 100:
 		ret += tcrypt_test("hmac(md5)");
 		break;
@@ -1729,6 +1733,10 @@ static int do_test(const char *alg, u32 type, u32 mask, int m)
 		test_hash_speed("sha3-512", sec, generic_hash_speed_template);
 		if (mode > 300 && mode < 400) break;
 
+	case 326:
+		test_hash_speed("sm3", sec, generic_hash_speed_template);
+		if (mode > 300 && mode < 400) break;
+
 	case 399:
 		break;
 
@@ -1835,6 +1843,10 @@ static int do_test(const char *alg, u32 type, u32 mask, int m)
 
 	case 424:
 		test_mb_ahash_speed("sha512", sec, generic_hash_speed_template);
+		if (mode > 400 && mode < 500) break;
+
+	case 425:
+		test_mb_ahash_speed("sm3", sec, generic_hash_speed_template);
 		if (mode > 400 && mode < 500) break;
 
 	case 499:
