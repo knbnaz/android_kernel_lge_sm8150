@@ -715,7 +715,6 @@ static unsigned int tipc_poll(struct file *file, struct socket *sock,
 			      poll_table *wait)
 {
 	struct sock *sk = sock->sk;
-	struct sk_buff *skb = skb_peek(&sk->sk_receive_queue);
 	struct tipc_sock *tsk = tipc_sk(sk);
 	struct tipc_group *grp = tsk->group;
 	u32 revents = 0;
