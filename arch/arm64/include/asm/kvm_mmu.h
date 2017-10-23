@@ -263,8 +263,8 @@ static inline void __coherent_cache_guest_page(struct kvm_vcpu *vcpu,
 		__flush_icache_all();
 	} else if (is_kernel_in_hyp_mode() || !icache_is_vpipt()) {
 		/* PIPT or VPIPT at EL2 (see comment in __kvm_tlb_flush_vmid_ipa) */
-		flush_icache_range((unsigned long)va,
-				   (unsigned long)va + size);
+		invalidate_icache_range((unsigned long)va,
+					(unsigned long)va + size);
 	}
 }
 
