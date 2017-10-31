@@ -515,6 +515,11 @@ static inline bool system_uses_ttbr0_pan(void)
 		!cpus_have_const_cap(ARM64_HAS_PAN);
 }
 
+static inline bool system_supports_sve(void)
+{
+	return false;
+}
+
 static inline int arm64_get_ssbd_state(void)
 {
 #ifdef CONFIG_ARM64_SSBD
