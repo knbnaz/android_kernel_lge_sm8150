@@ -966,6 +966,8 @@ static __net_exit void ppp_exit_net(struct net *net)
 
 	mutex_destroy(&pn->all_ppp_mutex);
 	idr_destroy(&pn->units_idr);
+	WARN_ON_ONCE(!list_empty(&pn->all_channels));
+	WARN_ON_ONCE(!list_empty(&pn->new_channels));
 }
 
 static struct pernet_operations ppp_net_ops = {
