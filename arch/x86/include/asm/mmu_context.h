@@ -236,7 +236,7 @@ do {						\
 } while (0)
 #endif
 
-static inline void arch_dup_pkeys(struct mm_struct *oldmm,
+static inline int arch_dup_pkeys(struct mm_struct *oldmm,
 				  struct mm_struct *mm)
 {
 #ifdef CONFIG_X86_INTEL_MEMORY_PROTECTION_KEYS
@@ -253,7 +253,7 @@ static inline int arch_dup_mmap(struct mm_struct *oldmm, struct mm_struct *mm)
 {
 	arch_dup_pkeys(oldmm, mm);
 	paravirt_arch_dup_mmap(oldmm, mm);
-	return ldt_dup_context(oldmm, mm);
+	return 0;
 }
 
 static inline void arch_exit_mmap(struct mm_struct *mm)
