@@ -252,7 +252,7 @@ vclkdev_alloc(struct clk_hw *hw, const char *con_id, const char *dev_fmt,
 {
 	struct clk_lookup_alloc *cla;
 
-	cla = __clkdev_alloc(sizeof(*cla));
+	cla = kzalloc(sizeof(*cla), GFP_KERNEL);
 	if (!cla)
 		return NULL;
 
