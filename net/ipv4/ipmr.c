@@ -2888,7 +2888,6 @@ static int ipmr_vif_open(struct inode *inode, struct file *file)
 }
 
 static const struct file_operations ipmr_vif_fops = {
-	.owner	 = THIS_MODULE,
 	.open    = ipmr_vif_open,
 	.read    = seq_read,
 	.llseek  = seq_lseek,
@@ -3041,7 +3040,6 @@ static int ipmr_mfc_open(struct inode *inode, struct file *file)
 }
 
 static const struct file_operations ipmr_mfc_fops = {
-	.owner	 = THIS_MODULE,
 	.open    = ipmr_mfc_open,
 	.read    = seq_read,
 	.llseek  = seq_lseek,
