@@ -687,10 +687,9 @@ static char *ptr_to_id(char *buf, char *end, const void *ptr,
 		       struct printf_spec spec)
 {
 	unsigned long hashval;
-	const int default_width = 2 * sizeof(ptr);
 
 	if (static_branch_unlikely(&not_filled_random_ptr_key)) {
-		spec.field_width = default_width;
+		spec.field_width = 2 * sizeof(ptr);
 		/* string length must be less than default_width */
 		return string(buf, end, "(ptrval)", spec);
 	}
@@ -705,15 +704,7 @@ static char *ptr_to_id(char *buf, char *end, const void *ptr,
 #else
 	hashval = (unsigned long)siphash_1u32((u32)ptr, &ptr_key);
 #endif
-
-	spec.flags |= SMALL;
-	if (spec.field_width == -1) {
-		spec.field_width = default_width;
-		spec.flags |= ZEROPAD;
-	}
-	spec.base = 16;
-
-	return number(buf, end, hashval, spec);
+	return pointer_string(buf, end, (const void *)hashval, spec);
 }
 
 static noinline_for_stack
@@ -1467,13 +1458,6 @@ static noinline_for_stack
 char *restricted_pointer(char *buf, char *end, const void *ptr,
 			 struct printf_spec spec)
 {
-	spec.base = 16;
-	spec.flags |= SMALL;
-	if (spec.field_width == -1) {
-		spec.field_width = 2 * sizeof(ptr);
-		spec.flags |= ZEROPAD;
-	}
-
 	switch (kptr_restrict) {
 	case 0:
 		/* Always print %pK values */
@@ -1485,8 +1469,11 @@ char *restricted_pointer(char *buf, char *end, const void *ptr,
 		 * kptr_restrict==1 cannot be used in IRQ context
 		 * because its test for CAP_SYSLOG would be meaningless.
 		 */
-		if (in_irq() || in_serving_softirq() || in_nmi())
+		if (in_irq() || in_serving_softirq() || in_nmi()) {
+			if (spec.field_width == -1)
+				spec.field_width = 2 * sizeof(ptr);
 			return string(buf, end, "pK-error", spec);
+		}
 
 		/*
 		 * Only print the real pointer value if the current
@@ -1511,7 +1498,7 @@ char *restricted_pointer(char *buf, char *end, const void *ptr,
 		break;
 	}
 
-	return number(buf, end, (unsigned long)ptr, spec);
+	return pointer_string(buf, end, ptr, spec);
 }
 
 static noinline_for_stack
