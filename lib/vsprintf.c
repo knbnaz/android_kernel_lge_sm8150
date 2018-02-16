@@ -686,12 +686,13 @@ early_initcall(initialize_ptr_random);
 static char *ptr_to_id(char *buf, char *end, const void *ptr,
 		       struct printf_spec spec)
 {
+	const char *str = sizeof(ptr) == 8 ? "(____ptrval____)" : "(ptrval)";
 	unsigned long hashval;
 
 	if (static_branch_unlikely(&not_filled_random_ptr_key)) {
 		spec.field_width = 2 * sizeof(ptr);
 		/* string length must be less than default_width */
-		return string(buf, end, "(ptrval)", spec);
+		return string(buf, end, str, spec);
 	}
 
 #ifdef CONFIG_64BIT
