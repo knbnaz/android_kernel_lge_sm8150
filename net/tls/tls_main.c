@@ -53,6 +53,12 @@ enum {
 };
 
 enum {
+	TLSV4,
+	TLSV6,
+	TLS_NUM_PROTS,
+};
+
+enum {
 	TLS_BASE_TX,
 	TLS_SW_TX,
 	TLS_NUM_CONFIG,
