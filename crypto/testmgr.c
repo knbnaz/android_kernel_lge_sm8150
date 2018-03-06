@@ -3089,6 +3089,15 @@ static const struct alg_test_desc alg_test_descs[] = {
 			}
 		}
 	}, {
+		.alg = "ecb(sm4)",
+		.test = alg_test_skcipher,
+		.suite = {
+			.cipher = {
+				.enc = __VECS(sm4_enc_tv_template),
+				.dec = __VECS(sm4_dec_tv_template)
+			}
+		}
+	}, {
 		.alg = "ecb(tea)",
 		.test = alg_test_skcipher,
 		.suite = {
