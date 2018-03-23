@@ -55,7 +55,7 @@
 #define VF_TAKEOVER_INT (HZ / 10)
 
 static int ring_size = 128;
-module_param(ring_size, int, S_IRUGO);
+module_param(ring_size, int, 0444);
 MODULE_PARM_DESC(ring_size, "Ring buffer size (# of pages)");
 
 static const u32 default_msg = NETIF_MSG_DRV | NETIF_MSG_PROBE |
@@ -64,7 +64,7 @@ static const u32 default_msg = NETIF_MSG_DRV | NETIF_MSG_PROBE |
 				NETIF_MSG_TX_ERR;
 
 static int debug = -1;
-module_param(debug, int, S_IRUGO);
+module_param(debug, int, 0444);
 MODULE_PARM_DESC(debug, "Debug level (0=none,...,16=all)");
 
 static LIST_HEAD(netvsc_dev_list);
