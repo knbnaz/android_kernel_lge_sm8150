@@ -156,10 +156,6 @@ static int alg_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
 	void *private;
 	int err;
 
-	/* If caller uses non-allowed flag, return error. */
-	if ((sa->salg_feat & ~allowed) || (sa->salg_mask & ~allowed))
-		return -EINVAL;
-
 	if (sock->state == SS_CONNECTED)
 		return -EINVAL;
 
@@ -168,6 +164,10 @@ static int alg_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
 	BUILD_BUG_ON(offsetof(struct sockaddr_alg, salg_name) != sizeof(*sa));
 
 	if (addr_len < sizeof(*sa) + 1)
+		return -EINVAL;
+
+	/* If caller uses non-allowed flag, return error. */
+	if ((sa->salg_feat & ~allowed) || (sa->salg_mask & ~allowed))
 		return -EINVAL;
 
 	/* If caller uses non-allowed flag, return error. */
