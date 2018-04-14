@@ -1752,10 +1752,10 @@ char *device_node_string(char *buf, char *end, struct device_node *dn,
  *
  * Right now we handle:
  *
- * - 'F' For symbolic function descriptor pointers with offset
- * - 'f' For simple symbolic function names without offset
- * - 'S' For symbolic direct pointers with offset
- * - 's' For symbolic direct pointers without offset
+ * - 'S' For symbolic direct pointers (or function descriptors) with offset
+ * - 's' For symbolic direct pointers (or function descriptors) without offset
+ * - 'F' Same as 'S'
+ * - 'f' Same as 's'
  * - '[FfSs]R' as above with __builtin_extract_return_addr() translation
  * - 'B' For backtraced symbolic direct pointers with offset
  * - 'R' For decoded struct resource, e.g., [mem 0x0-0x1f 64bit pref]
@@ -1850,10 +1850,6 @@ char *device_node_string(char *buf, char *end, struct device_node *dn,
  * - 'x' For printing the address. Equivalent to "%lx".
  *
  * ** Please update also Documentation/printk-formats.txt when making changes **
- *
- * Note: The difference between 'S' and 'F' is that on ia64 and ppc64
- * function pointers are really function descriptors, which contain a
- * pointer to the real address.
  *
  * Note: The default behaviour (unadorned %p) is to hash the address,
  * rendering it useful as a unique identifier.
