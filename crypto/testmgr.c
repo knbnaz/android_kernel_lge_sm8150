@@ -2670,6 +2670,13 @@ static const struct alg_test_desc alg_test_descs[] = {
 			}
 		}
 	}, {
+		/* Same as cbc(aes) except the key is stored in
+		 * hardware secure memory which we reference by index
+		 */
+		.alg = "cbc(paes)",
+		.test = alg_test_null,
+		.fips_allowed = 1,
+	}, {
 		.alg = "cbc(serpent)",
 		.test = alg_test_skcipher,
 		.suite = {
@@ -2815,6 +2822,13 @@ static const struct alg_test_desc alg_test_descs[] = {
 				.dec = __VECS(des3_ede_ctr_dec_tv_template)
 			}
 		}
+	}, {
+		/* Same as ctr(aes) except the key is stored in
+		 * hardware secure memory which we reference by index
+		 */
+		.alg = "ctr(paes)",
+		.test = alg_test_null,
+		.fips_allowed = 1,
 	}, {
 		.alg = "ctr(serpent)",
 		.test = alg_test_skcipher,
@@ -3085,6 +3099,13 @@ static const struct alg_test_desc alg_test_descs[] = {
 				}
 			}
 		}
+	}, {
+		/* Same as ecb(aes) except the key is stored in
+		 * hardware secure memory which we reference by index
+		 */
+		.alg = "ecb(paes)",
+		.test = alg_test_null,
+		.fips_allowed = 1,
 	}, {
 		.alg = "ecb(khazad)",
 		.test = alg_test_skcipher,
@@ -3401,6 +3422,13 @@ static const struct alg_test_desc alg_test_descs[] = {
 			}
 		}
 	}, {
+		/* Same as ofb(aes) except the key is stored in
+		 * hardware secure memory which we reference by index
+		 */
+		.alg = "ofb(paes)",
+		.test = alg_test_null,
+		.fips_allowed = 1,
+	}, {
 		.alg = "pcbc(fcrypt)",
 		.test = alg_test_skcipher,
 		.suite = {
@@ -3675,6 +3703,21 @@ static const struct alg_test_desc alg_test_descs[] = {
 				.dec = __VECS(aes_xts_dec_tv_template)
 			}
 		}
+	}, {
+		/* Same as xts(aes) except the key is stored in
+		 * hardware secure memory which we reference by index
+		 */
+		.alg = "xts(paes)",
+		.test = alg_test_null,
+		.fips_allowed = 1,
+	}, {
+		.alg = "xts4096(paes)",
+		.test = alg_test_null,
+		.fips_allowed = 1,
+	}, {
+		.alg = "xts512(paes)",
+		.test = alg_test_null,
+		.fips_allowed = 1,
 	}, {
 		.alg = "xts(camellia)",
 		.test = alg_test_skcipher,
