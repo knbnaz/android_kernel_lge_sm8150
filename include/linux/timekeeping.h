@@ -19,23 +19,25 @@ extern void xtime_update(unsigned long ticks);
 extern int do_settimeofday64(const struct timespec64 *ts);
 extern int do_sys_settimeofday64(const struct timespec64 *tv,
 				 const struct timezone *tz);
-/*
- * Kernel time accessors
- */
-struct timespec64 current_kernel_time64(void);
 
 /*
  * timespec64 based interfaces
  */
-struct timespec64 get_monotonic_coarse64(void);
-extern void getrawmonotonic64(struct timespec64 *ts);
+extern void ktime_get_raw_ts64(struct timespec64 *ts);
 extern void ktime_get_ts64(struct timespec64 *ts);
+extern void ktime_get_coarse_ts64(struct timespec64 *ts);
+extern void ktime_get_coarse_real_ts64(struct timespec64 *ts);
+
+void getboottime64(struct timespec64 *ts);
+
+/*
+ * time64_t base interfaces
+ */
 extern time64_t ktime_get_seconds(void);
 extern time64_t ktime_get_real_seconds(void);
 
 extern int __getnstimeofday64(struct timespec64 *tv);
 extern void getnstimeofday64(struct timespec64 *tv);
-extern void getboottime64(struct timespec64 *ts);
 
 #define ktime_get_real_ts64(ts)	getnstimeofday64(ts)
 
@@ -169,12 +171,12 @@ extern u64 ktime_get_boot_fast_ns(void);
  * for API completeness, these could be implemented more efficiently
  * if needed.
  */
-static inline void get_monotonic_boottime64(struct timespec64 *ts)
+static inline void ktime_get_boottime_ts64(struct timespec64 *ts)
 {
 	*ts = ktime_to_timespec64(ktime_get_boottime());
 }
 
-static inline void timekeeping_clocktai64(struct timespec64 *ts)
+static inline void ktime_get_clocktai_ts64(struct timespec64 *ts)
 {
 	*ts = ktime_to_timespec64(ktime_get_clocktai());
 }
@@ -280,5 +282,26 @@ extern void read_persistent_clock64(struct timespec64 *ts);
 extern void read_boot_clock64(struct timespec64 *ts);
 extern int update_persistent_clock64(struct timespec64 now);
 
+#define get_monotonic_boottime64(ts)	ktime_get_boottime_ts64(ts)
+#define getrawmonotonic64(ts)		ktime_get_raw_ts64(ts)
+#define timekeeping_clocktai64(ts)	ktime_get_clocktai_ts64(ts)
+
+static inline struct timespec64 current_kernel_time64(void)
+{
+	struct timespec64 ts;
+
+	ktime_get_coarse_real_ts64(&ts);
+
+	return ts;
+}
+
+static inline struct timespec64 get_monotonic_coarse64(void)
+{
+	struct timespec64 ts;
+
+	ktime_get_coarse_ts64(&ts);
+
+	return ts;
+}
 
 #endif
