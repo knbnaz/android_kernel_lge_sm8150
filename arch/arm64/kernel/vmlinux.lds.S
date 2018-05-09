@@ -27,9 +27,9 @@ jiffies = jiffies_64;
 
 #define HYPERVISOR_EXTABLE					\
 	. = ALIGN(SZ_8);					\
-	VMLINUX_SYMBOL(__start___kvm_ex_table) = .;		\
+	__start___kvm_ex_table = .;				\
 	*(__kvm_ex_table)					\
-	VMLINUX_SYMBOL(__stop___kvm_ex_table) = .;
+	__stop___kvm_ex_table = .;
 
 #define HYPERVISOR_TEXT					\
 	/*						\
@@ -41,26 +41,26 @@ jiffies = jiffies_64;
 	 *    4 KB (see related ASSERT() below)		\
 	 */						\
 	. = ALIGN(SZ_4K);				\
-	VMLINUX_SYMBOL(__hyp_idmap_text_start) = .;	\
+	__hyp_idmap_text_start = .;			\
 	*(.hyp.idmap.text)				\
-	VMLINUX_SYMBOL(__hyp_idmap_text_end) = .;	\
-	VMLINUX_SYMBOL(__hyp_text_start) = .;		\
+	__hyp_idmap_text_end = .;			\
+	__hyp_text_start = .;				\
 	*(.hyp.text)					\
 	HYPERVISOR_EXTABLE				\
-	VMLINUX_SYMBOL(__hyp_text_end) = .;
+	__hyp_text_end = .;
 
 #define IDMAP_TEXT					\
 	. = ALIGN(SZ_4K);				\
-	VMLINUX_SYMBOL(__idmap_text_start) = .;		\
+	__idmap_text_start = .;				\
 	*(.idmap.text)					\
-	VMLINUX_SYMBOL(__idmap_text_end) = .;
+	__idmap_text_end = .;
 
 #ifdef CONFIG_HIBERNATION
 #define HIBERNATE_TEXT					\
 	. = ALIGN(SZ_4K);				\
-	VMLINUX_SYMBOL(__hibernate_exit_text_start) = .;\
+	__hibernate_exit_text_start = .;		\
 	*(.hibernate_exit.text)				\
-	VMLINUX_SYMBOL(__hibernate_exit_text_end) = .;
+	__hibernate_exit_text_end = .;
 #else
 #define HIBERNATE_TEXT
 #endif
@@ -68,10 +68,10 @@ jiffies = jiffies_64;
 #ifdef CONFIG_UNMAP_KERNEL_AT_EL0
 #define TRAMP_TEXT					\
 	. = ALIGN(PAGE_SIZE);				\
-	VMLINUX_SYMBOL(__entry_tramp_text_start) = .;	\
+	__entry_tramp_text_start = .;			\
 	KEEP(*(.entry.tramp.text))			\
 	. = ALIGN(PAGE_SIZE);				\
-	VMLINUX_SYMBOL(__entry_tramp_text_end) = .;
+	__entry_tramp_text_end = .;
 #else
 #define TRAMP_TEXT
 #endif
