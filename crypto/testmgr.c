@@ -2400,6 +2400,33 @@ static const struct alg_test_desc alg_test_descs[] = {
 			}
 		},
 	}, {
+		.alg = "aegis128",
+		.test = alg_test_aead,
+		.suite = {
+			.aead = {
+				.enc = __VECS(aegis128_enc_tv_template),
+				.dec = __VECS(aegis128_dec_tv_template),
+			}
+		}
+	}, {
+		.alg = "aegis128l",
+		.test = alg_test_aead,
+		.suite = {
+			.aead = {
+				.enc = __VECS(aegis128l_enc_tv_template),
+				.dec = __VECS(aegis128l_dec_tv_template),
+			}
+		}
+	}, {
+		.alg = "aegis256",
+		.test = alg_test_aead,
+		.suite = {
+			.aead = {
+				.enc = __VECS(aegis256_enc_tv_template),
+				.dec = __VECS(aegis256_dec_tv_template),
+			}
+		}
+	}, {
 		.alg = "ansi_cprng",
 		.test = alg_test_cprng,
 		.suite = {
