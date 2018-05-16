@@ -83,10 +83,13 @@ struct tls_device {
 	void (*unhash)(struct tls_device *device, struct sock *sk);
 };
 
-struct tls_sw_context_tx {
+struct tls_sw_context {
 	struct crypto_aead *aead_send;
+	struct crypto_aead *aead_recv;
 	struct crypto_wait async_wait;
 
+	char rx_aad_ciphertext[TLS_AAD_SPACE_SIZE];
+	char rx_aad_plaintext[TLS_AAD_SPACE_SIZE];
 	char aad_space[TLS_AAD_SPACE_SIZE];
 
 	unsigned int sg_plaintext_size;
