@@ -108,7 +108,7 @@ ENDPROC(flush_cache_all)
  *	- start   - virtual start address of region
  *	- end     - virtual end address of region
  */
-ENTRY(flush_icache_range)
+ENTRY(__flush_icache_range)
 	/* FALLTHROUGH */
 
 /*
@@ -141,7 +141,7 @@ user_alt 9f, "dc cvau, x4",  "dc civac, x4",  ARM64_WORKAROUND_CLEAN_CACHE
 9:
 	mov	x0, #-EFAULT
 	b	1b
-ENDPROC(flush_icache_range)
+ENDPROC(__flush_icache_range)
 ENDPROC(__flush_cache_user_range)
 
 /*
