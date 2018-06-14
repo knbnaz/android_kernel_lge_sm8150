@@ -33,6 +33,9 @@ KASAN_SANITIZE := n
 UBSAN_SANITIZE := n
 KCOV_INSTRUMENT := n
 
+# Prevents link failures: __sanitizer_cov_trace_pc() is not linked in.
+KCOV_INSTRUMENT := n
+
 # Force dependency
 $(obj)/vdso.o : $(obj)/vdso.so
 
