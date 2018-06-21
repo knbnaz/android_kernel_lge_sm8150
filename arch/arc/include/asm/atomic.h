@@ -519,6 +519,7 @@ static inline long long atomic64_dec_if_positive(atomic64_t *v)
 
 	return val;
 }
+#define atomic64_dec_if_positive atomic64_dec_if_positive
 
 /**
  * atomic64_add_unless - add unless the number is a given value
