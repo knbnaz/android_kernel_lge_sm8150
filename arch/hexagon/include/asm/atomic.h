@@ -200,10 +200,4 @@ static inline int atomic_fetch_add_unless(atomic_t *v, int a, int u)
 
 #define atomic_inc_not_zero(v) atomic_add_unless((v), 1, 0)
 
-#define atomic_inc(v) atomic_add(1, (v))
-#define atomic_dec(v) atomic_sub(1, (v))
-
-#define atomic_inc_return(v) (atomic_add_return(1, v))
-#define atomic_dec_return(v) (atomic_sub_return(1, v))
-
 #endif
