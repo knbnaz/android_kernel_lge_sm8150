@@ -532,7 +532,7 @@
  */
 static inline bool atomic_add_unless(atomic_t *v, int a, int u)
 {
-	return __atomic_add_unless(v, a, u) != u;
+	return atomic_fetch_add_unless(v, a, u) != u;
 }
 
 /**
