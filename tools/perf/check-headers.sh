@@ -36,6 +36,7 @@ arch/s390/include/uapi/asm/ptrace.h
 arch/s390/include/uapi/asm/sie.h
 arch/arm/include/uapi/asm/kvm.h
 arch/arm64/include/uapi/asm/kvm.h
+arch/arm64/include/uapi/asm/unistd.h
 arch/alpha/include/uapi/asm/errno.h
 arch/mips/include/asm/errno.h
 arch/mips/include/uapi/asm/errno.h
@@ -54,6 +55,7 @@ include/uapi/asm-generic/errno.h
 include/uapi/asm-generic/errno-base.h
 include/uapi/asm-generic/ioctls.h
 include/uapi/asm-generic/mman-common.h
+include/uapi/asm-generic/unistd.h
 '
 
 check_2 () {
