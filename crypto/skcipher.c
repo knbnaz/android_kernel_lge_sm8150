@@ -446,7 +446,6 @@ static int skcipher_walk_first(struct skcipher_walk *walk)
 	}
 
 	walk->page = NULL;
-	walk->nbytes = walk->total;
 
 	return skcipher_walk_next(walk);
 }
