@@ -51,7 +51,6 @@
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 
-#include <asm/cacheflush.h>
 #include <linux/fdtable.h>
 #include <linux/file.h>
 #include <linux/freezer.h>
@@ -74,6 +73,7 @@
 
 #include <uapi/linux/android/binder.h>
 #include <uapi/linux/sched/types.h>
+#include <asm/cacheflush.h>
 #include "binder_alloc.h"
 #include "binder_internal.h"
 #include "binder_trace.h"
