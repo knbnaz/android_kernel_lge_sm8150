@@ -6,11 +6,7 @@
 /* Some compiler specific definitions are overwritten here
  * for Clang compiler
  */
-
-#ifdef uninitialized_var
-#undef uninitialized_var
 #define uninitialized_var(x) x = *(&(x))
-#endif
 
 /* same as gcc, this was present in clang-2.6 so we can assume it works
  * with any version that can compile the kernel
@@ -20,21 +16,13 @@
 /* all clang versions usable with the kernel support KASAN ABI version 5 */
 #define KASAN_ABI_VERSION 5
 
-/* __no_sanitize_address has been already defined compiler-gcc.h */
-#undef __no_sanitize_address
-
-#if __has_feature(address_sanitizer) || __has_feature(hwaddress_sanitizer)
+if __has_feature(address_sanitizer) || __has_feature(hwaddress_sanitizer)
 /* emulate gcc's __SANITIZE_ADDRESS__ flag */
 #define __SANITIZE_ADDRESS__
 #define __no_sanitize_address \
 		__attribute__((no_sanitize("address", "hwaddress")))
 #else
 #define __no_sanitize_address
-#endif
-
-/* Clang doesn't have a way to turn it off per-function, yet. */
-#ifdef __noretpoline
-#undef __noretpoline
 #endif
 
 #ifdef CONFIG_LTO_CLANG
@@ -53,7 +41,6 @@
  * checks. Unfortunately, we don't know which version of gcc clang
  * pretends to be, so the macro may or may not be defined.
  */
-#undef COMPILER_HAS_GENERIC_BUILTIN_OVERFLOW
 #if __has_builtin(__builtin_mul_overflow) && \
     __has_builtin(__builtin_add_overflow) && \
     __has_builtin(__builtin_sub_overflow)
@@ -65,3 +52,12 @@
 #else
 # define __noscs
 #endif
+
+/* The following are for compatibility with GCC, from compiler-gcc.h,
+ * and may be redefined here because they should not be shared with other
+ * compilers, like ICC.
+ */
+#define barrier() __asm__ __volatile__("" : : : "memory")
+#define __must_be_array(a) BUILD_BUG_ON_ZERO(__same_type((a), &(a)[0]))
+#define __assume_aligned(a, ...)	\
+	__attribute__((__assume_aligned__(a, ## __VA_ARGS__)))

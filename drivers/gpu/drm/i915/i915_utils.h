@@ -43,7 +43,7 @@
 #define MISSING_CASE(x) WARN(1, "Missing switch case (%lu) in %s\n", \
 			     (long)(x), __func__)
 
-#if GCC_VERSION >= 70000
+#if defined(GCC_VERSION) && GCC_VERSION >= 70000
 #define add_overflows(A, B) \
 	__builtin_add_overflow_p((A), (B), (typeof((A) + (B)))0)
 #else
