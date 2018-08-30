@@ -54,6 +54,9 @@ extern void __chk_io_ptr(const volatile void __iomem *);
 
 #ifdef __KERNEL__
 
+/* Attributes */
+#include <linux/compiler_attributes.h>
+
 /* Compiler specific macros. */
 #ifdef __clang__
 #include <linux/compiler-clang.h>
@@ -78,12 +81,6 @@ extern void __chk_io_ptr(const volatile void __iomem *);
 #include <asm/compiler.h>
 #endif
 
-/*
- * Generic compiler-independent macros required for kernel
- * build go below this comment. Actual compiler/compiler version
- * specific implementations come from the above header files
- */
-
 struct ftrace_branch_data {
 	const char *func;
 	const char *file;
@@ -106,9 +103,6 @@ struct ftrace_likely_data {
 	unsigned long			constant;
 };
 
-/* Don't. Just don't. */
-#define __deprecated
-
 #endif /* __KERNEL__ */
 
 #endif /* __ASSEMBLY__ */
@@ -122,10 +116,6 @@ struct ftrace_likely_data {
  * compilers. We don't consider that to be an error, so set them to nothing.
  * For example, some of them are for compiler specific plugins.
  */
-#ifndef __designated_init
-# define __designated_init
-#endif
-
 #ifndef __latent_entropy
 # define __latent_entropy
 #endif
@@ -143,23 +133,12 @@ struct ftrace_likely_data {
 # define randomized_struct_fields_end
 #endif
 
-#ifndef __visible
-#define __visible
-#endif
-
 #ifndef __norecordmcount
 #define __norecordmcount
 #endif
 
 #ifndef __nocfi
 #define __nocfi
-#endif
-
-/*
- * Assume alignment of return value.
- */
-#ifndef __assume_aligned
-#define __assume_aligned(a, ...)
 #endif
 
 /* Are two types/vars the same type (ignoring qualifiers)? */
@@ -169,10 +148,6 @@ struct ftrace_likely_data {
 #define __native_word(t) \
 	(sizeof(t) == sizeof(char) || sizeof(t) == sizeof(short) || \
 	 sizeof(t) == sizeof(int) || sizeof(t) == sizeof(long))
-
-#ifndef __noclone
-#define __noclone
-#endif
 
 /* Helpers for emitting diagnostics in pragmas. */
 #ifndef __diag
@@ -192,37 +167,6 @@ struct ftrace_likely_data {
 	__diag_ ## compiler(version, warn, option)
 #define __diag_error(compiler, version, option, comment) \
 	__diag_ ## compiler(version, error, option)
-
-/*
- * From the GCC manual:
- *
- * Many functions have no effects except the return value and their
- * return value depends only on the parameters and/or global
- * variables.  Such a function can be subject to common subexpression
- * elimination and loop optimization just as an arithmetic operator
- * would be.
- * [...]
- */
-#define __pure			__attribute__((__pure__))
-#define __attribute_const__	__attribute__((__const__))
-#define __aligned(x)		__attribute__((__aligned__(x)))
-#define __aligned_largest	__attribute__((__aligned__))
-#define __printf(a, b)		__attribute__((__format__(printf, a, b)))
-#define __scanf(a, b)		__attribute__((__format__(scanf, a, b)))
-#define __maybe_unused		__attribute__((__unused__))
-#define __always_unused		__attribute__((__unused__))
-#define __mode(x)		__attribute__((__mode__(x)))
-#define __malloc		__attribute__((__malloc__))
-#define __used			__attribute__((__used__))
-#define __noreturn		__attribute__((__noreturn__))
-#define __packed		__attribute__((__packed__))
-#define __weak			__attribute__((__weak__))
-#define __alias(symbol)		__attribute__((__alias__(#symbol)))
-#define __cold			__attribute__((__cold__))
-#define __section(S)		__attribute__((__section__(#S)))
-#define __always_inline		inline __attribute__((__always_inline__))
-#define __gnu_inline		__attribute__((__gnu_inline__))
-
 
 #ifdef CONFIG_ENABLE_MUST_CHECK
 #define __must_check		__attribute__((__warn_unused_result__))
@@ -257,18 +201,20 @@ struct ftrace_likely_data {
  * semantics rather than c99. This prevents multiple symbol definition errors
  * of extern inline functions at link time.
  * A lot of inline functions can cause havoc with function tracing.
+ * Do not use __always_inline here, since currently it expands to inline again
+ * (which would break users of __always_inline).
  */
 #if !defined(CONFIG_ARCH_SUPPORTS_OPTIMIZED_INLINING) || \
 	!defined(CONFIG_OPTIMIZE_INLINING)
-#define inline \
-	inline __attribute__((__always_inline__, __unused__)) notrace __gnu_inline
+#define inline inline __attribute__((__always_inline__)) __gnu_inline \
+	__maybe_unused notrace
 #else
-#define inline inline	__attribute__((__unused__)) notrace __gnu_inline
+#define inline inline                                    __gnu_inline \
+	__maybe_unused notrace
 #endif
 
 #define __inline__ inline
-#define __inline inline
-#define noinline	__attribute__((__noinline__))
+#define __inline   inline
 
 /*
  * Rather then using noinline to prevent stack consumption, use

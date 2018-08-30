@@ -58,5 +58,3 @@ if __has_feature(address_sanitizer) || __has_feature(hwaddress_sanitizer)
  * compilers, like ICC.
  */
 #define barrier() __asm__ __volatile__("" : : : "memory")
-#define __assume_aligned(a, ...)	\
-	__attribute__((__assume_aligned__(a, ## __VA_ARGS__)))
