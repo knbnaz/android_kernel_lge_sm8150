@@ -82,7 +82,7 @@
 #endif
 
 #ifdef CONFIG_RETPOLINE
-#define __noretpoline __attribute__((indirect_branch("keep")))
+#define __noretpoline __attribute__((__indirect_branch__("keep")))
 #endif
 
 #define __UNIQUE_ID(prefix) __PASTE(__PASTE(__UNIQUE_ID_, prefix), __COUNTER__)
@@ -90,8 +90,8 @@
 #define __compiletime_object_size(obj) __builtin_object_size(obj, 0)
 
 #ifndef __CHECKER__
-#define __compiletime_warning(message) __attribute__((warning(message)))
-#define __compiletime_error(message) __attribute__((error(message)))
+#define __compiletime_warning(message) __attribute__((__warning__(message)))
+#define __compiletime_error(message) __attribute__((__error__(message)))
 
 #ifdef LATENT_ENTROPY_PLUGIN
 #define __latent_entropy __attribute__((latent_entropy))
@@ -140,7 +140,7 @@
  * optimizer that something else uses this function or variable, thus preventing
  * this.
  */
-#define __visible	__attribute__((externally_visible))
+#define __visible	__attribute__((__externally_visible__))
 
 /* gcc version specific checks */
 
@@ -201,7 +201,7 @@
 #endif
 
 #if __has_attribute(__no_sanitize_address__)
-#define __no_sanitize_address __attribute__((no_sanitize_address))
+#define __no_sanitize_address __attribute__((__no_sanitize_address__))
 #else
 #define __no_sanitize_address
 #endif
@@ -211,7 +211,7 @@
  * Mark structures as requiring designated initializers.
  * https://gcc.gnu.org/onlinedocs/gcc/Designated-Inits.html
  */
-#define __designated_init __attribute__((designated_init))
+#define __designated_init __attribute__((__designated_init__))
 #define COMPILER_HAS_GENERIC_BUILTIN_OVERFLOW 1
 #endif
 
