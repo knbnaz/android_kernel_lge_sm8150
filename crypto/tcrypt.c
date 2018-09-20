@@ -2031,6 +2031,8 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
 		break;
 	case 191:
 		ret += tcrypt_test("ecb(sm4)");
+		ret += tcrypt_test("cbc(sm4)");
+		ret += tcrypt_test("ctr(sm4)");
 		break;
 	case 200:
 		test_cipher_speed("ecb(aes)", ENCRYPT, sec, NULL, 0,
@@ -2278,6 +2280,21 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
 		test_mb_aead_speed("rfc7539esp(chacha20,poly1305)", DECRYPT,
 				   sec, NULL, 0, 16, 8, aead_speed_template_36,
 				   num_mb);
+		break;
+
+	case 218:
+		test_cipher_speed("ecb(sm4)", ENCRYPT, sec, NULL, 0,
+				speed_template_16);
+		test_cipher_speed("ecb(sm4)", DECRYPT, sec, NULL, 0,
+				speed_template_16);
+		test_cipher_speed("cbc(sm4)", ENCRYPT, sec, NULL, 0,
+				speed_template_16);
+		test_cipher_speed("cbc(sm4)", DECRYPT, sec, NULL, 0,
+				speed_template_16);
+		test_cipher_speed("ctr(sm4)", ENCRYPT, sec, NULL, 0,
+				speed_template_16);
+		test_cipher_speed("ctr(sm4)", DECRYPT, sec, NULL, 0,
+				speed_template_16);
 		break;
 
 	case 219:
