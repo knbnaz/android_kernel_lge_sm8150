@@ -1068,22 +1068,6 @@ static struct skcipher_alg aesni_skciphers[] = {
 
 struct simd_skcipher_alg *aesni_simd_skciphers[ARRAY_SIZE(aesni_skciphers)];
 
-struct {
-	const char *algname;
-	const char *drvname;
-	const char *basename;
-	struct simd_skcipher_alg *simd;
-} aesni_simd_skciphers2[] = {
-#if (defined(MODULE) && IS_ENABLED(CONFIG_CRYPTO_PCBC)) || \
-    IS_BUILTIN(CONFIG_CRYPTO_PCBC)
-	{
-		.algname	= "pcbc(aes)",
-		.drvname	= "pcbc-aes-aesni",
-		.basename	= "fpu(pcbc(__aes-aesni))",
-	},
-#endif
-};
-
 #ifdef CONFIG_X86_64
 static int generic_gcmaes_set_key(struct crypto_aead *aead, const u8 *key,
 				  unsigned int key_len)
