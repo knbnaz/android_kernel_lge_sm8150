@@ -387,17 +387,29 @@ static void __init get_fs_names(char *page)
 	*s = '\0';
 }
 
-static int __init do_mount_root(char *name, char *fs, int flags, void *data)
+static int __init do_mount_root(const char *name, const char *fs,
+				 const int flags, const void *data)
 {
 	struct super_block *s;
-	int err = 0;
+	char *data_page;
+	struct page *p;
+	int ret;
 
 #ifdef CONFIG_QGKI_MSM_BOOT_TIME_MARKER
 	place_marker("M - DRIVER F/S Init");
 #endif
-	err = ksys_mount(name, "/root", fs, flags, data);
-	if (err)
-		return err;
+
+	/* do_mount() requires a full page as fifth argument */
+	p = alloc_page(GFP_KERNEL);
+	if (!p)
+		return -ENOMEM;
+
+	data_page = page_address(p);
+	strncpy(data_page, data, PAGE_SIZE - 1);
+
+	ret = do_mount(name, "/root", fs, flags, data_page);
+	if (ret)
+		goto out;
 
 	ksys_chdir("/root");
 	s = current->fs->pwd.dentry->d_sb;
@@ -410,7 +422,10 @@ static int __init do_mount_root(char *name, char *fs, int flags, void *data)
 #ifdef CONFIG_QGKI_MSM_BOOT_TIME_MARKER
 	place_marker("M - DRIVER F/S Ready");
 #endif
-	return 0;
+
+out:
+	put_page(p);
+	return ret;
 }
 
 void __init mount_block_root(char *name, int flags)
@@ -634,7 +649,7 @@ void __init prepare_namespace(void)
 	mount_root();
 out:
 	devtmpfs_mount();
-	ksys_mount(".", "/", NULL, MS_MOVE, NULL);
+	do_mount(".", "/", NULL, MS_MOVE, NULL);
 	ksys_chroot(".");
 }
 
