@@ -1969,6 +1969,7 @@ config CRYPTO_USER_API_AEAD
 
 config CRYPTO_STATS
 	bool
+	depends on CRYPTO_USER
 	help
 	  This option enables the gathering of crypto stats.
 	  This will collect:
