@@ -24,7 +24,6 @@
 #include <linux/in6.h>
 #include <linux/syscalls.h>
 #include <linux/io.h>
-#include <linux/arm-smccc.h>
 #include <linux/kprobes.h>
 
 #include <asm/checksum.h>
@@ -42,6 +41,3 @@ EXPORT_SYMBOL(_mcount);
 NOKPROBE_SYMBOL(_mcount);
 #endif
 
-	/* arm-smccc */
-EXPORT_SYMBOL(__arm_smccc_smc);
-EXPORT_SYMBOL(__arm_smccc_hvc);
