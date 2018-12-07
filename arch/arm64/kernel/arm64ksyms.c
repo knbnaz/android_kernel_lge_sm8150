@@ -29,9 +29,6 @@
 
 #include <asm/checksum.h>
 
-	/* physical memory */
-EXPORT_SYMBOL(memstart_addr);
-
 	/* atomic bitops */
 EXPORT_SYMBOL(set_bit);
 EXPORT_SYMBOL(test_and_set_bit);
