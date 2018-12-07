@@ -29,9 +29,6 @@
 
 #include <asm/checksum.h>
 
-	/* physical memory */
-EXPORT_SYMBOL(memstart_addr);
-
 #ifdef CONFIG_FUNCTION_TRACER
 EXPORT_SYMBOL(_mcount);
 NOKPROBE_SYMBOL(_mcount);
