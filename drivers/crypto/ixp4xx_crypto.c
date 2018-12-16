@@ -1193,7 +1193,6 @@ static struct ixp_alg ixp4xx_algos[] = {
 			.min_keysize	= DES_KEY_SIZE,
 			.max_keysize	= DES_KEY_SIZE,
 			.ivsize		= DES_BLOCK_SIZE,
-			.geniv		= "eseqiv",
 			}
 		}
 	},
@@ -1220,7 +1219,6 @@ static struct ixp_alg ixp4xx_algos[] = {
 			.min_keysize	= DES3_EDE_KEY_SIZE,
 			.max_keysize	= DES3_EDE_KEY_SIZE,
 			.ivsize		= DES3_EDE_BLOCK_SIZE,
-			.geniv		= "eseqiv",
 			}
 		}
 	},
@@ -1246,7 +1244,6 @@ static struct ixp_alg ixp4xx_algos[] = {
 			.min_keysize	= AES_MIN_KEY_SIZE,
 			.max_keysize	= AES_MAX_KEY_SIZE,
 			.ivsize		= AES_BLOCK_SIZE,
-			.geniv		= "eseqiv",
 			}
 		}
 	},
@@ -1272,7 +1269,6 @@ static struct ixp_alg ixp4xx_algos[] = {
 			.min_keysize	= AES_MIN_KEY_SIZE,
 			.max_keysize	= AES_MAX_KEY_SIZE,
 			.ivsize		= AES_BLOCK_SIZE,
-			.geniv		= "eseqiv",
 			}
 		}
 	},
@@ -1286,7 +1282,6 @@ static struct ixp_alg ixp4xx_algos[] = {
 			.min_keysize	= AES_MIN_KEY_SIZE,
 			.max_keysize	= AES_MAX_KEY_SIZE,
 			.ivsize		= AES_BLOCK_SIZE,
-			.geniv		= "eseqiv",
 			.setkey		= ablk_rfc3686_setkey,
 			.encrypt	= ablk_rfc3686_crypt,
 			.decrypt	= ablk_rfc3686_crypt }
