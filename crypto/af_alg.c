@@ -308,8 +308,6 @@ int af_alg_accept(struct sock *sk, struct socket *newsock, bool kern)
 	if (err)
 		goto unlock;
 
-	sk2->sk_family = PF_ALG;
-
 	if (atomic_inc_return_relaxed(&ask->refcnt) == 1)
 		sock_hold(sk);
 	if (nokey) {
@@ -389,7 +387,6 @@ static int alg_create(struct net *net, struct socket *sock, int protocol,
 	sock->ops = &alg_proto_ops;
 	sock_init_data(sock, sk);
 
-	sk->sk_family = PF_ALG;
 	sk->sk_destruct = alg_sock_destruct;
 
 	return 0;
