@@ -721,12 +721,6 @@ static int crypto_gcm_create(struct crypto_template *tmpl, struct rtattr **tb)
 	return crypto_gcm_create_common(tmpl, tb, ctr_name, "ghash");
 }
 
-static struct crypto_template crypto_gcm_tmpl = {
-	.name = "gcm",
-	.create = crypto_gcm_create,
-	.module = THIS_MODULE,
-};
-
 static int crypto_gcm_base_create(struct crypto_template *tmpl,
 				  struct rtattr **tb)
 {
@@ -743,12 +737,6 @@ static int crypto_gcm_base_create(struct crypto_template *tmpl,
 
 	return crypto_gcm_create_common(tmpl, tb, ctr_name, ghash_name);
 }
-
-static struct crypto_template crypto_gcm_base_tmpl = {
-	.name = "gcm_base",
-	.create = crypto_gcm_base_create,
-	.module = THIS_MODULE,
-};
 
 static int crypto_rfc4106_setkey(struct crypto_aead *parent, const u8 *key,
 				 unsigned int keylen)
@@ -976,12 +964,6 @@ out_free_inst:
 	kfree(inst);
 	goto out;
 }
-
-static struct crypto_template crypto_rfc4106_tmpl = {
-	.name = "rfc4106",
-	.create = crypto_rfc4106_create,
-	.module = THIS_MODULE,
-};
 
 static int crypto_rfc4543_setkey(struct crypto_aead *parent, const u8 *key,
 				 unsigned int keylen)
@@ -1219,10 +1201,24 @@ out_free_inst:
 	goto out;
 }
 
-static struct crypto_template crypto_rfc4543_tmpl = {
-	.name = "rfc4543",
-	.create = crypto_rfc4543_create,
-	.module = THIS_MODULE,
+static struct crypto_template crypto_gcm_tmpls[] = {
+	{
+		.name = "gcm_base",
+		.create = crypto_gcm_base_create,
+		.module = THIS_MODULE,
+	}, {
+		.name = "gcm",
+		.create = crypto_gcm_create,
+		.module = THIS_MODULE,
+	}, {
+		.name = "rfc4106",
+		.create = crypto_rfc4106_create,
+		.module = THIS_MODULE,
+	}, {
+		.name = "rfc4543",
+		.create = crypto_rfc4543_create,
+		.module = THIS_MODULE,
+	},
 };
 
 static int __init crypto_gcm_module_init(void)
@@ -1235,42 +1231,19 @@ static int __init crypto_gcm_module_init(void)
 
 	sg_init_one(&gcm_zeroes->sg, gcm_zeroes->buf, sizeof(gcm_zeroes->buf));
 
-	err = crypto_register_template(&crypto_gcm_base_tmpl);
+	err = crypto_register_templates(crypto_gcm_tmpls,
+					ARRAY_SIZE(crypto_gcm_tmpls));
 	if (err)
-		goto out;
+		kfree(gcm_zeroes);
 
-	err = crypto_register_template(&crypto_gcm_tmpl);
-	if (err)
-		goto out_undo_base;
-
-	err = crypto_register_template(&crypto_rfc4106_tmpl);
-	if (err)
-		goto out_undo_gcm;
-
-	err = crypto_register_template(&crypto_rfc4543_tmpl);
-	if (err)
-		goto out_undo_rfc4106;
-
-	return 0;
-
-out_undo_rfc4106:
-	crypto_unregister_template(&crypto_rfc4106_tmpl);
-out_undo_gcm:
-	crypto_unregister_template(&crypto_gcm_tmpl);
-out_undo_base:
-	crypto_unregister_template(&crypto_gcm_base_tmpl);
-out:
-	kfree(gcm_zeroes);
 	return err;
 }
 
 static void __exit crypto_gcm_module_exit(void)
 {
 	kfree(gcm_zeroes);
-	crypto_unregister_template(&crypto_rfc4543_tmpl);
-	crypto_unregister_template(&crypto_rfc4106_tmpl);
-	crypto_unregister_template(&crypto_gcm_tmpl);
-	crypto_unregister_template(&crypto_gcm_base_tmpl);
+	crypto_unregister_templates(crypto_gcm_tmpls,
+				    ARRAY_SIZE(crypto_gcm_tmpls));
 }
 
 module_init(crypto_gcm_module_init);
