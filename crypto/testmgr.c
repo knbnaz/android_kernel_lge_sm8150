@@ -705,7 +705,8 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
 
 		crypto_aead_clear_flags(tfm, ~0);
 		if (template[i].wk)
-			crypto_aead_set_flags(tfm, CRYPTO_TFM_REQ_WEAK_KEY);
+			crypto_aead_set_flags(tfm,
+					      CRYPTO_TFM_REQ_FORBID_WEAK_KEYS);
 
 		if (template[i].klen > MAX_KEYLEN) {
 			pr_err("alg: aead%s: setkey failed on test %d for %s: key size %d > %d\n",
@@ -819,7 +820,8 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
 
 		crypto_aead_clear_flags(tfm, ~0);
 		if (template[i].wk)
-			crypto_aead_set_flags(tfm, CRYPTO_TFM_REQ_WEAK_KEY);
+			crypto_aead_set_flags(tfm,
+					      CRYPTO_TFM_REQ_FORBID_WEAK_KEYS);
 		if (template[i].klen > MAX_KEYLEN) {
 			pr_err("alg: aead%s: setkey failed on test %d for %s: key size %d > %d\n",
 			       d, j, algo, template[i].klen, MAX_KEYLEN);
@@ -1077,7 +1079,7 @@ static int test_cipher(struct crypto_cipher *tfm, int enc,
 
 		crypto_cipher_clear_flags(tfm, ~0);
 		if (template[i].wk)
-			crypto_cipher_set_flags(tfm, CRYPTO_TFM_REQ_WEAK_KEY);
+			crypto_cipher_set_flags(tfm, CRYPTO_TFM_REQ_FORBID_WEAK_KEYS);
 
 		ret = crypto_cipher_setkey(tfm, template[i].key,
 					   template[i].klen);
@@ -1193,8 +1195,7 @@ static int __test_skcipher(struct crypto_skcipher *tfm, int enc,
 
 		crypto_skcipher_clear_flags(tfm, ~0);
 		if (template[i].wk)
-			crypto_skcipher_set_flags(tfm,
-						  CRYPTO_TFM_REQ_WEAK_KEY);
+			crypto_skcipher_set_flags(tfm, CRYPTO_TFM_REQ_FORBID_WEAK_KEYS);
 
 		ret = crypto_skcipher_setkey(tfm, template[i].key,
 					     template[i].klen);
@@ -1264,8 +1265,7 @@ static int __test_skcipher(struct crypto_skcipher *tfm, int enc,
 		j++;
 		crypto_skcipher_clear_flags(tfm, ~0);
 		if (template[i].wk)
-			crypto_skcipher_set_flags(tfm,
-						  CRYPTO_TFM_REQ_WEAK_KEY);
+			crypto_skcipher_set_flags(tfm, CRYPTO_TFM_REQ_FORBID_WEAK_KEYS);
 
 		ret = crypto_skcipher_setkey(tfm, template[i].key,
 					     template[i].klen);

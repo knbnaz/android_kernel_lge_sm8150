@@ -525,7 +525,7 @@ int blk_crypto_fallback_start_using_mode(enum blk_crypto_mode_num mode_num)
 		}
 
 		crypto_skcipher_set_flags(slotp->tfms[mode_num],
-					  CRYPTO_TFM_REQ_WEAK_KEY);
+					  CRYPTO_TFM_REQ_FORBID_WEAK_KEYS);
 	}
 
 	/*
