@@ -2114,12 +2114,11 @@ static int do_test_kpp(struct crypto_kpp *tfm, const struct kpp_testvec *vec,
 
 	if (vec->genkey) {
 		/* Save party A's public key */
-		a_public = kzalloc(out_len_max, GFP_KERNEL);
+		a_public = kmemdup(sg_virt(req->dst), out_len_max, GFP_KERNEL);
 		if (!a_public) {
 			err = -ENOMEM;
 			goto free_output;
 		}
-		memcpy(a_public, sg_virt(req->dst), out_len_max);
 	} else {
 		/* Verify calculated public key */
 		if (memcmp(vec->expected_a_public, sg_virt(req->dst),
@@ -2132,13 +2131,12 @@ static int do_test_kpp(struct crypto_kpp *tfm, const struct kpp_testvec *vec,
 	}
 
 	/* Calculate shared secret key by using counter part (b) public key. */
-	input_buf = kzalloc(vec->b_public_size, GFP_KERNEL);
+	input_buf = kmemdup(vec->b_public, vec->b_public_size, GFP_KERNEL);
 	if (!input_buf) {
 		err = -ENOMEM;
 		goto free_output;
 	}
 
-	memcpy(input_buf, vec->b_public, vec->b_public_size);
 	sg_init_one(&src, input_buf, vec->b_public_size);
 	sg_init_one(&dst, output_buf, out_len_max);
 	kpp_request_set_input(req, &src, vec->b_public_size);
@@ -2154,12 +2152,11 @@ static int do_test_kpp(struct crypto_kpp *tfm, const struct kpp_testvec *vec,
 
 	if (vec->genkey) {
 		/* Save the shared secret obtained by party A */
-		a_ss = kzalloc(vec->expected_ss_size, GFP_KERNEL);
+		a_ss = kmemdup(sg_virt(req->dst), vec->expected_ss_size, GFP_KERNEL);
 		if (!a_ss) {
 			err = -ENOMEM;
 			goto free_all;
 		}
-		memcpy(a_ss, sg_virt(req->dst), vec->expected_ss_size);
 
 		/*
 		 * Calculate party B's shared secret by using party A's
