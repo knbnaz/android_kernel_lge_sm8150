@@ -206,7 +206,7 @@ static struct skcipher_alg algs[] = {
 
 static int __init chacha_simd_mod_init(void)
 {
-	if (!(elf_hwcap & HWCAP_ASIMD))
+	if (!cpu_have_named_feature(ASIMD))
 		return 0;
 
 	static_branch_enable(&have_neon);
