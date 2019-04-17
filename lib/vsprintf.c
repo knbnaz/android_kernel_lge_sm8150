@@ -753,8 +753,8 @@ char *restricted_pointer(char *buf, char *end, const void *ptr,
 {
 	switch (kptr_restrict) {
 	case 0:
-		/* Always print %pK values */
-		break;
+		/* Handle as %p, hash and do _not_ leak addresses. */
+		return ptr_to_id(buf, end, ptr, spec);
 	case 1: {
 		const struct cred *cred;
 
@@ -2070,8 +2070,6 @@ char *pointer(const char *fmt, char *buf, char *end, void *ptr,
 			return buf;
 		}
 	case 'K':
-		if (!kptr_restrict)
-			break;
 		return restricted_pointer(buf, end, ptr, spec);
 	case 'N':
 		return netdev_bits(buf, end, ptr, spec, fmt);
