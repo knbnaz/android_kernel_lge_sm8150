@@ -3825,6 +3825,12 @@ static const struct alg_test_desc alg_test_descs[] = {
 		.test = alg_test_null,
 		.fips_allowed = 1,
 	}, {
+		/* Same as cbc(sm4) except the key is stored in
+		 * hardware secure memory which we reference by index
+		 */
+		.alg = "cbc(psm4)",
+		.test = alg_test_null,
+	}, {
 		.alg = "cbc(serpent)",
 		.test = alg_test_skcipher,
 		.suite = {
@@ -3960,6 +3966,13 @@ static const struct alg_test_desc alg_test_descs[] = {
 		.test = alg_test_null,
 		.fips_allowed = 1,
 	}, {
+
+		/* Same as ctr(sm4) except the key is stored in
+		 * hardware secure memory which we reference by index
+		 */
+		.alg = "ctr(psm4)",
+		.test = alg_test_null,
+	}, {
 		.alg = "ctr(serpent)",
 		.test = alg_test_skcipher,
 		.suite = {
@@ -3984,6 +3997,13 @@ static const struct alg_test_desc alg_test_descs[] = {
 		.suite = {
 			.cipher = __VECS(cts_mode_tv_template)
 		}
+	}, {
+		/* Same as cts(cbc((aes)) except the key is stored in
+		 * hardware secure memory which we reference by index
+		 */
+		.alg = "cts(cbc(paes))",
+		.test = alg_test_null,
+		.fips_allowed = 1,
 	}, {
 		.alg = "deflate",
 		.test = alg_test_comp,
