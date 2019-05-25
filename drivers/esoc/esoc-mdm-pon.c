@@ -56,7 +56,7 @@ static int sdx50m_toggle_soft_reset(struct mdm_ctrl *mdm, bool atomic)
 	 * Allow PS hold assert to be detected
 	 */
 	if (!atomic)
-		usleep_range(80000, 180000);
+		usleep_range(120000, 180000);
 	else
 		/*
 		 * The flow falls through this path as a part of the
