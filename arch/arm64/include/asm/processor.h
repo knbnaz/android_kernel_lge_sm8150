@@ -32,8 +32,6 @@
  */
 #define current_text_addr() ({ __label__ _l; _l: &&_l;})
 
-#ifdef __KERNEL__
-
 #include <linux/string.h>
 
 #include <asm/alternative.h>
@@ -241,8 +239,6 @@ static inline void spin_lock_prefetch(const void *ptr)
 }
 
 #define HAVE_ARCH_PICK_MMAP_LAYOUT
-
-#endif
 
 void cpu_enable_pan(const struct arm64_cpu_capabilities *__unused);
 void cpu_enable_cache_maint_trap(const struct arm64_cpu_capabilities *__unused);

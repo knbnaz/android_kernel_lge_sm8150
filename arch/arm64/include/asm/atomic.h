@@ -26,8 +26,6 @@
 #include <asm/barrier.h>
 #include <asm/lse.h>
 
-#ifdef __KERNEL__
-
 #include <asm/atomic_arch.h>
 #include <asm/cmpxchg.h>
 
@@ -159,5 +157,4 @@
 
 #include <asm-generic/atomic-instrumented.h>
 
-#endif
-#endif
+#endif /* __ASM_ATOMIC_H */

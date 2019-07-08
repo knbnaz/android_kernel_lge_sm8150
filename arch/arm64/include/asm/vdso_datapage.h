@@ -16,8 +16,6 @@
 #ifndef __ASM_VDSO_DATAPAGE_H
 #define __ASM_VDSO_DATAPAGE_H
 
-#ifdef __KERNEL__
-
 #ifndef __ASSEMBLY__
 
 #ifndef _VDSO_WTM_CLOCK_SEC_T
@@ -58,7 +56,5 @@ struct vdso_data {
 };
 
 #endif /* !__ASSEMBLY__ */
-
-#endif /* __KERNEL__ */
 
 #endif /* __ASM_VDSO_DATAPAGE_H */

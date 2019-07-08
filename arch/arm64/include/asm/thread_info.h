@@ -19,8 +19,6 @@
 #ifndef __ASM_THREAD_INFO_H
 #define __ASM_THREAD_INFO_H
 
-#ifdef __KERNEL__
-
 #include <linux/compiler.h>
 
 #ifndef __ASSEMBLY__
@@ -119,5 +117,4 @@ void arch_setup_new_exec(void);
 				 _TIF_SYSCALL_TRACEPOINT | _TIF_SECCOMP | \
 				 _TIF_NOHZ)
 
-#endif /* __KERNEL__ */
 #endif /* __ASM_THREAD_INFO_H */

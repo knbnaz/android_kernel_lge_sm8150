@@ -16,8 +16,6 @@
 #ifndef __ASM_DMA_MAPPING_H
 #define __ASM_DMA_MAPPING_H
 
-#ifdef __KERNEL__
-
 #include <linux/types.h>
 #include <linux/vmalloc.h>
 
@@ -85,5 +83,4 @@ static inline unsigned long dma_max_pfn(struct device *dev)
 }
 #define dma_max_pfn(dev) dma_max_pfn(dev)
 
-#endif	/* __KERNEL__ */
 #endif	/* __ASM_DMA_MAPPING_H */
