@@ -158,6 +158,9 @@ struct net {
 #if IS_ENABLED(CONFIG_CAN)
 	struct netns_can	can;
 #endif
+#if IS_ENABLED(CONFIG_CRYPTO_USER)
+	struct sock		*crypto_nlsk;
+#endif
 	struct sock		*diag_nlsk;
 	atomic_t		fnhe_genid;
 } __randomize_layout;
