@@ -4,3 +4,5 @@ obj-$(CONFIG_MSM_NPU_V2) += npu_v2/
 obj-$(CONFIG_MSM_GLOBAL_SYNX) += synx/
 obj-$(CONFIG_MSM_CVP) += cvp/
 obj-$(CONFIG_MSM_CVP_V2) += cvp2.0/
+obj-$(CONFIG_TSPP) += broadcast/
+obj-$(CONFIG_DVB_MPQ) += dvb/
