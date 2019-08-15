@@ -21,7 +21,7 @@
  */
 
 #include <asm/processor.h>
-#include <crypto/des.h>
+#include <crypto/internal/des.h>
 #include <linux/crypto.h>
 #include <linux/init.h>
 #include <linux/module.h>
