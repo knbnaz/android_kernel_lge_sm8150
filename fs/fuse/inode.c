@@ -463,7 +463,7 @@ enum {
 	OPT_ERR
 };
 
-static const struct fs_parameter_spec fuse_param_specs[] = {
+static const struct fs_parameter_spec fuse_fs_parameters[] = {
 	fsparam_string	("source",		OPT_SOURCE),
 	fsparam_u32	("fd",			OPT_FD),
 	fsparam_u32oct	("rootmode",		OPT_ROOTMODE),
@@ -475,10 +475,6 @@ static const struct fs_parameter_spec fuse_param_specs[] = {
 	fsparam_u32	("blksize",		OPT_BLKSIZE),
 	fsparam_string	("subtype",		OPT_SUBTYPE),
 	{}
-};
-
-static const struct fs_parameter_description fuse_fs_parameters = {
-	.specs		= fuse_param_specs,
 };
 
 static int fuse_parse_param(struct fs_context *fc, struct fs_parameter *param)
@@ -498,7 +494,7 @@ static int fuse_parse_param(struct fs_context *fc, struct fs_parameter *param)
 		return invalfc(fc, "No changes allowed in reconfigure");
 	}
 
-	opt = fs_parse(fc, &fuse_fs_parameters, param, &result);
+	opt = fs_parse(fc, fuse_fs_parameters, param, &result);
 	if (opt < 0)
 		return opt;
 
@@ -1372,7 +1368,7 @@ static struct file_system_type fuse_fs_type = {
 	.name		= "fuse",
 	.fs_flags	= FS_HAS_SUBTYPE | FS_USERNS_MOUNT,
 	.init_fs_context = fuse_init_fs_context,
-	.parameters	= &fuse_fs_parameters,
+	.parameters	= fuse_fs_parameters,
 	.kill_sb	= fuse_kill_sb_anon,
 };
 MODULE_ALIAS_FS("fuse");
@@ -1388,7 +1384,7 @@ static struct file_system_type fuseblk_fs_type = {
 	.owner		= THIS_MODULE,
 	.name		= "fuseblk",
 	.init_fs_context = fuse_init_fs_context,
-	.parameters	= &fuse_fs_parameters,
+	.parameters	= fuse_fs_parameters,
 	.kill_sb	= fuse_kill_sb_blk,
 	.fs_flags	= FS_REQUIRES_DEV | FS_HAS_SUBTYPE,
 };
