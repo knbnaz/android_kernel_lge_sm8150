@@ -178,6 +178,15 @@ config DEBUG_MODULE_LOAD_INFO
 
 	  If unsure, say N.
 
+config SYMBOLIC_ERRNAME
+	bool "Support symbolic error names in printf"
+	default y if PRINTK
+	help
+	  If you say Y here, the kernel's printf implementation will
+	  be able to print symbolic error names such as ENOSPC instead
+	  of the number 28. It makes the kernel image slightly larger
+	  (about 3KB), but can make the kernel logs easier to read.
+
 config DEBUG_CONSOLE_UNHASHED_POINTERS
 	bool "Display unhashed kernel pointers"
 	depends on DEBUG_KERNEL
