@@ -883,7 +883,7 @@ xfs_setattr_size(
 	if (newsize > oldsize) {
 		trace_xfs_zero_eof(ip, oldsize, newsize - oldsize);
 		error = iomap_zero_range(inode, oldsize, newsize - oldsize,
-				&did_zeroing, &xfs_iomap_ops);
+				&did_zeroing, &xfs_buffered_write_iomap_ops);
 	} else {
 		/*
 		 * iomap won't detect a dirty page over an unwritten block (or a
@@ -896,7 +896,7 @@ xfs_setattr_size(
 		if (error)
 			return error;
 		error = iomap_truncate_page(inode, newsize, &did_zeroing,
-				&xfs_iomap_ops);
+				&xfs_buffered_write_iomap_ops);
 	}
 
 	if (error)
