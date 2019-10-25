@@ -79,7 +79,7 @@ config CRYPTO_DEV_FSL_CAAM_CRYPTO_API
 	default y
 	select CRYPTO_AEAD
 	select CRYPTO_AUTHENC
-	select CRYPTO_BLKCIPHER
+	select CRYPTO_SKCIPHER
 	select CRYPTO_LIB_DES
 	help
 	  Selecting this will offload crypto for users of the
@@ -94,7 +94,7 @@ config CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI
 	depends on CRYPTO_DEV_FSL_CAAM_JR && FSL_DPAA && NET
 	default y
 	select CRYPTO_AUTHENC
-	select CRYPTO_BLKCIPHER
+	select CRYPTO_SKCIPHER
 	help
 	  Selecting this will use CAAM Queue Interface (QI) for sending
 	  & receiving crypto jobs to/from CAAM. This gives better performance
