@@ -707,20 +707,6 @@ static inline unsigned int crypto_tfm_ctx_alignment(void)
 	return __alignof__(tfm->__crt_ctx);
 }
 
-static inline u32 crypto_skcipher_type(u32 type)
-{
-	type &= ~CRYPTO_ALG_TYPE_MASK;
-	type |= CRYPTO_ALG_TYPE_BLKCIPHER;
-	return type;
-}
-
-static inline u32 crypto_skcipher_mask(u32 mask)
-{
-	mask &= ~CRYPTO_ALG_TYPE_MASK;
-	mask |= CRYPTO_ALG_TYPE_BLKCIPHER_MASK;
-	return mask;
-}
-
 /**
  * DOC: Single Block Cipher API
  *
