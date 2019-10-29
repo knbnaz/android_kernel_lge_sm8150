@@ -154,7 +154,7 @@ SECTIONS
 #endif
 	} :text = 0x9090
 
-	NOTES :text :note
+	NOTES
 
 	EXCEPTION_TABLE(16) :text = 0x9090
 

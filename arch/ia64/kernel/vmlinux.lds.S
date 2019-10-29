@@ -70,9 +70,7 @@ SECTIONS {
 	/*
 	 * Read-only data
 	 */
-	NOTES :code :note       /* put .notes in text and mark in PT_NOTE  */
-	code_continues : {
-	} : code               /* switch back to regular program...  */
+	NOTES
 
 	EXCEPTION_TABLE(16)
 

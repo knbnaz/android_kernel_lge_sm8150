@@ -34,10 +34,7 @@ SECTIONS
 	swapper_pg_dir = SWAPPER_PGD;
 	_etext = .;	/* End of text section */
 
-	NOTES :kernel :note
-	.dummy : {
-		*(.dummy)
-	} :kernel
+	NOTES
 
 	RODATA
 	EXCEPTION_TABLE(16)
