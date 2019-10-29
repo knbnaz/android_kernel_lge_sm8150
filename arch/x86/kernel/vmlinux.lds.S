@@ -23,6 +23,8 @@
 
 #define RUNTIME_DISCARD_EXIT
 
+#define EMITS_PT_NOTE
+
 #include <asm-generic/vmlinux.lds.h>
 #include <asm/asm-offsets.h>
 #include <asm/thread_info.h>

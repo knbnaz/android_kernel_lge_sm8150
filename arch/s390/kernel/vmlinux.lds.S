@@ -17,6 +17,8 @@
 
 #define RUNTIME_DISCARD_EXIT
 
+#define EMITS_PT_NOTE
+
 #include <asm-generic/vmlinux.lds.h>
 #include <asm/vmlinux.lds.h>
 
