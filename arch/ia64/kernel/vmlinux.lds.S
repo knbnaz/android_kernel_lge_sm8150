@@ -104,7 +104,7 @@ SECTIONS {
 	code_continues2 : {
 	} : code
 
-	RODATA
+	RO_DATA(4096)
 
 	.opd : AT(ADDR(.opd) - LOAD_OFFSET) {
 		__start_opd = .;
