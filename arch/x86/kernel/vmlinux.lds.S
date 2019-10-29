@@ -154,8 +154,6 @@ SECTIONS
 #endif
 	} :text = 0x9090
 
-	NOTES
-
 	EXCEPTION_TABLE(16) :text = 0x9090
 
 	/* End of text section, which should occupy whole number of pages */

@@ -28,7 +28,6 @@
  *	_edata = .;
  *
  *	EXCEPTION_TABLE(...)
- *	NOTES
  *
  *	BSS_SECTION(0, 0, 0)
  *	_end = .;
@@ -523,6 +522,7 @@
 	}								\
 									\
 	BTF								\
+	NOTES								\
 									\
 	. = ALIGN((align));						\
 	__end_rodata = .;
