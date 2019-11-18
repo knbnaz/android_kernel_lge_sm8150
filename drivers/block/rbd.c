@@ -462,7 +462,7 @@ struct rbd_device {
  *   by rbd_dev->lock
  */
 enum rbd_dev_flags {
-	RBD_DEV_FLAG_EXISTS,	/* mapped snapshot has not been deleted */
+	RBD_DEV_FLAG_EXISTS,	/* rbd_dev_device_setup() ran */
 	RBD_DEV_FLAG_REMOVING,	/* this mapping is being removed */
 	RBD_DEV_FLAG_READONLY,  /* -o ro or snapshot */
 };
@@ -4887,19 +4887,6 @@ static void rbd_queue_workfn(struct work_struct *work)
 		rbd_assert(!rbd_is_snap(rbd_dev));
 	}
 
-	/*
-	 * Quit early if the mapped snapshot no longer exists.  It's
-	 * still possible the snapshot will have disappeared by the
-	 * time our request arrives at the osd, but there's no sense in
-	 * sending it if we already know.
-	 */
-	if (!test_bit(RBD_DEV_FLAG_EXISTS, &rbd_dev->flags)) {
-		dout("request for non-existent snapshot");
-		rbd_assert(rbd_is_snap(rbd_dev));
-		result = -ENXIO;
-		goto err_rq;
-	}
-
 	if (offset && length > U64_MAX - offset + 1) {
 		rbd_warn(rbd_dev, "bad request range (%llu~%llu)", offset,
 			 length);
@@ -5073,25 +5060,6 @@ out:
 	kfree(ondisk);
 
 	return ret;
-}
-
-/*
- * Clear the rbd device's EXISTS flag if the snapshot it's mapped to
- * has disappeared from the (just updated) snapshot context.
- */
-static void rbd_exists_validate(struct rbd_device *rbd_dev)
-{
-	u64 snap_id;
-
-	if (!test_bit(RBD_DEV_FLAG_EXISTS, &rbd_dev->flags))
-		return;
-
-	snap_id = rbd_dev->spec->snap_id;
-	if (snap_id == CEPH_NOSNAP)
-		return;
-
-	if (rbd_dev_snap_index(rbd_dev, snap_id) == BAD_SNAP_INDEX)
-		clear_bit(RBD_DEV_FLAG_EXISTS, &rbd_dev->flags);
 }
 
 static void rbd_dev_update_size(struct rbd_device *rbd_dev)
@@ -7055,11 +7023,6 @@ static void rbd_dev_update_header(struct rbd_device *rbd_dev,
 			rbd_dev->mapping.size = header->image_size;
 			rbd_dev_update_size(rbd_dev);
 		}
-	}
-
-	if (rbd_is_snap(rbd_dev)) {
-		/* validate mapped snapshot's EXISTS flag */
-		rbd_exists_validate(rbd_dev);
 	}
 
 	ceph_put_snap_context(rbd_dev->header.snapc);
