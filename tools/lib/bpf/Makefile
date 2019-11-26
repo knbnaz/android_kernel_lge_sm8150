@@ -178,12 +178,12 @@ $(BPF_IN_SHARED): force elfdep bpfdep bpf_helper_defs.h
 	echo "Warning: Kernel ABI header at 'tools/include/uapi/linux/if_xdp.h' differs from latest version at 'include/uapi/linux/if_xdp.h'" >&2 )) || true
 	$(Q)$(MAKE) $(build)=libbpf OUTPUT=$(SHARED_OBJDIR) CFLAGS="$(CFLAGS) $(SHLIB_FLAGS)"
 
-bpf_helper_defs.h: $(srctree)/include/uapi/linux/bpf.h
-	$(Q)$(srctree)/scripts/bpf_helpers_doc.py --header 		\
-		--file $(srctree)/include/uapi/linux/bpf.h > bpf_helper_defs.h
-
-$(BPF_IN_STATIC): force elfdep bpfdep
+$(BPF_IN_STATIC): force elfdep bpfdep bpf_helper_defs.h
 	$(Q)$(MAKE) $(build)=libbpf OUTPUT=$(STATIC_OBJDIR)
+
+bpf_helper_defs.h: $(srctree)/tools/include/uapi/linux/bpf.h
+	$(Q)$(srctree)/scripts/bpf_helpers_doc.py --header 		\
+		--file $(srctree)/tools/include/uapi/linux/bpf.h > bpf_helper_defs.h
 
 $(OUTPUT)libbpf.so: $(OUTPUT)libbpf.so.$(LIBBPF_VERSION)
 
