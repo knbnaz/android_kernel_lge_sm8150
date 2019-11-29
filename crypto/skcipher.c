@@ -670,7 +670,7 @@ int crypto_skcipher_decrypt(struct skcipher_request *req)
 	if (crypto_skcipher_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
 		ret = -ENOKEY;
 	else
-		ret = tfm->decrypt(req);
+		ret = crypto_skcipher_alg(tfm)->decrypt(req);
 	crypto_stats_skcipher_decrypt(cryptlen, ret, alg);
 	return ret;
 }
@@ -688,8 +688,6 @@ static int crypto_skcipher_init_tfm(struct crypto_tfm *tfm)
 {
 	struct crypto_skcipher *skcipher = __crypto_skcipher_cast(tfm);
 	struct skcipher_alg *alg = crypto_skcipher_alg(skcipher);
-
-	skcipher->decrypt = alg->decrypt;
 
 	skcipher_set_needkey(skcipher);
 
