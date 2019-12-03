@@ -21,6 +21,7 @@ Core utilities
    flexible-arrays
    librs
    genalloc
+   padata
 
 Interfaces for kernel debugging
 ===============================
