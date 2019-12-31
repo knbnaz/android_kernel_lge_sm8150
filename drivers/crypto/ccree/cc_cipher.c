@@ -251,7 +251,6 @@ static int cc_cipher_sethkey(struct crypto_skcipher *sktfm, const u8 *key,
 	/* This check the size of the hardware key token */
 	if (keylen != sizeof(hki)) {
 		dev_err(dev, "Unsupported HW key size %d.\n", keylen);
-		crypto_tfm_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
 		return -EINVAL;
 	}
 
@@ -269,7 +268,6 @@ static int cc_cipher_sethkey(struct crypto_skcipher *sktfm, const u8 *key,
 
 	if (validate_keys_sizes(ctx_p, keylen)) {
 		dev_err(dev, "Unsupported key size %d.\n", keylen);
-		crypto_tfm_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
 		return -EINVAL;
 	}
 
@@ -322,7 +320,6 @@ static int cc_cipher_setkey(struct crypto_skcipher *sktfm, const u8 *key,
 
 	if (validate_keys_sizes(ctx_p, keylen)) {
 		dev_err(dev, "Unsupported key size %d.\n", keylen);
-		crypto_tfm_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
 		return -EINVAL;
 	}
 

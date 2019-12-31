@@ -555,7 +555,7 @@ static int cc_aead_setkey(struct crypto_aead *tfm, const u8 *key,
 
 	if (ctx->auth_mode != DRV_HASH_NULL) { /* authenc() alg. */
 		if (!RTA_OK(rta, keylen))
-			goto badkey;
+			return rc;
 		if (rta->rta_type != CRYPTO_AUTHENC_KEYA_PARAM)
 			goto badkey;
 		if (RTA_PAYLOAD(rta) < sizeof(*param))
@@ -572,7 +572,7 @@ static int cc_aead_setkey(struct crypto_aead *tfm, const u8 *key,
 			/* the nonce is stored in bytes at end of key */
 			if (ctx->enc_keylen <
 			    (AES_MIN_KEY_SIZE + CTR_RFC3686_NONCE_SIZE))
-				goto badkey;
+				return -EINVAL;
 			/* Copy nonce from last 4 bytes in CTR key to
 			 *  first 4 bytes in CTR IV
 			 */
@@ -589,7 +589,7 @@ static int cc_aead_setkey(struct crypto_aead *tfm, const u8 *key,
 
 	rc = validate_keys_sizes(ctx);
 	if (rc)
-		goto badkey;
+		return rc;
 
 	/* STAT_PHASE_1: Copy key to ctx */
 
@@ -602,7 +602,7 @@ static int cc_aead_setkey(struct crypto_aead *tfm, const u8 *key,
 	} else if (ctx->auth_mode != DRV_HASH_NULL) { /* HMAC */
 		rc = cc_get_plain_hmac_key(tfm, key, ctx->auth_keylen);
 		if (rc)
-			goto badkey;
+			return rc;
 	}
 
 	/* STAT_PHASE_2: Create sequence */
@@ -619,8 +619,7 @@ static int cc_aead_setkey(struct crypto_aead *tfm, const u8 *key,
 		break; /* No auth. key setup */
 	default:
 		dev_err(dev, "Unsupported authenc (%d)\n", ctx->auth_mode);
-		rc = -ENOTSUPP;
-		goto badkey;
+		return -ENOTSUPP;
 	}
 
 	/* STAT_PHASE_3: Submit sequence to HW */
@@ -629,17 +628,11 @@ static int cc_aead_setkey(struct crypto_aead *tfm, const u8 *key,
 		rc = cc_send_sync_request(ctx->drvdata, &cc_req, desc, seq_len);
 		if (rc) {
 			dev_err(dev, "send_request() failed (rc=%d)\n", rc);
-			goto setkey_error;
+			return rc;
 		}
 	}
 
 	/* Update STAT_PHASE_3 */
-	return rc;
-
-badkey:
-	crypto_aead_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
-
-setkey_error:
 	return rc;
 }
 

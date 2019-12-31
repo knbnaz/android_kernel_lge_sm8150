@@ -128,11 +128,9 @@ static int geode_setkey_cip(struct crypto_tfm *tfm, const u8 *key,
 		return 0;
 	}
 
-	if (len != AES_KEYSIZE_192 && len != AES_KEYSIZE_256) {
+	if (len != AES_KEYSIZE_192 && len != AES_KEYSIZE_256)
 		/* not supported at all */
-		tfm->crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
 		return -EINVAL;
-	}
 
 	/*
 	 * The requested key size is not supported by HW, do a fallback
@@ -161,11 +159,9 @@ static int geode_setkey_blk(struct crypto_tfm *tfm, const u8 *key,
 		return 0;
 	}
 
-	if (len != AES_KEYSIZE_192 && len != AES_KEYSIZE_256) {
+	if (len != AES_KEYSIZE_192 && len != AES_KEYSIZE_256)
 		/* not supported at all */
-		tfm->crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
 		return -EINVAL;
-	}
 
 	/*
 	 * The requested key size is not supported by HW, do a fallback

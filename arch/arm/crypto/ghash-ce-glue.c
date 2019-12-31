@@ -123,10 +123,8 @@ static int ghash_setkey(struct crypto_shash *tfm,
 	struct ghash_key *key = crypto_shash_ctx(tfm);
 	u64 a, b;
 
-	if (keylen != GHASH_BLOCK_SIZE) {
-		crypto_shash_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
+	if (keylen != GHASH_BLOCK_SIZE)
 		return -EINVAL;
-	}
 
 	/* perform multiplication by 'x' in GF(2^128) */
 	b = get_unaligned_be64(inkey);
