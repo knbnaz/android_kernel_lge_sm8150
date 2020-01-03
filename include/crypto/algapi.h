@@ -214,12 +214,12 @@ static inline void *crypto_instance_ctx(struct crypto_instance *inst)
 }
 
 static inline struct crypto_cipher *crypto_spawn_cipher(
-	struct crypto_spawn *spawn)
+	struct crypto_cipher_spawn *spawn)
 {
 	u32 type = CRYPTO_ALG_TYPE_CIPHER;
 	u32 mask = CRYPTO_ALG_TYPE_MASK;
 
-	return __crypto_cipher_cast(crypto_spawn_tfm(spawn, type, mask));
+	return __crypto_cipher_cast(crypto_spawn_tfm(&spawn->base, type, mask));
 }
 
 static inline struct cipher_alg *crypto_cipher_alg(struct crypto_cipher *tfm)
