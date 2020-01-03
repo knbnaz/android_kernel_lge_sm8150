@@ -562,6 +562,7 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
 			     const char *name, unsigned int ivsize)
 {
 	struct crypto_attr_type *algt;
+	u32 mask;
 	struct aead_instance *inst;
 	struct skcipher_alg *chacha;
 	struct crypto_alg *poly;
@@ -580,6 +581,8 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
 	if ((algt->type ^ CRYPTO_ALG_TYPE_AEAD) & algt->mask)
 		return -EINVAL;
 
+	mask = crypto_requires_sync(algt->type, algt->mask);
+
 	chacha_name = crypto_attr_alg_name(tb[1]);
 	if (IS_ERR(chacha_name))
 		return PTR_ERR(chacha_name);
@@ -589,9 +592,7 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
 
 	poly = crypto_find_alg(poly_name, &crypto_ahash_type,
 			       CRYPTO_ALG_TYPE_HASH,
-			       CRYPTO_ALG_TYPE_AHASH_MASK |
-			       crypto_requires_sync(algt->type,
-						    algt->mask));
+			       CRYPTO_ALG_TYPE_AHASH_MASK | mask);
 	if (IS_ERR(poly))
 		return PTR_ERR(poly);
 	poly_hash = __crypto_hash_alg_common(poly);
@@ -612,10 +613,8 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
 	if (err)
 		goto err_free_inst;
 
-	crypto_set_skcipher_spawn(&ctx->chacha, aead_crypto_instance(inst));
-	err = crypto_grab_skcipher(&ctx->chacha, chacha_name, 0,
-				   crypto_requires_sync(algt->type,
-							algt->mask));
+	err = crypto_grab_skcipher(&ctx->chacha, aead_crypto_instance(inst),
+				   chacha_name, 0, mask);
 	if (err)
 		goto err_drop_poly;
 
