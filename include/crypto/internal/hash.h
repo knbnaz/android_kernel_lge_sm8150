@@ -80,7 +80,6 @@ int crypto_register_ahashes(struct ahash_alg *algs, int count);
 void crypto_unregister_ahashes(struct ahash_alg *algs, int count);
 int ahash_register_instance(struct crypto_template *tmpl,
 			    struct ahash_instance *inst);
-void ahash_free_instance(struct crypto_instance *inst);
 
 bool crypto_shash_alg_has_setkey(struct shash_alg *alg);
 
@@ -91,10 +90,6 @@ static inline bool crypto_shash_alg_needs_key(struct shash_alg *alg)
 }
 
 bool crypto_hash_alg_has_setkey(struct hash_alg_common *halg);
-
-int crypto_init_ahash_spawn(struct crypto_ahash_spawn *spawn,
-			    struct hash_alg_common *alg,
-			    struct crypto_instance *inst);
 
 int crypto_grab_ahash(struct crypto_ahash_spawn *spawn,
 		      struct crypto_instance *inst,
@@ -111,8 +106,6 @@ static inline struct hash_alg_common *crypto_spawn_ahash_alg(
 	return __crypto_hash_alg_common(spawn->base.alg);
 }
 
-struct hash_alg_common *ahash_attr_alg(struct rtattr *rta, u32 type, u32 mask);
-
 int crypto_register_shash(struct shash_alg *alg);
 void crypto_unregister_shash(struct shash_alg *alg);
 int crypto_register_shashes(struct shash_alg *algs, int count);
@@ -120,10 +113,6 @@ void crypto_unregister_shashes(struct shash_alg *algs, int count);
 int shash_register_instance(struct crypto_template *tmpl,
 			    struct shash_instance *inst);
 void shash_free_instance(struct crypto_instance *inst);
-
-int crypto_init_shash_spawn(struct crypto_shash_spawn *spawn,
-			    struct shash_alg *alg,
-			    struct crypto_instance *inst);
 
 int crypto_grab_shash(struct crypto_shash_spawn *spawn,
 		      struct crypto_instance *inst,
@@ -139,8 +128,6 @@ static inline struct shash_alg *crypto_spawn_shash_alg(
 {
 	return __crypto_shash_alg(spawn->base.alg);
 }
-
-struct shash_alg *shash_attr_alg(struct rtattr *rta, u32 type, u32 mask);
 
 int shash_ahash_update(struct ahash_request *req, struct shash_desc *desc);
 int shash_ahash_finup(struct ahash_request *req, struct shash_desc *desc);
@@ -180,17 +167,6 @@ static inline struct ahash_instance *ahash_instance(
 static inline void *ahash_instance_ctx(struct ahash_instance *inst)
 {
 	return crypto_instance_ctx(ahash_crypto_instance(inst));
-}
-
-static inline unsigned int ahash_instance_headroom(void)
-{
-	return sizeof(struct ahash_alg) - sizeof(struct crypto_alg);
-}
-
-static inline struct ahash_instance *ahash_alloc_instance(
-	const char *name, struct crypto_alg *alg)
-{
-	return crypto_alloc_instance(name, alg, ahash_instance_headroom());
 }
 
 static inline void ahash_request_complete(struct ahash_request *req, int err)
@@ -248,13 +224,6 @@ static inline struct shash_instance *shash_alg_instance(
 static inline void *shash_instance_ctx(struct shash_instance *inst)
 {
 	return crypto_instance_ctx(shash_crypto_instance(inst));
-}
-
-static inline struct shash_instance *shash_alloc_instance(
-	const char *name, struct crypto_alg *alg)
-{
-	return crypto_alloc_instance(name, alg,
-				     sizeof(struct shash_alg) - sizeof(*alg));
 }
 
 static inline struct crypto_shash *crypto_spawn_shash(
