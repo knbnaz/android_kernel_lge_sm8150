@@ -253,9 +253,8 @@ static int pcrypt_create_aead(struct crypto_template *tmpl, struct rtattr **tb,
 		return -ENOMEM;
 
 	ctx = aead_instance_ctx(inst);
-	crypto_set_aead_spawn(&ctx->spawn, aead_crypto_instance(inst));
-
-	err = crypto_grab_aead(&ctx->spawn, name, 0, 0);
+	err = crypto_grab_aead(&ctx->spawn, aead_crypto_instance(inst),
+			       name, 0, 0);
 	if (err)
 		goto out_free_inst;
 
