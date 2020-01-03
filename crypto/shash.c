@@ -593,6 +593,9 @@ int shash_register_instance(struct crypto_template *tmpl,
 {
 	int err;
 
+	if (WARN_ON(!inst->free))
+		return -EINVAL;
+
 	err = shash_prepare_alg(&inst->alg);
 	if (err)
 		return err;
