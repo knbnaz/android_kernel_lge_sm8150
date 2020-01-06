@@ -54,13 +54,13 @@
  *
  *	Turn the CPU D-cache off.
  */
-ENTRY(cpu_cache_off)
+SYM_FUNC_START(cpu_cache_off)
 	mrs	x0, sctlr_el1
 	bic	x0, x0, #1 << 2			// clear SCTLR.C
 	msr	sctlr_el1, x0
 	isb
 	ret
-ENDPROC(cpu_cache_off)
+SYM_FUNC_END(cpu_cache_off)
 
 /*
  *	cpu_reset(loc)
@@ -72,15 +72,15 @@ ENDPROC(cpu_cache_off)
  *	- loc   - location to jump to for soft reset
  */
 	.align	5
-ENTRY(cpu_reset)
+SYM_FUNC_START(cpu_reset)
 	mrs	x1, sctlr_el1
 	bic	x1, x1, #1
 	msr	sctlr_el1, x1			// disable the MMU
 	isb
 	ret	x0
-ENDPROC(cpu_reset)
+SYM_FUNC_END(cpu_reset)
 
-ENTRY(cpu_soft_restart)
+SYM_FUNC_START(cpu_soft_restart)
 	/* Save address of cpu_reset() and reset address */
 	mov	x19, x0
 	mov	x20, x1
@@ -93,18 +93,18 @@ ENTRY(cpu_soft_restart)
 
 	mov	x0, x20
 	ret	x19
-ENDPROC(cpu_soft_restart)
+SYM_FUNC_END(cpu_soft_restart)
 
 /*
  *	cpu_do_idle()
  *
  *	Idle the processor (wait for interrupt).
  */
-ENTRY(cpu_do_idle)
+SYM_FUNC_START(cpu_do_idle)
 	dsb	sy				// WFI may enter a low-power mode
 	wfi
 	ret
-ENDPROC(cpu_do_idle)
+SYM_FUNC_END(cpu_do_idle)
 
 #ifdef CONFIG_CPU_PM
 /**
@@ -114,7 +114,7 @@ ENDPROC(cpu_do_idle)
  *
  * This must be kept in sync with struct cpu_suspend_ctx in <asm/suspend.h>.
  */
-ENTRY(cpu_do_suspend)
+SYM_FUNC_START(cpu_do_suspend)
 	mrs	x2, tpidr_el0
 	mrs	x3, tpidrro_el0
 	mrs	x4, contextidr_el1
@@ -143,7 +143,7 @@ alternative_endif
 	 */
 	str	x18, [x0, #96]
 	ret
-ENDPROC(cpu_do_suspend)
+SYM_FUNC_END(cpu_do_suspend)
 
 /**
  * cpu_do_resume - restore CPU register context
@@ -151,7 +151,7 @@ ENDPROC(cpu_do_suspend)
  * x0: Address of context pointer
  */
 	.pushsection ".idmap.text", "awx"
-ENTRY(cpu_do_resume)
+SYM_FUNC_START(cpu_do_resume)
 	ldp	x2, x3, [x0]
 	ldp	x4, x5, [x0, #16]
 	ldp	x6, x8, [x0, #32]
@@ -202,7 +202,7 @@ alternative_endif
 	reset_pmuserenr_el0 x0			// Disable PMU access from EL0
 	isb
 	ret
-ENDPROC(cpu_do_resume)
+SYM_FUNC_END(cpu_do_resume)
 	.popsection
 #endif
 
@@ -213,7 +213,7 @@ ENDPROC(cpu_do_resume)
  *
  *	- pgd_phys - physical address of new TTB
  */
-ENTRY(cpu_do_switch_mm)
+SYM_FUNC_START(cpu_do_switch_mm)
 	mrs	x2, ttbr1_el1
 	mmid	x1, x1				// get mm->context.id
 #ifdef CONFIG_ARM64_SW_TTBR0_PAN
@@ -225,7 +225,7 @@ ENTRY(cpu_do_switch_mm)
 	msr	ttbr0_el1, x0			// now update TTBR0
 	isb
 	b	post_ttbr_update_workaround	// Back to C code...
-ENDPROC(cpu_do_switch_mm)
+SYM_FUNC_END(cpu_do_switch_mm)
 
 	.pushsection ".idmap.text", "awx"
 
@@ -244,7 +244,7 @@ ENDPROC(cpu_do_switch_mm)
  * This is the low-level counterpart to cpu_replace_ttbr1, and should not be
  * called by anything else. It can only be executed from a TTBR0 mapping.
  */
-ENTRY(idmap_cpu_replace_ttbr1)
+SYM_FUNC_START(idmap_cpu_replace_ttbr1)
 	mrs	x2, daif
 	msr	daifset, #0xf
 
@@ -256,7 +256,7 @@ ENTRY(idmap_cpu_replace_ttbr1)
 	msr	daif, x2
 
 	ret
-ENDPROC(idmap_cpu_replace_ttbr1)
+SYM_FUNC_END(idmap_cpu_replace_ttbr1)
 	.popsection
 
 #ifdef CONFIG_UNMAP_KERNEL_AT_EL0
@@ -284,7 +284,7 @@ ENDPROC(idmap_cpu_replace_ttbr1)
  */
 __idmap_kpti_flag:
 	.long	1
-ENTRY(idmap_kpti_install_ng_mappings)
+SYM_FUNC_START(idmap_kpti_install_ng_mappings)
 	cpu		.req	w0
 	num_cpus	.req	w1
 	swapper_pa	.req	x2
@@ -453,7 +453,7 @@ __idmap_kpti_secondary:
 
 	.unreq	swapper_ttb
 	.unreq	flag_ptr
-ENDPROC(idmap_kpti_install_ng_mappings)
+SYM_FUNC_END(idmap_kpti_install_ng_mappings)
 	.popsection
 #endif
 
@@ -464,7 +464,7 @@ ENDPROC(idmap_kpti_install_ng_mappings)
  *	value of the SCTLR_EL1 register.
  */
 	.pushsection ".idmap.text", "awx"
-ENTRY(__cpu_setup)
+SYM_FUNC_START(__cpu_setup)
 	tlbi	vmalle1				// Invalidate local TLB
 	dsb	nsh
 
@@ -527,4 +527,4 @@ ENTRY(__cpu_setup)
 #endif	/* CONFIG_ARM64_HW_AFDBM */
 	msr	tcr_el1, x10
 	ret					// return to head.S
-ENDPROC(__cpu_setup)
+SYM_FUNC_END(__cpu_setup)
