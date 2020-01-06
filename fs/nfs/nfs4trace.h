@@ -641,7 +641,7 @@ TRACE_EVENT(nfs4_state_mgr_failed,
 		),
 
 		TP_fast_assign(
-			__entry->error = status;
+			__entry->error = status < 0 ? -status : 0;
 			__entry->state = clp->cl_state;
 			__assign_str(hostname, clp->cl_hostname);
 			__assign_str(section, section);
