@@ -439,3 +439,4 @@
 434  common	pidfd_open		sys_pidfd_open			sys_pidfd_open
 435  common	clone3			sys_clone3			sys_clone3
 443  common	process_madvise		sys_process_madvise		sys_process_madvise
+437  common	openat2			sys_openat2			sys_openat2
