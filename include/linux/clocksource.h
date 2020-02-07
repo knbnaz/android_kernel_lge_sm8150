@@ -24,7 +24,7 @@ struct clocksource;
 struct module;
 
 #if defined(CONFIG_ARCH_CLOCKSOURCE_DATA) || \
-    defined(CONFIG_GENERIC_VDSO_CLOCK_MODE)
+    defined(CONFIG_GENERIC_GETTIMEOFDAY)
 #include <asm/clocksource.h>
 #endif
 
