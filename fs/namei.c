@@ -2204,6 +2204,7 @@ static inline u64 hash_name(const void *salt, const char *name)
  */
 static int link_path_walk(const char *name, struct nameidata *nd)
 {
+	int depth = 0; // depth <= nd->depth
 	int err;
 
 	nd->last_type = LAST_ROOT;
@@ -2266,14 +2267,11 @@ static int link_path_walk(const char *name, struct nameidata *nd)
 		} while (unlikely(*name == '/'));
 		if (unlikely(!*name)) {
 OK:
-			/* pathname body, done */
-			if (!nd->depth)
-				return 0;
-			name = nd->stack[nd->depth - 1].name;
-			/* trailing symlink, done */
-			if (!name)
+			/* pathname or trailing symlink, done */
+			if (!depth)
 				return 0;
 			/* last component of nested symlink */
+			name = nd->stack[--depth].name;
 			link = walk_component(nd, 0);
 		} else {
 			/* not the last component */
@@ -2283,7 +2281,7 @@ OK:
 			if (IS_ERR(link))
 				return PTR_ERR(link);
 			/* a symlink to follow */
-			nd->stack[nd->depth - 1].name = name;
+			nd->stack[depth++].name = name;
 			name = link;
 			continue;
 		}
@@ -2408,7 +2406,6 @@ static inline const char *lookup_last(struct nameidata *nd)
 	link = walk_component(nd, WALK_TRAILING);
 	if (link) {
 		nd->flags |= LOOKUP_PARENT;
-		nd->stack[0].name = NULL;
 	}
 	return link;
 }
@@ -3364,7 +3361,6 @@ finish_lookup:
 	if (unlikely(res)) {
 		nd->flags |= LOOKUP_PARENT;
 		nd->flags &= ~(LOOKUP_OPEN|LOOKUP_CREATE|LOOKUP_EXCL);
-		nd->stack[0].name = NULL;
 		return res;
 	}
 
