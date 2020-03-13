@@ -58,6 +58,8 @@
 #define ARM64_HAS_AMU_EXTN			48
 #define ARM64_SPECTRE_BHB			49
 #define ARM64_WORKAROUND_1742098		50
+#define ARM64_HAS_ADDRESS_AUTH			51
+#define ARM64_HAS_GENERIC_AUTH			52
 
 /* kabi: reserve 51 - 62 for future cpu capabilities */
 #define ARM64_NCAPS				62
