@@ -16,7 +16,6 @@
 #include <linux/affs_hardblocks.h>
 
 #include "check.h"
-#include "amiga.h"
 
 /* magic offsets in partition DosEnvVec */
 #define NR_HD	3
