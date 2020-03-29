@@ -57,9 +57,6 @@ $(error-if,$(success,test -z "$(ld-info)"),Sorry$(comma) this linker is not supp
 ld-name := $(shell,set -- $(ld-info) && echo $1)
 ld-version := $(shell,set -- $(ld-info) && echo $2)
 
-# gcc version including patch level
-gcc-version := $(shell,$(srctree)/scripts/gcc-version.sh $(CC))
-
 # machine bit flags
 #  $(m32-flag): -m32 if the compiler supports it, or an empty string otherwise.
 #  $(m64-flag): -m64 if the compiler supports it, or an empty string otherwise.
