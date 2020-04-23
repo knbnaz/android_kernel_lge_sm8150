@@ -184,7 +184,7 @@ alternative_cb_end
 	ldr	x18, [tsk, #TSK_TI_SCS]		// Restore shadow call stack
 	str	xzr, [tsk, #TSK_TI_SCS]		// Limit visibility of saved SCS
 #endif
-	ptrauth_keys_install_kernel tsk, 1, x20, x22, x23
+	ptrauth_keys_install_kernel tsk, x20, x22, x23
 	.else
 	add	x21, sp, #S_FRAME_SIZE
 	get_current_task tsk
@@ -1306,7 +1306,7 @@ ENTRY(cpu_switch_to)
 	ldr	x18, [x1, #TSK_TI_SCS]
 	str	xzr, [x1, #TSK_TI_SCS]		// limit visibility of saved SCS
 #endif
-	ptrauth_keys_install_kernel x1, 1, x8, x9, x10
+	ptrauth_keys_install_kernel x1, x8, x9, x10
 	ret
 ENDPROC(cpu_switch_to)
 NOKPROBE(cpu_switch_to)
