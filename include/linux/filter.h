@@ -16,8 +16,8 @@
 #include <linux/workqueue.h>
 #include <linux/sched.h>
 #include <linux/capability.h>
-#include <linux/cryptohash.h>
 #include <linux/set_memory.h>
+#include <crypto/sha.h>
 
 #include <net/sch_generic.h>
 
