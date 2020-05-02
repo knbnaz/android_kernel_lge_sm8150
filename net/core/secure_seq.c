@@ -4,7 +4,6 @@
 
 #include <linux/kernel.h>
 #include <linux/init.h>
-#include <linux/cryptohash.h>
 #include <linux/module.h>
 #include <linux/cache.h>
 #include <linux/random.h>
