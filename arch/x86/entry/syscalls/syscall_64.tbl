@@ -360,6 +360,7 @@
 436	common	process_madvise		sys_process_madvise
 437	common	openat2			__x64_sys_openat2
 438	common	pidfd_getfd		__x64_sys_pidfd_getfd
+439	common	faccessat2		__x64_sys_faccessat2
 
 #
 # x32-specific system call numbers start at 512 to avoid cache impact
