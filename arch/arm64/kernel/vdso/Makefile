@@ -15,10 +15,11 @@ obj-vdso-s := $(addprefix $(obj)/, $(obj-vdso-s))
 obj-vdso-c := $(addprefix $(obj)/, $(obj-vdso-c))
 obj-vdso   := $(obj-vdso-c) $(obj-vdso-s)
 
-ccflags-y := -shared -fno-common -fno-builtin -fno-stack-protector -ffixed-x18
+ccflags-y := -fno-stack-protector -ffixed-x18
 ccflags-y += -DDISABLE_BRANCH_PROFILING
-ccflags-y += -nostdlib -Wl,-soname=linux-vdso.so.1 -Wl,--hash-style=sysv
 ccflags-y += $(DISABLE_LTO) $(DISABLE_SCS)
+ldflags-y := -shared -nostdlib -soname=linux-vdso.so.1 \
+		$(call ld-option, --hash-style=sysv) -n -T
 
 # Force -O2 to avoid libgcc dependencies
 CFLAGS_REMOVE_vgettimeofday.o = -pg -Os
@@ -32,11 +33,6 @@ GCOV_PROFILE := n
 KASAN_SANITIZE := n
 UBSAN_SANITIZE := n
 KCOV_INSTRUMENT := n
-
-# Workaround for bare-metal (ELF) toolchains that neglect to pass -shared
-# down to collect2, resulting in silent corruption of the vDSO image.
-ccflags-y += -Wl,-shared
-
 obj-y += vdso.o
 extra-y += vdso.lds
 CPPFLAGS_vdso.lds += -P -C -U$(ARCH)
@@ -46,7 +42,7 @@ $(obj)/vdso.o : $(obj)/vdso.so
 
 # Link rule for the .so file, .lds has to be first
 $(obj)/vdso.so.dbg: $(src)/vdso.lds $(obj-vdso)
-	$(call if_changed,vdsold)
+	$(call if_changed,ld)
 
 # Strip rule for the .so file
 $(obj)/%.so: OBJCOPYFLAGS := -S
