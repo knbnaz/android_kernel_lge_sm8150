@@ -143,6 +143,31 @@ struct padata_shell {
 };
 
 /**
+ * struct padata_mt_job - represents one multithreaded job
+ *
+ * @thread_fn: Called for each chunk of work that a padata thread does.
+ * @fn_arg: The thread function argument.
+ * @start: The start of the job (units are job-specific).
+ * @size: size of this node's work (units are job-specific).
+ * @align: Ranges passed to the thread function fall on this boundary, with the
+ *         possible exceptions of the beginning and end of the job.
+ * @min_chunk: The minimum chunk size in job-specific units.  This allows
+ *             the client to communicate the minimum amount of work that's
+ *             appropriate for one worker thread to do at once.
+ * @max_threads: Max threads to use for the job, actual number may be less
+ *               depending on task size and minimum chunk size.
+ */
+struct padata_mt_job {
+	void (*thread_fn)(unsigned long start, unsigned long end, void *arg);
+	void			*fn_arg;
+	unsigned long		start;
+	unsigned long		size;
+	unsigned long		align;
+	unsigned long		min_chunk;
+	int			max_threads;
+};
+
+/**
  * struct padata_instance - The overall control structure.
  *
  * @cpu_online_node: Linkage for CPU online callback.
@@ -185,6 +210,7 @@ extern void padata_free_shell(struct padata_shell *ps);
 extern int padata_do_parallel(struct padata_shell *ps,
 			      struct padata_priv *padata, int *cb_cpu);
 extern void padata_do_serial(struct padata_priv *padata);
+extern void __init padata_do_multithreaded(struct padata_mt_job *job);
 extern int padata_set_cpumask(struct padata_instance *pinst, int cpumask_type,
 			      cpumask_var_t cpumask);
 #endif
