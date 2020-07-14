@@ -702,7 +702,7 @@ int do_vfs_ioctl(struct file *filp, unsigned int fd, unsigned int cmd,
 	return error;
 }
 
-int ksys_ioctl(unsigned int fd, unsigned int cmd, unsigned long arg)
+SYSCALL_DEFINE3(ioctl, unsigned int, fd, unsigned int, cmd, unsigned long, arg)
 {
 	int error;
 	struct fd f = fdget(fd);
@@ -714,11 +714,6 @@ int ksys_ioctl(unsigned int fd, unsigned int cmd, unsigned long arg)
 		error = do_vfs_ioctl(f.file, fd, cmd, arg);
 	fdput(f);
 	return error;
-}
-
-SYSCALL_DEFINE3(ioctl, unsigned int, fd, unsigned int, cmd, unsigned long, arg)
-{
-	return ksys_ioctl(fd, cmd, arg);
 }
 
 #ifdef CONFIG_COMPAT
