@@ -460,7 +460,7 @@ SYSCALL_DEFINE2(access, const char __user *, filename, int, mode)
 	return do_faccessat(AT_FDCWD, filename, mode);
 }
 
-int ksys_chdir(const char __user *filename)
+SYSCALL_DEFINE1(chdir, const char __user *, filename)
 {
 	struct path path;
 	int error;
@@ -484,11 +484,6 @@ dput_and_out:
 	}
 out:
 	return error;
-}
-
-SYSCALL_DEFINE1(chdir, const char __user *, filename)
-{
-	return ksys_chdir(filename);
 }
 
 SYSCALL_DEFINE1(fchdir, unsigned int, fd)
