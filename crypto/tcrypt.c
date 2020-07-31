@@ -403,7 +403,7 @@ static void test_mb_aead_speed(const char *algo, int enc, int secs,
 					ret = do_one_aead_op(cur->req, ret);
 
 					if (ret) {
-						pr_err("calculating auth failed failed (%d)\n",
+						pr_err("calculating auth failed (%d)\n",
 						       ret);
 						break;
 					}
@@ -653,7 +653,7 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
 						     crypto_aead_encrypt(req));
 
 				if (ret) {
-					pr_err("calculating auth failed failed (%d)\n",
+					pr_err("calculating auth failed (%d)\n",
 					       ret);
 					break;
 				}
