@@ -14,7 +14,7 @@
  * pages =        {},
  * month =        {June},
  *}
- * Used by the iSCSI driver, possibly others, and derived from the
+ * Used by the iSCSI driver, possibly others, and derived from
  * the iscsi-crc.c module of the linux-iscsi driver at
  * http://linux-iscsi.sourceforge.net.
  *
@@ -55,7 +55,7 @@ struct chksum_desc_ctx {
 };
 
 /*
- * Steps through buffer one byte at at time, calculates reflected
+ * Steps through buffer one byte at a time, calculates reflected
  * crc using table.
  */
 
