@@ -16,6 +16,7 @@
 #include <linux/errno.h>
 #include <linux/interrupt.h>
 #include <linux/kernel.h>
+#include <linux/mm.h>
 #include <linux/percpu.h>
 #include <linux/smp.h>
 #include <linux/slab.h>

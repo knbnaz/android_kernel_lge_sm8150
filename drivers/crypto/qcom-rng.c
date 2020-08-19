@@ -7,6 +7,7 @@
 #include <linux/acpi.h>
 #include <linux/clk.h>
 #include <linux/crypto.h>
+#include <linux/io.h>
 #include <linux/hw_random.h>
 #include <linux/iopoll.h>
 #include <linux/kernel.h>

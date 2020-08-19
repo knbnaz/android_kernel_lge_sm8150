@@ -14,6 +14,7 @@
 
 #include <linux/err.h>
 #include <linux/delay.h>
+#include <linux/device.h>
 #include <crypto/engine.h>
 #include <uapi/linux/sched/types.h>
 #include "internal.h"

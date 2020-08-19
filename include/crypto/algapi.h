@@ -15,7 +15,6 @@
 #include <linux/crypto.h>
 #include <linux/list.h>
 #include <linux/kernel.h>
-#include <linux/skbuff.h>
 
 #include <asm/unaligned.h>
 
@@ -34,6 +33,7 @@ struct crypto_instance;
 struct module;
 struct rtattr;
 struct seq_file;
+struct sk_buff;
 
 struct crypto_type {
 	unsigned int (*ctxsize)(struct crypto_alg *alg, u32 type, u32 mask);

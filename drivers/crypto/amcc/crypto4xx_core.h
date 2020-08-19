@@ -22,6 +22,7 @@
 #ifndef __CRYPTO4XX_CORE_H__
 #define __CRYPTO4XX_CORE_H__
 
+#include <linux/scatterlist.h>
 #include <crypto/internal/hash.h>
 
 #define MODULE_NAME "crypto4xx"

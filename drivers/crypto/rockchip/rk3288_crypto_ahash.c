@@ -11,6 +11,7 @@
  *
  * Some ideas are from marvell/cesa.c and s5p-sss.c driver.
  */
+#include <linux/device.h>
 #include "rk3288_crypto.h"
 
 /*

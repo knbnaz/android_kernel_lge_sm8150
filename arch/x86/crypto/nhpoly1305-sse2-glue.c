@@ -9,6 +9,7 @@
 #include <crypto/internal/hash.h>
 #include <crypto/nhpoly1305.h>
 #include <linux/module.h>
+#include <linux/sizes.h>
 #include <asm/fpu/api.h>
 
 asmlinkage void nh_sse2(const u32 *key, const u8 *message, size_t message_len,
