@@ -1266,6 +1266,7 @@ config CRYPTO_AES_PPC_SPE
 
 config CRYPTO_ANUBIS
 	tristate "Anubis cipher algorithm"
+	depends on CRYPTO_USER_API_ENABLE_OBSOLETE
 	select CRYPTO_ALGAPI
 	help
 	  Anubis cipher algorithm.
@@ -1509,6 +1510,7 @@ config CRYPTO_FCRYPT
 
 config CRYPTO_KHAZAD
 	tristate "Khazad cipher algorithm"
+	depends on CRYPTO_USER_API_ENABLE_OBSOLETE
 	select CRYPTO_ALGAPI
 	help
 	  Khazad cipher algorithm.
@@ -1572,6 +1574,7 @@ config CRYPTO_CHACHA20_X86_64
 
 config CRYPTO_SEED
 	tristate "SEED cipher algorithm"
+	depends on CRYPTO_USER_API_ENABLE_OBSOLETE
 	select CRYPTO_ALGAPI
 	help
 	  SEED cipher algorithm (RFC4269).
@@ -1708,6 +1711,7 @@ config CRYPTO_SM4
 
 config CRYPTO_TEA
 	tristate "TEA, XTEA and XETA cipher algorithms"
+	depends on CRYPTO_USER_API_ENABLE_OBSOLETE
 	select CRYPTO_ALGAPI
 	help
 	  TEA cipher algorithm.
