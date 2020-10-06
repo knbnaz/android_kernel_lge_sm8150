@@ -91,7 +91,7 @@ static void __init
 do_xor_speed(struct xor_block_template *tmpl, void *b1, void *b2)
 {
 	int speed;
-	int i, j, count;
+	int i, j;
 	ktime_t min, start, diff;
 
 	tmpl->next = template_list;
@@ -105,8 +105,6 @@ do_xor_speed(struct xor_block_template *tmpl, void *b1, void *b2)
 		for (j = 0; j < REPS; j++) {
 			mb(); /* prevent loop optimzation */
 			tmpl->do_2(BENCH_SIZE, b1, b2);
-			mb();
-			count++;
 			mb();
 		}
 		diff = ktime_sub(ktime_get(), start);
