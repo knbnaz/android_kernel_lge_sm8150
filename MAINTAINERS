@@ -4027,6 +4027,7 @@ W:	https://clangbuiltlinux.github.io/
 B:	https://github.com/ClangBuiltLinux/linux/issues
 C:	irc://chat.freenode.net/clangbuiltlinux
 S:	Supported
+F:	scripts/lld-version.sh
 K:	\b(?i:clang|llvm)\b
 F:	Documentation/kbuild/llvm.rst
 
