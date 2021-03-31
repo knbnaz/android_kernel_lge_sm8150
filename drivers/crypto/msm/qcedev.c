@@ -446,7 +446,7 @@ static int start_cipher_req(struct qcedev_control *podev)
 		if ((qcedev_areq->cipher_op_req.op == QCEDEV_OPER_ENC_NO_KEY)
 			|| (qcedev_areq->cipher_op_req.op ==
 				QCEDEV_OPER_DEC_NO_KEY))
-			creq.op = QCE_REQ_ABLK_CIPHER_NO_KEY;
+			creq.op = QCE_REQ_SK_CIPHER_NO_KEY;
 		else {
 			int i;
 
@@ -457,20 +457,20 @@ static int start_cipher_req(struct qcedev_control *podev)
 
 			if ((podev->platform_support.hw_key_support == 1) &&
 						(i == QCEDEV_MAX_KEY_SIZE))
-				creq.op = QCE_REQ_ABLK_CIPHER;
+				creq.op = QCE_REQ_SK_CIPHER;
 			else {
 				ret = -EINVAL;
 				goto unsupported;
 			}
 		}
 	} else {
-		creq.op = QCE_REQ_ABLK_CIPHER;
+		creq.op = QCE_REQ_SK_CIPHER;
 	}
 
 	creq.qce_cb = qcedev_cipher_req_cb;
 	creq.areq = (void *)&qcedev_areq->cipher_req;
 	creq.flags = 0;
-	ret = qce_ablk_cipher_req(podev->qce, &creq);
+	ret = qce_sk_cipher_req(podev->qce, &creq);
 unsupported:
 	if (ret)
 		qcedev_areq->err = -ENXIO;
@@ -1167,7 +1167,7 @@ static int qcedev_hash_final(struct qcedev_async_req *areq,
 		return qcedev_hmac_final(areq, handle);
 }
 
-static int qcedev_vbuf_ablk_cipher_max_xfer(struct qcedev_async_req *areq,
+static int qcedev_vbuf_sk_cipher_max_xfer(struct qcedev_async_req *areq,
 				int *di, struct qcedev_handle *handle,
 				uint8_t *k_align_src)
 {
@@ -1215,8 +1215,8 @@ static int qcedev_vbuf_ablk_cipher_max_xfer(struct qcedev_async_req *areq,
 					k_align_dst,
 					areq->cipher_op_req.data_len);
 
-	areq->cipher_req.creq.nbytes = areq->cipher_op_req.data_len;
-	areq->cipher_req.creq.info = areq->cipher_op_req.iv;
+	areq->cipher_req.creq.cryptlen = areq->cipher_op_req.data_len;
+	areq->cipher_req.creq.iv = areq->cipher_op_req.iv;
 	areq->cipher_op_req.entries = 1;
 
 	err = submit_req(areq, handle);
@@ -1259,7 +1259,7 @@ exit:
 	return err;
 };
 
-static int qcedev_vbuf_ablk_cipher(struct qcedev_async_req *areq,
+static int qcedev_vbuf_sk_cipher(struct qcedev_async_req *areq,
 						struct qcedev_handle *handle)
 {
 	int err = 0;
@@ -1316,7 +1316,7 @@ static int qcedev_vbuf_ablk_cipher(struct qcedev_async_req *areq,
 				creq->data_len = max_data_xfer;
 				creq->entries = 1;
 
-				err = qcedev_vbuf_ablk_cipher_max_xfer(areq,
+				err = qcedev_vbuf_sk_cipher_max_xfer(areq,
 						&di, handle, k_align_src);
 				if (err < 0) {
 					kzfree(k_buf_src);
@@ -1358,7 +1358,7 @@ static int qcedev_vbuf_ablk_cipher(struct qcedev_async_req *areq,
 				creq->entries =  num_entries;
 
 				i = j;
-				err = qcedev_vbuf_ablk_cipher_max_xfer(areq,
+				err = qcedev_vbuf_sk_cipher_max_xfer(areq,
 						&di, handle, k_align_src);
 				if (err < 0) {
 					kzfree(k_buf_src);
@@ -1388,7 +1388,7 @@ static int qcedev_vbuf_ablk_cipher(struct qcedev_async_req *areq,
 
 		} /* end of while ((i < req.entries) && (err == 0)) */
 	} else
-		err = qcedev_vbuf_ablk_cipher_max_xfer(areq, &di, handle,
+		err = qcedev_vbuf_sk_cipher_max_xfer(areq, &di, handle,
 								k_align_src);
 
 	/* Restore the original req structure */
@@ -1706,7 +1706,7 @@ static inline long qcedev_ioctl(struct file *file,
 			goto exit_free_qcedev_areq;
 		}
 
-		err = qcedev_vbuf_ablk_cipher(qcedev_areq, handle);
+		err = qcedev_vbuf_sk_cipher(qcedev_areq, handle);
 		if (err)
 			goto exit_free_qcedev_areq;
 		if (copy_to_user((void __user *)arg,
