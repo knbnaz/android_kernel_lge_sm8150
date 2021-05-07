@@ -4,6 +4,7 @@
 
 
 #include <stdarg.h>
+#include <linux/align.h>
 #include <linux/linkage.h>
 #include <linux/stddef.h>
 #include <linux/types.h>
