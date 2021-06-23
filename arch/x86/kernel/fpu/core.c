@@ -370,8 +370,7 @@ static inline void copy_init_fpstate_to_fpregs(void)
 	else
 		copy_kernel_to_fregs(&init_fpstate.fsave);
 
-	if (boot_cpu_has(X86_FEATURE_OSPKE))
-		copy_init_pkru_to_fpregs();
+	pkru_write_default();
 }
 
 /*
