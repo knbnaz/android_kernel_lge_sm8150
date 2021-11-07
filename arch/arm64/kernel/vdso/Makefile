@@ -18,7 +18,7 @@ obj-vdso   := $(obj-vdso-c) $(obj-vdso-s)
 ccflags-y := -fno-stack-protector -ffixed-x18
 ccflags-y += -DDISABLE_BRANCH_PROFILING
 ccflags-y += $(DISABLE_LTO) $(DISABLE_SCS)
-ldflags-y := -shared -nostdlib -soname=linux-vdso.so.1  --hash-style=sysv \
+ldflags-y := -shared -soname=linux-vdso.so.1  --hash-style=sysv \
 		--build-id $(call ld-option,-n) -T
 
 # Force -O2 to avoid libgcc dependencies
