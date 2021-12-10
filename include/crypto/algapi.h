@@ -12,9 +12,11 @@
 #ifndef _CRYPTO_ALGAPI_H
 #define _CRYPTO_ALGAPI_H
 
+#include <linux/align.h>
 #include <linux/crypto.h>
+#include <linux/kconfig.h>
 #include <linux/list.h>
-#include <linux/kernel.h>
+#include <linux/types.h>
 
 #include <asm/unaligned.h>
 
@@ -31,6 +33,7 @@
 struct crypto_aead;
 struct crypto_instance;
 struct module;
+struct notifier_block;
 struct rtattr;
 struct seq_file;
 struct sk_buff;
