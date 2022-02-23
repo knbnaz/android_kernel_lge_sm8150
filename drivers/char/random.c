@@ -745,6 +745,7 @@ static void __cold _credit_init_bits(size_t bits)
  *	void add_device_randomness(const void *buf, size_t len);
  *	void add_hwgenerator_randomness(const void *buf, size_t len, size_t entropy);
  *	void add_bootloader_randomness(const void *buf, size_t len);
+ *	void add_vmfork_randomness(const void *unique_vm_id, size_t size);
  *	void add_interrupt_randomness(int irq);
  *	void add_input_randomness(unsigned int type, unsigned int code, unsigned int value);
  *	void add_disk_randomness(struct gendisk *disk);
@@ -764,6 +765,10 @@ static void __cold _credit_init_bits(size_t bits)
  * add_bootloader_randomness() is called by bootloader drivers, such as EFI
  * and device tree, and credits its input depending on whether or not the
  * configuration option CONFIG_RANDOM_TRUST_BOOTLOADER is set.
+ *
+ * add_vmfork_randomness() adds a unique (but not necessarily secret) ID
+ * representing the current instance of a VM to the pool, without crediting,
+ * and then force-reseeds the crng so that it takes effect immediately.
  *
  * add_interrupt_randomness() uses the interrupt timing as random
  * inputs to the entropy pool. Using the cycle counters and the irq source
@@ -888,6 +893,21 @@ void __init add_bootloader_randomness(const void *buf, size_t len)
 	if (trust_bootloader)
 		credit_init_bits(len * 8);
 }
+
+/*
+ * Handle a new unique VM ID, which is unique, not secret, so we
+ * don't credit it, but we do immediately force a reseed after so
+ * that it's used by the crng posthaste.
+ */
+void add_vmfork_randomness(const void *unique_vm_id, size_t size)
+{
+	add_device_randomness(unique_vm_id, size);
+	if (crng_ready()) {
+		crng_reseed(true);
+		pr_notice("crng reseeded due to virtual machine fork\n");
+	}
+}
+EXPORT_SYMBOL_GPL(add_vmfork_randomness);
 
 struct fast_pool {
 	unsigned long pool[4];
