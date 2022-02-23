@@ -239,7 +239,7 @@ static DEFINE_PER_CPU(struct crng, crngs) = {
 static void extract_entropy(void *buf, size_t len);
 
 /* This extracts a new crng key from the input pool. */
-static void crng_reseed(void)
+static void crng_reseed(bool force)
 {
 	unsigned long flags;
 	unsigned long next_gen;
@@ -360,7 +360,7 @@ static void crng_make_state(u32 chacha_state[CHACHA20_BLOCK_SIZE / sizeof(u32)],
 	 * generation counter that we check below.
 	 */
 	if (unlikely(crng_has_old_seed()))
-		crng_reseed();
+		crng_reseed(false);
 
 	local_irq_save(flags);
 	crng = raw_cpu_ptr(&crngs);
@@ -715,7 +715,7 @@ static void __cold _credit_init_bits(size_t bits)
 	} while (cmpxchg(&input_pool.init_bits, orig, new) != orig);
 
 	if (orig < POOL_READY_BITS && new >= POOL_READY_BITS) {
-		crng_reseed(); /* Sets crng_init to CRNG_READY under base_crng.lock. */
+		crng_reseed(false); /* Sets crng_init to CRNG_READY under base_crng.lock. */
 		process_random_ready_list();
 		wake_up_interruptible(&crng_init_wait);
 		kill_fasync(&fasync, SIGIO, POLL_IN);
@@ -832,7 +832,7 @@ int __init random_init(const char *command_line)
 	add_latent_entropy();
 
 	if (crng_ready())
-		crng_reseed();
+		crng_reseed(false);
 	else if (trust_cpu)
 		_credit_init_bits(arch_bits);
 
@@ -888,6 +888,16 @@ void __init add_bootloader_randomness(const void *buf, size_t len)
 	if (trust_bootloader)
 		credit_init_bits(len * 8);
 }
+
+void add_vmfork_randomness(const void *unique_vm_id, size_t size)
+{
+	add_device_randomness(unique_vm_id, size);
+	if (crng_ready()) {
+		crng_reseed(true);
+		pr_notice("crng reseeded due to virtual machine fork\n");
+	}
+}
+EXPORT_SYMBOL_GPL(add_vmfork_randomness);
 
 struct fast_pool {
 	unsigned long pool[4];
@@ -1366,7 +1376,7 @@ static long random_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 			return -EPERM;
 		if (!crng_ready())
 			return -ENODATA;
-		crng_reseed();
+		crng_reseed(false);
 		return 0;
 	default:
 		return -EINVAL;
