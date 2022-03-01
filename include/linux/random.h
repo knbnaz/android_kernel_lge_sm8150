@@ -20,6 +20,11 @@ void add_interrupt_randomness(int irq) __latent_entropy;
 void add_hwgenerator_randomness(const void *buf, size_t len, size_t entropy);
 #if IS_ENABLED(CONFIG_VMGENID)
 void add_vmfork_randomness(const void *unique_vm_id, size_t size);
+int register_random_vmfork_notifier(struct notifier_block *nb);
+int unregister_random_vmfork_notifier(struct notifier_block *nb);
+#else
+static inline int register_random_vmfork_notifier(struct notifier_block *nb) { return 0; }
+static inline int unregister_random_vmfork_notifier(struct notifier_block *nb) { return 0; }
 #endif
 
 static inline void add_latent_entropy(void)
