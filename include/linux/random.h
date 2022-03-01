@@ -18,7 +18,9 @@ void add_input_randomness(unsigned int type, unsigned int code,
 			  unsigned int value) __latent_entropy;
 void add_interrupt_randomness(int irq) __latent_entropy;
 void add_hwgenerator_randomness(const void *buf, size_t len, size_t entropy);
+#if IS_ENABLED(CONFIG_VMGENID)
 void add_vmfork_randomness(const void *unique_vm_id, size_t size);
+#endif
 
 static inline void add_latent_entropy(void)
 {
