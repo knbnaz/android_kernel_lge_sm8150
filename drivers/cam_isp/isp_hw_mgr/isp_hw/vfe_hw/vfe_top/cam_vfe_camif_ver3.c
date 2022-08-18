@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Copyright (c) 2019-2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
 #include <linux/slab.h>
@@ -21,6 +22,7 @@
 #include "cam_trace.h"
 
 #define CAM_VFE_CAMIF_IRQ_SOF_DEBUG_CNT_MAX 2
+#define CAM_VFE_CAMIF_OFFLINE_EPOCH0_LINE   200
 
 struct cam_vfe_mux_camif_ver3_data {
 	void __iomem                                *mem_base;
@@ -486,12 +488,16 @@ static int cam_vfe_camif_ver3_resource_start(
 			(rsrc_data->last_line - rsrc_data->first_line))
 			epoch0_line_cfg = (rsrc_data->last_line -
 				rsrc_data->first_line)/2;
+
 	/* epoch line cfg will still be configured at midpoint of the
 	 * frame width. We use '/ 4' instead of '/ 2'
 	 * cause it is multipixel path
 	 */
 		if (rsrc_data->horizontal_bin || rsrc_data->qcfa_bin)
 			epoch0_line_cfg >>= 1;
+		if (rsrc_data->is_offline &&
+			epoch0_line_cfg > CAM_VFE_CAMIF_OFFLINE_EPOCH0_LINE / 2)
+			epoch0_line_cfg = CAM_VFE_CAMIF_OFFLINE_EPOCH0_LINE / 2;
 
 		epoch1_line_cfg = rsrc_data->reg_data->epoch_line_cfg &
 			0xFFFF;
@@ -513,14 +519,12 @@ static int cam_vfe_camif_ver3_resource_start(
 	camif_res->res_state = CAM_ISP_RESOURCE_STATE_STREAMING;
 
 	/* Reg Update */
-	if (!rsrc_data->is_offline) {
-		cam_io_w_mb(rsrc_data->reg_data->reg_update_cmd_data,
-			rsrc_data->mem_base +
-			rsrc_data->camif_reg->reg_update_cmd);
-		CAM_DBG(CAM_ISP, "VFE:%d CAMIF RUP val:0x%X",
-			camif_res->hw_intf->hw_idx,
-			rsrc_data->reg_data->reg_update_cmd_data);
-	}
+	cam_io_w_mb(rsrc_data->reg_data->reg_update_cmd_data,
+		rsrc_data->mem_base +
+		rsrc_data->camif_reg->reg_update_cmd);
+	CAM_DBG(CAM_ISP, "VFE:%d CAMIF RUP val:0x%X",
+		camif_res->hw_intf->hw_idx,
+		rsrc_data->reg_data->reg_update_cmd_data);
 
 	/* disable sof irq debug flag */
 	rsrc_data->enable_sof_irq_debug = false;

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Copyright (c) 2017-2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
 #include <media/cam_defs.h>
@@ -11,6 +12,61 @@
 #include "cam_isp_packet_parser.h"
 #include "cam_debug_util.h"
 #include "cam_isp_hw_mgr_intf.h"
+#include "cam_req_mgr_debug.h"
+
+int cam_isp_count_hw_entries(struct cam_hw_prepare_update_args *prepare)
+{
+	uint32_t                            i, num_in_buf, num_out_buf;
+	struct cam_buf_io_cfg              *io_cfg;
+	struct cam_hw_fence_map_entry      *out_map_entries;
+	struct cam_hw_fence_map_entry      *in_map_entries;
+
+	io_cfg = (struct cam_buf_io_cfg *) ((uint8_t *)
+			&prepare->packet->payload +
+			prepare->packet->io_configs_offset);
+	num_out_buf = 0;
+	num_in_buf = 0;
+	for (i = 0; i < prepare->packet->num_io_configs; i++) {
+		if (io_cfg[i].direction == CAM_BUF_OUTPUT) {
+			out_map_entries =
+				&prepare->out_map_entries[num_out_buf];
+			if (num_out_buf <
+				prepare->max_out_map_entries) {
+				out_map_entries->resource_handle =
+					io_cfg[i].resource_type;
+				out_map_entries->sync_id =
+					io_cfg[i].fence;
+				num_out_buf++;
+			} else {
+				CAM_ERR(CAM_ISP, "ln_out:%d max_ln:%d",
+					num_out_buf,
+					prepare->max_out_map_entries);
+				return -EINVAL;
+			}
+		} else if (io_cfg[i].direction == CAM_BUF_INPUT) {
+			in_map_entries =
+				&prepare->in_map_entries[num_in_buf];
+			if (num_in_buf < prepare->max_in_map_entries) {
+				in_map_entries->resource_handle =
+					io_cfg[i].resource_type;
+				in_map_entries->sync_id =
+					io_cfg[i].fence;
+				num_in_buf++;
+			} else {
+				CAM_ERR(CAM_ISP, "ln_in:%d imax_ln:%d",
+					num_in_buf,
+					prepare->max_in_map_entries);
+				return -EINVAL;
+			}
+		} else {
+			CAM_ERR(CAM_ISP, "Invalid buf direction");
+			return -EINVAL;
+		}
+	}
+	prepare->num_out_map_entries = num_out_buf;
+	prepare->num_in_map_entries  = num_in_buf;
+	return 0;
+}
 
 int cam_isp_add_change_base(
 	struct cam_hw_prepare_update_args      *prepare,
@@ -472,7 +528,8 @@ int cam_isp_add_io_buffers(
 	struct list_head                     *res_list_ife_in_rd,
 	uint32_t                              size_isp_out,
 	bool                                  fill_fence,
-	struct cam_isp_frame_header_info     *frame_header_info)
+	struct cam_isp_frame_header_info     *frame_header_info,
+	uint32_t                              unpacker_fmt)
 {
 	int                                 rc = 0;
 	dma_addr_t                          io_addr[CAM_PACKET_MAX_PLANES];
@@ -863,9 +920,10 @@ int cam_isp_add_io_buffers(
 			update_buf.cmd.cmd_buf_addr = kmd_buf_info->cpu_addr +
 				kmd_buf_info->used_bytes/4 +
 					io_cfg_used_bytes/4;
-			bus_rd_update.image_buf = io_addr;
-			bus_rd_update.num_buf   = plane_id;
-			bus_rd_update.io_cfg    = &io_cfg[i];
+			bus_rd_update.image_buf    = io_addr;
+			bus_rd_update.num_buf      = plane_id;
+			bus_rd_update.io_cfg       = &io_cfg[i];
+			bus_rd_update.unpacker_fmt = unpacker_fmt;
 			update_buf.cmd.size = kmd_buf_remain_size;
 			update_buf.rm_update = &bus_rd_update;
 

@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
  * Copyright (c) 2017-2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
 #ifndef _CAM_ISP_HW_PARSER_H_
@@ -164,7 +165,8 @@ int cam_isp_add_io_buffers(
 	struct list_head                     *res_list_ife_in_rd,
 	uint32_t                              size_isp_out,
 	bool                                  fill_fence,
-	struct cam_isp_frame_header_info     *frame_header_info);
+	struct cam_isp_frame_header_info     *frame_header_info,
+	uint32_t                              unpacker_fmt);
 
 /*
  * cam_isp_add_reg_update()
@@ -249,4 +251,6 @@ int cam_isp_add_go_cmd(
 	uint32_t                              base_idx,
 	struct cam_kmd_buf_info              *kmd_buf_info);
 
+
+int cam_isp_count_hw_entries(struct cam_hw_prepare_update_args *prepare);
 #endif /*_CAM_ISP_HW_PARSER_H */

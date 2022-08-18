@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Copyright (c) 2018-2020, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
 #include <linux/ratelimit.h>
@@ -151,6 +152,10 @@ struct cam_vfe_bus_rd_ver1_priv {
 	int                                 irq_handle;
 	void                               *tasklet_info;
 	uint32_t                            top_irq_shift;
+	uint32_t                            max_clk_threshold;
+	uint32_t                            nom_clk_threshold;
+	uint32_t                            min_clk_threshold;
+	uint32_t                            bytes_per_clk;
 };
 
 static int cam_vfe_bus_rd_process_cmd(
@@ -534,6 +539,11 @@ static int cam_vfe_bus_deinit_rm_resource(
 static int cam_vfe_bus_rd_get_secure_mode(void *priv, void *cmd_args,
 	uint32_t arg_size)
 {
+
+	bool *mode = cmd_args;
+
+	*mode = false;
+
 	return 0;
 }
 
@@ -797,6 +807,14 @@ static int cam_vfe_bus_init_vfe_bus_read_resource(uint32_t  index,
 		bus_rd_hw_info->vfe_bus_rd_hw_info[index].max_width;
 	rsrc_data->max_height  =
 		bus_rd_hw_info->vfe_bus_rd_hw_info[index].max_height;
+	bus_rd_priv->max_clk_threshold  =
+		bus_rd_hw_info->vfe_bus_rd_hw_info[index].max_clk_threshold;
+	bus_rd_priv->nom_clk_threshold  =
+		bus_rd_hw_info->vfe_bus_rd_hw_info[index].nom_clk_threshold;
+	bus_rd_priv->min_clk_threshold  =
+		bus_rd_hw_info->vfe_bus_rd_hw_info[index].min_clk_threshold;
+	bus_rd_priv->bytes_per_clk  =
+		bus_rd_hw_info->vfe_bus_rd_hw_info[index].bytes_per_clk;
 	rsrc_data->secure_mode = CAM_SECURE_MODE_NON_SECURE;
 
 	vfe_bus_rd->start = cam_vfe_bus_start_vfe_bus_rd;
@@ -900,6 +918,13 @@ static int cam_vfe_bus_rd_update_rm(void *priv, void *cmd_args,
 		rm_data = vfe_bus_rd_data->rm_res[i]->res_priv;
 
 		/* update size register */
+
+		rm_data->unpacker_cfg = cam_vfe_bus_get_unpacker_fmt(
+					update_buf->rm_update->unpacker_fmt);
+
+		CAM_VFE_ADD_REG_VAL_PAIR(reg_val_pair, j,
+			rm_data->hw_regs->unpacker_cfg, rm_data->unpacker_cfg);
+
 		cam_vfe_bus_rd_pxls_to_bytes(io_cfg->planes[i].width,
 			rm_data->unpacker_cfg, &rm_data->width);
 		rm_data->height = io_cfg->planes[i].height;
@@ -1012,6 +1037,26 @@ static int cam_vfe_bus_rd_update_fs_cfg(void *priv, void *cmd_args,
 	bus_priv->common_data.go_cmd_sel = fe_cfg->go_cmd_sel;
 	return 0;
 }
+
+static int cam_vfe_bus_rd_get_off_clk_thr(void *priv, void *cmd_args,
+	uint32_t arg_size)
+{
+	struct cam_vfe_bus_rd_ver1_priv    *bus_priv;
+	struct cam_isp_hw_get_off_clk_thr  *args = cmd_args;
+
+	if (arg_size != sizeof(struct cam_isp_hw_get_off_clk_thr)) {
+		CAM_ERR(CAM_ISP, "invalid ars size");
+		return -EINVAL;
+	}
+	bus_priv = (struct cam_vfe_bus_rd_ver1_priv  *) priv;
+	args->max_clk_threshold = bus_priv->max_clk_threshold;
+	args->nom_clk_threshold = bus_priv->nom_clk_threshold;
+	args->min_clk_threshold = bus_priv->min_clk_threshold;
+	args->bytes_per_clk     = bus_priv->bytes_per_clk;
+
+	return 0;
+}
+
 
 static int cam_vfe_bus_rd_add_go_cmd(void *priv, void *cmd_args,
 	uint32_t arg_size)
@@ -1180,6 +1225,9 @@ static int cam_vfe_bus_rd_process_cmd(
 		break;
 	case CAM_ISP_HW_CMD_FE_TRIGGER_CMD:
 		rc = cam_vfe_bus_rd_add_go_cmd(priv, cmd_args, arg_size);
+		break;
+	case CAM_ISP_HW_CMD_GET_CLK_THRESHOLDS:
+		rc = cam_vfe_bus_rd_get_off_clk_thr(priv, cmd_args, arg_size);
 		break;
 	default:
 		CAM_ERR_RATE_LIMIT(CAM_ISP, "Invalid camif process command:%d",
