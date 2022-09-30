@@ -227,3 +227,11 @@ config QTI_THERMAL_QFPROM
           set or not. It supports to check multiple nvmem cell value for
           multiple condtion. In that case, if any of the nvmem-cell condition
           fails, driver just exits with default enabled thermal zones.
+
+config QTI_VIRTUAL_SENSOR
+	tristate "QTI Virtual Thermal Sensor"
+	depends on THERMAL && THERMAL_OF
+	help
+	   This driver implements virtual sensors , which takes inputs from
+	   devicetree to give aggregated temperature of a set of thermal
+	   zones based on configurable aggregation logic.
