@@ -89,7 +89,8 @@ static int cam_ife_mgr_regspace_data_cb(uint32_t reg_base_type,
 		switch (reg_base_type) {
 		case CAM_REG_DUMP_BASE_TYPE_CAMNOC:
 		case CAM_REG_DUMP_BASE_TYPE_ISP_LEFT:
-			if (!hw_mgr_res->hw_res[CAM_ISP_HW_SPLIT_LEFT])
+			if (!hw_mgr_res->hw_res[CAM_ISP_HW_SPLIT_LEFT] ||
+				!hw_mgr_res->hw_res[CAM_ISP_HW_SPLIT_LEFT]->process_cmd)
 				continue;
 
 			rc = hw_mgr_res->hw_res[
@@ -112,7 +113,8 @@ static int cam_ife_mgr_regspace_data_cb(uint32_t reg_base_type,
 			*soc_info_ptr = soc_info;
 			break;
 		case CAM_REG_DUMP_BASE_TYPE_ISP_RIGHT:
-			if (!hw_mgr_res->hw_res[CAM_ISP_HW_SPLIT_RIGHT])
+			if (!hw_mgr_res->hw_res[CAM_ISP_HW_SPLIT_RIGHT] ||
+				!hw_mgr_res->hw_res[CAM_ISP_HW_SPLIT_RIGHT]->process_cmd)
 				continue;
 
 			rc = hw_mgr_res->hw_res[
@@ -7782,7 +7784,7 @@ end:
 	return rc;
 }
 
-static inline void cam_ife_hw_mgr_get_offline_sof_timestamp(
+static inline void cam_ife_hw_mgr_get_timestamp(
 	uint64_t                             *timestamp,
 	uint64_t                             *boot_time)
 {
@@ -8412,7 +8414,7 @@ static int cam_ife_hw_mgr_handle_hw_sof(
 				sof_done_event_data.boot_time);
 		} else {
 			if (ife_ctx->is_offline)
-				cam_ife_hw_mgr_get_offline_sof_timestamp(
+				cam_ife_hw_mgr_get_timestamp(
 				&sof_done_event_data.timestamp,
 				&sof_done_event_data.boot_time);
 			else
@@ -8476,6 +8478,10 @@ static int cam_ife_hw_mgr_handle_hw_eof(
 
 	switch (event_info->res_id) {
 	case CAM_ISP_HW_VFE_IN_CAMIF:
+		cam_ife_hw_mgr_get_timestamp(
+			&eof_done_event_data.timestamp,
+			&eof_done_event_data.boot_time);
+
 		if (atomic_read(&ife_ctx->overflow_pending))
 			break;
 
@@ -8969,6 +8975,8 @@ static uint32_t cam_ife_mgr_calc_bw(struct cam_ife_mgr_bw_data *bw_data)
 	CAM_ERR(CAM_ISP, "BW OFFLINE stream dimensions %dx%d@%d",
 			bw_data->width, bw_data->height, bw_data->framerate);
 	bw = bw_data->width * bw_data->height * bw_data->framerate;
+	/* Add BW for IFE Read as well */
+	bw = 3 * (bw / 2);
 	switch (bw_data->format) {
 	case CAM_FORMAT_MIPI_RAW_8:
 		break;
