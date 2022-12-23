@@ -34,6 +34,10 @@
 #define CAM_IFE_HW_STATE_BUSY     3
 #define CAM_IFE_HW_STATE_STOPPING 4
 
+/* CDM HW POWER STATE */
+#define CAM_CDM_POWER_STATE_OFF 0
+#define CAM_CDM_POWER_STATE_ON  1
+
 /**
  * struct cam_ife_hw_mgr_debug - contain the debug information
  *
@@ -88,6 +92,9 @@ struct cam_ife_mgr_bw_data {
  * num_in_ports:          number of context input ports
  * in_ports:              context input ports
  * bw_data:               contains data for BW usage calculation
+ * unpacker_fmt:          ife input unpacker format
+ * dynamic_rdi_alloc:     is dynamic rdi allocation enabled
+ * dynamic_rdi_mask:      dynamic allocated resources mask
  *
  */
 struct cam_ife_hw_mgr_ctx {
@@ -102,6 +109,8 @@ struct cam_ife_hw_mgr_ctx {
 	struct cam_isp_in_port_generic_info  *in_ports;
 	struct cam_ife_mgr_bw_data            bw_data;
 	uint32_t                              unpacker_fmt;
+	bool                                  dynamic_rdi_alloc;
+	uint32_t                              dynamic_rdi_mask;
 };
 
 /**
@@ -145,6 +154,7 @@ struct cam_ife_hw_mgr_ctx {
  *                          context
  * @cdm_done                flag to indicate cdm has finished writing shadow
  *                          registers
+ * @cdm_power_on            flag to check cdm power state
  * @last_cdm_done_req:      Last cdm done request
  * @is_rdi_only_context     flag to specify the context has only rdi resource
  * @config_done_complete    indicator for configuration complete
@@ -206,6 +216,7 @@ struct cam_ife_hw_concrete_ctx {
 	uint32_t                        eof_cnt[CAM_IFE_HW_NUM_MAX];
 	atomic_t                        overflow_pending;
 	atomic_t                        cdm_done;
+	atomic_t                        cdm_power_on;
 	uint64_t                        last_cdm_done_req;
 	uint32_t                        is_rdi_only_context;
 	struct completion               config_done_complete;

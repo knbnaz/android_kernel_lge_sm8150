@@ -13,6 +13,8 @@
 #include "cam_common_util.h"
 #include "cam_packet_util.h"
 
+#include <soc/qcom/boot_stats.h>
+
 
 static int cam_sensor_update_req_mgr(
 	struct cam_sensor_ctrl_t *s_ctrl,
@@ -953,6 +955,8 @@ int32_t cam_sensor_driver_cmd(struct cam_sensor_ctrl_t *s_ctrl,
 			"CAM_ACQUIRE_DEV Success, sensor_id:0x%x,sensor_slave_addr:0x%x",
 			s_ctrl->sensordata->slave_info.sensor_id,
 			s_ctrl->sensordata->slave_info.sensor_slave_addr);
+
+		place_marker("M - Hibernation: CAM_ACQUIRE_DEV Success");
 	}
 		break;
 	case CAM_RELEASE_DEV: {
@@ -1061,6 +1065,7 @@ int32_t cam_sensor_driver_cmd(struct cam_sensor_ctrl_t *s_ctrl,
 			"CAM_START_DEV Success, sensor_id:0x%x,sensor_slave_addr:0x%x",
 			s_ctrl->sensordata->slave_info.sensor_id,
 			s_ctrl->sensordata->slave_info.sensor_slave_addr);
+		place_marker("M - Hibernation: Sensor Start dev success");
 	}
 		break;
 	case CAM_STOP_DEV: {
@@ -1105,10 +1110,10 @@ int32_t cam_sensor_driver_cmd(struct cam_sensor_ctrl_t *s_ctrl,
 			rc = cam_sensor_apply_settings(s_ctrl, 0,
 				pkt_opcode);
 
-			if ((rc == -EAGAIN) &&
+			if ((rc == -ETIMEDOUT || rc == -EAGAIN) &&
 			(s_ctrl->io_master_info.master_type == CCI_MASTER)) {
-				/* If CCI hardware is resetting we need to wait
-				 * for sometime before reapply
+				/* If CCI hardware is resetting or timeout,
+				 * reapply with some dealy.
 				 */
 				CAM_WARN(CAM_SENSOR,
 					"Reapplying the Init settings due to cci hw reset");

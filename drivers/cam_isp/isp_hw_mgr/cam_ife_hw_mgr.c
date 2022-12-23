@@ -1803,7 +1803,8 @@ static int cam_ife_hw_mgr_acquire_csid_hw(
 	struct cam_ife_hw_mgr *ife_hw_mgr,
 	struct cam_csid_hw_reserve_resource_args  *csid_acquire,
 	bool is_start_lower_idx,
-	struct cam_ife_hw_mgr_ctx  *ife_ctx)
+	struct cam_ife_hw_mgr_ctx  *ife_ctx,
+	bool dynamic_rdi_alloc)
 {
 	int i;
 	int rc = -EINVAL;
@@ -1868,7 +1869,7 @@ static int cam_ife_hw_mgr_acquire_csid_hw(
 				csid_acquire,
 				sizeof(struct
 					cam_csid_hw_reserve_resource_args));
-			if (is_rdi &&
+			if (is_rdi && dynamic_rdi_alloc &&
 				(tries < CAM_IFE_CSID_RDI_MAX-1) &&
 				c_ctx->acq_common_args_ver > 0x1000 &&
 				rc == -EAGAIN) {
@@ -1887,7 +1888,8 @@ static int cam_ife_mgr_attempt_reuse_cid_res(
 	struct cam_ife_hw_concrete_ctx          *c_ctx,
 	struct cam_isp_hw_mgr_res          *cid_res_temp,
 	struct cam_csid_hw_reserve_resource_args  *csid_acquire,
-	uint32_t *acquired_cnt)
+	uint32_t *acquired_cnt,
+	bool dynamic_rdi_alloc)
 {
 
 	int rc = -1;
@@ -1941,7 +1943,7 @@ static int cam_ife_mgr_attempt_reuse_cid_res(
 				hw_intf = cid_res_iterator->hw_res[i]->hw_intf;
 				rc = hw_intf->hw_ops.reserve(hw_intf->hw_priv,
 					csid_acquire, sizeof(*csid_acquire));
-				if (is_rdi &&
+				if (is_rdi && dynamic_rdi_alloc &&
 					(tries < CAM_IFE_CSID_RDI_MAX-1)  &&
 				c_ctx->acq_common_args_ver > 0x1000 &&
 						rc == -EAGAIN) {
@@ -2057,18 +2059,21 @@ static int cam_ife_mgr_acquire_cid_res(
 	 */
 	if (cam_ife_mgr_attempt_reuse_cid_res(
 			c_ctx, cid_res_temp, &csid_acquire,
-			&acquired_cnt) == 0)
+			&acquired_cnt, ife_ctx->dynamic_rdi_alloc) == 0)
 		goto acquire_successful;
-	/*
-	 * Try acquiring CID resource from previously acquired HW from other
-	 * used contexts
-	 */
-	list_for_each_entry(ife_ctx_iterator, &ife_hw_mgr->used_ctx_list,
-		list) {
-		if (cam_ife_mgr_attempt_reuse_cid_res(
-				ife_ctx_iterator, cid_res_temp, &csid_acquire,
-				&acquired_cnt) == 0)
-			goto acquire_successful;
+
+	if (ife_ctx->dynamic_rdi_alloc) {
+		/* Try acquiring CID resource from previously acquired HW from
+		   other used contexts */
+		list_for_each_entry(ife_ctx_iterator,
+			&ife_hw_mgr->used_ctx_list,
+			list) {
+			if (0 == cam_ife_mgr_attempt_reuse_cid_res(
+					ife_ctx_iterator, cid_res_temp,
+					&csid_acquire, &acquired_cnt,
+					ife_ctx->dynamic_rdi_alloc))
+				goto acquire_successful;
+		}
 	}
 
 	/* Acquire Left if not already acquired */
@@ -2080,10 +2085,10 @@ static int cam_ife_mgr_acquire_cid_res(
 	if (c_ctx->is_fe_enabled ||
 		c_ctx->dsp_enabled)
 		rc = cam_ife_hw_mgr_acquire_csid_hw(ife_hw_mgr,
-			&csid_acquire, true, ife_ctx);
+			&csid_acquire, true, ife_ctx, ife_ctx->dynamic_rdi_alloc);
 	else
 		rc = cam_ife_hw_mgr_acquire_csid_hw(ife_hw_mgr,
-			&csid_acquire, false, ife_ctx);
+			&csid_acquire, false, ife_ctx, ife_ctx->dynamic_rdi_alloc);
 
 	if (rc || !csid_acquire.node_res) {
 		CAM_ERR(CAM_ISP, "No %d paths available rc %d rsrc %p",
@@ -2671,6 +2676,53 @@ static int cam_ife_mgr_check_fe(
 	return 0;
 }
 
+static int cam_ife_mgr_get_dynamic_rdi_alloc(
+	struct cam_ife_hw_mgr_ctx      *ife_ctx,
+	struct cam_isp_acquire_hw_info *acquire_hw_info,
+	uint32_t acquire_info_size)
+{
+	struct cam_isp_common_info *common_info;
+	ife_ctx->dynamic_rdi_alloc = false;
+	/* Check if version supports dynamic allocation */
+
+	if (acquire_hw_info->common_info_version < 0x2001)
+		return 0;
+
+	if (acquire_hw_info->common_info_offset +
+			sizeof(struct cam_isp_common_info) >
+				acquire_info_size) {
+		CAM_ERR(CAM_ISP, "Invalid acquire info size");
+		return -EINVAL;
+	}
+
+	common_info = (struct cam_isp_common_info *)
+		((uint8_t *)&acquire_hw_info->data +
+			acquire_hw_info->common_info_offset);
+
+	if (!ife_ctx->is_offline && common_info->dynamic_rdi_alloc)
+		ife_ctx->dynamic_rdi_alloc = true;
+
+	return 0;
+}
+
+static int cam_ife_mgr_set_dynamic_rdi_mask(
+	struct cam_ife_hw_mgr_ctx      *ife_ctx,
+	struct cam_isp_acquire_hw_info *acquire_hw_info)
+{
+	struct cam_isp_common_info *common_info;
+
+	/* Check if version supports dynamic allocation */
+	if (!ife_ctx->dynamic_rdi_alloc)
+		return 0;
+
+	common_info = (struct cam_isp_common_info *)
+		((uint8_t *)&acquire_hw_info->data +
+			acquire_hw_info->common_info_offset);
+	common_info->resource_mask = ife_ctx->dynamic_rdi_mask;
+
+	return 0;
+}
+
 static int cam_ife_hw_mgr_preprocess_port(
 	struct cam_ife_hw_mgr_ctx   *ife_ctx,
 	struct cam_isp_in_port_generic_info *in_port)
@@ -3006,6 +3058,7 @@ static int cam_ife_mgr_acquire_hw_for_ctx(
 	bool crop_enable                          = true;
 
 	is_dual_isp = in_port->usage_type;
+	ife_ctx->dynamic_rdi_mask = 0;
 	ife_ctx->concr_ctx->dsp_enabled = (bool)in_port->dsp_mode;
 	ife_ctx->concr_ctx->is_dual = (bool)in_port->usage_type;
 
@@ -3077,6 +3130,7 @@ static int cam_ife_mgr_acquire_hw_for_ctx(
 		rc = cam_ife_hw_mgr_acquire_res_ife_src(ife_ctx,
 			in_port, false,
 			acquired_hw_id, acquired_hw_path);
+		ife_ctx->dynamic_rdi_mask |= (acquired_hw_path[0] | *acq_res_id);
 
 		if (rc) {
 			CAM_ERR(CAM_ISP,
@@ -3592,6 +3646,7 @@ static int cam_ife_mgr_acquire_hw(void *hw_mgr_priv, void *acquire_hw_args)
 	if (cdm_acquire.id == CAM_CDM_IFE)
 		ife_ctx->internal_cdm = true;
 	atomic_set(&ife_ctx->cdm_done, 1);
+	atomic_set(&ife_ctx->cdm_power_on, CAM_CDM_POWER_STATE_OFF);
 	atomic_set(&ife_ctx->ctx_state, CAM_IFE_HW_STATE_STOPPED);
 	ife_ctx->last_cdm_done_req = 0;
 
@@ -3882,6 +3937,7 @@ static int cam_ife_mgr_acquire_dev(void *hw_mgr_priv, void *acquire_hw_args)
 	ife_ctx->cdm_handle = cdm_acquire.handle;
 	ife_ctx->cdm_id = cdm_acquire.id;
 	atomic_set(&ife_ctx->cdm_done, 1);
+	atomic_set(&ife_ctx->cdm_power_on, CAM_CDM_POWER_STATE_OFF);
 	atomic_set(&ife_ctx->ctx_state, CAM_IFE_HW_STATE_STOPPED);
 	ife_ctx->last_cdm_done_req = 0;
 
@@ -4687,6 +4743,8 @@ static int cam_ife_mgr_stop_hw(void *hw_mgr_priv, void *stop_hw_args)
 
 	if (cam_cdm_stream_off(ctx->cdm_handle))
 		CAM_ERR(CAM_ISP, "CDM stream off failed %d", ctx->cdm_handle);
+	else
+		atomic_set(&ctx->cdm_power_on, CAM_CDM_POWER_STATE_OFF);
 
 	if (ctx->is_tpg)
 		cam_ife_hw_mgr_stop_hw_res(&ctx->res_list_tpg);
@@ -4960,6 +5018,8 @@ static int cam_ife_mgr_start_hw(void *hw_mgr_priv, void *start_hw_args)
 	if (rc) {
 		CAM_ERR(CAM_ISP, "Can not start cdm (%d)", ctx->cdm_handle);
 		//goto safe_disable;
+	} else {
+		atomic_set(&ctx->cdm_power_on, CAM_CDM_POWER_STATE_ON);
 	}
 
 start_only:
@@ -5089,6 +5149,7 @@ err:
 
 cdm_streamoff:
 	cam_cdm_stream_off(ctx->cdm_handle);
+	atomic_set(&ctx->cdm_power_on, CAM_CDM_POWER_STATE_OFF);
 
 //safe_disable:
 	cam_ife_notify_safe_lut_scm(CAM_IFE_SAFE_DISABLE);
@@ -5170,14 +5231,6 @@ static int cam_ife_mgr_release_hw(void *hw_mgr_priv,
 		return -EINVAL;
 	}
 	hw_mgr_ctx = (struct cam_ife_hw_mgr_ctx *)release_args->ctxt_to_hw_map;
-	ctx = hw_mgr_ctx->concr_ctx;
-	if (!ctx || !ctx->ctx_in_use) {
-		CAM_ERR(CAM_ISP, "Invalid context is used");
-		return -EPERM;
-	}
-
-	CAM_DBG(CAM_ISP, "Enter...ctx id:%d",
-		ctx->ctx_index);
 
 	ctx = hw_mgr_ctx->concr_ctx;
 	if (!ctx || !ctx->ctx_in_use) {
@@ -8864,7 +8917,7 @@ static int cam_ife_mgr_check_start_processing(void *hw_mgr_priv,
 	struct cam_ife_hw_mgr *ife_hw_mgr        = hw_mgr_priv;
 	struct cam_ife_hw_concrete_ctx            *ife_ctx = NULL;
 	int rc = 0;
-	uint32_t state;
+	uint32_t state, cdm_state;
 	bool found = false;
 	bool is_init_pkt;
 
@@ -8875,6 +8928,10 @@ static int cam_ife_mgr_check_start_processing(void *hw_mgr_priv,
 		if (!ife_ctx->is_offline ||
 			(state != CAM_IFE_HW_STATE_STARTED &&
 			state != CAM_IFE_HW_STATE_STARTING))
+			continue;
+
+		cdm_state = atomic_read(&ife_ctx->cdm_power_on);
+		if (cdm_state != CAM_CDM_POWER_STATE_ON)
 			continue;
 
 		cam_ife_mgr_free_in_proc_req(ife_hw_mgr,
@@ -8895,6 +8952,8 @@ static int cam_ife_mgr_check_start_processing(void *hw_mgr_priv,
 			if (ife_ctx->waiting_start &&
 				c_elem->ctx_idx != ife_ctx->start_ctx_idx)
 				continue;
+			if (!c_elem->ready)
+				continue;
 			if (ife_hw_mgr->starting_offline_cnt == 0 &&
 				c_elem->request_id == 0) {
 				c_elem->hw_id = ife_ctx->acquired_hw_id;
@@ -8909,22 +8968,20 @@ static int cam_ife_mgr_check_start_processing(void *hw_mgr_priv,
 				c_elem->prepare.packet->header.request_id)
 				CAM_ERR(CAM_ISP,
 					"Request id mismatch. Packet recycled before use!");
-			if (c_elem->ready) {
-				run_hw_mgr_ctx =
-				    &ife_hw_mgr->virt_ctx_pool[c_elem->ctx_idx];
-				if (!run_hw_mgr_ctx->ctx_in_use)
-					CAM_ERR(CAM_ISP, "UNUSED CONTEXT %d",
-							c_elem->ctx_idx);
-				run_hw_mgr_ctx->concr_ctx = ife_ctx;
-				c_elem->prepare.ctxt_to_hw_map = run_hw_mgr_ctx;
-				c_elem->cfg.ctxt_to_hw_map = run_hw_mgr_ctx;
-				found = true;
-				list_del_init(&c_elem->list);
-				c_elem->hw_id = ife_ctx->acquired_hw_id;
-				list_add_tail(&c_elem->list,
-					&ife_hw_mgr->in_proc_queue.list);
-				break;
-			}
+			run_hw_mgr_ctx =
+			    &ife_hw_mgr->virt_ctx_pool[c_elem->ctx_idx];
+			if (!run_hw_mgr_ctx->ctx_in_use)
+				CAM_ERR(CAM_ISP, "UNUSED CONTEXT %d",
+						c_elem->ctx_idx);
+			run_hw_mgr_ctx->concr_ctx = ife_ctx;
+			c_elem->prepare.ctxt_to_hw_map = run_hw_mgr_ctx;
+			c_elem->cfg.ctxt_to_hw_map = run_hw_mgr_ctx;
+			found = true;
+			list_del_init(&c_elem->list);
+			c_elem->hw_id = ife_ctx->acquired_hw_id;
+			list_add_tail(&c_elem->list,
+				&ife_hw_mgr->in_proc_queue.list);
+			break;
 		}
 		if (found) {
 
@@ -9110,6 +9167,10 @@ static int cam_ife_mgr_v_acquire(void *hw_mgr_priv, void *acquire_hw_args)
 		return rc;
 	}
 
+	ife_mgr_ctx->is_offline = is_offline;
+	cam_ife_mgr_get_dynamic_rdi_alloc(ife_mgr_ctx, acquire_hw_info,
+			acq_args_ptr->acquire_info_size);
+
 	CAM_DBG(CAM_ISP, "FE %d Offline %d", is_fe, is_offline);
 
 	ife_mgr_ctx->cb_priv = acq_args_ptr->context_data;
@@ -9119,7 +9180,6 @@ static int cam_ife_mgr_v_acquire(void *hw_mgr_priv, void *acquire_hw_args)
 	acq_args_ptr->ctxt_to_hw_map = ife_mgr_ctx;
 
 	if (is_offline) {
-		ife_mgr_ctx->is_offline = true;
 		ife_mgr_ctx->unpacker_fmt = ife_mgr_ctx->bw_data.format;
 		allocated = false;
 		mutex_lock(&ife_hw_mgr->ctx_mutex);
@@ -9201,10 +9261,13 @@ static int cam_ife_mgr_v_acquire(void *hw_mgr_priv, void *acquire_hw_args)
 		}
 	} else {
 		rc =  cam_ife_mgr_acquire(hw_mgr_priv, acquire_hw_args);
-		ife_mgr_ctx->is_offline = false;
 		ife_mgr_ctx->concr_ctx->served_ctx_w = 0;
 		ife_mgr_ctx->concr_ctx->served_ctx_id[0] =
 			ife_mgr_ctx->ctx_idx;
+
+		if (!rc && ife_mgr_ctx->dynamic_rdi_alloc)
+			cam_ife_mgr_set_dynamic_rdi_mask(ife_mgr_ctx,
+					acquire_hw_info);
 	}
 	return rc;
 }
