@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
  * Copyright (c) 2020-2021 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2022, Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
 #ifndef __QTI_POWER_SUPPLY_IIO_H__
@@ -155,4 +156,8 @@
 /* BMS */
 #define PSY_IIO_CLEAR_SOH			0x7c
 #define PSY_IIO_SYS_SOC				0x7d
+
+/* QNOVO5 */
+#define PSY_IIO_VOLTAGE_QNOVO       0x7e
+#define PSY_IIO_CURRENT_QNOVO       0x7f
 #endif /* __QTI_POWER_SUPPLY_IIO_H__ */
