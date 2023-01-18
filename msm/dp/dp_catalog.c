@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Copyright (c) 2017-2020, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022,2024 Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
 
@@ -2782,6 +2782,10 @@ static int dp_catalog_init(struct device *dev, struct dp_catalog *dp_catalog,
 		break;
 	case DP_PHY_VERSION_2_0_0:
 		dp_catalog->sub = dp_catalog_get_v200(dev, dp_catalog,
+					&catalog->io);
+		break;
+	case DP_PHY_VERSION_5_0_0:
+		dp_catalog->sub = dp_catalog_get_v500(dev, dp_catalog,
 					&catalog->io);
 		break;
 	default:
