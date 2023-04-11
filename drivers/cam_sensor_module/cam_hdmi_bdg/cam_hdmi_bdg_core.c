@@ -984,6 +984,24 @@ void cam_hdmi_bdg_unset_cam_ctrl(void)
 	cam_hdmi_bdg_cam_ctrl = NULL;
 }
 
+int cam_hdmi_bdg_power_up(void)
+{
+	int32_t rc = 0;
+	if (!cam_hdmi_bdg_cam_ctrl) {
+		CAM_ERR(CAM_SENSOR, "LT6911UXC is not ready.");
+		return -EINVAL;
+	}
+
+	rc = cam_sensor_power_up(cam_hdmi_bdg_cam_ctrl);
+	if (rc < 0) {
+		CAM_ERR(CAM_SENSOR, "power up failed");
+	}
+	else {
+		CAM_INFO(CAM_SENSOR, "power up success");
+	}
+	return rc;
+}
+
 int cam_hdmi_bdg_upgrade_firmware(void)
 {
 	int32_t rc = 0;

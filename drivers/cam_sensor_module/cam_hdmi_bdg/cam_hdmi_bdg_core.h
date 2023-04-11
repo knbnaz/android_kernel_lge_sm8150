@@ -12,6 +12,10 @@
 #define HDMI_BDG_HDMI_CONNECTED    0x55
 #define HDMI_BDG_HDMI_DISCONNECTED 0x88
 
+/**
+ * This API power up lt6911.
+ */
+int cam_hdmi_bdg_power_up(void);
 
 /**
  * This API upgrade lt6911 firmware.
