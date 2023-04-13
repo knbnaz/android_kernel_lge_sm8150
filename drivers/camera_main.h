@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
  * Copyright (c) 2020, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
 #ifndef CAMERA_MAIN_H
@@ -73,6 +73,9 @@ extern struct platform_driver cam_custom_csid_driver;
 extern struct platform_driver custom_driver;
 #endif
 
+#ifdef CONFIG_SPECTRA_SENSOR
+extern struct spi_driver cam_lens_driver_spi_driver;
+#endif
 /*
  * Drivers to be bound by component framework in this order with
  * CRM as master
@@ -140,6 +143,12 @@ static struct platform_driver *const cam_component_drivers[] = {
 	&cam_custom_hw_sub_mod_driver,
 	&cam_custom_csid_driver,
 	&custom_driver,
+#endif
+};
+
+static struct spi_driver *const cam_spi_bus_component_drivers[] = {
+#ifdef CONFIG_SPECTRA_SENSOR
+	&cam_lens_driver_spi_driver,
 #endif
 };
 

@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
  * Copyright (c) 2017-2020, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
 #ifndef _CAM_DEBUG_UTIL_H_
@@ -44,6 +44,7 @@
 #define CAM_IO_ACCESS  (1 << 29)
 #define CAM_SFE        (1 << 30)
 #define CAM_IR_LED     (1 << 31)
+#define CAM_LENS_DRIVER ((unsigned long)1 << 32)
 
 /* Log level types */
 #define CAM_TYPE_TRACE      (1 << 0)
@@ -96,7 +97,7 @@ struct camera_debug_settings {
  * @fmt       :  Formatted string which needs to be print in the log
  *
  */
-void cam_debug_log(unsigned int module_id, const char *func, const int line,
+void cam_debug_log(unsigned long module_id, const char *func, const int line,
 	const char *fmt, ...);
 
 /*
@@ -113,7 +114,7 @@ void cam_debug_log(unsigned int module_id, const char *func, const int line,
  * @fmt       :  Formatted string which needs to be print in the log
  *
  */
-void cam_debug_trace(unsigned int tag, unsigned int module_id,
+void cam_debug_trace(unsigned int tag, unsigned long module_id,
 	const char *func, const int line, const char *fmt, ...);
 
 /*
@@ -123,7 +124,7 @@ void cam_debug_trace(unsigned int tag, unsigned int module_id,
  *
  * @module_id :  Module ID which is using this function
  */
-const char *cam_get_module_name(unsigned int module_id);
+const char *cam_get_module_name(unsigned long module_id);
 
 /*
  * CAM_TRACE

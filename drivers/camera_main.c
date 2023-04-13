@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Copyright (c) 2019-2020, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  */
 #include <linux/module.h>
 #include <linux/build_bug.h>
@@ -32,6 +32,7 @@
 #endif
 
 #include "cam_ir_led_dev.h"
+#include "cam_lens_driver_dev.h"
 
 #include "a5_core.h"
 #include "ipe_core.h"
@@ -118,6 +119,7 @@ static const struct camera_submodule_component camera_sensor[] = {
 	{&cam_flash_init_module, &cam_flash_exit_module},
 #endif
 	{&cam_ir_led_init_module, &cam_ir_led_exit_module},
+	{&cam_lens_driver_init, &cam_lens_driver_exit},
 #endif
 };
 
