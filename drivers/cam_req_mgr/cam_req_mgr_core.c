@@ -686,20 +686,25 @@ static void __cam_req_mgr_validate_crm_wd_timer(
 	}
 	spin_lock_bh(&link->link_state_spin_lock);
 	if (link->watchdog) {
-		if (next_frame_timeout) {
+		if ((next_frame_timeout + CAM_REQ_MGR_WATCHDOG_TIMEOUT) >
+			link->watchdog->expires) {
 			CAM_DBG(CAM_CRM,
 				"Modifying wd timer expiry from %d ms to %d ms",
 				link->watchdog->expires,
-				next_frame_timeout);
+				(next_frame_timeout +
+				CAM_REQ_MGR_WATCHDOG_TIMEOUT));
 			crm_timer_modify(link->watchdog,
-				next_frame_timeout);
+				(next_frame_timeout +
+				CAM_REQ_MGR_WATCHDOG_TIMEOUT));
 		} else if (current_frame_timeout) {
 			CAM_DBG(CAM_CRM,
 				"Reset wd timer to current frame from %d ms to %d ms",
 				link->watchdog->expires,
-				current_frame_timeout);
+				(current_frame_timeout +
+				CAM_REQ_MGR_WATCHDOG_TIMEOUT));
 			crm_timer_modify(link->watchdog,
-				current_frame_timeout);
+				(current_frame_timeout +
+				CAM_REQ_MGR_WATCHDOG_TIMEOUT));
 		} else if (!next_frame_timeout && (link->watchdog->expires >
 			CAM_REQ_MGR_WATCHDOG_TIMEOUT)) {
 			CAM_DBG(CAM_CRM,

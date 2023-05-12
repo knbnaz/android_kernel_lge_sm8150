@@ -114,10 +114,12 @@ static long hdmi_bdg_irq_handler_dev_ioctl(struct file *filp,
 			CAM_ERR(CAM_SENSOR, "hdmi_bdg_irq_handler: IOCTL read error!");
 		break;
 	case HDMI_BDG_IRQ_HANDLER_IOCTL_CMD_RST:
+		CAM_INFO(CAM_SENSOR, "power up LT6911, reset and run");
 		s_hdmi_bdg_res_info.width = -1;
 		s_hdmi_bdg_res_info.height = -1;
 		s_hdmi_bdg_res_info.have_hdmi_signal = false;
 		s_hdmi_bdg_res_info.id = 0;
+		rc = cam_hdmi_bdg_power_up();
 		break;
 	case HDMI_BDG_IRQ_HANDLER_IOCTL_CMD_UPGRADE_FW:
 		CAM_INFO(CAM_SENSOR, "hdmi_bdg_irq_handler: Upgrading firmware...");
