@@ -9095,7 +9095,7 @@ static uint32_t cam_ife_mgr_required_offline_hw(void *hw_mgr_priv, bool stop)
 	if ((stop) && (cnt == 1))
 		return 0;
 
-	if (max_bw < nom_bw_per_hw)
+	if (total_bw < nom_bw_per_hw)
 		req_hw = (uint32_t)((total_bw + nom_bw_per_hw - 1) /
 				nom_bw_per_hw);
 	else {
