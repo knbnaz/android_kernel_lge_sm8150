@@ -86,55 +86,6 @@ int32_t cam_lens_driver_create_wq(struct cam_lens_driver_ctrl_t *l_ctrl)
 	return rc;
 }
 
-static int32_t cam_lens_driver_adjust_backlash_step(
-	struct cam_lens_driver_ctrl_t *l_ctrl,
-	struct cam_lens_driver_motor_status *pMotor_status)
-{
-	int rc = 0;
-	struct cam_lens_driver_set_motor_actual_position motor_act_pos_info;
-
-	if (pMotor_status->motorId >= STM_MOTOR_MAX) {
-		CAM_ERR(CAM_LENS_DRIVER, "Invalid motor Id.");
-		rc = -EINVAL;
-		return rc;
-	}
-
-	if (l_ctrl->motor_drv_method == ABSOLUTE_DRV) {
-		motor_act_pos_info.motorId = pMotor_status->motorId;
-		motor_act_pos_info.motorPosition =
-			pMotor_status->motorCurrentPosition +
-			l_ctrl->stm_motor_info[pMotor_status->motorId].backLashStepCount;
-	} else if (l_ctrl->motor_drv_method == RELATIVE_DRV) {
-		motor_act_pos_info.motorId = pMotor_status->motorId;
-		motor_act_pos_info.motorPosition =
-			pMotor_status->motorCurrentPosition +
-			l_ctrl->stm_motor_info[pMotor_status->motorId].backLashStepCount;
-	}
-	CAM_DBG(CAM_LENS_DRIVER, "set motor[%d] actual position[%d]",
-			motor_act_pos_info.motorId,
-			motor_act_pos_info.motorPosition);
-
-	if (l_ctrl->lens_driver_intf != NULL &&
-		l_ctrl->lens_driver_intf->set_motor_actual_position != NULL) {
-		rc = l_ctrl->lens_driver_intf->set_motor_actual_position(
-				l_ctrl,
-				motor_act_pos_info.motorId,
-				motor_act_pos_info.motorPosition);
-		if (rc < 0) {
-			CAM_ERR(CAM_LENS_DRIVER,
-				"Fail set motor actual position motorId:%d Act_Pos:%d",
-				motor_act_pos_info.motorId,
-				motor_act_pos_info.motorPosition);
-		} else {
-			l_ctrl->stm_motor_info[motor_act_pos_info.motorId].is_moving =
-				pMotor_status->isMoving;
-			l_ctrl->stm_motor_info[motor_act_pos_info.motorId].actual_position =
-				pMotor_status->motorCurrentPosition;
-		}
-	}
-	return rc;
-}
-
 static int32_t cam_lens_driver_process_cmd(void *priv, void *data)
 {
 	uint8_t motor_id;
@@ -169,6 +120,7 @@ static int32_t cam_lens_driver_process_cmd(void *priv, void *data)
 	switch (cmd_data->cmd_type) {
 	case CAM_LENS_DRIVER_ABS_MOTOR_MOVE:{
 		int32_t actual_position;
+		int32_t target_position;
 
 		abs_motor_move_info =
 			(struct cam_lens_driver_absolute_motor_move *)cmd_data->payload;
@@ -177,16 +129,30 @@ static int32_t cam_lens_driver_process_cmd(void *priv, void *data)
 			rc = -EINVAL;
 			goto end;
 		}
+
+		target_position = abs_motor_move_info->usteps;
 		motor_id = abs_motor_move_info->motorId;
 		actual_position = l_ctrl->stm_motor_info[motor_id].actual_position;
-		direction = ((abs_motor_move_info->usteps -
-			actual_position) >= 0) ? FORWARD : BACKWARD;
-		if (direction == BACKWARD &&
-			l_ctrl->stm_motor_info[motor_id].last_direction
-				== FORWARD) {
-			abs_motor_move_info->usteps -=
-				l_ctrl->stm_motor_info[motor_id].backLashStepCount;
-			l_ctrl->stm_motor_info[motor_id].is_backlash_step_added = 1;
+		direction = ((target_position - actual_position) >= 0) ?
+			FORWARD : BACKWARD;
+		if (direction == BACKWARD) {
+			/* Protection: Reset absolute position to 0 if its value -ve after
+			 * backlash compensation.
+			 * If absolute position value is -ve from CSL packet, then it is
+			 * set from UMD for specific operation like boundary calibration.
+			 */
+			if (abs_motor_move_info->usteps > 0) {
+				if (abs_motor_move_info->usteps -
+					l_ctrl->stm_motor_info[motor_id].backLashStepCount >= 0) {
+					abs_motor_move_info->usteps -=
+						l_ctrl->stm_motor_info[motor_id].backLashStepCount;
+				} else {
+					abs_motor_move_info->usteps = 0;
+				}
+			} else {
+				abs_motor_move_info->usteps -=
+					l_ctrl->stm_motor_info[motor_id].backLashStepCount;
+			}
 		}
 		CAM_DBG(CAM_LENS_DRIVER, "ABS DRV motorID:%d usteps:%d",
 				abs_motor_move_info->motorId,
@@ -203,12 +169,16 @@ static int32_t cam_lens_driver_process_cmd(void *priv, void *data)
 						abs_motor_move_info->usteps);
 			} else {
 				l_ctrl->stm_motor_info[motor_id].last_direction = direction;
+				l_ctrl->stm_motor_info[motor_id].actual_position =
+					target_position;
 				l_ctrl->stm_motor_info[motor_id].is_moving = 1;
 			}
 		}
 		break;
 	}
-	case CAM_LENS_DRIVER_REL_MOTOR_MOVE:
+	case CAM_LENS_DRIVER_REL_MOTOR_MOVE:{
+		uint32_t microsteps = 0;
+
 		rel_motor_move_info =
 			(struct cam_lens_driver_relative_motor_move *)cmd_data->payload;
 
@@ -218,13 +188,15 @@ static int32_t cam_lens_driver_process_cmd(void *priv, void *data)
 			goto end;
 		}
 
+		if (rel_motor_move_info->usteps < 0)
+			rel_motor_move_info->usteps = 0;
+
+		microsteps = rel_motor_move_info->usteps;
 		motor_id = rel_motor_move_info->motorId;
-		if (rel_motor_move_info->direction == BACKWARD &&
-			l_ctrl->stm_motor_info[motor_id].last_direction
-			== FORWARD) {
+		if (rel_motor_move_info->direction !=
+			l_ctrl->stm_motor_info[motor_id].last_direction) {
 			rel_motor_move_info->usteps +=
 				l_ctrl->stm_motor_info[motor_id].backLashStepCount;
-			l_ctrl->stm_motor_info[motor_id].is_backlash_step_added = 1;
 		}
 		CAM_DBG(CAM_LENS_DRIVER, "REL DRV motorID:%d, usteps:%d, dir:%d",
 				rel_motor_move_info->motorId,
@@ -245,11 +217,14 @@ static int32_t cam_lens_driver_process_cmd(void *priv, void *data)
 			} else {
 				l_ctrl->stm_motor_info[motor_id].last_direction =
 					rel_motor_move_info->direction;
+				l_ctrl->stm_motor_info[motor_id].actual_position +=
+					(rel_motor_move_info->direction == FORWARD) ?
+					microsteps : (-1) * microsteps;
 				l_ctrl->stm_motor_info[motor_id].is_moving = 1;
 			}
 		}
 		break;
-
+	}
 	case CAM_LENS_DRIVER_PI_CALIBRATION:
 		PI_cal_info =
 			(struct cam_lens_driver_PI_calibration *)cmd_data->payload;
@@ -389,27 +364,17 @@ static int32_t cam_lens_driver_process_cmd(void *priv, void *data)
 			rc = l_ctrl->lens_driver_intf->get_motor_status(
 					l_ctrl, motor_id, &motor_status);
 			if (rc < 0) {
-				CAM_ERR(CAM_LENS_DRIVER, "Fail to motor[%d] status", motor_id);
+				CAM_ERR(CAM_LENS_DRIVER, "Fail to read motor[%d] status",
+				motor_id);
 			} else {
-				CAM_DBG(CAM_LENS_DRIVER, "Read motor status of motorID :%d",
-					motor_status.motorId);
+				CAM_DBG(CAM_LENS_DRIVER, "recvd motor:%d status from lens drv",
+					motor_id);
 				CAM_DBG(CAM_LENS_DRIVER, "isMoving :%d currentPosition :%d",
 					motor_status.isMoving,
 					motor_status.motorCurrentPosition);
 				if (motor_status.isMoving == 0) {
-					if (l_ctrl->stm_motor_info[motor_id].is_backlash_step_added
-						== 1) {
-						l_ctrl->stm_motor_info[motor_id].is_backlash_step_added
-							= 0;
-						CAM_DBG(CAM_LENS_DRIVER, "Adjust backlash step.");
-						cam_lens_driver_adjust_backlash_step(l_ctrl,
-							&motor_status);
-					} else {
-						l_ctrl->stm_motor_info[motor_id].is_moving =
-							motor_status.isMoving;
-						l_ctrl->stm_motor_info[motor_id].actual_position =
-							motor_status.motorCurrentPosition;
-					}
+					l_ctrl->stm_motor_info[motor_id].is_moving =
+						motor_status.isMoving;
 				}
 			}
 		}
@@ -493,7 +458,9 @@ static int32_t cam_lens_driver_parse_get_motor_status_cmd(
 			goto end;
 		}
 		read_buffer += io_cfg->offsets[0];
-
+		CAM_DBG(CAM_LENS_DRIVER,
+			"read motor status for reqid %d",
+			csl_packet->header.request_id);
 		for (j = 0; j < STM_MOTOR_MAX &&
 				count < get_motor_cmd->num_of_cmd; j++) {
 			/* Call lens driver Get motor moving status API */
@@ -507,7 +474,7 @@ static int32_t cam_lens_driver_parse_get_motor_status_cmd(
 				else {
 					if (j < STM_MOTOR_MAX) {
 						CAM_DBG(CAM_LENS_DRIVER,
-							"New task: read motor status");
+							"New task: read motor[%d] status", j);
 						l_ctrl->stm_motor_info[j].motorId = j;
 						cmd_data = (struct lens_driver_cmd_work_data *)
 									task->payload;
@@ -526,10 +493,9 @@ static int32_t cam_lens_driver_parse_get_motor_status_cmd(
 					l_ctrl->stm_motor_info[j].is_moving;
 				motor_status.motorCurrentPosition =
 					l_ctrl->stm_motor_info[j].actual_position;
-				CAM_DBG(CAM_LENS_DRIVER, "computed motorID :%d ", j);
-				CAM_DBG(CAM_LENS_DRIVER, "recv data for motorID :%d",
-					motor_status.motorId);
-				CAM_DBG(CAM_LENS_DRIVER, "isMoving:%d CurrPos:%d",
+				CAM_DBG(CAM_LENS_DRIVER, "Fill motor status", j);
+				CAM_DBG(CAM_LENS_DRIVER, "motorID:%d isMoving:%d CurrPos:%d",
+					motor_status.motorId,
 					motor_status.isMoving,
 					motor_status.motorCurrentPosition);
 				CAM_DBG(CAM_LENS_DRIVER, "copy the data, len:%d",
@@ -843,6 +809,49 @@ end:
 	return rc;
 }
 
+int32_t cam_lens_driver_read_all_motor_status(
+	struct cam_lens_driver_ctrl_t *l_ctrl)
+{
+	int32_t rc = 0;
+	uint8_t motor_id;
+	struct cam_lens_driver_motor_status motor_status;
+
+	for (motor_id = 0; motor_id < STM_MOTOR_MAX; motor_id++) {
+		memset(&motor_status, 0, sizeof(motor_status));
+		if (l_ctrl->lens_driver_intf != NULL &&
+				l_ctrl->lens_driver_intf->get_motor_status != NULL) {
+			if (((motor_id == STM_MOTOR_PIRIS) &&
+				(l_ctrl->lens_capability.PIRIS == true)) ||
+				((motor_id == STM_MOTOR_AF) &&
+				(l_ctrl->lens_capability.AF == true)) ||
+				((motor_id == STM_MOTOR_ZOOM) &&
+				(l_ctrl->lens_capability.ZOOM == true)) ||
+				((motor_id == STM_MOTOR_DCIRIS) &&
+				(l_ctrl->lens_capability.DCIRIS == true))) {
+				rc = l_ctrl->lens_driver_intf->get_motor_status(
+						l_ctrl, motor_id, &motor_status);
+				if (rc < 0) {
+					CAM_ERR(CAM_LENS_DRIVER, "Fail to get motor[%d] status",
+					motor_id);
+				} else {
+					CAM_DBG(CAM_LENS_DRIVER,
+						"motorID:%d isMoving:%d currentPosition:%d",
+						motor_status.motorId,
+						motor_status.isMoving,
+						motor_status.motorCurrentPosition);
+					l_ctrl->stm_motor_info[motor_id].is_moving =
+						motor_status.isMoving;
+					if (motor_status.isMoving == false) {
+						l_ctrl->stm_motor_info[motor_id].actual_position =
+							motor_status.motorCurrentPosition;
+					}
+				}
+			}
+		}
+	}
+	return rc;
+}
+
 int32_t cam_lens_driver_config(struct cam_lens_driver_ctrl_t *l_ctrl,
 	void *arg)
 {
@@ -952,7 +961,8 @@ int32_t cam_lens_driver_config(struct cam_lens_driver_ctrl_t *l_ctrl,
 			rc = l_ctrl->lens_driver_intf->lens_driver_init(l_ctrl);
 			if (rc < 0)
 				CAM_ERR(CAM_LENS_DRIVER, "Lens Driver Init failed");
-
+			else
+				cam_lens_driver_read_all_motor_status(l_ctrl);
 			mutex_unlock(&(l_ctrl->spi_sync_mutex));
 		}
 		CAM_DBG(CAM_LENS_DRIVER, "Lens driving method %d",
