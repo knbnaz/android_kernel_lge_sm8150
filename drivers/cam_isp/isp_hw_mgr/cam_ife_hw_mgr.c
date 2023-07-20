@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Copyright (c) 2017-2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
 #include <linux/slab.h>
@@ -7832,6 +7832,7 @@ static int cam_ife_mgr_dump(void *hw_mgr_priv, void *args)
 		}
 	}
 	dump_args->offset = isp_hw_dump_args.offset;
+	cam_mem_put_cpu_buf(dump_args->buf_handle);
 end:
 	CAM_DBG(CAM_ISP, "offset %u", dump_args->offset);
 	return rc;
@@ -9095,7 +9096,7 @@ static uint32_t cam_ife_mgr_required_offline_hw(void *hw_mgr_priv, bool stop)
 	if ((stop) && (cnt == 1))
 		return 0;
 
-	if (max_bw < nom_bw_per_hw)
+	if (total_bw < nom_bw_per_hw)
 		req_hw = (uint32_t)((total_bw + nom_bw_per_hw - 1) /
 				nom_bw_per_hw);
 	else {

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Copyright (c) 2014-2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
 #include <linux/dma-mapping.h>
@@ -187,7 +188,13 @@ static int camera_platform_compare_dev(struct device *dev, void *data)
 {
 	return platform_bus_type.match(dev, (struct device_driver *) data);
 }
+
 #endif
+
+static int camera_spibus_compare_dev(struct device *dev, const void *data)
+{
+	return spi_bus_type.match(dev, (struct device_driver *) data);
+}
 
 /* Callback to compare device from match list before adding as component */
 static inline int camera_component_compare_dev(struct device *dev, void *data)
@@ -201,6 +208,7 @@ int camera_component_match_add_drivers(struct device *master_dev,
 {
 	int i, rc = 0;
 	struct platform_device *pdev = NULL;
+	struct spi_device *spi = NULL;
 	struct device *start_dev = NULL, *match_dev = NULL;
 
 	if (!master_dev || !match_list) {
@@ -231,6 +239,27 @@ int camera_component_match_add_drivers(struct device *master_dev,
 		put_device(start_dev);
 	}
 
+	for (i = 0; i < ARRAY_SIZE(cam_spi_bus_component_drivers); i++) {
+#if KERNEL_VERSION(5, 4, 0) <= LINUX_VERSION_CODE
+		struct device_driver const *drv =
+			&cam_spi_bus_component_drivers[i]->driver;
+		const void *drv_ptr = (const void *)drv;
+#else
+		struct device_driver *drv = &cam_spi_bus_component_drivers[i]->driver;
+		void *drv_ptr = (void *)drv;
+#endif
+		start_dev = NULL;
+		while ((match_dev = bus_find_device(&spi_bus_type,
+			start_dev, drv_ptr, &camera_spibus_compare_dev))) {
+			put_device(start_dev);
+			spi = to_spi_device(match_dev);
+			CAM_DBG(CAM_UTIL, "Adding matched component:%s", spi->modalias);
+			component_match_add(master_dev, match_list,
+				camera_component_compare_dev, match_dev);
+			start_dev = match_dev;
+		}
+		put_device(start_dev);
+	}
 end:
 	return rc;
 }

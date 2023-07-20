@@ -362,6 +362,7 @@ static int32_t cam_sensor_i2c_pkt_parse(struct cam_sensor_ctrl_t *s_ctrl,
 	}
 
 end:
+	cam_mem_put_cpu_buf(config.packet_handle);
 	return rc;
 }
 
@@ -720,9 +721,11 @@ int32_t cam_handle_mem_ptr(uint64_t handle, struct cam_sensor_ctrl_t *s_ctrl)
 				"Failed to parse the command Buffer Header");
 			goto end;
 		}
+		cam_mem_put_cpu_buf(cmd_desc[i].mem_handle);
 	}
 
 end:
+	cam_mem_put_cpu_buf(handle);
 	return rc;
 }
 
@@ -745,6 +748,8 @@ void cam_sensor_query_cap(struct cam_sensor_ctrl_t *s_ctrl,
 		s_ctrl->sensordata->subdev_id[SUB_MODULE_OIS];
 	query_cap->ir_led_slot_id =
 		s_ctrl->sensordata->subdev_id[SUB_MODULE_IR_LED];
+	query_cap->ldm_slot_id =
+		s_ctrl->sensordata->subdev_id[SUB_MODULE_LENS_DRIVER];
 	query_cap->slot_info =
 		s_ctrl->soc_info.index;
 }

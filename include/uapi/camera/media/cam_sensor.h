@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-only WITH Linux-syscall-note */
 /*
  * Copyright (c) 2016-2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
 #ifndef __UAPI_CAM_SENSOR_H__
@@ -16,6 +16,8 @@
 #define MAX_OIS_NAME_SIZE 32
 #define CAM_CSIPHY_SECURE_MODE_ENABLED 1
 #define CAM_IR_LED_SUPPORTED
+#define MAX_CAM_MOTOR_TYPE 4
+
 /**
  * struct cam_sensor_query_cap - capabilities info for sensor
  *
@@ -30,6 +32,7 @@
  * @flash_slot_id    :  Flash slot id which connected to sensor
  * @csiphy_slot_id   :  CSIphy slot id which connected to sensor
  * @irled_slot_id    :  IRLED slot id which connected to sensor
+ * @ldm_slot_id      :  Lens Driver slot id which connected to sensor
  *
  */
 struct  cam_sensor_query_cap {
@@ -44,6 +47,7 @@ struct  cam_sensor_query_cap {
 	__u32        flash_slot_id;
 	__u32        csiphy_slot_id;
 	__u32        ir_led_slot_id;
+	__u32        ldm_slot_id;
 } __attribute__((packed));
 
 /**
@@ -522,4 +526,182 @@ struct cam_ir_led_set_on_off {
        uint32_t    pwm_period_ns;
        uint8_t     brightness;
 } __attribute__((packed));
+
+/**
+ * struct cam_ldm_query_cap  :  capabilities info for lens driver
+ *
+ * @slot_info           :  Indicates about the slotId or cell Index
+ *
+ */
+struct cam_ldm_query_cap {
+	__u32    slot_info;
+	__u32    reserved;
+} __attribute__ ((packed));
+
+/**
+ * struct cam_lens_driver_absolute_motor_move : Drive motor at
+ *                          aboslute position
+ * @ cmd_type           :   Motor operation Command type
+ * @ motorId            :   Motor ID (PIRIS/AF/ZOOM/DCIRIS/ICR)
+ * @ usteps             :   micro steps value
+ *
+ */
+struct cam_lens_driver_absolute_motor_move {
+	__u8    cmd_type;
+	__u8    motorId;
+	__u16   reserved;
+	__s32   usteps;
+} __attribute__ ((packed));
+
+/**
+ * struct cam_lens_driver_relative_motor_move : Drive motor
+ *                          at relative position
+ * @cmd_type             :   Motor operation Command type
+ * @ motorId            :   Motor ID (PIRIS/AF/ZOOM/DCIRIS/ICR)
+ * @ direction          :   Motor movement Direction
+ * @ usteps             :   micro steps value
+ *
+ */
+struct cam_lens_driver_relative_motor_move {
+	__u8    cmd_type;
+	__u8    motorId;
+	__u8    direction;
+	__u8    reserved;
+	__s32   usteps;
+} __attribute__ ((packed));
+
+/**
+ * struct cam_lens_driver_set_motor_control : Set motor
+ *                          control parameters
+ * @ cmd_type           :   Motor operation Command type
+ * @ motorId            :   Motor ID (PIRIS/AF/ZOOM/DCIRIS/ICR)
+ * @ lensPowerLevel     :   Motor driving duty (Excitation level)
+ * @ drivng mode        :   Motor driving mode
+ * @ backLashStepCount  :   Back lash step value
+ * @ speed              :   Motor Speed in PPS
+ *
+ */
+struct cam_lens_driver_set_motor_control {
+	__u8    cmd_type;
+	__u8    motorId;
+	__u8    lensPowerLevel;
+	__u8    driving_mode;
+	__u16   backLashStepCount;
+	__u16   reserved;
+	__u32   speed;
+} __attribute__ ((packed));
+
+/**
+ * struct cam_lens_driver_set_motor_actual_position :
+ *                          Set motor actual position
+ * @ cmd_type           :   Motor operation Command type
+ * @ motorId            :   Motor ID (PIRIS/AF/ZOOM/DCIRIS/ICR)
+ * @ motorPosition      :   Motor position in usteps count
+ *
+ */
+struct cam_lens_driver_set_motor_actual_position {
+	__u8    cmd_type;
+	__u8    motorId;
+	__u16   reserved;
+	__s32   motorPosition;
+} __attribute__ ((packed));
+
+/**
+ * struct cam_lens_driver_PI_calibration : Perform
+ *                          PI calibration for motor
+ * @ cmd_type            :   Motor operation Command type
+ * @ motorId             :   Motor ID (PIRIS/AF/ZOOM/DCIRIS/ICR)
+ *
+ */
+struct cam_lens_driver_PI_calibration {
+	__u8    cmd_type;
+	__u8    motorId;
+	__u16   reserved;
+} __attribute__ ((packed));
+
+/**
+ * struct cam_lens_driver_abort_motor_moving : Stop moving motor.
+ * @ cmd_type            :   Motor operation Command type
+ * @ motorId             :   Motor ID (PIRIS/AF/ZOOM/DCIRIS)
+ *
+ */
+struct cam_lens_driver_abort_motor_moving {
+	__u8    cmd_type;
+	__u8    motorId;
+	__u16   reserved;
+} __attribute__ ((packed));
+
+/**
+ * struct cam_lens_driver_motor_status : Current motor status
+ * @ motorId                :   Motor ID (PIRIS/AF/ZOOM/DCIRIS/ICR)
+ * @ isMoving               :   Motor is running or in steady state
+ * @ motorCurrentPosition   :   Current motor position in steps
+ *
+ */
+struct cam_lens_driver_motor_status {
+	__u8    motorId;
+	__u8    isMoving;
+	__u16   reserved;
+	__s32   motorCurrentPosition;
+} __attribute__ ((packed));
+
+/**
+ * struct cam_lens_driver_get_motor_status : Get motor
+ *                              current status
+ * @ cmd_type               :   Motor operation Command type
+ * @ motorId_flag           :   ORing of different motorID Bits
+ * @ num_of_cmd             :   Get motor status for this no of motors
+ *
+ */
+struct cam_lens_driver_get_motor_status {
+	__u8    cmd_type;
+	__u8    motorId_flag;
+	__u8    num_of_cmd;
+	__u8    reserved;
+} __attribute__ ((packed));
+
+/**
+ * struct cam_lens_driver_get_motor_power_level : Get motor
+ *                              power level
+ * @ cmd_type               :   Motor operation Command type
+ * @ motorId                :   ORing of different motorID Bits
+ *
+ */
+struct cam_lens_driver_get_motor_power_level {
+	__u8    cmd_type;
+	__u8    motorId;
+	__u16   reserved;
+} __attribute__ ((packed));
+
+/**
+ * struct cam_lens_capability : How many stepper motor
+ *                              supported by lens hardware
+ * @ PIRIS      :   PIRIS supported in Lens HW
+ * @ AF         :   AF supported in Lens HW
+ * @ ZOOM       :   ZOOM supported in Lens HW
+ * @ DCIRIS     :   DCIRIS supported in Lens HW
+ * @ ICR        :   ICR supported in Lens HW
+ */
+struct cam_lens_capability {
+	__u8 PIRIS;
+	__u8 AF;
+	__u8 ZOOM;
+	__u8 DCIRIS;
+	__u8 ICR;
+} __attribute__ ((packed));
+
+/**
+ * struct cam_lens_driver_init_param : Initialise parameter for
+ *                              Lens Driver
+ * @ motorDrivingMethod     :   Motor driving method
+ * @ lensCapability         :   Motor is running or in steady state
+ * @ motorChannelId         :   Lens Driver channel ID
+ *                              at which Motor connected
+ */
+struct cam_lens_driver_init_param {
+	__u8    motorDrivingMethod;
+	__u8    motorChannelId[MAX_CAM_MOTOR_TYPE];
+	struct  cam_lens_capability lensCapability;
+} __attribute__ ((packed));
+
 #endif
