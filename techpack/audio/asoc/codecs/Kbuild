@@ -213,6 +213,9 @@ ifeq ($(KERNEL_BUILD), 1)
 	obj-y	+= msm_sdw/
 	obj-y	+= wcd9360/
 	obj-y	+= wcd937x/
+	obj-y	+= sma6101/
+	obj-y	+= tfa9872/
+	obj-y	+= cs35l41/
 endif
 
 #For TAS2562/TAS2558
