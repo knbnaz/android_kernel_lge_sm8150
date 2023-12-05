@@ -174,7 +174,7 @@ int32_t cam_cmd_buf_parser(struct csiphy_device *csiphy_dev,
 	struct cam_config_dev_cmd *cfg_dev)
 {
 	int32_t                 rc = 0;
-	uintptr_t                generic_ptr;  //LGE STATIC_ANALYSIS (#285808)
+	uintptr_t                generic_ptr = 0;  //LGE STATIC_ANALYSIS (#285808)
 	uintptr_t                generic_pkt_ptr = 0; //LGE STATIC_ANALYSIS (#285807)
 	struct cam_packet       *csl_packet = NULL;
 	struct cam_cmd_buf_desc *cmd_desc = NULL;
