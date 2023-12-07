@@ -23,6 +23,7 @@
 #include <linux/extcon.h>
 #include <linux/soc/qcom/fsa4480-i2c.h>
 
+#include <drm/drm_client.h>
 #include "sde_connector.h"
 
 #include "msm_drv.h"
@@ -166,9 +167,17 @@ static const struct of_device_id dp_dt_match[] = {
 	{}
 };
 
+static void dp_display_update_hdcp_info(struct dp_display_private *dp);
+
 static inline bool dp_display_is_hdcp_enabled(struct dp_display_private *dp)
 {
 	return dp->link->hdcp_status.hdcp_version && dp->hdcp.ops;
+}
+
+static bool is_drm_bootsplash_enabled(struct device *dev)
+{
+	return of_property_read_bool(dev->of_node,
+		"qcom,sde-drm-fb-splash-logo-enabled");
 }
 
 static irqreturn_t dp_display_irq(int irq, void *dev_id)
@@ -765,6 +774,7 @@ static int dp_display_send_hpd_notification(struct dp_display_private *dp)
 {
 	int ret = 0;
 	bool hpd = dp->is_connected;
+	static int bootsplash_count;
 
 	dp->aux->state |= DP_STATE_NOTIFICATION_SENT;
 
@@ -772,6 +782,14 @@ static int dp_display_send_hpd_notification(struct dp_display_private *dp)
 		dp->dp_display.is_sst_connected = hpd;
 	else
 		dp->dp_display.is_sst_connected = false;
+
+	if (!dp->dp_display.is_bootsplash_en
+		&& is_drm_bootsplash_enabled(dp->dp_display.drm_dev->dev)
+		&& !bootsplash_count) {
+		dp->dp_display.is_bootsplash_en = true;
+		bootsplash_count++;
+		drm_client_dev_register(dp->dp_display.drm_dev);
+	}
 
 	reinit_completion(&dp->notification_comp);
 #if IS_ENABLED(CONFIG_LGE_COVER_DISPLAY) || IS_ENABLED(CONFIG_LGE_DUAL_SCREEN)
@@ -1891,6 +1909,7 @@ error_ctrl:
 error_panel:
 	dp_link_put(dp->link);
 error_link:
+	dp->aux->drm_aux_deregister(dp->aux);
 	dp_aux_put(dp->aux);
 error_aux:
 	dp_power_put(dp->power);
@@ -2147,6 +2166,11 @@ static int dp_display_post_enable(struct dp_display *dp_display, void *panel)
 	dp_panel = panel;
 
 	mutex_lock(&dp->session_lock);
+
+	if (dp->dp_display.is_bootsplash_en) {
+		dp->dp_display.is_bootsplash_en = false;
+		goto end;
+	}
 
 	if (!dp->power_on) {
 		pr_debug("stream not setup, return\n");
