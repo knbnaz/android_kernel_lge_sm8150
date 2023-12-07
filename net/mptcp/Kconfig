@@ -64,7 +64,7 @@ endif
 config DEFAULT_MPTCP_PM
 	string
 	default "default" if DEFAULT_DUMMY
-	default "fullmesh" if DEFAULT_FULLMESH 
+	default "fullmesh" if DEFAULT_FULLMESH
 	default "ndiffports" if DEFAULT_NDIFFPORTS
 	default "binder" if DEFAULT_BINDER
 	default "default"
@@ -127,3 +127,12 @@ config DEFAULT_MPTCP_SCHED
 	default "redundant" if DEFAULT_REDUNDANT
 	default "default"
 
+config LGP_DATA_TCPIP_MPTCP_CHECKSUM_ENABLE
+	bool "MPTCP: MPTCP checksum disable requirement (For LGU+, KT Operator)"
+	---help---
+	  This is the MPTCP disable config.
+
+config LGP_DATA_TCPIP_MPTCP_SYN_RETRY_1
+	bool "MPTCP: MPTCP SYN retry count (For LGU+ Operator)"
+	---help---
+	  This is the limit of MPTCP SYN retry count to 1.

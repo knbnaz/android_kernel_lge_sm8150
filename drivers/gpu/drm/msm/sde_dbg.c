@@ -28,7 +28,11 @@
 #define SDE_DBG_BASE_MAX		10
 
 #define DEFAULT_PANIC		1
+#if IS_ENABLED(CONFIG_LGE_DISPLAY_XLOG_ENABLED)
+#define DEFAULT_REGDUMP		SDE_DBG_DUMP_IN_LOG
+#else
 #define DEFAULT_REGDUMP		SDE_DBG_DUMP_IN_MEM
+#endif
 #define DEFAULT_DBGBUS_SDE	SDE_DBG_DUMP_IN_MEM
 #define DEFAULT_DBGBUS_VBIFRT	SDE_DBG_DUMP_IN_MEM
 #define DEFAULT_BASE_REG_CNT	0x100
@@ -5127,14 +5131,11 @@ int sde_dbg_debugfs_register(struct device *dev)
 
 	return 0;
 }
-
 #else
-
 int sde_dbg_debugfs_register(struct device *dev)
 {
 	return 0;
 }
-
 #endif
 
 static void _sde_dbg_debugfs_destroy(void)

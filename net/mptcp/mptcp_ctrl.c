@@ -63,15 +63,28 @@ static struct kmem_cache *mptcp_sock_cache __read_mostly;
 static struct kmem_cache *mptcp_cb_cache __read_mostly;
 static struct kmem_cache *mptcp_tw_cache __read_mostly;
 
-int sysctl_mptcp_enabled __read_mostly = 1;
+//int sysctl_mptcp_enabled __read_mostly = 1;
 EXPORT_SYMBOL(sysctl_mptcp_enabled);
 int sysctl_mptcp_version __read_mostly = 0;
 static int min_mptcp_version;
 static int max_mptcp_version = 1;
+
+/* 2015-06-03 jewon.lee@lge.com, LGP_DATA_TCPIP_MPTCP [START] */
+int sysctl_mptcp_enabled __read_mostly = 2;
+#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP_CHECKSUM_ENABLE
 int sysctl_mptcp_checksum __read_mostly = 1;
+#else
+int sysctl_mptcp_checksum __read_mostly = 0;
+#endif
+#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP_SYN_RETRY_1
+int sysctl_mptcp_syn_retries __read_mostly = 1;
+#else
+int sysctl_mptcp_syn_retries __read_mostly = 3;
+#endif
+/* 2015-06-03 jewon.lee@lge.com, LGP_DATA_TCPIP_MPTCP [END] */
 int sysctl_mptcp_debug __read_mostly;
 EXPORT_SYMBOL(sysctl_mptcp_debug);
-int sysctl_mptcp_syn_retries __read_mostly = 3;
+//int sysctl_mptcp_syn_retries __read_mostly = 3;
 
 bool mptcp_init_failed __read_mostly;
 

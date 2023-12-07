@@ -17,6 +17,11 @@
 #include "sde_formats.h"
 #include "dsi_display.h"
 #include "sde_trace.h"
+#if IS_ENABLED(CONFIG_LGE_COVER_DISPLAY)
+#include <asm/atomic.h>
+#include "../lge/dp/lge_dp_def.h"
+#include <linux/lge_cover_display.h>
+#endif
 
 #define SDE_DEBUG_VIDENC(e, fmt, ...) SDE_DEBUG("enc%d intf%d " fmt, \
 		(e) && (e)->base.parent ? \
@@ -993,6 +998,12 @@ end:
 		phys_enc->parent_ops.handle_frame_done(
 				phys_enc->parent, phys_enc,
 				event);
+#if IS_ENABLED(CONFIG_LGE_COVER_DISPLAY)
+	if (ret == -ETIMEDOUT) {
+		pr_err("%s : CoverDisplay unexpected error happens\n", __func__);
+		set_cover_display_state(COVER_DISPLAY_STATE_CONNECTED_OFF);
+	}
+#endif
 	return ret;
 }
 

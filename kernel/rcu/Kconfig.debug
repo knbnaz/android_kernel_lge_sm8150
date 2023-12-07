@@ -4,6 +4,9 @@
 
 menu "RCU Debugging"
 
+config PROVE_RCU
+	def_bool PROVE_LOCKING
+
 config TORTURE_TEST
 	tristate
 	default n

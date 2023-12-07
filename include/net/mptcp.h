@@ -816,7 +816,7 @@ struct sock *mptcp_check_req_child(struct sock *meta_sk,
 				   struct sk_buff *skb,
 				   const struct mptcp_options_received *mopt);
 u32 __mptcp_select_window(struct sock *sk);
-void mptcp_select_initial_window(int __space, __u32 mss, __u32 *rcv_wnd,
+void mptcp_select_initial_window(struct net *net, int __space, __u32 mss, __u32 *rcv_wnd,
 					__u32 *window_clamp, int wscale_ok,
 					__u8 *rcv_wscale, __u32 init_rcv_wnd,
 					const struct sock *sk);
@@ -1509,6 +1509,7 @@ static inline void mptcp_disable_static_key(void) {}
 static inline void mptcp_cookies_reqsk_init(struct request_sock *req,
 					    struct mptcp_options_received *mopt,
 					    struct sk_buff *skb) {}
+static inline void mptcp_mpcb_put(struct mptcp_cb *mpcb) {}
 static inline void mptcp_fin(struct sock *meta_sk) {}
 static inline bool mptcp_can_new_subflow(const struct sock *meta_sk)
 {

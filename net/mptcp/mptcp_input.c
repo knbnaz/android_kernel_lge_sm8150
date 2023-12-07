@@ -1946,6 +1946,14 @@ skip_hmac_v4:
 			port  = mpadd->u.v4.port;
 		family = AF_INET;
 		addr.in = mpadd->u.v4.addr;
+
+/* 2016-07-19 jewon.lee@lge.com, LGP_DATA_TCPIP_MPTCP [START] */
+        /* do not need to handle add address option in case of the initial subflow's address */
+        if (mpcb->master_sk->sk_daddr == addr.ip) {
+            mptcp_debug("%s: same ip address with master socket\n", __func__);
+            return;
+        }
+/* 2016-07-19 jewon.lee@lge.com, LGP_DATA_TCPIP_MPTCP [END] */
 #if IS_ENABLED(CONFIG_IPV6)
 	} else if (mpadd->ipver == 6) {
 		char *recv_hmac;
@@ -1981,6 +1989,14 @@ skip_hmac_v6:
 			port  = mpadd->u.v6.port;
 		family = AF_INET6;
 		addr.in6 = mpadd->u.v6.addr;
+
+/* 2016-07-19 jewon.lee@lge.com, LGP_DATA_TCPIP_MPTCP [START] */
+        /* do not need to handle add address option in case of the initial subflow's address */
+        if (ipv6_addr_equal(&mpcb->master_sk->sk_v6_daddr, &addr.in6)) {
+            mptcp_debug("%s: same ipv6 address with master socket\n", __func__);
+            return;
+        }
+/* 2016-07-19 jewon.lee@lge.com, LGP_DATA_TCPIP_MPTCP [END] */
 #endif /* CONFIG_IPV6 */
 	} else {
 		return;

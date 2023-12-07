@@ -104,7 +104,9 @@
 #include <net/ip_fib.h>
 #include <net/inet_connection_sock.h>
 #include <net/tcp.h>
+#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
 #include <net/mptcp.h>
+#endif
 #include <net/udp.h>
 #include <net/udplite.h>
 #include <net/ping.h>
@@ -151,8 +153,10 @@ void inet_sock_destruct(struct sock *sk)
 		return;
 	}
 
+#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
 	if (sock_flag(sk, SOCK_MPTCP))
 		mptcp_disable_static_key();
+#endif
 
 	WARN_ON(atomic_read(&sk->sk_rmem_alloc));
 	WARN_ON(refcount_read(&sk->sk_wmem_alloc));
@@ -246,7 +250,12 @@ EXPORT_SYMBOL(inet_listen);
  *	Create an inet socket.
  */
 
+#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
 int inet_create(struct net *net, struct socket *sock, int protocol, int kern)
+#else
+static int inet_create(struct net *net, struct socket *sock, int protocol,
+		       int kern)
+#endif
 {
 	struct sock *sk;
 	struct inet_protosw *answer;
@@ -705,7 +714,7 @@ int inet_accept(struct socket *sock, struct socket *newsock, int flags,
 	lock_sock(sk2);
 
 	sock_rps_record_flow(sk2);
-
+#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
 	if (sk2->sk_protocol == IPPROTO_TCP && mptcp(tcp_sk(sk2))) {
 		struct sock *sk_it = sk2;
 
@@ -721,7 +730,7 @@ int inet_accept(struct socket *sock, struct socket *newsock, int flags,
 			write_unlock_bh(&sk_it->sk_callback_lock);
 		}
 	}
-
+#endif
 	WARN_ON(!((1 << sk2->sk_state) &
 		  (TCPF_ESTABLISHED | TCPF_SYN_RECV |
 		  TCPF_CLOSE_WAIT | TCPF_CLOSE)));
@@ -1890,10 +1899,10 @@ static int __init inet_init(void)
 	 */
 
 	ip_init();
-
+#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
 	/* We must initialize MPTCP before TCP. */
 	mptcp_init();
-
+#endif
 	/* Setup TCP slab cache for open requests. */
 	tcp_init();
 

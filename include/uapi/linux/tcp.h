@@ -18,15 +18,19 @@
 #ifndef _UAPI_LINUX_TCP_H
 #define _UAPI_LINUX_TCP_H
 
+#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
 #ifndef __KERNEL__
 #include <sys/socket.h>
 #endif
+#endif
 
+#include <linux/types.h>
 #include <asm/byteorder.h>
+#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
 #include <linux/in.h>
 #include <linux/in6.h>
+#endif
 #include <linux/socket.h>
-#include <linux/types.h>
 
 struct tcphdr {
 	__be16	source;
@@ -126,12 +130,14 @@ enum {
 #define TCP_FASTOPEN_CONNECT	30	/* Attempt FastOpen with connect */
 #define TCP_ULP			31	/* Attach a ULP to a TCP connection */
 #define TCP_MD5SIG_EXT		32	/* TCP MD5 Signature with extensions */
+#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
 #define MPTCP_ENABLED		42
 #define MPTCP_SCHEDULER		43
 #define MPTCP_PATH_MANAGER	44
 #define MPTCP_INFO		45
 
 #define MPTCP_INFO_FLAG_SAVE_MASTER	0x01
+#endif
 
 struct tcp_repair_opt {
 	__u32	opt_code;
@@ -254,6 +260,7 @@ enum {
 
 };
 
+#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
 struct mptcp_meta_info {
 	__u8	mptcpi_state;
 	__u8	mptcpi_retransmits;
@@ -300,7 +307,7 @@ struct mptcp_info {
 	struct tcp_info		*subflows;	/* Pointer to array of tcp_info structs */
 	struct mptcp_sub_info	*subflow_info;
 };
-
+#endif
 /* for TCP_MD5SIG socket option */
 #define TCP_MD5SIG_MAXKEYLEN	80
 
