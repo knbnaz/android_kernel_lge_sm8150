@@ -1322,6 +1322,8 @@ out:
 	return err;
 }
 
+int ufshcd_read_device_desc(struct ufs_hba *hba, u8 *buf, u32 size);
+
 #ifdef CONFIG_UFS_LGE_FEATURE
 int ufshcd_read_geo_desc(struct ufs_hba *hba, u8 *buf, u32 size);
 int ufshcd_read_config_desc(struct ufs_hba *hba, u8 *buf, u32 size);
@@ -1355,6 +1357,11 @@ static inline void ufshcd_init_req_stats(struct ufs_hba *hba)
 #else
 static inline void ufshcd_init_req_stats(struct ufs_hba *hba) {}
 #endif
+
+#define ASCII_STD true
+#define UTF16_STD false
+int ufshcd_read_string_desc(struct ufs_hba *hba, int desc_index, u8 *buf, 
+				u32 size, bool ascii);
 
 /* Expose Query-Request API */
 int ufshcd_query_flag(struct ufs_hba *hba, enum query_opcode opcode,

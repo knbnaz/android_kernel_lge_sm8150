@@ -4660,7 +4660,7 @@ static inline int ufshcd_read_power_desc(struct ufs_hba *hba,
 }
 #endif
 
-static int ufshcd_read_device_desc(struct ufs_hba *hba, u8 *buf, u32 size)
+int ufshcd_read_device_desc(struct ufs_hba *hba, u8 *buf, u32 size)
 {
 	return ufshcd_read_desc(hba, QUERY_DESC_IDN_DEVICE, 0, buf, size);
 }
@@ -4702,8 +4702,7 @@ int ufshcd_read_health_desc(struct ufs_hba *hba, u8 *buf, u32 size)
  *
  * Return 0 in case of success, non-zero otherwise
  */
-#define ASCII_STD true
-static int ufshcd_read_string_desc(struct ufs_hba *hba, int desc_index,
+int ufshcd_read_string_desc(struct ufs_hba *hba, int desc_index,
 				   u8 *buf, u32 size, bool ascii)
 {
 	int err = 0;
