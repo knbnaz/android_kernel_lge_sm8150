@@ -790,14 +790,6 @@ static int touch_notify(struct touch_core_data *ts,
 
 	TOUCH_TRACE();
 
-	boot_mode = touch_check_boot_mode(ts->dev);
-	if (boot_mode == TOUCH_CHARGER_MODE
-			|| boot_mode == TOUCH_LAF_MODE
-			|| boot_mode == TOUCH_RECOVERY_MODE) {
-		TOUCH_I("%s: boot_mode = %d\n", __func__, boot_mode);
-		return 0;
-	}
-
 	if (ts->driver->notify) {
 		mutex_lock(&ts->lock);
 		switch (event) {
@@ -863,14 +855,6 @@ static int display_notify(struct touch_core_data *ts,
 	struct lge_panel_notifier *panel_data = data;
 
 	TOUCH_TRACE();
-
-	boot_mode = touch_check_boot_mode(ts->dev);
-	if (boot_mode == TOUCH_CHARGER_MODE
-			|| boot_mode == TOUCH_LAF_MODE
-			|| boot_mode == TOUCH_RECOVERY_MODE) {
-		TOUCH_I("%s: boot_mode = %d\n", __func__, boot_mode);
-		return 0;
-	}
 
 	if (atomic_read(&ts->state.core) == CORE_SHUTDOWN) {
 		TOUCH_I("%s: skip in shutdown state\n", __func__);
@@ -1322,14 +1306,6 @@ static int touch_core_probe(struct platform_device *pdev)
 	}
 
 	ts = (struct touch_core_data *) pdev->dev.platform_data;
-
-	boot_mode = touch_check_boot_mode(ts->dev);
-	if (boot_mode == TOUCH_CHARGER_MODE
-			|| boot_mode == TOUCH_LAF_MODE
-			|| boot_mode == TOUCH_RECOVERY_MODE) {
-		TOUCH_I("%s: boot_mode = %d\n", __func__, boot_mode);
-		return touch_core_probe_etc(pdev);
-	}
 
 	return touch_core_probe_normal(pdev);
 }
