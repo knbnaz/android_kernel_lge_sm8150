@@ -657,22 +657,24 @@ int32_t r2j30516_lens_driver_init(struct cam_lens_driver_ctrl_t *l_ctrl)
 				l_ctrl->stm_motor_info[STM_MOTOR_AF].channelNum,
 				true);
 			if (ret < 0)
-				CAM_ERR(CAM_LENS_DRIVER, "PIRIS ops enable failed.");
+				CAM_ERR(CAM_LENS_DRIVER, "AF ops enable failed.");
 		}
 		if (l_ctrl->lens_capability.ZOOM == true) {
 			ret = r2j30516_lens_driver_STM_PC_operation(spi,
 					l_ctrl->stm_motor_info[STM_MOTOR_ZOOM].channelNum,
 					true);
 			if (ret < 0)
-				CAM_ERR(CAM_LENS_DRIVER, "PIRIS ops enable failed.");
+				CAM_ERR(CAM_LENS_DRIVER, "ZOOM ops enable failed.");
 		}
 		if (l_ctrl->lens_capability.DCIRIS == true) {
 			ret = r2j30516_lens_driver_STM_PC_operation(spi,
 					l_ctrl->stm_motor_info[STM_MOTOR_DCIRIS].channelNum,
 					true);
 			if (ret < 0)
-				CAM_ERR(CAM_LENS_DRIVER, "PIRIS ops enable failed.");
+				CAM_ERR(CAM_LENS_DRIVER, "DCIRIS ops enable failed.");
 		}
+		/* Required sleep to get motor status properly. */
+		msleep(5);
 	} else if (l_ctrl->motor_drv_method == RELATIVE_DRV) {
 		ret = init_relative_drive_params(spi);
 		if (ret < 0)
@@ -680,7 +682,6 @@ int32_t r2j30516_lens_driver_init(struct cam_lens_driver_ctrl_t *l_ctrl)
 	} else {
 		CAM_ERR(CAM_LENS_DRIVER, "Invalid motor driving type.");
 	}
-
 	return ret;
 }
 
@@ -2563,12 +2564,8 @@ static int32_t get_absolute_motor_drive_running_status(
 		motor_status->isMoving = false;
 		ret = absolute_drive_get_actual_position(spi, channel,
 			&motor_status->motorCurrentPosition);
-		if (ret < 0) {
+		if (ret < 0)
 			CAM_ERR(CAM_LENS_DRIVER, "Get abs motor position failed.");
-		} else {
-			l_ctrl->stm_motor_info[motor_id].actual_position =
-				motor_status->motorCurrentPosition;
-		}
 	} else {
 		motor_status->motorId = motor_id;
 		motor_status->isMoving = true;
