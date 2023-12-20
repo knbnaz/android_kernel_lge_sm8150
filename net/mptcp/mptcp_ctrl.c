@@ -1382,8 +1382,6 @@ int mptcp_add_sock(struct sock *meta_sk, struct sock *sk, u8 loc_id, u8 rem_id,
 	tp->mptcp->attached = 1;
 
 	mpcb->cnt_subflows++;
-	atomic_add(atomic_read(&((struct sock *)tp)->sk_rmem_alloc),
-		   &meta_sk->sk_rmem_alloc);
 
 	mptcp_sub_inherit_sockopts(meta_sk, sk);
 	INIT_DELAYED_WORK(&tp->mptcp->work, mptcp_sub_close_wq);
@@ -1650,6 +1648,7 @@ void mptcp_sub_close(struct sock *sk, unsigned long delay)
 		if (!cancel_delayed_work(work))
 			return;
 		sock_put(sk);
+		mptcp_mpcb_put(tp->mpcb);
 	}
 
 	if (!delay) {
@@ -2125,14 +2124,28 @@ int mptcp_check_req_master(struct sock *sk, struct sock *child,
 	 */
 	if (drop) {
 		tcp_synack_rtt_meas(child, req);
-		inet_csk_complete_hashdance(sk, meta_sk, req, true);
+
+		inet_csk_reqsk_queue_drop(sk, req);
+		reqsk_queue_removed(&inet_csk(sk)->icsk_accept_queue, req);
+		if (!inet_csk_reqsk_queue_add(sk, req, meta_sk)) {
+			bh_unlock_sock(meta_sk);
+			/* No sock_put() of the meta needed. The reference has
+			 * already been dropped in __mptcp_check_req_master().
+			 */
+			sock_put(child);
+			return -1;
+		}
 	} else {
 		/* Thus, we come from syn-cookies */
 		refcount_set(&req->rsk_refcnt, 1);
 		tcp_sk(meta_sk)->tsoffset = tsoff;
 		if (!inet_csk_reqsk_queue_add(sk, req, meta_sk)) {
 			bh_unlock_sock(meta_sk);
-			sock_put(meta_sk);
+			/* No sock_put() of the meta needed. The reference has
+			 * already been dropped in __mptcp_check_req_master().
+			 */
+			sock_put(child);
+			reqsk_put(req);
 			return -1;
 		}
 	}
@@ -2983,7 +2996,7 @@ void __init mptcp_init(void)
 	if (mptcp_register_scheduler(&mptcp_sched_default))
 		goto register_sched_failed;
 
-	pr_info("MPTCP: Stable release v0.94.4");
+	pr_info("MPTCP: Stable release v0.94.7");
 
 	mptcp_init_failed = false;
 

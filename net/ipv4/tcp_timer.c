@@ -222,8 +222,20 @@ static bool retransmits_timed_out(struct sock *sk,
 		return false;
 
 	start_ts = tcp_sk(sk)->retrans_stamp;
+#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
+	if (unlikely(!start_ts)) {
+		struct sk_buff *skb = tcp_write_queue_head(sk);
+
+		if (!skb)
+			return false;
+
+		start_ts = tcp_skb_timestamp(skb);
+	}
+
+#else
 	if (unlikely(!start_ts))
 		start_ts = tcp_skb_timestamp(tcp_write_queue_head(sk));
+#endif
 
 	if (likely(timeout == 0)) {
 		linear_backoff_thresh = ilog2(TCP_RTO_MAX/rto_base);
@@ -446,7 +458,14 @@ static void tcp_probe_timer(struct sock *sk)
 	}
 
 	if (icsk->icsk_probes_out >= max_probes) {
-abort:		tcp_write_err(sk);
+abort:
+		tcp_write_err(sk);
+#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
+		if (is_meta_sk(sk) &&
+		    mptcp_in_infinite_mapping_weak(tp->mpcb)) {
+			mptcp_sub_force_close_all(tp->mpcb, NULL);
+		}
+#endif
 	} else {
 		/* Only send another probe if we didn't close things up. */
 		tcp_send_probe0(sk);
