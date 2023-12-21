@@ -3788,13 +3788,11 @@ static int tcp_ack(struct sock *sk, const struct sk_buff *skb, int flag)
 
 #ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
 	if (mptcp(tp)) {
-		if (mptcp_fallback_infinite(sk, flag)) {
+		if (mptcp_handle_ack_in_infinite(sk, skb, flag)) {
 			pr_err("%s resetting flow\n", __func__);
 			mptcp_send_reset(sk);
 			goto invalid_ack;
 		}
-
-		mptcp_clean_rtx_infinite(skb, sk);
 	}
 #endif
 	if (tp->tlp_high_seq)
@@ -4153,7 +4151,11 @@ static inline bool tcp_paws_discard(const struct sock *sk,
 static inline bool tcp_sequence(const struct tcp_sock *tp, u32 seq, u32 end_seq)
 {
 	return	!before(end_seq, tp->rcv_wup) &&
+#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
+		!after(seq, tp->rcv_nxt + tcp_receive_window_no_shrink(tp));
+#else
 		!after(seq, tp->rcv_nxt + tcp_receive_window(tp));
+#endif
 }
 
 /* When we get a reset we do this. */
@@ -4909,7 +4911,11 @@ static void tcp_data_queue(struct sock *sk, struct sk_buff *skb)
 	 *  Out of sequence packets to the out_of_order_queue.
 	 */
 	if (TCP_SKB_CB(skb)->seq == tp->rcv_nxt) {
+#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
+		if (tcp_receive_window_no_shrink(tp) == 0)
+#else
 		if (tcp_receive_window(tp) == 0)
+#endif
 			goto out_of_window;
 
 		/* Ok. In sequence. In window. */
@@ -4974,7 +4980,12 @@ drop:
 	}
 
 	/* Out of window. F.e. zero window probe. */
+#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
+	if (!before(TCP_SKB_CB(skb)->seq,
+		    tp->rcv_nxt + tcp_receive_window_no_shrink(tp)))
+#else
 	if (!before(TCP_SKB_CB(skb)->seq, tp->rcv_nxt + tcp_receive_window(tp)))
+#endif
 		goto out_of_window;
 
 	if (before(TCP_SKB_CB(skb)->seq, tp->rcv_nxt)) {
@@ -4988,7 +4999,11 @@ drop:
 		/* If window is closed, drop tail of packet. But after
 		 * remembering D-SACK for its head made in previous line.
 		 */
+#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
+		if (!tcp_receive_window_no_shrink(tp))
+#else
 		if (!tcp_receive_window(tp))
+#endif
 			goto out_of_window;
 		goto queue_and_out;
 	}
@@ -5388,9 +5403,17 @@ static void __tcp_ack_snd_check(struct sock *sk, int ofo_possible)
 					sysctl_tcp_delack_seg &&
 	     /* ... and right edge of window advances far enough.
 	      * (tcp_recvmsg() will send ACK otherwise). Or...
+#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
+	      * in the case of mptcp the meta ofo queue may
+	      * prevent tcp_recvmsg from being called in time
+	      * so no data is available for the application, skip the
+	      * receive window check as there is no hope that the application
+	      * will do a tcp_recvmsg anytime soon.
+#endif
 	      */
 #ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
-	     tp->ops->__select_window(sk) >= tp->rcv_wnd) ||
+	    (tp->ops->__select_window(sk) >= tp->rcv_wnd || (mptcp(tp) &&
+	     skb_queue_empty(&mptcp_meta_sk(sk)->sk_receive_queue)))) ||
 #else
 	     __tcp_select_window(sk) >= tp->rcv_wnd) ||
 #endif
@@ -6086,6 +6109,9 @@ static int tcp_rcv_synsent_state_process(struct sock *sk, struct sk_buff *skb,
 		 */
 		tp->rcv_nxt = TCP_SKB_CB(skb)->seq + 1;
 		tp->rcv_wup = TCP_SKB_CB(skb)->seq + 1;
+#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
+		tcp_update_rcv_right_edge(tp);
+#endif
 
 		/* RFC1323: The window in SYN & SYN/ACK segments is
 		 * never scaled.
@@ -6215,6 +6241,9 @@ discard:
 		tp->rcv_nxt = TCP_SKB_CB(skb)->seq + 1;
 		tp->copied_seq = tp->rcv_nxt;
 		tp->rcv_wup = TCP_SKB_CB(skb)->seq + 1;
+#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
+		tcp_update_rcv_right_edge(tp);
+#endif
 
 		/* RFC1323: The window in SYN & SYN/ACK segments is
 		 * never scaled.

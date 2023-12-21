@@ -386,7 +386,6 @@ extern const struct tcp_request_sock_ops tcp_request_sock_ipv6_ops;
 struct mptcp_options_received;
 
 void tcp_cleanup_rbuf(struct sock *sk, int copied);
-void tcp_cwnd_validate(struct sock *sk, bool is_cwnd_limited);
 int tcp_close_state(struct sock *sk);
 void tcp_minshall_update(struct tcp_sock *tp, unsigned int mss_now,
 			 const struct sk_buff *skb);
@@ -870,11 +869,37 @@ static inline u32 tcp_min_rtt(const struct tcp_sock *tp)
  * Rcv_nxt can be after the window if our peer push more data
  * than the offered window.
  */
-static inline u32 tcp_receive_window(const struct tcp_sock *tp)
+static inline u32 tcp_receive_window_now(const struct tcp_sock *tp)
 {
 	s32 win = tp->rcv_wup + tp->rcv_wnd - tp->rcv_nxt;
 
 	if (win < 0)
+		win = 0;
+	return (u32) win;
+}
+
+/* right edge only moves forward, even if window shrinks due
+ * to mptcp meta
+ */
+static inline void tcp_update_rcv_right_edge(struct tcp_sock *tp)
+{
+	if (after(tp->rcv_wup + tp->rcv_wnd, tp->rcv_right_edge))
+		tp->rcv_right_edge = tp->rcv_wup + tp->rcv_wnd;
+}
+
+/* Compute receive window which will never shrink. The way MPTCP handles
+ * the receive window can cause the effective right edge to shrink,
+ * causing valid segments to become out of window.
+ * This function should be used when checking if a segment is valid for
+ * the max right edge announced.
+ */
+static inline u32 tcp_receive_window_no_shrink(const struct tcp_sock *tp)
+{
+	s32 win = tp->rcv_right_edge - tp->rcv_nxt;
+
+	win = max_t(s32, win, tp->rcv_wup + tp->rcv_wnd - tp->rcv_nxt);
+
+	if (unlikely(win < 0))
 		win = 0;
 	return (u32) win;
 }
@@ -1242,6 +1267,8 @@ void tcp_get_allowed_congestion_control(char *buf, size_t len);
 int tcp_set_allowed_congestion_control(char *allowed);
 int tcp_set_congestion_control(struct sock *sk, const char *name, bool load,
 			       bool reinit, bool cap_net_admin);
+int __tcp_set_congestion_control(struct sock *sk, const char *name, bool load,
+				 bool reinit, bool cap_net_admin);
 u32 tcp_slow_start(struct tcp_sock *tp, u32 acked);
 void tcp_cong_avoid_ai(struct tcp_sock *tp, u32 w, u32 acked);
 
@@ -2153,7 +2180,8 @@ struct tcp_sock_ops {
 	void (*retransmit_timer)(struct sock *sk);
 	void (*time_wait)(struct sock *sk, int state, int timeo);
 	void (*cleanup_rbuf)(struct sock *sk, int copied);
-	void (*cwnd_validate)(struct sock *sk, bool is_cwnd_limited);
+	int (*set_cong_ctrl)(struct sock *sk, const char *name, bool load,
+			     bool reinit, bool cap_net_admin);
 };
 extern const struct tcp_sock_ops tcp_specific;
 #endif

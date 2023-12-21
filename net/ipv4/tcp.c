@@ -427,7 +427,7 @@ const struct tcp_sock_ops tcp_specific = {
 	.retransmit_timer		= tcp_retransmit_timer,
 	.time_wait			= tcp_time_wait,
 	.cleanup_rbuf			= tcp_cleanup_rbuf,
-	.cwnd_validate			= tcp_cwnd_validate,
+	.set_cong_ctrl			= __tcp_set_congestion_control,
 };
 #endif
 
@@ -1715,7 +1715,11 @@ static void tcp_cleanup_rbuf(struct sock *sk, int copied)
 	 * in states, where we will not receive more. It is useless.
 	 */
 	if (copied > 0 && !time_to_ack && !(sk->sk_shutdown & RCV_SHUTDOWN)) {
+#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
+		__u32 rcv_window_now = tcp_receive_window_now(tp);
+#else
 		__u32 rcv_window_now = tcp_receive_window(tp);
+#endif
 
 		/* Optimize, __tcp_select_window() is not cheap. */
 		if (2*rcv_window_now <= tp->window_clamp) {
@@ -2254,6 +2258,9 @@ static const unsigned char new_state[16] = {
   [TCP_LISTEN]		= TCP_CLOSE,
   [TCP_CLOSING]		= TCP_CLOSING,
   [TCP_NEW_SYN_RECV]	= TCP_CLOSE,	/* should not happen ! */
+#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
+  [TCP_RST_WAIT]	= TCP_CLOSE,
+#endif
 };
 
 #ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
@@ -2571,6 +2578,7 @@ int tcp_disconnect(struct sock *sk, int flags)
 	if (is_meta_sk(sk)) {
 		mptcp_disconnect(sk);
 	} else {
+		tp->request_mptcp = 0;
 		if (tp->inside_tk_table)
 			mptcp_hash_remove_bh(tp);
 	}
@@ -2667,6 +2675,9 @@ static int tcp_repair_set_window(struct tcp_sock *tp, char __user *optbuf, int l
 
 	tp->rcv_wnd	= opt.rcv_wnd;
 	tp->rcv_wup	= opt.rcv_wup;
+#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
+	tp->rcv_right_edge = tp->rcv_wup + tp->rcv_wnd;
+#endif
 
 	return 0;
 }

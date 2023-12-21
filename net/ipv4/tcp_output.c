@@ -298,7 +298,7 @@ static u16 tcp_select_window(struct sock *sk)
 	 * have to allow this. Otherwise we may announce a window too large
 	 * for the current meta-level sk_rcvbuf.
 	 */
-	u32 cur_win = tcp_receive_window(mptcp(tp) ? tcp_sk(mptcp_meta_sk(sk)) : tp);
+	u32 cur_win = tcp_receive_window_now(mptcp(tp) ? tcp_sk(mptcp_meta_sk(sk)) : tp);
 	u32 new_win = tp->ops->__select_window(sk);
 #else
 	u32 cur_win = tcp_receive_window(tp);
@@ -321,6 +321,9 @@ static u16 tcp_select_window(struct sock *sk)
 	}
 	tp->rcv_wnd = new_win;
 	tp->rcv_wup = tp->rcv_nxt;
+#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
+	tcp_update_rcv_right_edge(tp);
+#endif
 
 	/* Make sure we do not exceed the maximum possible
 	 * scaled window.
@@ -1771,11 +1774,7 @@ static void tcp_cwnd_application_limited(struct sock *sk)
 	tp->snd_cwnd_stamp = tcp_jiffies32;
 }
 
-#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
-void tcp_cwnd_validate(struct sock *sk, bool is_cwnd_limited)
-#else
 static void tcp_cwnd_validate(struct sock *sk, bool is_cwnd_limited)
-#endif
 {
 	const struct tcp_congestion_ops *ca_ops = inet_csk(sk)->icsk_ca_ops;
 	struct tcp_sock *tp = tcp_sk(sk);
@@ -1811,8 +1810,15 @@ static void tcp_cwnd_validate(struct sock *sk, bool is_cwnd_limited)
 		 * 2) not cwnd limited (this else condition)
 		 * 3) no more data to send (null tcp_send_head )
 		 * 4) application is hitting buffer limit (SOCK_NOSPACE)
+#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
+		 * 5) For MPTCP subflows, the scheduler determines
+		 *    sndbuf limited.
+#endif
 		 */
 		if (!tcp_send_head(sk) && sk->sk_socket &&
+#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
+		    !(mptcp(tcp_sk(sk)) && !is_meta_sk(sk)) &&
+#endif
 		    test_bit(SOCK_NOSPACE, &sk->sk_socket->flags) &&
 		    (1 << sk->sk_state) & (TCPF_ESTABLISHED | TCPF_CLOSE_WAIT))
 			tcp_chrono_start(sk, TCP_CHRONO_SNDBUF_LIMITED);
@@ -2652,12 +2658,9 @@ repair:
 		tcp_chrono_stop(sk, TCP_CHRONO_RWND_LIMITED);
 
 	is_cwnd_limited |= (tcp_packets_in_flight(tp) >= tp->snd_cwnd);
-#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
-		if (tp->ops->cwnd_validate)
-			tp->ops->cwnd_validate(sk, is_cwnd_limited);
-#else
+	if (likely(sent_pkts || is_cwnd_limited))
 		tcp_cwnd_validate(sk, is_cwnd_limited);
-#endif
+
 	if (likely(sent_pkts)) {
 		if (tcp_in_cwnd_reduction(sk))
 			tp->prr_out += sent_pkts;
@@ -3663,6 +3666,10 @@ static void tcp_connect_init(struct sock *sk)
 	else
 		tp->rcv_tstamp = tcp_jiffies32;
 	tp->rcv_wup = tp->rcv_nxt;
+#ifdef CONFIG_LGP_DATA_TCPIP_MPTCP
+	/* force set rcv_right_edge here at start of connection */
+	tp->rcv_right_edge = tp->rcv_wup + tp->rcv_wnd;
+#endif
 	tp->copied_seq = tp->rcv_nxt;
 
 	inet_csk(sk)->icsk_rto = tcp_timeout_init(sk);
