@@ -894,6 +894,9 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
 	} else if (own_req) {
 		return mptcp_check_req_child(sk, child, req, skb, &mopt);
 	}
+
+	/* Fallback to regular TCP */
+	tcp_sk(child)->mpc = 0;
 #endif
 	sock_rps_save_rxhash(child, skb);
 	tcp_synack_rtt_meas(child, req);

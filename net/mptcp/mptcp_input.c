@@ -854,20 +854,44 @@ static int mptcp_validate_mapping(struct sock *sk, struct sk_buff *skb)
 		mptcp_skb_trim_head(tmp, sk, tp->mptcp->map_subseq);
 	}
 
-	/* ... or the new skb (tail) has to be split at the end. */
-	tcp_end_seq = TCP_SKB_CB(skb)->end_seq;
-	if (TCP_SKB_CB(skb)->tcp_flags & TCPHDR_FIN)
-		tcp_end_seq--;
-	if (after(tcp_end_seq, tp->mptcp->map_subseq + tp->mptcp->map_data_len)) {
-		u32 seq = tp->mptcp->map_subseq + tp->mptcp->map_data_len;
-		MPTCP_INC_STATS(sock_net(sk), MPTCP_MIB_DSSSPLITTAIL);
-		if (mptcp_skb_split_tail(skb, sk, seq)) { /* Allocation failed */
-			/* TODO : maybe handle this here better.
-			 * We now just force meta-retransmission.
+	skb_queue_walk_from(&sk->sk_receive_queue, skb) {
+		/* ... or the new skb (tail) has to be split at the end. */
+		tcp_end_seq = TCP_SKB_CB(skb)->end_seq;
+		if (TCP_SKB_CB(skb)->tcp_flags & TCPHDR_FIN)
+			tcp_end_seq--;
+
+		if (tcp_end_seq == tp->mptcp->map_subseq + tp->mptcp->map_data_len)
+			break;
+
+		if (after(tcp_end_seq, tp->mptcp->map_subseq + tp->mptcp->map_data_len)) {
+			u32 seq = tp->mptcp->map_subseq + tp->mptcp->map_data_len;
+
+			MPTCP_INC_STATS(sock_net(sk), MPTCP_MIB_DSSSPLITTAIL);
+			if (mptcp_skb_split_tail(skb, sk, seq)) {
+				if (net_ratelimit())
+					pr_err("MPTCP: Could not allocate memory for mptcp_skb_split_tail on seq %u\n", seq);
+
+				/* allocations are failing - there is not much to do.
+				 * Let's try the best and trigger meta-rexmit on the
+				 * sender-side by simply dropping all packets up to sk
+				 * in the receive-queue.
+				 */
+
+				skb_queue_walk_safe(&sk->sk_receive_queue, tmp, tmp1) {
+					tp->copied_seq = TCP_SKB_CB(tmp)->end_seq;
+					__skb_unlink(tmp, &sk->sk_receive_queue);
+					__kfree_skb(tmp);
+
+					if (tmp == skb)
+						break;
+				}
+			}
+
+			/* We just split an skb in the receive-queue (or removed
+			 * a whole bunch of them).
+			 * We have to restart as otherwise the list-processing
+			 * will fail - thus return -1.
 			 */
-			tp->copied_seq = TCP_SKB_CB(skb)->end_seq;
-			__skb_unlink(skb, &sk->sk_receive_queue);
-			__kfree_skb(skb);
 			return -1;
 		}
 	}
@@ -960,6 +984,7 @@ static int mptcp_queue_skb(struct sock *sk)
 			tp->copied_seq = TCP_SKB_CB(tmp1)->end_seq;
 			mptcp_prepare_skb(tmp1, sk);
 			__skb_unlink(tmp1, &sk->sk_receive_queue);
+			sk_forced_mem_schedule(meta_sk, tmp1->truesize);
 			/* MUST be done here, because fragstolen may be true later.
 			 * Then, kfree_skb_partial will not account the memory.
 			 */
@@ -991,6 +1016,7 @@ static int mptcp_queue_skb(struct sock *sk)
 			tp->copied_seq = TCP_SKB_CB(tmp1)->end_seq;
 			mptcp_prepare_skb(tmp1, sk);
 			__skb_unlink(tmp1, &sk->sk_receive_queue);
+			sk_forced_mem_schedule(meta_sk, tmp1->truesize);
 			/* MUST be done here, because fragstolen may be true.
 			 * Then, kfree_skb_partial will not account the memory.
 			 */
@@ -1430,7 +1456,7 @@ static void mptcp_stop_subflow_chronos(struct sock *meta_sk,
 		tcp_chrono_stop(sk_it, type);
 }
 
-/* Handle the DATA_ACK */
+/* Return false if we can continue processing packets. True, otherwise */
 static bool mptcp_process_data_ack(struct sock *sk, const struct sk_buff *skb)
 {
 	struct sock *meta_sk = mptcp_meta_sk(sk);
@@ -1581,6 +1607,7 @@ no_queue:
 	return false;
 }
 
+/* Return false if we can continue processing packets. True, otherwise */
 bool mptcp_handle_ack_in_infinite(struct sock *sk, const struct sk_buff *skb,
 				  int flag)
 {
@@ -1633,6 +1660,13 @@ bool mptcp_handle_ack_in_infinite(struct sock *sk, const struct sk_buff *skb,
 		return true;
 	}
 
+	/* We have sent more than what has ever been sent on the master subflow.
+	 * This means, we won't be able to seamlessly fallback because there
+	 * will now be a hole in the sequence space.
+	 */
+	if (before(tp->mptcp->last_end_data_seq, meta_tp->snd_una))
+		return true;
+
 	mpcb->infinite_mapping_snd = 1;
 	mpcb->infinite_mapping_rcv = 1;
 	mpcb->infinite_rcv_seq = mptcp_get_rcv_nxt_64(mptcp_meta_tp(tp));
@@ -1649,7 +1683,7 @@ bool mptcp_handle_ack_in_infinite(struct sock *sk, const struct sk_buff *skb,
 	 * this becomes our data_ack.
 	 */
 	if (after(meta_tp->snd_una, tp->mptcp->last_end_data_seq - (tp->snd_nxt - tp->snd_una))) {
-		/* Remmeber that meta snd_una is ahead of the game */
+		/* Remember that meta snd_una is ahead of the game */
 		mpcb->infinite_send_una_ahead = 1;
 		tp->mptcp->rx_opt.data_ack = meta_tp->snd_una;
 	} else {
@@ -1658,9 +1692,8 @@ bool mptcp_handle_ack_in_infinite(struct sock *sk, const struct sk_buff *skb,
 	}
 
 exit:
-	mptcp_process_data_ack(sk, skb);
 
-	return false;
+	return mptcp_process_data_ack(sk, skb);
 }
 
 /**** static functions used by mptcp_parse_options */

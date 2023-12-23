@@ -457,7 +457,7 @@ static void tcp_v6_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
 	np = inet6_sk(sk);
 
 	if (type == NDISC_REDIRECT) {
-		if (!sock_owned_by_user(sk)) {
+		if (!sock_owned_by_user(meta_sk)) {
 			struct dst_entry *dst = __sk_dst_check(sk, np->dst_cookie);
 
 			if (dst)
@@ -1284,7 +1284,7 @@ static struct sock *tcp_v6_syn_recv_sock(const struct sock *sk, struct sk_buff *
 		/* We must check on the request-socket because the listener
 		 * socket's flag may have been changed halfway through.
 		 */
-		if (!inet_rsk(req)->saw_mpc)
+		if (inet_rsk(req)->saw_mpc)
 			inet_csk(newsk)->icsk_af_ops = &mptcp_v6_mapped;
 		else
 #endif
