@@ -5,7 +5,7 @@
 # A mix between the arm64 and arm vDSO Makefiles.
 
 ifeq ($(cc-name),clang)
-  CC_ARM32 := $(cc-name) --target=arm-linux-gnueabi
+  CC_ARM32 := $(cc-name) --target=arm-none-linux-eabi
 else
   CC_ARM32 := $(CROSS_COMPILE_ARM32)$(cc-name)
 endif
