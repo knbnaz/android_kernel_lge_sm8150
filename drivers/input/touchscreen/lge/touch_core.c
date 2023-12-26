@@ -751,14 +751,6 @@ void touch_send_uevent(struct touch_core_data *ts, int type)
 		TOUCH_I("%s  is not sent\n", uevent_str[type][0]);
 	}
 	switch (type) {
-		case LPWG_DOUBLE_TAP:
-			input_report_key(ts->input, KEY_WAKEUP, 1);
-			TOUCH_I("Simulate power button depress\n");
-			input_sync(ts->input);
-			input_report_key(ts->input, KEY_WAKEUP, 0);
-			TOUCH_I("Simulate power button release\n");
-			input_sync(ts->input);
-			break;
 		case TOUCH_UEVENT_SWIPE_DOWN:
 			TOUCH_I("Swipe DOWN reported\n");
 			input_report_key(ts->input, KEY_GESTURE_SWIPE_DOWN, 1);
