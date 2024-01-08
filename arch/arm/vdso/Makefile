@@ -24,7 +24,11 @@ CFLAGS_REMOVE_vdso.o = -pg
 
 # Force -O2 to avoid libgcc dependencies
 CFLAGS_REMOVE_vgettimeofday.o = -pg -Os $(GCC_PLUGINS_CFLAGS)
+ifeq ($(cc-name),clang)
+CFLAGS_vgettimeofday.o = -O3
+else
 CFLAGS_vgettimeofday.o = -O2
+endif
 
 # Disable gcov, kasan, ubsan and kcov profiling for VDSO code
 GCOV_PROFILE := n
