@@ -1827,7 +1827,6 @@ int msm_vidc_decide_core_and_power_mode_ar50(struct msm_vidc_inst *inst)
 			__func__, inst);
 		return -EINVAL;
 	}
-	inst->clk_data.core_id = VIDC_CORE_ID_1;
 
 	core = inst->core;
 	max_freq = msm_vidc_max_freq(inst->core, inst->sid);
@@ -1869,11 +1868,14 @@ int msm_vidc_decide_core_and_power_mode_ar50(struct msm_vidc_inst *inst)
 	else if (cur_inst_load + core_load <= max_freq) {
 		if (mbpf > max_hq_mbpf || mbps > max_hq_mbps)
 			enable = true;
+		inst->clk_data.core_id = VIDC_CORE_ID_1;
 		msm_vidc_power_save_mode_enable(inst, enable);
 	} else if (cur_inst_lp_load + core_load <= max_freq) {
+		inst->clk_data.core_id = VIDC_CORE_ID_1;
 		msm_vidc_power_save_mode_enable(inst, true);
 	} else if (cur_inst_lp_load + core_lp_load <= max_freq) {
 		s_vpr_h(inst->sid, "Moved all inst's to LP");
+		inst->clk_data.core_id = VIDC_CORE_ID_1;
 		msm_vidc_move_core_to_power_save_mode(core,
 			VIDC_CORE_ID_1, inst->sid);
 	} else {
