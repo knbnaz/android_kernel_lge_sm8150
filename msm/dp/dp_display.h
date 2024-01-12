@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2023-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  * Copyright (c) 2017-2020, The Linux Foundation. All rights reserved.
  */
 
@@ -71,6 +71,7 @@ struct dp_display {
 	void *base_dp_panel;
 	bool is_sst_connected;
 	bool is_mst_supported;
+	bool is_edp;
 	bool dsc_cont_pps;
 	u32 max_pclk_khz;
 	void *dp_mst_prv_info;
