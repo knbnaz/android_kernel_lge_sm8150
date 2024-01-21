@@ -4,7 +4,7 @@
 
 #include <asm/atomic_ll_sc.h>
 
-#ifdef CONFIG_ARM64_LSE_ATOMICS
+#if defined(CONFIG_AS_LSE) && defined(CONFIG_ARM64_LSE_ATOMICS)
 
 #include <linux/jump_label.h>
 #include <linux/stringify.h>
@@ -49,7 +49,7 @@ static inline bool system_uses_lse_atomics(void)
 	ALTERNATIVE(llsc, __LSE_PREAMBLE lse, ARM64_HAS_LSE_ATOMICS)
 
 #endif	/* __ASSEMBLER__ */
-#else	/* CONFIG_ARM64_LSE_ATOMICS */
+#else	/* CONFIG_AS_LSE && CONFIG_ARM64_LSE_ATOMICS */
 
 #ifdef __ASSEMBLER__
 
@@ -66,5 +66,5 @@ static inline bool system_uses_lse_atomics(void) { return false; }
 #define ARM64_LSE_ATOMIC_INSN(llsc, lse)	llsc
 
 #endif	/* __ASSEMBLER__ */
-#endif	/* CONFIG_ARM64_LSE_ATOMICS */
+#endif	/* CONFIG_AS_LSE && CONFIG_ARM64_LSE_ATOMICS */
 #endif	/* __ASM_LSE_H */
