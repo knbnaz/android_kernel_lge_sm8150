@@ -1230,7 +1230,6 @@ static inline bool atomic64_add_unless(atomic64_t *v, long long a, long long u)
 {
 	return atomic64_fetch_add_unless(v, a, u) != u;
 }
-#endif
 
 /**
  * atomic64_inc_and_test - increment and test
