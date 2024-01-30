@@ -293,7 +293,7 @@ int verify_signature_one(const struct public_key_signature *sig,
 	}
 
 	ref = keyring_search(make_key_ref(trusted_keys, 1),
-				&key_type_asymmetric, keyid);
+				&key_type_asymmetric, keyid, false);
 	if (IS_ERR(ref)) {
 		pr_err("Asymmetric key (%s) not found in keyring(%s)\n",
 				keyid, trusted_keys->description);

@@ -142,7 +142,7 @@ static struct key *search_fscrypt_keyring(struct key *keyring,
 	 */
 	key_ref_t keyref = make_key_ref(keyring, true /* possessed */);
 
-	keyref = keyring_search(keyref, type, description);
+	keyref = keyring_search(keyref, type, description, false);
 	if (IS_ERR(keyref)) {
 		if (PTR_ERR(keyref) == -EAGAIN || /* not found */
 		    PTR_ERR(keyref) == -EKEYREVOKED) /* recently invalidated */
