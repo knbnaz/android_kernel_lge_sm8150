@@ -35,7 +35,7 @@ enum qcedev_crypto_oper_type {
 struct qcedev_handle;
 
 struct qcedev_cipher_req {
-	struct ablkcipher_request creq;
+	struct SKcipher_request creq;
 	void *cookie;
 };
 
