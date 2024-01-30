@@ -1314,29 +1314,6 @@ static int __ecc_is_key_valid(const struct ecc_curve *curve,
 	return 0;
 }
 
-static int __ecc_is_key_valid(const struct ecc_curve *curve,
-			      const u64 *private_key, unsigned int ndigits)
-{
-	u64 one[ECC_MAX_DIGITS] = { 1, };
-	u64 res[ECC_MAX_DIGITS];
-
-	if (!private_key)
-		return -EINVAL;
-
-	if (curve->g.ndigits != ndigits)
-		return -EINVAL;
-
-	/* Make sure the private key is in the range [2, n-3]. */
-	if (vli_cmp(one, private_key, ndigits) != -1)
-		return -EINVAL;
-	vli_sub(res, curve->n, one, ndigits);
-	vli_sub(res, res, one, ndigits);
-	if (vli_cmp(res, private_key, ndigits) != 1)
-		return -EINVAL;
-
-	return 0;
-}
-
 int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
 		     const u64 *private_key, unsigned int private_key_len)
 {
