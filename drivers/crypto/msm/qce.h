@@ -102,8 +102,8 @@ enum qce_cipher_mode_enum {
 
 /* Cipher operation type */
 enum qce_req_op_enum {
-	QCE_REQ_SK_CIPHER = 0,
-	QCE_REQ_SK_CIPHER_NO_KEY = 1,
+	QCE_REQ_ABLK_CIPHER = 0,
+	QCE_REQ_ABLK_CIPHER_NO_KEY = 1,
 	QCE_REQ_AEAD = 2,
 	QCE_REQ_LAST
 };
@@ -187,7 +187,7 @@ extern struct qce_pm_table qce_pm_table;
 void *qce_open(struct platform_device *pdev, int *rc);
 int qce_close(void *handle);
 int qce_aead_req(void *handle, struct qce_req *req);
-int qce_SK_cipher_req(void *handle, struct qce_req *req);
+int qce_ablk_cipher_req(void *handle, struct qce_req *req);
 int qce_hw_support(void *handle, struct ce_hw_support *support);
 int qce_process_sha_req(void *handle, struct qce_sha_req *s_req);
 int qce_enable_clk(void *handle);

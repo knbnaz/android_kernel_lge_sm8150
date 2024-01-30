@@ -312,8 +312,8 @@ int qdf_aes_ctr(const uint8_t *key, unsigned int key_len, uint8_t *siv,
 int qdf_aes_ctr(const uint8_t *key, unsigned int key_len, uint8_t *siv,
 		const uint8_t *src, size_t src_len, uint8_t *dest, bool enc)
 {
-	struct crypto_skcipher *tfm;
-	struct skcipher_request *req = NULL;
+	struct crypto_ablkcipher *tfm;
+	struct ablkcipher_request *req = NULL;
 	struct scatterlist sg_in, sg_out;
 	int ret;
 
@@ -323,7 +323,7 @@ int qdf_aes_ctr(const uint8_t *key, unsigned int key_len, uint8_t *siv,
 		return -EINVAL;
 	}
 
-	tfm = crypto_alloc_skcipher("ctr(aes)", 0, CRYPTO_ALG_ASYNC);
+	tfm = crypto_alloc_ablkcipher("ctr(aes)", 0, CRYPTO_ALG_ASYNC);
 	if (IS_ERR(tfm)) {
 		QDF_TRACE(QDF_MODULE_ID_QDF, QDF_TRACE_LEVEL_ERROR,
 			  FL("Failed to alloc transformation for ctr(aes):%ld"),
@@ -331,31 +331,31 @@ int qdf_aes_ctr(const uint8_t *key, unsigned int key_len, uint8_t *siv,
 		return -EAGAIN;
 	}
 
-	req = skcipher_request_alloc(tfm, GFP_KERNEL);
+	req = ablkcipher_request_alloc(tfm, GFP_KERNEL);
 	if (!req) {
 		QDF_TRACE(QDF_MODULE_ID_QDF, QDF_TRACE_LEVEL_ERROR,
 			  FL("Failed to allocate request for ctr(aes)"));
-		crypto_free_skcipher(tfm);
+		crypto_free_ablkcipher(tfm);
 		return -EAGAIN;
 	}
 
-	ret = crypto_skcipher_setkey(tfm, key, key_len);
+	ret = crypto_ablkcipher_setkey(tfm, key, key_len);
 	if (ret) {
 		QDF_TRACE(QDF_MODULE_ID_QDF, QDF_TRACE_LEVEL_ERROR,
 			  FL("Set key failed for ctr(aes), ret:%d"), -ret);
-		skcipher_request_free(req);
-		crypto_free_skcipher(tfm);
+		ablkcipher_request_free(req);
+		crypto_free_ablkcipher(tfm);
 		return ret;
 	}
 
 	sg_init_one(&sg_in, src, src_len);
 	sg_init_one(&sg_out, dest, src_len);
-	skcipher_request_set_crypt(req, &sg_in, &sg_out, src_len, siv);
+	ablkcipher_request_set_crypt(req, &sg_in, &sg_out, src_len, siv);
 
 	if (enc)
-		ret = crypto_skcipher_encrypt(req);
+		ret = crypto_ablkcipher_encrypt(req);
 	else
-		ret = crypto_skcipher_decrypt(req);
+		ret = crypto_ablkcipher_decrypt(req);
 
 	if (ret) {
 		QDF_TRACE(QDF_MODULE_ID_QDF, QDF_TRACE_LEVEL_ERROR,
@@ -363,8 +363,8 @@ int qdf_aes_ctr(const uint8_t *key, unsigned int key_len, uint8_t *siv,
 			  enc ? "Encryption" : "Decryption", -ret);
 	}
 
-	skcipher_request_free(req);
-	crypto_free_skcipher(tfm);
+	ablkcipher_request_free(req);
+	crypto_free_ablkcipher(tfm);
 
 	return ret;
 }

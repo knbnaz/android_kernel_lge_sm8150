@@ -40,7 +40,7 @@ static int qcedev_setup_context_bank(struct context_bank_info *cb,
 	}
 
 	cb->mapping = arm_iommu_create_mapping(bus, cb->start_addr, cb->size);
-	if (IS_ERR_OR_NULL(cb->mapping)) {sk
+	if (IS_ERR_OR_NULL(cb->mapping)) {
 		pr_err("%s err: failed to create mapping\n", __func__);
 		rc = PTR_ERR(cb->mapping) ?: -ENODEV;
 		goto remove_cb;
