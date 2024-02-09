@@ -198,9 +198,15 @@ err:
 
 static int wg_get_device_start(struct netlink_callback *cb)
 {
+	struct nlattr **attrs = genl_family_attrbuf(&genl_family);
 	struct wg_device *wg;
+	int ret;
 
-	wg = lookup_interface(genl_dumpit_info(cb)->attrs, cb->skb);
+	ret = nlmsg_parse(cb->nlh, GENL_HDRLEN + genl_family.hdrsize, attrs,
+			  genl_family.maxattr, device_policy, NULL);
+	if (ret < 0)
+		return ret;
+	wg = lookup_interface(attrs, cb->skb);
 	if (IS_ERR(wg))
 		return PTR_ERR(wg);
 	DUMP_CTX(cb)->wg = wg;
@@ -613,11 +619,13 @@ static const struct genl_ops genl_ops[] = {
 		.start = wg_get_device_start,
 		.dumpit = wg_get_device_dump,
 		.done = wg_get_device_done,
-		.flags = GENL_UNS_ADMIN_PERM
+		.flags = GENL_UNS_ADMIN_PERM,
+		.policy = device_policy
 	}, {
 		.cmd = WG_CMD_SET_DEVICE,
 		.doit = wg_set_device,
-		.flags = GENL_UNS_ADMIN_PERM
+		.flags = GENL_UNS_ADMIN_PERM,
+		.policy = device_policy
 	}
 };
 
@@ -628,7 +636,6 @@ static struct genl_family genl_family __ro_after_init = {
 	.version = WG_GENL_VERSION,
 	.maxattr = WGDEVICE_A_MAX,
 	.module = THIS_MODULE,
-	.policy = device_policy,
 	.netnsok = true
 };
 
