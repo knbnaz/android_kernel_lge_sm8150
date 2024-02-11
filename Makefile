@@ -807,7 +807,7 @@ KBUILD_CFLAGS += $(call cc-disable-warning, enum-conversion)
 KBUILD_CFLAGS += $(call cc-disable-warning, array-parameter)
 
 ifeq ($(ld-name),lld)
-LDFLAGS += -O3
+LDFLAGS += --lto-O3
 endif
 
 KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
