@@ -213,11 +213,13 @@ static bool cleanup_symbol_name(char *s)
 		*res = '\0';
 		return true;
 	}
-
-	if (!IS_ENABLED(CONFIG_CFI_CLANG) ||
-	    !IS_ENABLED(CONFIG_THINLTO) ||
-	    CONFIG_CLANG_VERSION >= 130000)
+#if (__clang_major__ > 12)
 		return false;
+#else
+	if (!IS_ENABLED(CONFIG_CFI_CLANG) ||
+	    !IS_ENABLED(CONFIG_THINLTO))
+		return false;
+#endif
 
 	/*
 	 * Prior to LLVM 13, the following suffixes were observed when thinLTO
