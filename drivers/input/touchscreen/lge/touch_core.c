@@ -80,9 +80,6 @@ static void touch_report_event(struct touch_core_data *ts)
 	u16 release_mask = 0;
 	u16 change_mask = 0;
 	int i;
-	bool hide_lockscreen_coord =
-		((atomic_read(&ts->state.lockscreen) == LOCKSCREEN_LOCK) &&
-		 (ts->role.hide_coordinate));
 
 	TOUCH_TRACE();
 
@@ -819,7 +816,6 @@ EXPORT_SYMBOL(touch_notify_earjack);
 static int touch_notify(struct touch_core_data *ts,
 				   unsigned long event, void *data)
 {
-	int boot_mode = TOUCH_NORMAL_BOOT;
 	int ret = 0;
 	char buf[100] = {0};
 	struct module_data *md = NULL;
@@ -885,7 +881,6 @@ static int touch_notify(struct touch_core_data *ts,
 static int display_notify(struct touch_core_data *ts,
 				   unsigned long event, void *data)
 {
-	int boot_mode = TOUCH_NORMAL_BOOT;
 	int ret = 0;
 	u32 display_notify_data = 0;
 	struct lge_panel_notifier *panel_data = data;
@@ -1301,44 +1296,9 @@ error_init_work:
 	return ret;
 }
 
-static int touch_core_probe_etc(struct platform_device *pdev)
-{
-	struct touch_core_data *ts;
-	int ret = 0;
-
-	TOUCH_TRACE();
-
-	ts = (struct touch_core_data *) pdev->dev.platform_data;
-
-	ret = touch_init_platform_data(ts);
-	if (ret < 0) {
-		TOUCH_E("failed to initialize platform_data\n");
-		return -EINVAL;
-	}
-
-	ret = ts->driver->probe(ts->dev);
-	if (ret < 0) {
-		TOUCH_E("failed to device probe\n");
-		return ret;
-	}
-
-	touch_init_locks(ts);
-	ret = touch_init_works(ts);
-	if (ret < 0) {
-		TOUCH_E("failed to initialize works\n");
-		return ret;
-	}
-
-	touch_init_pm(ts);
-	touch_init_notify(ts);
-
-	return ret;
-}
-
 static int touch_core_probe(struct platform_device *pdev)
 {
 	struct touch_core_data *ts;
-	int boot_mode = TOUCH_NORMAL_BOOT;
 
 	TOUCH_TRACE();
 

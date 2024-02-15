@@ -2483,7 +2483,6 @@ static int sw42000_probe(struct device *dev)
 {
 	struct touch_core_data *ts = to_touch_core(dev);
 	struct sw42000_data *d = NULL;
-	int boot_mode = TOUCH_NORMAL_BOOT;
 
 	TOUCH_TRACE();
 
