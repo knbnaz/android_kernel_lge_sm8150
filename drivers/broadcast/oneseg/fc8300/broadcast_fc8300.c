@@ -457,7 +457,7 @@ int isdbt_fc8300_power_on(void)
     return rc;
 }
 
-int isdbt_fc8300_is_power_on()
+int isdbt_fc8300_is_power_on(void)
 {
     return (int)fc8300_pdata.powstate;
 }

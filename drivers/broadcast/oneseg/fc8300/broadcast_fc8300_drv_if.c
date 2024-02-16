@@ -84,7 +84,7 @@ s32 OnAir = 0;
 s32 broad_type;
 
 #ifndef BBM_I2C_TSIF
-extern void broadcast_fci_ringbuffer_flush();
+extern void broadcast_fci_ringbuffer_flush(void);
 #endif
 
 /* Body of Internel function */

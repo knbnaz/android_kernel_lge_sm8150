@@ -1801,7 +1801,7 @@ static fci_u8 ficBuffer[1024];
 extern int (*pFicCallback)(fci_u32 userdata, fci_u8 *data, int length);
 extern fci_u32 gFicUserData;
 
-void tunerbb_drv_fc8080_process_polling_data()
+void tunerbb_drv_fc8080_process_polling_data(void)
 {
     HANDLE hDevice = NULL;
     fci_u16      mfIntStatus = 0;

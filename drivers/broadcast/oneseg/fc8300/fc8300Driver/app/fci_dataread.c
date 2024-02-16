@@ -56,7 +56,7 @@ static int is_sync(unsigned char* p) {
 }
 static struct demux_info demux[MAX_DEMUX];
 
-int print_pkt_log()
+int print_pkt_log(void)
 {
     unsigned long i=0;
 
@@ -138,7 +138,7 @@ int put_ts_packet(int no, unsigned char* packet, int sz) {
 }
 
 
-void create_tspacket_anal() {
+void create_tspacket_anal(void) {
     int n, i;
 
     for(n = 0; n < MAX_DEMUX; n++) {

@@ -2,7 +2,7 @@
 
 #include "monitor.h"
 
-int main()
+int main(void)
 {
         Monitor();
 
