@@ -3160,7 +3160,7 @@ static int ipa_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent);
 static void ipa_pci_remove(struct pci_dev *pdev);
 static void ipa_pci_shutdown(struct pci_dev *pdev);
 static pci_ers_result_t ipa_pci_io_error_detected(struct pci_dev *dev,
-	pci_channel_state_t state);
+	enum pci_channel_state state);
 static pci_ers_result_t ipa_pci_io_slot_reset(struct pci_dev *dev);
 static void ipa_pci_io_resume(struct pci_dev *dev);
 
@@ -3178,7 +3178,7 @@ MODULE_DEVICE_TABLE(pci, ipa_pci_tbl);
 
 /* PCI Error Recovery */
 static const struct pci_error_handlers ipa_pci_err_handler = {
-	.error_detected = ipa_pci_io_error_detected,
+	.error_detected = (*ipa_pci_io_error_detected),
 	.slot_reset = ipa_pci_io_slot_reset,
 	.resume = ipa_pci_io_resume,
 };
@@ -3917,7 +3917,7 @@ static void ipa_pci_shutdown(struct pci_dev *pci_dev)
 }
 
 static pci_ers_result_t ipa_pci_io_error_detected(struct pci_dev *pci_dev,
-	pci_channel_state_t state)
+	enum pci_channel_state state)
 {
 	return 0;
 }

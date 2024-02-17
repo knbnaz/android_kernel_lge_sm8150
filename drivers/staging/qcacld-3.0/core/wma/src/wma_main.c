@@ -3341,7 +3341,7 @@ QDF_STATUS wma_open(struct wlan_objmgr_psoc *psoc,
 
 	wma_register_debug_callback();
 	wifi_pos_register_get_phy_mode_cb(wma_handle->psoc,
-					  wma_get_phy_mode_cb);
+			(void (*)(uint8_t, uint32_t, uint32_t *))wma_get_phy_mode_cb);
 	wifi_pos_register_get_fw_phy_mode_for_freq_cb(
 					wma_handle->psoc,
 					wma_get_fw_phy_mode_for_freq_cb);
