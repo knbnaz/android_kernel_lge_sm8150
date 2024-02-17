@@ -1022,6 +1022,10 @@ KBUILD_CFLAGS   += $(call cc-option,-Werror=designated-init)
 # change __FILE__ to the relative path from the srctree
 KBUILD_CFLAGS	+= $(call cc-option,-fmacro-prefix-map=$(srctree)/=)
 
+# Clang 16 introduced these warnings. Treat them as errors , especially when CFI is enabled.
+KBUILD_CFLAGS   += $(call cc-option,-Werror=cast-function-type-strict)
+KBUILD_CFLAGS   += $(call cc-option,-Werror=incompatible-function-pointer-types-strict)
+
 # use the deterministic mode of AR if available
 KBUILD_ARFLAGS := $(call ar-option,D)
 
