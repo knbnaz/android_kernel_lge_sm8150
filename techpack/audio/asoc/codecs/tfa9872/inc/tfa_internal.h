@@ -91,29 +91,29 @@ struct tfa98xx_controls {
 //	struct tfa98xx_control temp;
 };
 
-typedef enum tfa98xx_error (*dsp_msg_t)(tfa98xx_handle_t handle,
+typedef enum tfa98xx_error (*dsp_msg_t)(int handle,
 	int length, const char *buf);
-typedef enum tfa98xx_error (*dsp_msg_read_t)(tfa98xx_handle_t handle,
+typedef enum tfa98xx_error (*dsp_msg_read_t)(int handle,
 	int length, unsigned char *bytes);
-typedef enum tfa98xx_error (*reg_read_t)(tfa98xx_handle_t handle,
+typedef enum tfa98xx_error (*reg_read_t)(int handle,
 	unsigned char subaddress, unsigned short *value);
-typedef enum tfa98xx_error (*reg_write_t)(tfa98xx_handle_t handle,
+typedef enum tfa98xx_error (*reg_write_t)(int handle,
 	unsigned char subaddress, unsigned short value);
-typedef enum tfa98xx_error (*mem_read_t)(tfa98xx_handle_t handle,
+typedef enum tfa98xx_error (*mem_read_t)(int handle,
 	unsigned int start_offset, int num_words, int *p_values);
-typedef enum tfa98xx_error (*mem_write_t)(tfa98xx_handle_t handle,
+typedef enum tfa98xx_error (*mem_write_t)(int handle,
 	unsigned short address, int value, int memtype);
 
 struct tfa_device_ops {
-	enum tfa98xx_error (*tfa_init)(tfa98xx_handle_t dev_idx);
+	enum tfa98xx_error (*tfa_init)(int dev_idx);
 	enum tfa98xx_error (*tfa_dsp_reset)
-		(tfa98xx_handle_t dev_idx, int state);
+		(int dev_idx, int state);
 	enum tfa98xx_error (*tfa_dsp_system_stable)
-		(tfa98xx_handle_t handle, int *ready);
+		(int handle, int *ready);
 	enum tfa98xx_error (*tfa_dsp_write_tables)
-		(tfa98xx_handle_t dev_idx, int sample_rate);
+		(int dev_idx, int sample_rate);
 	enum tfa98xx_error (*tfa_set_boost_trip_level)
-		(tfa98xx_handle_t handle, int Re25C);
+		(int handle, int Re25C);
 
 	dsp_msg_t	dsp_msg;
 	dsp_msg_read_t	dsp_msg_read;
@@ -166,19 +166,19 @@ struct tfa98xx_handle_private {
 
 /* tfa98xx.c */
 extern TFA_INTERNAL struct tfa98xx_handle_private handles_local[];
-TFA_INTERNAL int tfa98xx_handle_is_open(tfa98xx_handle_t h);
+TFA_INTERNAL int tfa98xx_handle_is_open(int h);
 TFA_INTERNAL enum tfa98xx_error tfa98xx_check_rpc_status
-(tfa98xx_handle_t handle, int *p_rpc_status);
+(int handle, int *p_rpc_status);
 TFA_INTERNAL enum tfa98xx_error tfa98xx_wait_result
-(tfa98xx_handle_t handle, int waitRetryCount);
-TFA_INTERNAL void tfa98xx_apply_deferred_calibration(tfa98xx_handle_t handle);
+(int handle, int waitRetryCount);
+TFA_INTERNAL void tfa98xx_apply_deferred_calibration(int handle);
 TFA_INTERNAL void tfa98xx_deferred_calibration_status
-(tfa98xx_handle_t handle, int calibrate_done);
+(int handle, int calibrate_done);
 TFA_INTERNAL int print_calibration
-(tfa98xx_handle_t handle, char *str, size_t size);
+(int handle, char *str, size_t size);
 
 #if defined(TFADSP_DSP_BUFFER_POOL)
 TFA_INTERNAL int tfa98xx_buffer_pool_access
-(tfa98xx_handle_t handle, int r_index, size_t g_size, int control);
+(int handle, int r_index, size_t g_size, int control);
 #endif
 #endif /* __TFA_INTERNAL_H__ */

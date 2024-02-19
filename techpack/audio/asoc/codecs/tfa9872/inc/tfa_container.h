@@ -26,7 +26,7 @@ void tfa_set_partial_update(int enp);
  * @param length the length of the container file
  * @return tfa_error
  */
-enum tfa_error tfa_load_cnt(void *cnt, int length);
+enum tfa98xx_error tfa_load_cnt(void *cnt, int length);
 
 /**
  * Resets init variables
@@ -37,7 +37,7 @@ void tfa_deinit(void);
  * Verify the calibration results from each channel
  * @param handle the index of the device
  */
-void individual_calibration_results(tfa98xx_handle_t handle);
+void individual_calibration_results(int handle);
 
 /**
  * Return the descriptor string
@@ -237,7 +237,7 @@ enum tfa98xx_error tfa_cont_write_profile
  * @param dev_idx index of the device
  * @param configuration name string of the configuration
  */
-void tfa98xx_set_spkr_select(tfa98xx_handle_t dev_idx, char *configuration);
+void tfa98xx_set_spkr_select(int dev_idx, char *configuration);
 
 /**
  * Set current vstep for a given channel
@@ -360,7 +360,7 @@ struct tfa_livedata_list *tfa_cont_next_livedata
  * @return Tfa98xx_Error
  */
 enum tfa98xx_error tfa_run_write_bitfield
-(tfa98xx_handle_t dev_idx,  struct tfa_bitfield bf); // TODO move to run core
+(int dev_idx,  struct tfa_bitfield bf); // TODO move to run core
 
 /**
  * Write a parameter file to the device
@@ -407,7 +407,7 @@ void tfa_cont_show_header(struct tfa_header *hdr);
  * @return Tfa98xx_Error
  */
 enum tfa98xx_error tfa_run_read_bitfield
-(tfa98xx_handle_t dev_idx,  struct tfa_bitfield *bf);
+(int dev_idx,  struct tfa_bitfield *bf);
 
 /**
  * Get hw feature bits from container file
@@ -415,7 +415,7 @@ enum tfa98xx_error tfa_run_read_bitfield
  * @param hw_feature_register pointer to where hw features are stored
  */
 void get_hw_features_from_cnt
-(tfa98xx_handle_t dev_idx, int *hw_feature_register);
+(int dev_idx, int *hw_feature_register);
 
 /**
  * Get sw feature bits from container file
@@ -423,14 +423,14 @@ void get_hw_features_from_cnt
  * @param sw_feature_register pointer to where sw features are stored
  */
 void get_sw_features_from_cnt
-(tfa98xx_handle_t dev_idx, int sw_feature_register[2]);
+(int dev_idx, int sw_feature_register[2]);
 
 /**
  * Factory trimming for the Boost converter
  * check if there is a correction needed
  * @param dev_idx device index
  */
-void tfa_factory_trimmer(tfa98xx_handle_t dev_idx);
+void tfa_factory_trimmer(int dev_idx);
 
 /**
  * Search for filters settings and if found then write them to the device

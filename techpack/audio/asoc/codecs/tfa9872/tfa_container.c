@@ -62,7 +62,7 @@ void tfa_set_partial_update(int enp)
 /*
  * check the container file and set module global
 */
-enum tfa_error tfa_load_cnt(void *cnt, int length)
+enum tfa98xx_error tfa_load_cnt(void *cnt, int length)
 {
 	struct tfa_container *cntbuf = (struct tfa_container *)cnt;
 
@@ -70,29 +70,29 @@ enum tfa_error tfa_load_cnt(void *cnt, int length)
 
 	if (length > TFA_MAX_CNT_LENGTH) {
 		pr_err("incorrect length\n");
-		return tfa_error_container;
+		return TFA98XX_ERROR_CONTAINER;
 	}
 
 	if (HDR(cntbuf->id[0],cntbuf->id[1]) == 0) {
 		pr_err("header is 0\n");
-		return tfa_error_container;
+		return TFA98XX_ERROR_CONTAINER;
 	}
 
 	if ((HDR(cntbuf->id[0],cntbuf->id[1])) != params_hdr) {
 		pr_err("wrong header type: 0x%02x 0x%02x\n",
 			cntbuf->id[0], cntbuf->id[1]);
-		return tfa_error_container;
+		return TFA98XX_ERROR_CONTAINER;
 	}
 
 	if (cntbuf->size == 0) {
 		pr_err("data size is 0\n");
-		return tfa_error_container;
+		return TFA98XX_ERROR_CONTAINER;
 	}
 
 	/* check CRC */
 	if (tfa_cont_crc_check_container(cntbuf)) {
 		pr_err("CRC error\n");
-		return tfa_error_container;
+		return TFA98XX_ERROR_CONTAINER;
 	}
 
 	/* check sub version level */
@@ -103,10 +103,10 @@ enum tfa_error tfa_load_cnt(void *cnt, int length)
 	} else {
 		pr_err("container sub-version not supported: %c%c\n",
 				cntbuf->subversion[0], cntbuf->subversion[1]);
-		return tfa_error_container;
+		return TFA98XX_ERROR_CONTAINER;
 	}
 
-	return tfa_error_ok;
+	return TFA98XX_ERROR_OK;
 }
 
 void tfa_deinit(void)
@@ -1050,7 +1050,7 @@ enum tfa98xx_error tfa_cont_get_slave(int dev_idx, uint8_t *slave_addr)
  * write a bit field
  */
 enum tfa98xx_error
-tfa_run_write_bitfield(tfa98xx_handle_t dev_idx,
+tfa_run_write_bitfield(int dev_idx,
 	struct tfa_bitfield bf)
 {
 	enum tfa98xx_error error;
@@ -1078,7 +1078,7 @@ tfa_run_write_bitfield(tfa98xx_handle_t dev_idx,
  * read a bit field
  */
 enum tfa98xx_error
-tfa_run_read_bitfield(tfa98xx_handle_t dev_idx,
+tfa_run_read_bitfield(int dev_idx,
 	struct tfa_bitfield *bf)
 {
 	enum tfa98xx_error error;
@@ -1107,7 +1107,7 @@ tfa_run_read_bitfield(tfa98xx_handle_t dev_idx,
  dsp mem direct write
  */
 enum tfa98xx_error
-tfa_run_write_dsp_mem(tfa98xx_handle_t dev, struct tfa_dsp_mem *cfmem)
+tfa_run_write_dsp_mem(int dev, struct tfa_dsp_mem *cfmem)
 {
 	enum tfa98xx_error error = TFA98XX_ERROR_OK;
 	int i;
@@ -1132,12 +1132,12 @@ tfa_run_write_dsp_mem(tfa98xx_handle_t dev, struct tfa_dsp_mem *cfmem)
  * the aa data is used but it's the same for all of them
  */
 enum tfa98xx_error
-tfa_run_write_filter(tfa98xx_handle_t dev, union tfa_cont_biquad *bq)
+tfa_run_write_filter(int dev, union tfa_cont_biquad *bq)
 {
 	enum tfa98xx_error error = TFA98XX_ERROR_OK;
 	enum tfa98xx_dmem dmem;
 	uint16_t address;
-	uint8_t data[3*3+sizeof(bq->aa.bytes)];
+	unsigned char data[3*3+sizeof(bq->aa.bytes)];
 	int i, channel=0, runs=1;
 	int8_t saved_index=bq->aa.index; /* This is used to set back the index */
 
@@ -1232,7 +1232,7 @@ tfa_run_write_filter(tfa98xx_handle_t dev, union tfa_cont_biquad *bq)
  * only the part that is masked will be updated
  */
 enum tfa98xx_error
-tfa_run_write_register(tfa98xx_handle_t handle, struct tfa_reg_patch *reg)
+tfa_run_write_register(int handle, struct tfa_reg_patch *reg)
 {
 	enum tfa98xx_error error;
 	uint16_t value,newvalue;
@@ -1430,7 +1430,7 @@ enum tfa98xx_error tfa_cont_write_files(int dev_idx)
 				(dev->list[i].offset + (char *)g_cont);
 			err = dsp_msg
 				(dev_idx, size,
-				dev->list[i].offset+2 + (char *)g_cont);
+				(char *)(dev->list[i].offset+2 + g_cont));
 			if (tfa98xx_cnt_verbose) {
 				cmd = (struct tfa_cmd *)
 					(dev->list[i].offset+(uint8_t *)g_cont);
@@ -1536,8 +1536,8 @@ tfa_cont_write_files_prof(int dev_idx, int prof_idx, int vstep_idx)
 					+ (char *)g_cont);
 				err = dsp_msg
 					(dev_idx, size,
-					prof->list[i].offset
-					+ 2 + (char *)g_cont);
+					(char *)(prof->list[i].offset
+					+ 2 + g_cont));
 
 				if (tfa98xx_cnt_verbose) {
 					cmd = (struct tfa_cmd *)
@@ -2267,8 +2267,8 @@ tfa_cont_write_profile(int dev_idx, int prof_idx, int vstep_idx)
 					+ (char *)g_cont);
 				err = dsp_msg
 					(dev_idx, size,
-					prof->list[i].offset
-					+ 2 + (char *)g_cont);
+					(char *)(prof->list[i].offset
+					+ 2 + g_cont));
 
 				if (tfa98xx_cnt_verbose) {
 					cmd = (struct tfa_cmd *)
@@ -2369,7 +2369,7 @@ char *tfa_cont_get_string(struct tfa_desc_ptr *dsc)
 	return dsc->offset+(char*)g_cont;
 }
 
-void individual_calibration_results(tfa98xx_handle_t handle)
+void individual_calibration_results(int handle)
 {
 	int value_p, value_s;
 
@@ -2626,7 +2626,7 @@ tfa_cont_get_1st_livedata_list(struct tfa_container *cont)
 
 enum tfa98xx_error tfa_cont_open(int dev_idx)
 {
-	return tfa98xx_open((tfa98xx_handle_t)dev_idx);
+	return tfa98xx_open((int)dev_idx);
 }
 
 enum tfa98xx_error tfa_cont_close(int dev_idx)
@@ -2813,7 +2813,7 @@ void create_dsp_buffer_msg(struct tfa_msg *msg, char *buffer, int *size)
 	*size = (3 + (msg->msg_size * 3)) * sizeof(char);
 }
 
-void get_all_features_from_cnt(tfa98xx_handle_t dev_idx,
+void get_all_features_from_cnt(int dev_idx,
 	int *hw_feature_register, int sw_feature_register[2])
 {
 	struct tfa_features *features;
@@ -2842,7 +2842,7 @@ void get_all_features_from_cnt(tfa98xx_handle_t dev_idx,
 }
 
 /* wrapper function */
-void get_hw_features_from_cnt(tfa98xx_handle_t dev_idx,
+void get_hw_features_from_cnt(int dev_idx,
 	int *hw_feature_register)
 {
 	int sw_feature_register[2];
@@ -2851,7 +2851,7 @@ void get_hw_features_from_cnt(tfa98xx_handle_t dev_idx,
 }
 
 /* wrapper function */
-void get_sw_features_from_cnt(tfa98xx_handle_t dev_idx,
+void get_sw_features_from_cnt(int dev_idx,
 	int sw_feature_register[2])
 {
 	int hw_feature_register;
@@ -2860,7 +2860,7 @@ void get_sw_features_from_cnt(tfa98xx_handle_t dev_idx,
 }
 
 /* Factory trimming for the Boost converter */
-void tfa_factory_trimmer(tfa98xx_handle_t dev_idx)
+void tfa_factory_trimmer(int dev_idx)
 {
 	unsigned short current_value, delta;
 	int result;

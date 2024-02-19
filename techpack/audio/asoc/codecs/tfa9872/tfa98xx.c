@@ -208,10 +208,10 @@ static struct tfa98xx_rate rate_to_fssel[] = {
 };
 
 /* Wrapper for tfa start */
-static enum tfa_error
+static enum tfa98xx_error
 tfa98xx_tfa_start(struct tfa98xx *tfa98xx, int next_profile, int *vstep)
 {
-	enum tfa_error err;
+	enum tfa98xx_error err;
 
 	err = tfa_start(next_profile, vstep);
 
@@ -627,7 +627,7 @@ static int tfa98xx_dbgfs_temp_set(void *data, u64 val)
  * read the calibration file once to get the calibration result
  */
 /* tfa98xx_deferred_calibration_status - called from tfa_run_wait_calibration */
-void tfa98xx_deferred_calibration_status(tfa98xx_handle_t handle,
+void tfa98xx_deferred_calibration_status(int handle,
 	int calibrate_done)
 {
 	struct tfa98xx *tfa98xx = tfa98xx_devices[handle];
@@ -1081,7 +1081,7 @@ static ssize_t tfa98xx_dbgfs_dsp_state_set(struct file *file,
 {
 	struct i2c_client *i2c = file->private_data;
 	struct tfa98xx *tfa98xx = i2c_get_clientdata(i2c);
-	enum tfa_error ret;
+	enum tfa98xx_error ret;
 	char buf[32];
 	const char start_cmd[] = "start";
 	const char stop_cmd[] = "stop";
@@ -1205,7 +1205,7 @@ static ssize_t tfa98xx_dbgfs_rpc_read(struct file *file,
 	}
 
 	mutex_lock(&tfa98xx->dsp_lock);
-	error = dsp_msg_read(tfa98xx->handle, count, buffer);
+	error = dsp_msg_read(tfa98xx->handle, (int)count, (char *)buffer);
 	mutex_unlock(&tfa98xx->dsp_lock);
 	if (error) {
 		pr_debug("[0x%x] dsp_msg_read error: %d\n",
@@ -1261,7 +1261,7 @@ static ssize_t tfa98xx_dbgfs_rpc_send(struct file *file,
 				tfa98xx->i2c->addr, error);
 	} else {
 		error = dsp_msg
-			(tfa98xx->handle, msg_file->size, msg_file->data);
+			(tfa98xx->handle, (int)msg_file->size, (char *)msg_file->data);
 		if (error)
 			pr_debug("[0x%x] dsp_msg error: %d\n",
 				tfa98xx->i2c->addr, error);
@@ -1302,7 +1302,7 @@ static ssize_t tfa98xx_dbgfs_dsp_read(struct file *file,
 	}
 
 	mutex_lock(&tfa98xx->dsp_lock);
-	error = dsp_msg_read(tfa98xx->handle, count, buffer);
+	error = dsp_msg_read(tfa98xx->handle, (int)count, (char *)buffer);
 	mutex_unlock(&tfa98xx->dsp_lock);
 	if (error) {
 		pr_debug("[0x%x] dsp_msg_read error: %d\n",
@@ -1360,7 +1360,7 @@ static ssize_t tfa98xx_dbgfs_dsp_write(struct file *file,
 	}
 
 	mutex_lock(&tfa98xx->dsp_lock);
-	error = dsp_msg(tfa98xx->handle, count, buffer);
+	error = dsp_msg(tfa98xx->handle, (int)count, (char *)buffer);
 	mutex_unlock(&tfa98xx->dsp_lock);
 	if (error) {
 		pr_debug("[0x%x] dsp_msg error: %d\n",
@@ -2711,7 +2711,7 @@ static int tfa98xx_unregister_dsp(struct tfa98xx *tfa98xx)
 
 
 /* I2C wrapper functions */
-enum tfa98xx_error tfa98xx_write_register16(tfa98xx_handle_t handle,
+enum tfa98xx_error tfa98xx_write_register16(int handle,
 					unsigned char subaddress,
 					unsigned short value)
 {
@@ -2753,7 +2753,7 @@ retry:
 	return error;
 }
 
-enum tfa98xx_error tfa98xx_read_register16(tfa98xx_handle_t handle,
+enum tfa98xx_error tfa98xx_read_register16(int handle,
 					unsigned char subaddress,
 					unsigned short *val)
 {
@@ -2798,7 +2798,7 @@ retry:
 	return error;
 }
 
-enum tfa98xx_error tfa98xx_read_data(tfa98xx_handle_t handle,
+enum tfa98xx_error tfa98xx_read_data(int handle,
 				unsigned char reg,
 				int len, unsigned char value[])
 {
@@ -2851,7 +2851,7 @@ enum tfa98xx_error tfa98xx_read_data(tfa98xx_handle_t handle,
 	return error;
 }
 
-enum tfa98xx_error tfa98xx_write_raw(tfa98xx_handle_t handle,
+enum tfa98xx_error tfa98xx_write_raw(int handle,
 				int len,
 				const unsigned char data[])
 {
@@ -2993,7 +2993,7 @@ static void
 tfa98xx_container_loaded(const struct firmware *cont,	void *context)
 {
 	struct tfa98xx *tfa98xx = context;
-	enum tfa_error tfa_err;
+	enum tfa98xx_error tfa_err;
 	int container_size;
 	int handle;
 #if defined(TFA_DBGFS_CHECK_MTPEX)
@@ -3040,7 +3040,7 @@ tfa98xx_container_loaded(const struct firmware *cont,	void *context)
 		 partial_enable ? "enable" : "disable");
 
 	tfa_err = tfa_load_cnt(container, container_size);
-	if (tfa_err != tfa_error_ok) {
+	if (tfa_err != TFA98XX_ERROR_OK) {
 		dev_err(tfa98xx->dev, "Cannot load container file, aborting\n");
 		mutex_unlock(&probe_lock);
 		return;
