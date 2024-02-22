@@ -197,6 +197,8 @@ libs-$(CONFIG_EFI_STUB) += $(objtree)/drivers/firmware/efi/libstub/lib.a
 
 ifeq ($(CONFIG_BUILD_ARM64_KERNEL_COMPRESSION_GZIP),y)
 KBUILD_IMAGE   := Image.gz
+else ifeq ($(CONFIG_BUILD_ARM64_KERNEL_COMPRESSION_LZ4),y)
+KBUILD_IMAGE   := Image.lz4
 else
 KBUILD_IMAGE   := Image
 endif
@@ -229,8 +231,15 @@ Image: vmlinux
 Image.%: Image
 	$(Q)$(MAKE) $(build)=$(boot) $(boot)/$@
 
+ifeq ($(CONFIG_BUILD_ARM64_KERNEL_COMPRESSION_GZIP),y)
 zinstall install:
 	$(Q)$(MAKE) $(build)=$(boot) $@
+endif
+
+ifeq ($(CONFIG_BUILD_ARM64_KERNEL_COMPRESSION_LZ4),y)
+lz4install install:
+	$(Q)$(MAKE) $(build)=$(boot) $@
+endif
 
 %.dtb: scripts
 	$(Q)$(MAKE) $(build)=$(boot)/dts $(boot)/dts/$@
@@ -247,6 +256,9 @@ Image-dtb: vmlinux scripts dtbs
 	$(Q)$(MAKE) $(build)=$(boot) $(boot)/$@
 
 Image.gz-dtb: vmlinux scripts dtbs Image.gz
+	$(Q)$(MAKE) $(build)=$(boot) $(boot)/$@
+
+Image.lz4-dtb: vmlinux scripts dtbs Image.lz4
 	$(Q)$(MAKE) $(build)=$(boot) $(boot)/$@
 
 ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
