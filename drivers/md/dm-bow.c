@@ -5,7 +5,7 @@
  */
 
 #include "dm.h"
-#include "dm-bufio.h"
+#include <linux/dm-bufio.h>
 #include "dm-core.h"
 
 #include <linux/crc32.h>
