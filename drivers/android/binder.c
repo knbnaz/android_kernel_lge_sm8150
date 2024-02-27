@@ -100,7 +100,6 @@ static atomic_t binder_last_id;
 
 static int proc_show(struct seq_file *m, void *unused);
 DEFINE_SHOW_ATTRIBUTE(proc);
-#endif
 
 #define FORBIDDEN_MMAP_FLAGS                (VM_WRITE)
 
