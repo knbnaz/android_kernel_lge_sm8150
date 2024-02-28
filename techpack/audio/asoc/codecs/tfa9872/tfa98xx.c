@@ -627,7 +627,7 @@ static int tfa98xx_dbgfs_temp_set(void *data, u64 val)
  * read the calibration file once to get the calibration result
  */
 /* tfa98xx_deferred_calibration_status - called from tfa_run_wait_calibration */
-void tfa98xx_deferred_calibration_status(tfa98xx_handle_t handle,
+void tfa98xx_deferred_calibration_status(int handle,
 	int calibrate_done)
 {
 	struct tfa98xx *tfa98xx = tfa98xx_devices[handle];
@@ -2711,7 +2711,7 @@ static int tfa98xx_unregister_dsp(struct tfa98xx *tfa98xx)
 
 
 /* I2C wrapper functions */
-enum tfa98xx_error tfa98xx_write_register16(tfa98xx_handle_t handle,
+enum tfa98xx_error tfa98xx_write_register16(int handle,
 					unsigned char subaddress,
 					unsigned short value)
 {
@@ -2753,7 +2753,7 @@ retry:
 	return error;
 }
 
-enum tfa98xx_error tfa98xx_read_register16(tfa98xx_handle_t handle,
+enum tfa98xx_error tfa98xx_read_register16(int handle,
 					unsigned char subaddress,
 					unsigned short *val)
 {
@@ -2798,7 +2798,7 @@ retry:
 	return error;
 }
 
-enum tfa98xx_error tfa98xx_read_data(tfa98xx_handle_t handle,
+enum tfa98xx_error tfa98xx_read_data(int handle,
 				unsigned char reg,
 				int len, unsigned char value[])
 {
@@ -2851,7 +2851,7 @@ enum tfa98xx_error tfa98xx_read_data(tfa98xx_handle_t handle,
 	return error;
 }
 
-enum tfa98xx_error tfa98xx_write_raw(tfa98xx_handle_t handle,
+enum tfa98xx_error tfa98xx_write_raw(int handle,
 				int len,
 				const unsigned char data[])
 {

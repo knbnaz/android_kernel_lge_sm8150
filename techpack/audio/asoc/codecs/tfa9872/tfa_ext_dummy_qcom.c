@@ -326,7 +326,7 @@ return.
 
 */
 //#if defined(__x86_64__) | defined(__i386__) /* for on PC testing */
-static int tfa_dsp_handle_event(tfa98xx_handle_t handle, enum tfadsp_event_en tfadsp_event)
+static int tfa_dsp_handle_event(int handle, enum tfadsp_event_en tfadsp_event)
 {
 	int retval = 0;// handles_local[handle].rev; /* return revid by default */
 	u8 msgbuf[200], readbuf[200], *bptr;

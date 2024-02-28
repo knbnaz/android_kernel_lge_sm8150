@@ -20,7 +20,7 @@
 
 #include "inc/tfa98xx_tfafieldnames.h"
 
-static enum tfa98xx_error tfa9895_specific(tfa98xx_handle_t handle)
+static enum tfa98xx_error tfa9895_specific(int handle)
 {
         enum tfa98xx_error error = TFA98XX_ERROR_OK;
         int result;
@@ -47,7 +47,7 @@ static enum tfa98xx_error tfa9895_specific(tfa98xx_handle_t handle)
         return error;
 }
 
-static enum tfa98xx_error tfa9890_specific(tfa98xx_handle_t handle)
+static enum tfa98xx_error tfa9890_specific(int handle)
 {
 	enum tfa98xx_error error = TFA98XX_ERROR_OK;
 	unsigned short regRead = 0;
@@ -72,7 +72,7 @@ static enum tfa98xx_error tfa9890_specific(tfa98xx_handle_t handle)
 	return error;
 }
 
-static enum tfa98xx_error tfa9891_specific(tfa98xx_handle_t handle)
+static enum tfa98xx_error tfa9891_specific(int handle)
 {
         enum tfa98xx_error error = TFA98XX_ERROR_OK;
 
@@ -92,7 +92,7 @@ static enum tfa98xx_error tfa9891_specific(tfa98xx_handle_t handle)
         return error;
 }
 
-static enum tfa98xx_error tfa9896_specific(tfa98xx_handle_t handle)
+static enum tfa98xx_error tfa9896_specific(int handle)
 {
         enum tfa98xx_error error = TFA98XX_ERROR_OK;
         unsigned short check_value;
@@ -123,7 +123,7 @@ static enum tfa98xx_error tfa9896_specific(tfa98xx_handle_t handle)
         return error;
 }
 
-static enum tfa98xx_error tfa9897_specific(tfa98xx_handle_t handle)
+static enum tfa98xx_error tfa9897_specific(int handle)
 {
         enum tfa98xx_error error = TFA98XX_ERROR_OK;
         unsigned short check_value;
@@ -148,7 +148,7 @@ static enum tfa98xx_error tfa9897_specific(tfa98xx_handle_t handle)
         return error;
 }
 
-static enum tfa98xx_error tfa9888_specific(tfa98xx_handle_t handle)
+static enum tfa98xx_error tfa9888_specific(int handle)
 {
 	enum tfa98xx_error error = TFA98XX_ERROR_OK;
 	unsigned short value, xor;
@@ -252,7 +252,7 @@ static enum tfa98xx_error tfa9888_specific(tfa98xx_handle_t handle)
 	return error;
 }
 
-static enum tfa98xx_error tfa9872_specific(tfa98xx_handle_t handle)
+static enum tfa98xx_error tfa9872_specific(int handle)
 {
 	enum tfa98xx_error error = TFA98XX_ERROR_OK;
 	uint16_t MANAOOSC = 0x0140; /* version 17 */
@@ -330,7 +330,7 @@ static enum tfa98xx_error tfa9872_specific(tfa98xx_handle_t handle)
 	return error;
 }
 
-static enum tfa98xx_error tfa9912_specific(tfa98xx_handle_t handle)
+static enum tfa98xx_error tfa9912_specific(int handle)
 {
 	enum tfa98xx_error error = TFA98XX_ERROR_OK;
 	unsigned short value, xor;
@@ -390,7 +390,7 @@ static enum tfa98xx_error tfa9912_specific(tfa98xx_handle_t handle)
  *
  */
 static enum tfa98xx_error
-tfa9890_dsp_system_stable(tfa98xx_handle_t handle, int *ready)
+tfa9890_dsp_system_stable(int handle, int *ready)
 {
 	enum tfa98xx_error error = TFA98XX_ERROR_OK;
 	unsigned short status, mtp0;
@@ -461,7 +461,7 @@ errorExit:
 /*
  * Disable clock gating
  */
-static enum tfa98xx_error tfa9890_clockgating(tfa98xx_handle_t handle, int on)
+static enum tfa98xx_error tfa9890_clockgating(int handle, int on)
 {
 	enum tfa98xx_error error;
 	unsigned short value;
@@ -487,7 +487,7 @@ static enum tfa98xx_error tfa9890_clockgating(tfa98xx_handle_t handle, int on)
  * Tfa9890_DspReset will deal with clock gating control in order
  * to reset the DSP for warm state restart
  */
-static enum tfa98xx_error tfa9890_dsp_reset(tfa98xx_handle_t handle, int state)
+static enum tfa98xx_error tfa9890_dsp_reset(int handle, int state)
 {
 	enum tfa98xx_error error;
 
@@ -524,7 +524,7 @@ static unsigned char vsfwdelay_table[] = {
  *  so moving this to the tfa98xx API requires also updating all patches
  */
 static enum tfa98xx_error
-tfa9896_dsp_write_vsfwdelay_table(tfa98xx_handle_t handle)
+tfa9896_dsp_write_vsfwdelay_table(int handle)
 {
 	enum tfa98xx_error error;
         error = tfa_dsp_cmd_id_write(handle, MODULE_FRAMEWORK,
@@ -550,7 +550,7 @@ static unsigned char cvfracdelay_table[] ={
         0,0,62 /*Index 8 - Current/Volt Fractional Delay for 48KHz */
 };
 
-enum tfa98xx_error tfa9896_dsp_write_cvfracdelay_table(tfa98xx_handle_t handle)
+enum tfa98xx_error tfa9896_dsp_write_cvfracdelay_table(int handle)
 {
 	enum tfa98xx_error error;
         error = tfa_dsp_cmd_id_write(handle, MODULE_FRAMEWORK,
@@ -561,7 +561,7 @@ enum tfa98xx_error tfa9896_dsp_write_cvfracdelay_table(tfa98xx_handle_t handle)
 }
 
 static enum tfa98xx_error
-tfa9896_tfa_dsp_write_tables(tfa98xx_handle_t dev_idx, __attribute__((unused)) int sample_rate)
+tfa9896_tfa_dsp_write_tables(int dev_idx, __attribute__((unused)) int sample_rate)
 {
 	enum tfa98xx_error error;
 
@@ -577,7 +577,7 @@ tfa9896_tfa_dsp_write_tables(tfa98xx_handle_t dev_idx, __attribute__((unused)) i
 
 #if 0 /* TODO: remove or use me */
 static enum tfa98xx_error
-tfa9896_tfa_set_boost_trip_level(tfa98xx_handle_t handle, int Re25C)
+tfa9896_tfa_set_boost_trip_level(int handle, int Re25C)
 {
 	enum tfa98xx_error error = TFA98XX_ERROR_OK;
 	int trip_value;
@@ -630,7 +630,7 @@ static unsigned char tfa9897_vsfwdelay_table[] = {
  *  so moving this to the tfa98xx API requires also updating all patches
  */
 static enum tfa98xx_error
-tfa9897_dsp_write_vsfwdelay_table(tfa98xx_handle_t handle)
+tfa9897_dsp_write_vsfwdelay_table(int handle)
 {
 	enum tfa98xx_error error;
 
@@ -658,7 +658,7 @@ static unsigned char tfa9897_cvfracdelay_table[] ={
 };
 
 enum tfa98xx_error
-tfa9897_dsp_write_cvfracdelay_table(tfa98xx_handle_t handle)
+tfa9897_dsp_write_cvfracdelay_table(int handle)
 {
 	enum tfa98xx_error error;
 
@@ -670,7 +670,7 @@ tfa9897_dsp_write_cvfracdelay_table(tfa98xx_handle_t handle)
 }
 
 static enum tfa98xx_error
-tfa9897_tfa_dsp_write_tables(tfa98xx_handle_t dev_idx, __attribute__((unused)) int sample_rate)
+tfa9897_tfa_dsp_write_tables(int dev_idx, __attribute__((unused)) int sample_rate)
 {
 	enum tfa98xx_error error;
 
@@ -685,7 +685,7 @@ tfa9897_tfa_dsp_write_tables(tfa98xx_handle_t dev_idx, __attribute__((unused)) i
 }
 
 static enum tfa98xx_error
-tfa9888_tfa_dsp_write_tables(tfa98xx_handle_t handle, int sample_rate)
+tfa9888_tfa_dsp_write_tables(int handle, int sample_rate)
 {
 	unsigned char buffer[15] = {0};
 	int size = 15 * sizeof(char);
@@ -740,7 +740,7 @@ tfa9888_tfa_dsp_write_tables(tfa98xx_handle_t handle, int sample_rate)
 }
 
 static enum tfa98xx_error
-tfa9912_tfa_dsp_write_tables(tfa98xx_handle_t handle, int sample_rate)
+tfa9912_tfa_dsp_write_tables(int handle, int sample_rate)
 {
 	unsigned char buffer[15] = {0};
 	int size = 15 * sizeof(char);

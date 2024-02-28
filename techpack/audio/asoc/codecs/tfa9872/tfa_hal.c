@@ -41,7 +41,7 @@ tfa98xx_classify_i2c_error(enum NXP_I2C_Error i2c_error)
  * write a 16 bit subaddress
  */
 enum tfa98xx_error
-tfa98xx_write_register16(tfa98xx_handle_t handle,
+tfa98xx_write_register16(int handle,
 			unsigned char subaddress, unsigned short value)
 {
 	enum NXP_I2C_Error i2c_error;
@@ -61,7 +61,7 @@ tfa98xx_write_register16(tfa98xx_handle_t handle,
 }
 
 enum tfa98xx_error
-tfa98xx_read_register16(tfa98xx_handle_t handle,
+tfa98xx_read_register16(int handle,
 		       unsigned char subaddress, unsigned short *p_value)
 {
 	enum NXP_I2C_Error i2c_error;
@@ -86,7 +86,7 @@ tfa98xx_read_register16(tfa98xx_handle_t handle,
 }
 
 enum tfa98xx_error
-tfa98xx_read_data(tfa98xx_handle_t handle,
+tfa98xx_read_data(int handle,
 		 unsigned char subaddress, int num_bytes, unsigned char data[])
 {
 	enum NXP_I2C_Error i2c_error;
@@ -108,7 +108,7 @@ tfa98xx_read_data(tfa98xx_handle_t handle,
  * Write raw I2C data with no sub address
  */
 enum tfa98xx_error
-tfa98xx_write_raw(tfa98xx_handle_t handle,
+tfa98xx_write_raw(int handle,
 		  int num_bytes,
 		  const unsigned char data[])
 {

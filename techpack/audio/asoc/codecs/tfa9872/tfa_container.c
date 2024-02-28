@@ -1050,7 +1050,7 @@ enum tfa98xx_error tfa_cont_get_slave(int dev_idx, uint8_t *slave_addr)
  * write a bit field
  */
 enum tfa98xx_error
-tfa_run_write_bitfield(tfa98xx_handle_t dev_idx,
+tfa_run_write_bitfield(int dev_idx,
 	struct tfa_bitfield bf)
 {
 	enum tfa98xx_error error;
@@ -1078,7 +1078,7 @@ tfa_run_write_bitfield(tfa98xx_handle_t dev_idx,
  * read a bit field
  */
 enum tfa98xx_error
-tfa_run_read_bitfield(tfa98xx_handle_t dev_idx,
+tfa_run_read_bitfield(int dev_idx,
 	struct tfa_bitfield *bf)
 {
 	enum tfa98xx_error error;
@@ -1107,7 +1107,7 @@ tfa_run_read_bitfield(tfa98xx_handle_t dev_idx,
  dsp mem direct write
  */
 enum tfa98xx_error
-tfa_run_write_dsp_mem(tfa98xx_handle_t dev, struct tfa_dsp_mem *cfmem)
+tfa_run_write_dsp_mem(int dev, struct tfa_dsp_mem *cfmem)
 {
 	enum tfa98xx_error error = TFA98XX_ERROR_OK;
 	int i;
@@ -1132,7 +1132,7 @@ tfa_run_write_dsp_mem(tfa98xx_handle_t dev, struct tfa_dsp_mem *cfmem)
  * the aa data is used but it's the same for all of them
  */
 enum tfa98xx_error
-tfa_run_write_filter(tfa98xx_handle_t dev, union tfa_cont_biquad *bq)
+tfa_run_write_filter(int dev, union tfa_cont_biquad *bq)
 {
 	enum tfa98xx_error error = TFA98XX_ERROR_OK;
 	enum tfa98xx_dmem dmem;
@@ -1232,7 +1232,7 @@ tfa_run_write_filter(tfa98xx_handle_t dev, union tfa_cont_biquad *bq)
  * only the part that is masked will be updated
  */
 enum tfa98xx_error
-tfa_run_write_register(tfa98xx_handle_t handle, struct tfa_reg_patch *reg)
+tfa_run_write_register(int handle, struct tfa_reg_patch *reg)
 {
 	enum tfa98xx_error error;
 	uint16_t value,newvalue;
@@ -2369,7 +2369,7 @@ char *tfa_cont_get_string(struct tfa_desc_ptr *dsc)
 	return dsc->offset+(char*)g_cont;
 }
 
-void individual_calibration_results(tfa98xx_handle_t handle)
+void individual_calibration_results(int handle)
 {
 	int value_p, value_s;
 
@@ -2626,7 +2626,7 @@ tfa_cont_get_1st_livedata_list(struct tfa_container *cont)
 
 enum tfa98xx_error tfa_cont_open(int dev_idx)
 {
-	return tfa98xx_open((tfa98xx_handle_t)dev_idx);
+	return tfa98xx_open((int)dev_idx);
 }
 
 enum tfa98xx_error tfa_cont_close(int dev_idx)
@@ -2813,7 +2813,7 @@ void create_dsp_buffer_msg(struct tfa_msg *msg, char *buffer, int *size)
 	*size = (3 + (msg->msg_size * 3)) * sizeof(char);
 }
 
-void get_all_features_from_cnt(tfa98xx_handle_t dev_idx,
+void get_all_features_from_cnt(int dev_idx,
 	int *hw_feature_register, int sw_feature_register[2])
 {
 	struct tfa_features *features;
@@ -2842,7 +2842,7 @@ void get_all_features_from_cnt(tfa98xx_handle_t dev_idx,
 }
 
 /* wrapper function */
-void get_hw_features_from_cnt(tfa98xx_handle_t dev_idx,
+void get_hw_features_from_cnt(int dev_idx,
 	int *hw_feature_register)
 {
 	int sw_feature_register[2];
@@ -2851,7 +2851,7 @@ void get_hw_features_from_cnt(tfa98xx_handle_t dev_idx,
 }
 
 /* wrapper function */
-void get_sw_features_from_cnt(tfa98xx_handle_t dev_idx,
+void get_sw_features_from_cnt(int dev_idx,
 	int sw_feature_register[2])
 {
 	int hw_feature_register;
@@ -2860,7 +2860,7 @@ void get_sw_features_from_cnt(tfa98xx_handle_t dev_idx,
 }
 
 /* Factory trimming for the Boost converter */
-void tfa_factory_trimmer(tfa98xx_handle_t dev_idx)
+void tfa_factory_trimmer(int dev_idx)
 {
 	unsigned short current_value, delta;
 	int result;

@@ -383,24 +383,22 @@ struct regdef {
 	char *name;	      /**< short register name */
 };
 
-#define tfa98xx_handle_t int
-
 /**
  * Open the instance handle
  */
-enum tfa98xx_error tfa98xx_open(tfa98xx_handle_t handle);
+enum tfa98xx_error tfa98xx_open(int handle);
 
 /**
  * Load the default HW settings in the device
  */
-enum tfa98xx_error tfa98xx_init(tfa98xx_handle_t handle);
+enum tfa98xx_error tfa98xx_init(int handle);
 
 /**
  * Return the tfa revision
  */
 void tfa98xx_rev(int *major, int *minor, int *revision);
 
-enum tfa98xx_dmem tfa98xx_filter_mem(tfa98xx_handle_t dev,
+enum tfa98xx_dmem tfa98xx_filter_mem(int dev,
 			int filter_index, unsigned short *address, int channel);
 
 /**
@@ -419,18 +417,18 @@ const char *tfa98xx_get_i2c_status_id_string(int status);
 /**
  * Close the instance handle
  */
-enum tfa98xx_error tfa98xx_close(tfa98xx_handle_t handle);
+enum tfa98xx_error tfa98xx_close(int handle);
 
 /* control the powerdown bit
  * @param powerdown must be 1 or 0
  */
-enum tfa98xx_error tfa98xx_powerdown(tfa98xx_handle_t handle,
+enum tfa98xx_error tfa98xx_powerdown(int handle,
 				  int powerdown);
 
 /* indicates on which channel of DATAI2 the gain from the IC is set
  * @param gain_sel, see Tfa98xx_StereoGainSel_t
  */
-enum tfa98xx_error tfa98xx_select_stereo_gain_channel(tfa98xx_handle_t handle,
+enum tfa98xx_error tfa98xx_select_stereo_gain_channel(int handle,
 						enum tfa98xx_stereo_gain_sel
 						gain_sel);
 
@@ -440,9 +438,9 @@ enum tfa98xx_error tfa98xx_select_stereo_gain_channel(tfa98xx_handle_t handle,
  * @param mask to be applied toi the bits affected
  */
 enum tfa98xx_error tfa98xx_set_mtp
-(tfa98xx_handle_t handle, uint16_t value, uint16_t mask);
+(int handle, uint16_t value, uint16_t mask);
 enum tfa98xx_error tfa98xx_get_mtp
-(tfa98xx_handle_t handle, uint16_t *value);
+(int handle, uint16_t *value);
 
 /**
  * lock or unlock KEY2
@@ -450,37 +448,37 @@ enum tfa98xx_error tfa98xx_get_mtp
  * lock = 0 will unlock
  * note that on return all the hidden key will be off
  */
-void tfa98xx_key2(tfa98xx_handle_t handle, int lock);
+void tfa98xx_key2(int handle, int lock);
 
-int tfa_calibrate(tfa98xx_handle_t handle) ;
-enum tfa98xx_error tfa_tfadsp_calibrate(tfa98xx_handle_t handle);
+int tfa_calibrate(int handle) ;
+enum tfa98xx_error tfa_tfadsp_calibrate(int handle);
 enum tfa98xx_error tfa_calibration_range_check
-(tfa98xx_handle_t handle, unsigned int channel, int mohm);
-void tfa98xx_set_exttemp(tfa98xx_handle_t handle, short ext_temp);
-short tfa98xx_get_exttemp(tfa98xx_handle_t handle);
+(int handle, unsigned int channel, int mohm);
+void tfa98xx_set_exttemp(int handle, short ext_temp);
+short tfa98xx_get_exttemp(int handle);
 
 /* control the volume of the DSP
  * @param vol volume in bit field. It must be between 0 and 255
  */
-enum tfa98xx_error tfa98xx_set_volume_level(tfa98xx_handle_t handle,
+enum tfa98xx_error tfa98xx_set_volume_level(int handle,
 				  unsigned short vol);
 
 /* set the input channel to use
  * @param channel see TFA98XX_CHANNEL_t enumeration
  */
-enum tfa98xx_error tfa98xx_select_channel(tfa98xx_handle_t handle,
+enum tfa98xx_error tfa98xx_select_channel(int handle,
 				      enum tfa98xx_channel channel);
 
 /* set the mode for normal or receiver mode
  * @param mode see Tfa98xx_Mode enumeration
  */
 enum tfa98xx_error tfa98xx_select_mode
-(tfa98xx_handle_t handle, enum tfa98xx_mode mode);
+(int handle, enum tfa98xx_mode mode);
 
 /* mute/unmute the audio
  * @param mute see Tfa98xx_Mute_t enumeration
  */
-enum tfa98xx_error tfa98xx_set_mute(tfa98xx_handle_t handle,
+enum tfa98xx_error tfa98xx_set_mute(int handle,
 				enum tfa98xx_mute mute);
 
 /*
@@ -488,21 +486,21 @@ enum tfa98xx_error tfa98xx_set_mute(tfa98xx_handle_t handle,
  *  returns the number of the supported speaker count
  */
 enum tfa98xx_error tfa98xx_supported_speakers
-(tfa98xx_handle_t handle, int *spkr_count);
+(int handle, int *spkr_count);
 
 /*
  * Return the feature bits from MTP and cnt file for comparison
  */
 enum tfa98xx_error tfa98xx_compare_features
-(tfa98xx_handle_t handle, int features_from_MTP[3], int features_from_cnt[3]);
+(int handle, int features_from_MTP[3], int features_from_cnt[3]);
 
 /*
  * return feature bits
  */
 enum tfa98xx_error
-tfa98xx_dsp_get_sw_feature_bits(tfa98xx_handle_t handle, int features[2]);
+tfa98xx_dsp_get_sw_feature_bits(int handle, int features[2]);
 enum tfa98xx_error
-tfa98xx_dsp_get_hw_feature_bits(tfa98xx_handle_t handle, int *features);
+tfa98xx_dsp_get_hw_feature_bits(int handle, int *features);
 /*
  * tfa98xx_supported_dai
  *  returns the bitmap of the supported Digital Audio Interfaces
@@ -510,7 +508,7 @@ tfa98xx_dsp_get_hw_feature_bits(tfa98xx_handle_t handle, int *features);
  *  @return error code
  */
 enum tfa98xx_error tfa98xx_supported_dai
-(tfa98xx_handle_t handle, enum tfa98xx_dai_bitmap *daimap);
+(int handle, enum tfa98xx_dai_bitmap *daimap);
 
 /*
  * tfa98xx_supported_saam
@@ -519,7 +517,7 @@ enum tfa98xx_error tfa98xx_supported_dai
  *  @return error code
  */
 enum tfa98xx_error tfa98xx_supported_saam
-(tfa98xx_handle_t handle, enum tfa98xx_saam *saam);
+(int handle, enum tfa98xx_saam *saam);
 
 /*
  * tfa98xx_set_saam_use_case
@@ -538,7 +536,7 @@ enum tfa98xx_error tfa98xx_set_stream_state(int stream_state);
  *   @return error code
  */
 enum tfa98xx_error tfa98xx_dsp_write_tables
-(tfa98xx_handle_t handle, int sample_rate);
+(int handle, int sample_rate);
 
 /* Set the boost trip level
  *   called every startup, profile switch or volume switch
@@ -551,7 +549,7 @@ enum tfa98xx_error tfa98xx_set_boost_trip_level(void);
  * @param new state
  * @return error code
  */
-enum tfa98xx_error tfa98xx_dsp_reset(tfa98xx_handle_t handle, int state);
+enum tfa98xx_error tfa98xx_dsp_reset(int handle, int state);
 
 /* check the state of the DSP subsystem
  * return ready = 1 when clocks are stable to allow safe DSP subsystem access
@@ -559,13 +557,13 @@ enum tfa98xx_error tfa98xx_dsp_reset(tfa98xx_handle_t handle, int state);
  * @return error code
  */
 enum tfa98xx_error tfa98xx_dsp_system_stable
-(tfa98xx_handle_t handle, int *ready);
+(int handle, int *ready);
 
 /**
  * check the state of the DSP coolflux
  * returns the value of CFE
  */
-int tfa98xx_cf_enabled(tfa98xx_handle_t dev_idx);
+int tfa98xx_cf_enabled(int dev_idx);
 
 /* The following functions can only be called when the DSP is running
  * - I2S clock must be active,
@@ -578,26 +576,26 @@ int tfa98xx_cf_enabled(tfa98xx_handle_t dev_idx);
  * @param patch_length the number of bytes of patch_bytes
  * @param patch_bytes pointer to the bytes to patch
  */
-enum tfa98xx_error tfa_dsp_patch(tfa98xx_handle_t handle,
+enum tfa98xx_error tfa_dsp_patch(int handle,
 				 int patch_length,
 				 const unsigned char *patch_bytes);
 
 /**
  * return the tfa device family id
  */
-int tfa98xx_dev_family(tfa98xx_handle_t dev_idx);
+int tfa98xx_dev_family(int dev_idx);
 
 /**
  * return the device revision id
  */
-unsigned short tfa98xx_dev_revision(tfa98xx_handle_t dev_idx);
+unsigned short tfa98xx_dev_revision(int dev_idx);
 
 /**
  * load explicitly the speaker parameters in case of free speaker,
  * or when using a saved speaker model
  */
 enum tfa98xx_error tfa98xx_dsp_write_speaker_parameters(
-				tfa98xx_handle_t handle,
+				int handle,
 				int length,
 				const unsigned char *pSpeakerBytes);
 
@@ -605,7 +603,7 @@ enum tfa98xx_error tfa98xx_dsp_write_speaker_parameters(
  * read the speaker parameters as used by the SpeakerBoost processing
  */
 enum tfa98xx_error tfa98xx_dsp_read_speaker_parameters(
-				tfa98xx_handle_t handle,
+				int handle,
 				int length,
 				unsigned char *pSpeakerBytes);
 
@@ -614,7 +612,7 @@ enum tfa98xx_error tfa98xx_dsp_read_speaker_parameters(
  * not essential to be used in a product
  */
 enum tfa98xx_error tfa98xx_dsp_get_state_info(
-				tfa98xx_handle_t handle,
+				int handle,
 				unsigned char bytes[],
 				unsigned int *statesize);
 
@@ -623,32 +621,32 @@ enum tfa98xx_error tfa98xx_dsp_get_state_info(
  * pb_support_drc=1 when DSP supports DRC,
  * pb_support_drc=0 when DSP doesn't support it
  */
-enum tfa98xx_error tfa98xx_dsp_support_drc(tfa98xx_handle_t handle,
+enum tfa98xx_error tfa98xx_dsp_support_drc(int handle,
 				      int *pb_support_drc);
 
 enum tfa98xx_error
 tfa98xx_dsp_support_framework
-(tfa98xx_handle_t handle, int *pb_support_framework);
+(int handle, int *pb_support_framework);
 
 /**
  * read the speaker excursion model as used by SpeakerBoost processing
  */
 enum tfa98xx_error tfa98xx_dsp_read_excursion_model(
-				tfa98xx_handle_t handle,
+				int handle,
 				int length,
 				unsigned char *pSpeakerBytes);
 
 /**
  * load all the parameters for a preset from a file
  */
-enum tfa98xx_error tfa98xx_dsp_write_preset(tfa98xx_handle_t handle,
+enum tfa98xx_error tfa98xx_dsp_write_preset(int handle,
 				       int length, const unsigned char
 				       *pPresetBytes);
 
 /**
  * wrapper for dsp_msg that adds opcode and only writes
  */
-enum tfa98xx_error tfa_dsp_cmd_id_write(tfa98xx_handle_t handle,
+enum tfa98xx_error tfa_dsp_cmd_id_write(int handle,
 			   unsigned char module_id,
 			   unsigned char param_id, int num_bytes,
 			   const unsigned char data[]);
@@ -656,7 +654,7 @@ enum tfa98xx_error tfa_dsp_cmd_id_write(tfa98xx_handle_t handle,
 /**
  * wrapper for dsp_msg that writes opcode and reads back the data
  */
-enum tfa98xx_error tfa_dsp_cmd_id_write_read(tfa98xx_handle_t handle,
+enum tfa98xx_error tfa_dsp_cmd_id_write_read(int handle,
 			   unsigned char module_id,
 			   unsigned char param_id, int num_bytes,
 			   unsigned char data[]);
@@ -664,7 +662,7 @@ enum tfa98xx_error tfa_dsp_cmd_id_write_read(tfa98xx_handle_t handle,
 /**
  * wrapper for dsp_msg that adds opcode and 3 bytes required for coefs
  */
-enum tfa98xx_error tfa_dsp_cmd_id_coefs(tfa98xx_handle_t handle,
+enum tfa98xx_error tfa_dsp_cmd_id_coefs(int handle,
 			   unsigned char module_id,
 			   unsigned char param_id, int num_bytes,
 			   unsigned char data[]);
@@ -672,7 +670,7 @@ enum tfa98xx_error tfa_dsp_cmd_id_coefs(tfa98xx_handle_t handle,
 /**
  * wrapper for dsp_msg that adds opcode and 3 bytes required for MBDrcDynamics
  */
-enum tfa98xx_error tfa_dsp_cmd_id_mbdrc_dynamics(tfa98xx_handle_t handle,
+enum tfa98xx_error tfa_dsp_cmd_id_mbdrc_dynamics(int handle,
 			   unsigned char module_id,
 			   unsigned char param_id, int index_subband,
 			   int num_bytes, unsigned char data[]);
@@ -682,7 +680,7 @@ enum tfa98xx_error tfa_dsp_cmd_id_mbdrc_dynamics(tfa98xx_handle_t handle,
  * @param handle to opened instance
  * @param biquad_index: 1-10 of the biquad that needs to be adressed
  */
-enum tfa98xx_error tfa98xx_dsp_biquad_disable(tfa98xx_handle_t handle,
+enum tfa98xx_error tfa98xx_dsp_biquad_disable(int handle,
 			   int biquad_index);
 
 /**
@@ -690,19 +688,19 @@ enum tfa98xx_error tfa98xx_dsp_biquad_disable(tfa98xx_handle_t handle,
  * assume that the device has been calibrated
  */
 enum tfa98xx_error
-tfa_dsp_get_calibration_impedance(tfa98xx_handle_t handle);
+tfa_dsp_get_calibration_impedance(int handle);
 enum tfa98xx_error
-tfa_tfadsp_get_calibration_impedance(tfa98xx_handle_t handle);
+tfa_tfadsp_get_calibration_impedance(int handle);
 
 /*
  * return the mohm value
  */
-int tfa_get_calibration_info(tfa98xx_handle_t handle, int channel);
+int tfa_get_calibration_info(int handle, int channel);
 
 /*
  * return sign extended tap pattern
  */
-int tfa_get_tap_pattern(tfa98xx_handle_t handle);
+int tfa_get_tap_pattern(int handle);
 
 /**
  * Reads a number of words from dsp memory
@@ -710,7 +708,7 @@ int tfa_get_tap_pattern(tfa98xx_handle_t handle);
  * @param subaddress write address to set in address register
  * @param p_value pointer to read data
  */
-enum tfa98xx_error tfa98xx_read_register16(tfa98xx_handle_t handle,
+enum tfa98xx_error tfa98xx_read_register16(int handle,
 				       unsigned char subaddress,
 				       unsigned short *p_value);
 
@@ -720,7 +718,7 @@ enum tfa98xx_error tfa98xx_read_register16(tfa98xx_handle_t handle,
  * @param subaddress write address to set in address register
  * @param value value to write int the memory
  */
-enum tfa98xx_error tfa98xx_write_register16(tfa98xx_handle_t handle,
+enum tfa98xx_error tfa98xx_write_register16(int handle,
 					unsigned char subaddress,
 					unsigned short value);
 
@@ -731,7 +729,7 @@ enum tfa98xx_error tfa98xx_write_register16(tfa98xx_handle_t handle,
  * @param num_words number of words to read
  * @param p_values pointer to read data
  */
-enum tfa98xx_error tfa98xx_dsp_read_mem(tfa98xx_handle_t handle,
+enum tfa98xx_error tfa98xx_dsp_read_mem(int handle,
 				   unsigned int start_offset,
 				   int num_words, int *p_values);
 /**
@@ -742,7 +740,7 @@ enum tfa98xx_error tfa98xx_dsp_read_mem(tfa98xx_handle_t handle,
  * @param memtype type of memory to write to
  */
 enum tfa98xx_error tfa98xx_dsp_write_mem_word
-(tfa98xx_handle_t handle, unsigned short address, int value, int memtype);
+(int handle, unsigned short address, int value, int memtype);
 
 /**
  * Read data from dsp memory
@@ -751,7 +749,7 @@ enum tfa98xx_error tfa98xx_dsp_write_mem_word
  * @param num_bytes number of bytes to read from dsp
  * @param data the unsigned char buffer to read data into
  */
-enum tfa98xx_error tfa98xx_read_data(tfa98xx_handle_t handle,
+enum tfa98xx_error tfa98xx_read_data(int handle,
 				 unsigned char subaddress,
 				 int num_bytes, unsigned char data[]);
 
@@ -762,12 +760,12 @@ enum tfa98xx_error tfa98xx_read_data(tfa98xx_handle_t handle,
  * @param num_bytes number of bytes to write
  * @param data actual data to write
  */
-enum tfa98xx_error tfa98xx_write_data(tfa98xx_handle_t handle,
+enum tfa98xx_error tfa98xx_write_data(int handle,
 				  unsigned char subaddress,
 				  int num_bytes,
 				  const unsigned char data[]);
 
-enum tfa98xx_error tfa98xx_write_raw(tfa98xx_handle_t handle,
+enum tfa98xx_error tfa98xx_write_raw(int handle,
 				     int num_bytes,
 				     const unsigned char data[]);
 
@@ -787,12 +785,12 @@ void tfa98xx_convert_data2bytes(int num_data, const int data[],
 
 /* return the device revision id
  */
-unsigned short tfa98xx_get_device_revision(tfa98xx_handle_t handle);
+unsigned short tfa98xx_get_device_revision(int handle);
 
 /**
  * return the device digital audio interface (DAI) type bitmap
  */
-enum tfa98xx_dai_bitmap tfa98xx_get_device_dai(tfa98xx_handle_t handle);
+enum tfa98xx_dai_bitmap tfa98xx_get_device_dai(int handle);
 
 /**
  * convert memory bytes to signed 24 bit integers
@@ -814,7 +812,7 @@ void tfa98xx_convert_bytes2data(int num_bytes, const unsigned char bytes[],
  * @param bytes output data as unsigned char array
  */
 enum tfa98xx_error tfa98xx_dsp_get_memory
-(tfa98xx_handle_t handle, int memory_type, int offset,
+(int handle, int memory_type, int offset,
 	int length, unsigned char bytes[]);
 
 /**
@@ -826,12 +824,12 @@ enum tfa98xx_error tfa98xx_dsp_get_memory
  * @param value the value to write to the dsp
  */
 enum tfa98xx_error tfa98xx_dsp_set_memory
-(tfa98xx_handle_t handle, int memory_type, int offset, int length, int value);
+(int handle, int memory_type, int offset, int length, int value);
 
 enum tfa98xx_error tfa98xx_dsp_write_config
-(tfa98xx_handle_t handle, int length, const unsigned char *p_config_bytes);
+(int handle, int length, const unsigned char *p_config_bytes);
 enum tfa98xx_error tfa98xx_dsp_write_drc
-(tfa98xx_handle_t handle, int length, const unsigned char *p_drc_bytes);
+(int handle, int length, const unsigned char *p_drc_bytes);
 
 /**
  * write/read raw msg functions :
@@ -843,32 +841,32 @@ enum tfa98xx_error tfa98xx_dsp_write_drc
  * @param buf character buffer to write
  */
 enum tfa98xx_error tfa_dsp_msg
-(tfa98xx_handle_t handle, int length, const char *buf);
+(int handle, int length, const char *buf);
 
 /**
  * The wrapper functions to call the dsp msg, register and memory function
  * for tfa or probus
  */
 enum tfa98xx_error dsp_msg
-(tfa98xx_handle_t handle, int length, const char *buf);
+(int handle, int length, const char *buf);
 #if defined(TFADSP_DSP_MSG_APR_PACKET_STRATEGY)
 enum tfa98xx_error dsp_msg_packet
-(tfa98xx_handle_t handle, uint8_t *blob, int tfadsp_buf_size);
+(int handle, uint8_t *blob, int tfadsp_buf_size);
 #endif
 enum tfa98xx_error dsp_msg_read
-(tfa98xx_handle_t handle, int length, unsigned char *bytes);
+(int handle, int length, unsigned char *bytes);
 enum tfa98xx_error reg_write
-(tfa98xx_handle_t handle, unsigned char subaddress, unsigned short value);
+(int handle, unsigned char subaddress, unsigned short value);
 enum tfa98xx_error reg_read
-(tfa98xx_handle_t handle, unsigned char subaddress, unsigned short *value);
+(int handle, unsigned char subaddress, unsigned short *value);
 enum tfa98xx_error mem_write
-(tfa98xx_handle_t handle, unsigned short address, int value, int memtype);
+(int handle, unsigned short address, int value, int memtype);
 enum tfa98xx_error mem_read
-(tfa98xx_handle_t handle, unsigned int start_offset,
+(int handle, unsigned int start_offset,
 	int num_words, int *p_values);
 
 enum tfa98xx_error dsp_partial_coefficients
-(tfa98xx_handle_t dev_idx, uint8_t *prev, uint8_t *next);
+(int dev_idx, uint8_t *prev, uint8_t *next);
 
 /**
  * write/read raw msg functions:
@@ -882,7 +880,7 @@ enum tfa98xx_error dsp_partial_coefficients
  * @param cmdid command identifier
  */
 enum tfa98xx_error tfa_dsp_msg_id
-(tfa98xx_handle_t handle, int length, const char *buf, uint8_t cmdid[3]);
+(int handle, int length, const char *buf, uint8_t cmdid[3]);
 
 /**
  * write raw dsp msg functions
@@ -891,7 +889,7 @@ enum tfa98xx_error tfa_dsp_msg_id
  * @param buffer character buffer to write
  */
 enum tfa98xx_error tfa_dsp_msg_write
-(tfa98xx_handle_t handle, int length, const char *buffer);
+(int handle, int length, const char *buffer);
 
 /**
  * write raw dsp msg functions
@@ -901,7 +899,7 @@ enum tfa98xx_error tfa_dsp_msg_write
  * @param cmdid command identifier
  */
 enum tfa98xx_error tfa_dsp_msg_write_id
-(tfa98xx_handle_t handle, int length, const char *buffer, uint8_t cmdid[3]);
+(int handle, int length, const char *buffer, uint8_t cmdid[3]);
 
 /**
  * status function used by tfa_dsp_msg() to retrieve command/msg status:
@@ -910,7 +908,7 @@ enum tfa98xx_error tfa_dsp_msg_write_id
  * @param p_rpc_status status for remote processor communication
  */
 enum tfa98xx_error tfa_dsp_msg_status
-(tfa98xx_handle_t handle, int *p_rpc_status);
+(int handle, int *p_rpc_status);
 
 /**
  * Read a message from dsp
@@ -918,22 +916,22 @@ enum tfa98xx_error tfa_dsp_msg_status
  * @param bytes pointer to unsigned char buffer
  */
 enum tfa98xx_error tfa_dsp_msg_read
-(tfa98xx_handle_t handle, int length, unsigned char *bytes);
+(int handle, int length, unsigned char *bytes);
 
 
 void create_dsp_buffer_msg(struct tfa_msg *msg, char *buffer, int *size);
 
 int tfa_set_bf
-(tfa98xx_handle_t dev_idx, const uint16_t bf, const uint16_t value);
+(int dev_idx, const uint16_t bf, const uint16_t value);
 int tfa_set_bf_volatile
-(tfa98xx_handle_t dev_idx, const uint16_t bf, const uint16_t value);
+(int dev_idx, const uint16_t bf, const uint16_t value);
 
 /**
  * Get the value of a given bitfield
  * @param dev_idx this is the device index
  * @param bf the value indicating which bitfield
  */
-int tfa_get_bf(tfa98xx_handle_t dev_idx, const uint16_t bf);
+int tfa_get_bf(int dev_idx, const uint16_t bf);
 
 /**
  * Set the value of a given bitfield
@@ -946,8 +944,8 @@ int tfa_set_bf_value
 
 uint16_t tfa_get_bf_value(const uint16_t bf, const uint16_t reg_value);
 int tfa_write_reg
-(tfa98xx_handle_t dev_idx, const uint16_t bf, const uint16_t reg_value);
-int tfa_read_reg(tfa98xx_handle_t dev_idx, const uint16_t bf);
+(int dev_idx, const uint16_t bf, const uint16_t reg_value);
+int tfa_read_reg(int dev_idx, const uint16_t bf);
 
 /* bitfield */
 /**
@@ -1021,35 +1019,35 @@ uint16_t tfa_cont_bf_enum_any(const char *name);
  * run the startup/init sequence and set ACS bit
  * @param state the cold start state that is requested
  */
-enum tfa98xx_error tfa_run_coldboot(tfa98xx_handle_t handle, int state);
-enum tfa98xx_error tfa_run_mute(tfa98xx_handle_t handle);
-enum tfa98xx_error tfa_run_unmute(tfa98xx_handle_t handle);
+enum tfa98xx_error tfa_run_coldboot(int handle, int state);
+enum tfa98xx_error tfa_run_mute(int handle);
+enum tfa98xx_error tfa_run_unmute(int handle);
 
 /**
  * wait for calibrate_done
  * @param calibrate_done pointer to status of calibration
  */
 enum tfa98xx_error tfa_run_wait_calibration
-(tfa98xx_handle_t handle, int *calibrate_done);
+(int handle, int *calibrate_done);
 
 /**
  * run the startup/init sequence and set ACS bit
  * @param profile the profile that should be loaded
  */
-enum tfa98xx_error tfa_run_coldstartup(tfa98xx_handle_t handle, int profile);
+enum tfa98xx_error tfa_run_coldstartup(int handle, int profile);
 
 /**
  *  this will load the patch witch will implicitly start the DSP
  *   if no patch is available the DPS is started immediately
  */
-enum tfa98xx_error tfa_run_start_dsp(tfa98xx_handle_t handle);
+enum tfa98xx_error tfa_run_start_dsp(int handle);
 
 /**
  * start the clocks and wait until the AMP is switching
  * on return the DSP sub system will be ready for loading
  * @param profile the profile that should be loaded on startup
  */
-enum tfa98xx_error tfa_run_startup(tfa98xx_handle_t handle, int profile);
+enum tfa98xx_error tfa_run_startup(int handle, int profile);
 
 /**
  * start the maximus speakerboost algorithm
@@ -1058,7 +1056,7 @@ enum tfa98xx_error tfa_run_startup(tfa98xx_handle_t handle, int profile);
  * @param profile the profile that should be loaded
  */
 enum tfa98xx_error tfa_run_speaker_boost
-(tfa98xx_handle_t handle, int force, int profile);
+(int handle, int force, int profile);
 
 /**
  * Startup the device and write all files from device and profile section
@@ -1066,35 +1064,35 @@ enum tfa98xx_error tfa_run_speaker_boost
  * @param profile the profile that should be loaded on speaker startup
  */
 enum tfa98xx_error tfa_run_speaker_startup
-(tfa98xx_handle_t handle, int force, int profile);
+(int handle, int force, int profile);
 
 /**
  * Run calibration
  * @param profile the profile that should be loaded
  */
 enum tfa98xx_error tfa_run_speaker_calibration
-(tfa98xx_handle_t handle, int profile);
-enum tfa98xx_error tfa_set_calibration_values(tfa98xx_handle_t handle);
+(int handle, int profile);
+enum tfa98xx_error tfa_set_calibration_values(int handle);
 
 enum tfa98xx_error tfa_mtp_get_calibration
-(tfa98xx_handle_t handle, uint16_t *cal_data);
+(int handle, uint16_t *cal_data);
 enum tfa98xx_error tfa_mtp_set_calibration
-(tfa98xx_handle_t handle, uint16_t cal_data);
+(int handle, uint16_t cal_data);
 
 /**
  * startup all devices. all step until patch loading is handled
  */
-int tfa_run_startup_all(tfa98xx_handle_t *handles);
+int tfa_run_startup_all(int *handles);
 
 /**
  * powerup the coolflux subsystem and wait for it
  */
-enum tfa98xx_error tfa_cf_powerup(tfa98xx_handle_t handle);
+enum tfa98xx_error tfa_cf_powerup(int handle);
 
 /*
  * print the current device manager state
  */
-enum tfa98xx_error show_current_state(tfa98xx_handle_t handle);
+enum tfa98xx_error show_current_state(int handle);
 
 /**
  * set verbosity level
@@ -1112,7 +1110,7 @@ void tfa_dsp_verbose(int level);
 /**
  * Init registers and coldboot dsp
  */
-int tfa98xx_reset(tfa98xx_handle_t handle);
+int tfa98xx_reset(int handle);
 
 /**
  * @param dev_idx is the device index
@@ -1130,52 +1128,52 @@ enum tfa98xx_error tfa_soft_probe(int dev_idx, int revid);
 /**
  * Get profile from a register
  */
-int tfa_get_swprof(tfa98xx_handle_t handle);
+int tfa_get_swprof(int handle);
 
 /**
  * Save profile in a register
  */
-int tfa_set_swprof(tfa98xx_handle_t handle, unsigned short new_value);
+int tfa_set_swprof(int handle, unsigned short new_value);
 
-int tfa_get_swvstep(tfa98xx_handle_t handle);
+int tfa_get_swvstep(int handle);
 
-int tfa_set_swvstep(tfa98xx_handle_t handle, unsigned short new_value);
+int tfa_set_swvstep(int handle, unsigned short new_value);
 
-int tfa_is_cold(tfa98xx_handle_t handle);
+int tfa_is_cold(int handle);
 
-int tfa_is_cold_amp(tfa98xx_handle_t handle);
+int tfa_is_cold_amp(int handle);
 
-int tfa_cf_enabled(tfa98xx_handle_t handle);
+int tfa_cf_enabled(int handle);
 
 /* tfa2 interrupt support */
 /*
  * interrupt bit function to clear
  */
-int tfa_irq_clear(tfa98xx_handle_t handle, int bit);
+int tfa_irq_clear(int handle, int bit);
 /*
  * return state of irq or -1 if illegal bit
  */
-int tfa_irq_get(tfa98xx_handle_t handle, int bit);
+int tfa_irq_get(int handle, int bit);
 /*
  * interrupt bit function that operates on the shadow regs in the handle
  */
-int tfa_irq_ena(tfa98xx_handle_t handle, int bit, int state);
+int tfa_irq_ena(int handle, int bit, int state);
 /*
  * interrupt bit function that sets the polarity
  */
-int tfa_irq_set_pol(tfa98xx_handle_t handle, int bit, int state);
+int tfa_irq_set_pol(int handle, int bit, int state);
 /*
  * update dirty cached regs to i2c registers
  */
-void tfa_irq_update(tfa98xx_handle_t handle);
+void tfa_irq_update(int handle);
 /*
  * mask interrupts by disabling them
  */
-int tfa_irq_mask(tfa98xx_handle_t handle);
+int tfa_irq_mask(int handle);
 /*
  * unmask interrupts by enabling them again
  */
-int tfa_irq_unmask(tfa98xx_handle_t handle);
+int tfa_irq_unmask(int handle);
 
 #ifdef __cplusplus
 }
