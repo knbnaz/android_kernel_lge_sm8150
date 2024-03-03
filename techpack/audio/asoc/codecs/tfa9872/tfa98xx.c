@@ -208,10 +208,10 @@ static struct tfa98xx_rate rate_to_fssel[] = {
 };
 
 /* Wrapper for tfa start */
-static enum tfa_error
+static enum tfa98xx_error
 tfa98xx_tfa_start(struct tfa98xx *tfa98xx, int next_profile, int *vstep)
 {
-	enum tfa_error err;
+	enum tfa98xx_error err;
 
 	err = tfa_start(next_profile, vstep);
 
@@ -1081,7 +1081,7 @@ static ssize_t tfa98xx_dbgfs_dsp_state_set(struct file *file,
 {
 	struct i2c_client *i2c = file->private_data;
 	struct tfa98xx *tfa98xx = i2c_get_clientdata(i2c);
-	enum tfa_error ret;
+	enum tfa98xx_error ret;
 	char buf[32];
 	const char start_cmd[] = "start";
 	const char stop_cmd[] = "stop";
@@ -1713,7 +1713,7 @@ static int tfa98xx_set_vstep(struct snd_kcontrol *kcontrol,
 			tfa98xx_open(tfa98xx->handle);
 			tfa98xx_close(tfa98xx->handle);
 
-			err = tfa98xx_tfa_start
+			err = (int)tfa98xx_tfa_start
 				(tfa98xx, profile, tfa98xx_vsteps);
 			if (err)
 				pr_err("Write vstep error: %d\n", err);
@@ -1784,7 +1784,7 @@ static int tfa98xx_set_profile(struct snd_kcontrol *kcontrol,
 	int profile_count = tfa98xx_mixer_profiles;
 	int profile = tfa98xx_mixer_profile;
 	int new_profile = ucontrol->value.integer.value[0];
-	int err;
+	enum tfa98xx_error err;
 	int prof_idx;
 
 	if (no_start != 0)
@@ -2993,7 +2993,7 @@ static void
 tfa98xx_container_loaded(const struct firmware *cont,	void *context)
 {
 	struct tfa98xx *tfa98xx = context;
-	enum tfa_error tfa_err;
+	enum tfa98xx_error tfa_err;
 	int container_size;
 	int handle;
 #if defined(TFA_DBGFS_CHECK_MTPEX)
@@ -3040,7 +3040,7 @@ tfa98xx_container_loaded(const struct firmware *cont,	void *context)
 		 partial_enable ? "enable" : "disable");
 
 	tfa_err = tfa_load_cnt(container, container_size);
-	if (tfa_err != tfa_error_ok) {
+	if (tfa_err != TFA98XX_ERROR_OK) {
 		dev_err(tfa98xx->dev, "Cannot load container file, aborting\n");
 		mutex_unlock(&probe_lock);
 		return;
@@ -3305,7 +3305,7 @@ tfa_monitor_exit:
 
 static void tfa98xx_dsp_init(struct tfa98xx *tfa98xx)
 {
-	int ret;
+	enum tfa98xx_error ret;
 	bool failed = false;
 	bool reschedule = false;
 

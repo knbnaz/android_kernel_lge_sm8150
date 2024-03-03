@@ -26,7 +26,7 @@ void tfa_set_partial_update(int enp);
  * @param length the length of the container file
  * @return tfa_error
  */
-enum tfa_error tfa_load_cnt(void *cnt, int length);
+enum tfa98xx_error tfa_load_cnt(void *cnt, int length);
 
 /**
  * Resets init variables

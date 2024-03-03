@@ -106,7 +106,7 @@ TFA_INTERNAL struct tfa98xx_handle_private handles_local[MAX_HANDLES];
 /* calibration done executed */
 #define TFA_MTPEX_POS	TFA98XX_KEY2_PROTECTED_MTP0_MTPEX_POS /**/
 
-static enum tfa_error _tfa_stop(int handle);
+static enum tfa98xx_error _tfa_stop(int handle);
 
 /*
  * static variables
@@ -577,7 +577,7 @@ int tfa98xx_buffer_pool_access(int handle,
 			    .buf_pool[index].in_use)
 				continue;
 			if (handles_local[handle]
-			    .buf_pool[index].size < g_size)
+			    .buf_pool[index].size < (int)g_size)
 				continue;
 			handles_local[handle]
 				.buf_pool[index].in_use = 1;
@@ -611,7 +611,7 @@ int tfa98xx_buffer_pool_access(int handle,
 		break;
 	}
 
-	return TFA_ERROR;
+	return (int)TFA_ERROR;
 }
 #endif // TFADSP_DSP_BUFFER_POOL
 
@@ -2028,7 +2028,7 @@ void tfa_dsp_mem_register(int dev_idx,
 enum tfa98xx_error dsp_msg(int handle, int length, const char *buf)
 {
 	enum tfa98xx_error error = 0;
-	static int lastmessage;
+	int lastmessage;
 	uint8_t *blob = NULL;
 #if defined(TFADSP_DSP_BUFFER_POOL)
 	int blob_p_index = -1;
@@ -2070,14 +2070,14 @@ enum tfa98xx_error dsp_msg(int handle, int length, const char *buf)
 	buf32_len = (length/3)*4;
 #if defined(TFADSP_DSP_BUFFER_POOL)
 	buf32_p_index = tfa98xx_buffer_pool_access
-		(handle, -1, buf32_len, POOL_GET);
+		(handle, -1, (size_t)buf32_len, POOL_GET);
 	if (buf32_p_index != -1) {
 		pr_debug("%s: allocated from buffer_pool[%d] for %d bytes\n",
 			__func__, buf32_p_index, buf32_len);
 		buf32 = (int32_t *)(handles_local[handle]
 			.buf_pool[buf32_p_index].pool);
 	} else {
-		buf32 = kmalloc(buf32_len, GFP_KERNEL);
+		buf32 = kmalloc((size_t)buf32_len, GFP_KERNEL);
 		if (buf32 == NULL) {
 			pr_err("%s: kmalloc error %d bytes\n",
 				__func__, buf32_len);
@@ -2085,7 +2085,7 @@ enum tfa98xx_error dsp_msg(int handle, int length, const char *buf)
 		}
 	}
 #else
-	buf32 = kmalloc(buf32_len, GFP_KERNEL);
+	buf32 = kmalloc((size_t)buf32_len, GFP_KERNEL);
 	if (buf32 == NULL) {
 		pr_debug("%s: kmalloc error %d bytes\n",
 			__func__, buf32_len);
@@ -2094,9 +2094,9 @@ enum tfa98xx_error dsp_msg(int handle, int length, const char *buf)
 #endif // TFADSP_DSP_BUFFER_POOL
 
 	/*convert 24 bits -> 32 bits */
-	tfa_msg24to32(buf32, buf, length);
+	tfa_msg24to32(buf32, (uint8_t *)buf, length);
 
-	tfadsp_buf = (char *) buf32;
+	tfadsp_buf = (const char *) buf32;
 	tfadsp_buf_size = buf32_len;
 #endif // (TFADSP_32BITS)
 
@@ -2181,11 +2181,11 @@ enum tfa98xx_error dsp_msg(int handle, int length, const char *buf)
 						0, POOL_RETURN);
 					blob_p_index = -1;
 				} else {
-					kfree(blob);
+					kfree((const void *)blob);
 					blob = NULL;
 				}
 #else
-				kfree(blob); /* Free the kmalloc blob */
+				kfree((const void *)blob); /* Free the kmalloc blob */
 				blob = NULL;
 #endif // TFADSP_DSP_BUFFER_POOL
 				lastmessage = 0; /* reset to be able to re-start */
@@ -2233,8 +2233,7 @@ enum tfa98xx_error dsp_msg(int handle, int length, const char *buf)
 		pr_debug("%s: OK\n", __func__);
 	else {
 		/* Get actual error code from softDSP */
-		error = (enum tfa98xx_error)
-			(error + TFA98XX_ERROR_BUFFER_RPC_BASE);
+		error += TFA98XX_ERROR_BUFFER_RPC_BASE);
 		pr_info("%s: (rpc base %d) error = %d\n",
 			__func__, TFA98XX_ERROR_BUFFER_RPC_BASE, error);
 	}
@@ -2248,11 +2247,11 @@ enum tfa98xx_error dsp_msg(int handle, int length, const char *buf)
 		buf32_p_index = -1;
 	} else {
 		if (buf32 != NULL)
-			kfree(buf32);
+			kfree((const void *)buf32);
 	}
 #else
 	if (buf32 != NULL)
-		kfree(buf32);
+		kfree((const void *)buf32);
 #endif // TFADSP_DSP_BUFFER_POOL
 #endif // (TFADSP_32BITS)
 	if (tfa98xx_dsp_verbose) {
@@ -2276,7 +2275,7 @@ dsp_msg_error_exit:
 		tfa98xx_buffer_pool_access
 			(handle, buf32_p_index, 0, POOL_RETURN);
 	} else {
-		kfree(buf32);
+		kfree((const void *)buf32);
 	}
 #else
 	kfree(buf32);
@@ -2288,10 +2287,10 @@ dsp_msg_error_exit:
 		tfa98xx_buffer_pool_access
 			(handle, blob_p_index, 0, POOL_RETURN);
 	} else {
-		kfree(blob);
+		kfree((const void *)blob);
 	}
 #else
-	kfree(blob); /* Free the kmalloc blob */
+	kfree((const void *)blob); /* Free the kmalloc blob */
 #endif // TFADSP_DSP_BUFFER_POOL
 
 	return TFA98XX_ERROR_FAIL;
@@ -2321,12 +2320,12 @@ enum tfa98xx_error dsp_msg_packet(int handle,
 		apr_buff = (uint8_t *)
 			(handles_local[handle].buf_pool[apr_buff_p_index].pool);
 	} else {
-		apr_buff = kmalloc(MAX_APR_MSG_SIZE, GFP_KERNEL);
+		apr_buff = (uint8_t *)kmalloc(MAX_APR_MSG_SIZE, GFP_KERNEL);
 		if (apr_buff == NULL)
 			goto dsp_msg_packet_error_exit;
 	}
 #else
-	apr_buff = kmalloc(MAX_APR_MSG_SIZE, GFP_KERNEL);
+	apr_buff = (uint8_t *)kmalloc(MAX_APR_MSG_SIZE, GFP_KERNEL);
 	if (apr_buff == NULL)
 		goto dsp_msg_packet_error_exit;
 #endif /* TFADSP_DSP_BUFFER_POOL */
@@ -2339,17 +2338,17 @@ enum tfa98xx_error dsp_msg_packet(int handle,
 		apr_buff[1] = (uint8_t)((packet_id + 1) & 0xFF);
 		apr_buff[2] = (uint8_t)((packet_size >> 8) & 0xFF);
 		apr_buff[3] = (uint8_t) (packet_size & 0xFF);
-		memcpy(apr_buff + 4, blob + tfadsp_buf_offset, packet_size);
+		memcpy((void *)(apr_buff + 4), (const void *)(blob + tfadsp_buf_offset), (unsigned int)packet_size);
 		if ((handles_local[handle].stream_state & BIT_PSTREAM) == 1) {
 			error = (*handles_local[handle].dev_ops.dsp_msg)
-				(handle, packet_size + 4,
+				(handle, (int)(packet_size + 4),
 				(const char *)apr_buff);
 		} else {
 			pr_info("%s: skip dsp_msg when pstream is not active\n",
 				__func__);
 		}
-		tfadsp_buf_offset += packet_size;
-		remaining_blob_size -= packet_size;
+		tfadsp_buf_offset += (int)packet_size;
+		remaining_blob_size -= (int)packet_size;
 	}
 
 #if defined(TFADSP_DSP_BUFFER_POOL)
@@ -2358,31 +2357,31 @@ enum tfa98xx_error dsp_msg_packet(int handle,
 			apr_buff_p_index, 0, POOL_RETURN);
 		apr_buff_p_index = -1;
 	} else {
-		kfree(apr_buff);
+		kfree((const void *)apr_buff);
 		apr_buff = NULL;
 	}
 #else
-	kfree(apr_buff);
+	kfree((const void *)apr_buff);
 	apr_buff = NULL;
 #endif /* TFADSP_DSP_BUFFER_POOL */
 
 	if (remaining_blob_size > 0) {
-		packet_size = remaining_blob_size;
+		packet_size = (int)remaining_blob_size;
 #if defined(TFADSP_DSP_BUFFER_POOL)
 		apr_buff_p_index = tfa98xx_buffer_pool_access
-			(handle, -1, packet_size + 4, POOL_GET);
+			(handle, -1, (size_t)(packet_size + 4), POOL_GET);
 		if (apr_buff_p_index != -1) {
 			pr_debug("%s: allocated from buffer_pool [%d] - apr_buff_last\n",
 				__func__, apr_buff_p_index);
 			apr_buff_last = (uint8_t *)(handles_local[handle]
 				.buf_pool[apr_buff_p_index].pool);
 		} else {
-			apr_buff_last = kmalloc(packet_size + 4, GFP_KERNEL);
+			apr_buff_last = kmalloc((size_t)(packet_size + 4), GFP_KERNEL);
 			if (apr_buff_last == NULL)
 				goto dsp_msg_packet_error_exit;
 		}
 #else
-		apr_buff_last = kmalloc(packet_size + 4, GFP_KERNEL);
+		apr_buff_last = kmalloc((size_t)(packet_size + 4), GFP_KERNEL);
 		if (apr_buff_last == NULL)
 			goto dsp_msg_packet_error_exit;
 #endif /* TFADSP_DSP_BUFFER_POOL */
@@ -2393,17 +2392,17 @@ enum tfa98xx_error dsp_msg_packet(int handle,
 		apr_buff_last[1] = 0xFF;
 		apr_buff_last[2] = (uint8_t)((packet_size >> 8) & 0xFF);
 		apr_buff_last[3] = (uint8_t)(packet_size & 0xFF);
-		memcpy(apr_buff_last + 4,
-			blob + tfadsp_buf_offset, remaining_blob_size);
+		memcpy((void *)(apr_buff_last + 4),
+			(const void *)(blob + tfadsp_buf_offset), (unsigned int)remaining_blob_size);
 		if ((handles_local[handle].stream_state & BIT_PSTREAM) == 1) {
 			error = (*handles_local[handle].dev_ops.dsp_msg)
-				(handle, packet_size + 4,
+				(handle, (int)(packet_size + 4),
 				(const char *)apr_buff_last);
 		} else {
 			pr_info("%s: skip dsp_msg when pstream is not active\n",
 				__func__);
 		}
-		tfadsp_buf_offset += packet_size;
+		tfadsp_buf_offset += (int)packet_size;
 		remaining_blob_size = 0;
 #if defined(TFADSP_DSP_BUFFER_POOL)
 		if (apr_buff_p_index != -1) {
@@ -2411,11 +2410,11 @@ enum tfa98xx_error dsp_msg_packet(int handle,
 				apr_buff_p_index, 0, POOL_RETURN);
 			apr_buff_p_index = -1;
 		} else {
-			kfree(apr_buff_last);
+			kfree((const void *)apr_buff_last);
 			apr_buff_last = NULL;
 		}
 #else
-		kfree(apr_buff_last);
+		kfree((const void *)apr_buff_last);
 		apr_buff_last = NULL;
 #endif /* TFADSP_DSP_BUFFER_POOL */
 	}
@@ -2429,12 +2428,12 @@ dsp_msg_packet_error_exit:
 		tfa98xx_buffer_pool_access
 			(handle, apr_buff_p_index, 0, POOL_RETURN);
 	} else {
-		kfree(apr_buff);
-		kfree(apr_buff_last);
+		kfree((const void *)apr_buff);
+		kfree((const void *)apr_buff_last);
 	}
 #else
-	kfree(apr_buff);
-	kfree(apr_buff_last);
+	kfree((const void *)apr_buff);
+	kfree((const void *)apr_buff_last);
 #endif /* TFADSP_DSP_BUFFER_POOL */
 
 	return TFA98XX_ERROR_FAIL;
@@ -2489,7 +2488,7 @@ dsp_msg_read(int handle, int length, unsigned char *bytes)
 		buf32 = (int32_t *)(handles_local[handle]
 			.buf_pool[buf32_p_index].pool);
 	} else {
-		buf32 = kmalloc(buf32_len, GFP_KERNEL);
+		buf32 = kmalloc((size_t)buf32_len, GFP_KERNEL);
 		if (buf32 == NULL)
 			goto dsp_msg_read_error_exit;
 	}
@@ -2513,8 +2512,7 @@ dsp_msg_read(int handle, int length, unsigned char *bytes)
 				pr_debug("%s: OK\n", __func__);
 			else {
 				/* Get actual error code from softDSP */
-				error = (enum tfa98xx_error)
-					(error + TFA98XX_ERROR_BUFFER_RPC_BASE);
+				error += TFA98XX_ERROR_BUFFER_RPC_BASE;
 				pr_info("%s: (rpc base %d) error = %d\n",
 					__func__,
 					TFA98XX_ERROR_BUFFER_RPC_BASE, error);
@@ -2534,7 +2532,7 @@ dsp_msg_read(int handle, int length, unsigned char *bytes)
 		pr_debug("%s: buf32bits[%d] = 0x%08x\n",
 			__func__, i, tfadsp_buf[i]);
 	/*convert 32 bits -> 24 bits */
-	tfa_msg32to24(bytes, (uint8_t *)tfadsp_buf, tfadsp_buf_size);
+	tfa_msg32to24((uint8_t *)bytes, (uint8_t *)tfadsp_buf, tfadsp_buf_size);
 	for (i = 0; i < 6; i++)
 		pr_debug("%s: buf24bits[%d] = 0x%08x\n", __func__, i, bytes[i]);
 
@@ -2966,7 +2964,7 @@ enum tfa98xx_error tfa_dsp_cmd_id_write(int handle,
 
 	memcpy(&buffer[3], data, num_bytes);
 
-	error = dsp_msg(handle, 3 + num_bytes, (char *)buffer);
+	error = dsp_msg(handle, 3 + num_bytes, buffer);
 
 #if defined(TFADSP_DSP_BUFFER_POOL)
 	if (buffer_p_index != -1) {
@@ -4342,7 +4340,7 @@ tfa_run_wait_calibration(int handle, int *calibrate_done)
 	return err;
 }
 
-static enum tfa_error _tfa_stop(int handle)
+static enum tfa98xx_error _tfa_stop(int handle)
 {
 	enum tfa98xx_error err = TFA98XX_ERROR_OK;
 
@@ -4366,7 +4364,7 @@ static enum tfa_error _tfa_stop(int handle)
 	return err;
 }
 
-enum tfa_error tfa_start(int next_profile, int *vstep)
+enum tfa98xx_error tfa_start(int next_profile, int *vstep)
 {
 	enum tfa98xx_error err = TFA98XX_ERROR_OK;
 	int dev, devcount = tfa98xx_cnt_max_device();
@@ -4393,7 +4391,7 @@ enum tfa_error tfa_start(int next_profile, int *vstep)
 
 	if (devcount < 1) {
 		pr_err("No or wrong container file loaded\n");
-		return tfa_error_bad_param;
+		return TFA98XX_ERROR_BAD_PARAMETER;
 	}
 
 #if defined(TFA_USE_DEVICE_SPECIFIC_CONTROL)
@@ -4604,14 +4602,14 @@ error_exit:
 	return err;
 }
 
-enum tfa_error tfa_stop(void)
+enum tfa98xx_error tfa_stop(void)
 {
 	enum tfa98xx_error err = TFA98XX_ERROR_OK;
 	int dev, devcount = tfa98xx_cnt_max_device();
 
 	if (devcount == 0) {
 		pr_err("No or wrong container file loaded\n");
-		return	tfa_error_bad_param;
+		return	TFA98XX_ERROR_BAD_PARAMETER;
 	}
 
 	for (dev = 0; dev < devcount; dev++) {
@@ -4676,7 +4674,7 @@ int tfa98xx_reset(int handle)
 	return err;
 }
 
-enum tfa_error tfa_reset(void)
+enum tfa98xx_error tfa_reset(void)
 {
 	enum tfa98xx_error err = TFA98XX_ERROR_OK;
 	int dev, devcount = tfa98xx_cnt_max_device();
@@ -5125,7 +5123,7 @@ tfa_dsp_handle_event(int handle,
 	enum tfadsp_event_en tfadsp_event)
 {
 	int retval = handles_local[handle].rev; /* return revid by default */
-	enum tfa_error err;
+	enum tfa98xx_error err;
 
 	switch (tfadsp_event) {
 	case TFADSP_EXT_PWRUP: /* DSP starting */
@@ -5141,7 +5139,7 @@ tfa_dsp_handle_event(int handle,
 		err = tfa_start
 			(handles_local[handle].profile,
 			handles_local[handle].vstep);
-		if (err == tfa_error_ok) {
+		if (err == TFA98XX_ERROR_OK) {
 			handles_local[handle].ext_dsp = 2; /* set warm */
 			handles_local[handle].is_cold = 0;
 			retval = 0;

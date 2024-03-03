@@ -158,6 +158,7 @@ enum tfa98xx_error {
 	TFA98XX_ERROR_NOT_OPEN,	        /* 8. the given handle is not open */
 	TFA98XX_ERROR_IN_USE,	        /* 9. too many handles */
 	TFA98XX_ERROR_BUFFER_TOO_SMALL, /* 10. if a buffer is too small */
+	TFA98XX_ERROR_CONTAINER, 		/* 11. no or wrong container file */
 	/* the expected response did not occur within the expected time */
 	TFA98XX_ERROR_BUFFER_RPC_BASE = 100,
 	TFA98XX_ERROR_RPC_BUSY = 101,

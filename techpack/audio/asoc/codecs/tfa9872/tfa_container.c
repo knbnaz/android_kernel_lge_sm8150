@@ -62,7 +62,7 @@ void tfa_set_partial_update(int enp)
 /*
  * check the container file and set module global
 */
-enum tfa_error tfa_load_cnt(void *cnt, int length)
+enum tfa98xx_error tfa_load_cnt(void *cnt, int length)
 {
 	struct tfa_container *cntbuf = (struct tfa_container *)cnt;
 
@@ -70,29 +70,29 @@ enum tfa_error tfa_load_cnt(void *cnt, int length)
 
 	if (length > TFA_MAX_CNT_LENGTH) {
 		pr_err("incorrect length\n");
-		return tfa_error_container;
+		return TFA98XX_ERROR_CONTAINER;
 	}
 
 	if (HDR(cntbuf->id[0],cntbuf->id[1]) == 0) {
 		pr_err("header is 0\n");
-		return tfa_error_container;
+		return TFA98XX_ERROR_CONTAINER;
 	}
 
 	if ((HDR(cntbuf->id[0],cntbuf->id[1])) != params_hdr) {
 		pr_err("wrong header type: 0x%02x 0x%02x\n",
 			cntbuf->id[0], cntbuf->id[1]);
-		return tfa_error_container;
+		return TFA98XX_ERROR_CONTAINER;
 	}
 
 	if (cntbuf->size == 0) {
 		pr_err("data size is 0\n");
-		return tfa_error_container;
+		return TFA98XX_ERROR_CONTAINER;
 	}
 
 	/* check CRC */
 	if (tfa_cont_crc_check_container(cntbuf)) {
 		pr_err("CRC error\n");
-		return tfa_error_container;
+		return TFA98XX_ERROR_CONTAINER;
 	}
 
 	/* check sub version level */
@@ -103,10 +103,10 @@ enum tfa_error tfa_load_cnt(void *cnt, int length)
 	} else {
 		pr_err("container sub-version not supported: %c%c\n",
 				cntbuf->subversion[0], cntbuf->subversion[1]);
-		return tfa_error_container;
+		return TFA98XX_ERROR_CONTAINER;
 	}
 
-	return tfa_error_ok;
+	return TFA98XX_ERROR_OK;
 }
 
 void tfa_deinit(void)

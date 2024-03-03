@@ -21,20 +21,6 @@
 #define TFA_MAX_CNT_LENGTH (256*1024)
 
 /**
- * tfa error returns
- */
-enum tfa_error {
-	tfa_error_ok, /**< no error */
-	tfa_error_device, /**< no response from device */
-	tfa_error_bad_param, /**< parameter no accepted */
-	tfa_error_noclock, /**< required clock not present */
-	tfa_error_timeout, /**< a timeout occurred */
-	tfa_error_dsp, /**< a DSP error was returned */
-	tfa_error_container, /**< no or wrong container file */
-	tfa_error_max /**< impossible value, max enum */
-};
-
-/**
  * Pass the container buffer, initialize and allocate internal memory.
  *
  * Note that this buffer will be kept and should not be freed until
@@ -48,7 +34,7 @@ enum tfa_error {
  *  - tfa_error_bad_param invalid parameter
  *
  */
-enum tfa_error tfa_load_cnt(void *cnt, int length);
+enum tfa98xx_error tfa_load_cnt(void *cnt, int length);
 
 /**
  * Probe/init the device.
@@ -80,7 +66,7 @@ tfa_probe(unsigned char slave_address, int *pDevice);
  *                        0 sets the maximum volume
  * @return enum tfa_error
  */
-enum tfa_error tfa_start(int profile, int *vstep);
+enum tfa98xx_error tfa_start(int profile, int *vstep);
 
 /**
  * Stop SpeakerBoost on all devices/channels.
@@ -92,7 +78,7 @@ enum tfa_error tfa_start(int profile, int *vstep);
  *
  * @return enum tfa_error
  */
-enum tfa_error tfa_stop(void);
+enum tfa98xx_error tfa_stop(void);
 
 /**
  * discard container buffer and free all resources.\n
@@ -110,7 +96,7 @@ void tfa_deinit(void);
  *  - tfa_error_device channel error
  *  - tfa_error_noclock only register level init could be preformed
  */
-enum tfa_error tfa_reset(void);
+enum tfa98xx_error tfa_reset(void);
 
 enum tfa98xx_error tfa_write_filters(int dev_idx, int prof_idx);
 
