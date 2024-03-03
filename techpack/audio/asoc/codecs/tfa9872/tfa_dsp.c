@@ -4353,7 +4353,7 @@ static enum tfa_error _tfa_stop(int handle)
 	/* powerdown CF */
 	err = tfa98xx_powerdown(handle, 1);
 	if (err != TFA98XX_ERROR_OK)
-		return (enum tfa_error)err;
+		return err;
 
 	/* Workaround for ticket PLMA5337 */
 	if ((handles_local[handle].rev & 0xff) == 0x72) {
@@ -4363,7 +4363,7 @@ static enum tfa_error _tfa_stop(int handle)
 	/* disable I2S output on TFA1 devices without TDM */
 	err = tfa98xx_aec_output(handle, 0);
 
-	return (enum tfa_error)err;
+	return err;
 }
 
 enum tfa_error tfa_start(int next_profile, int *vstep)
@@ -4461,7 +4461,7 @@ enum tfa_error tfa_start(int next_profile, int *vstep)
 					(unsigned short)
 					tfa_cont_get_current_vstep(dev));
 
-				err = (enum tfa98xx_error)_tfa_stop(dev); /* stop inactive handle */
+				err = _tfa_stop(dev); /* stop inactive handle */
 				continue;
 			}
 		}
@@ -4591,7 +4591,7 @@ enum tfa_error tfa_start(int next_profile, int *vstep)
 		tfa_cont_close(dev); /* close all of them */
 	}
 
-	return (enum tfa_error)err;
+	return err;
 
 error_exit:
 	if (dev < devcount)
@@ -4601,7 +4601,7 @@ error_exit:
 	for (dev = 0; dev < devcount; dev++)
 		tfa_cont_close(dev); /* close all of them */
 
-	return (enum tfa_error)err;
+	return err;
 }
 
 enum tfa_error tfa_stop(void)
@@ -4622,7 +4622,7 @@ enum tfa_error tfa_stop(void)
 			pr_debug("Stopping device [%s]\n",
 				tfa_cont_device_name(dev));
 
-		err = (enum tfa98xx_error)_tfa_stop(dev);
+		err = _tfa_stop(dev);
 		if (err != TFA98XX_ERROR_OK)
 			goto error_exit;
 
@@ -4638,7 +4638,7 @@ error_exit:
 	for (dev = 0; dev < devcount; dev++)
 		tfa_cont_close(dev); /* close all of them */
 
-	return (enum tfa_error)err;
+	return err;
 }
 
 /*
@@ -4696,7 +4696,7 @@ enum tfa_error tfa_reset(void)
 		tfa_cont_close(dev);
 	}
 
-	return (enum tfa_error)err;
+	return err;
 }
 
 /*
