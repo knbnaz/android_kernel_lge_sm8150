@@ -27,9 +27,9 @@
 static inline void handle_cfi_failure(void *ptr)
 {
 #ifdef CONFIG_CFI_PERMISSIVE
-	WARN_RATELIMIT(1, "CFI failure (target: [<%px>] %pF):\n", ptr, ptr);
+	WARN_RATELIMIT(1, "CFI failure (target: [<%px>] %pS):\n", ptr, ptr);
 #else
-	pr_err("CFI failure (target: [<%px>] %pF):\n", ptr, ptr);
+	pr_err("CFI failure (target: [<%px>] %pS):\n", ptr, ptr);
 	BUG();
 #endif
 }
