@@ -15,6 +15,9 @@
 #include <dsp/rtac.h>
 #if defined(CONFIG_SND_SOC_TFA9872)
 #include <ipc/apr_tal.h>
+#include "../../asoc/codecs/tfa9872/inc/tfa_ext.h"
+#include "../../asoc/codecs/tfa9872/inc/tfa_service.h"
+#include "../../asoc/codecs/tfa9872/inc/tfa_internal.h"
 #endif
 
 #define IN			0x000
@@ -369,19 +372,6 @@ struct aanc_data {
 	int level;
 };
 
-#if defined(CONFIG_SND_SOC_TFA9872)
-/*afe tfa dsp read message*/
-struct afe_tfa_dsp_read_msg_t {
-	struct apr_hdr hdr;
-	struct afe_rtac_get_param_v2 get_param;
-} __packed;
-
-typedef int (*tfa_event_handler_t)(int devidx, int tfadsp_event);
-typedef int (*dsp_send_message_t)(int devidx, int length,
-	char *buf, int msg_type, int num_msgs);
-typedef int (*dsp_read_message_t)(int devidx, int length, char *buf);
-#endif
-
 int afe_open(u16 port_id, union afe_port_config *afe_config, int rate);
 int afe_close(int port_id);
 int afe_loopback(u16 enable, u16 rx_port, u16 tx_port);
@@ -499,11 +489,6 @@ int afe_tdm_port_start(u16 port_id, struct afe_tdm_port_config *tdm_port,
 void afe_set_routing_callback(routing_cb cb);
 int afe_get_av_dev_drift(struct afe_param_id_dev_timing_stats *timing_stats,
 		u16 port);
-#if defined(CONFIG_SND_SOC_TFA9872)
-int tfa_ext_register(dsp_send_message_t tfa_send_message,
-		dsp_read_message_t tfa_read_message,
-		tfa_event_handler_t *tfa_event_handler);
-#endif
 int afe_get_sp_rx_tmax_xmax_logging_data(
 		struct afe_sp_rx_tmax_xmax_logging_param *xt_logging,
 		u16 port_id);

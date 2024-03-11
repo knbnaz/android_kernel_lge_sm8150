@@ -31,12 +31,7 @@ enum tfadsp_event_en
 } ;
 
 typedef int (*tfa_event_handler_t)(int devidx, enum tfadsp_event_en tfadsp_event);
-#if !defined(TFADSP_DSP_MSG_BUFFERING)
 typedef int (*dsp_send_message_t)(int devidx, int length, const char *buf);
-#else
-typedef int (*dsp_send_message_t)(int devidx, int length, const char *buf
-	int msg_type, int num_msgs);
-#endif // (TFADSP_DSP_MSG_BUFFERING)
 typedef int (*dsp_read_message_t)(int devidx, int length, char *buf);
 typedef int (*dsp_write_reg_t)(int devidx, unsigned char subaddress, unsigned short value);
 

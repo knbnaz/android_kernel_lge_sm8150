@@ -9763,7 +9763,7 @@ static int voice_set_cvp_param(struct voice_data *v,
 
 	v->cvp_state = CMD_STATUS_FAIL;
 	v->async_err = 0;
-	ret = apr_send_pkt(apr_cvp, (u32 *) set_param);
+	ret = apr_send_pkt(apr_cvp, (uint32_t *) set_param);
 	if (ret < 0) {
 		pr_err("%s: Failed to send apr packet, error %d\n", __func__,
 		       ret);
@@ -9879,7 +9879,7 @@ static int voice_pack_and_set_cvs_ui_property(struct voice_data *v,
 
 	v->cvs_state = CMD_STATUS_FAIL;
 	v->async_err = 0;
-	ret = apr_send_pkt(apr_cvs, (u32 *) set_ui_property);
+	ret = apr_send_pkt(apr_cvs, (uint32_t *) set_ui_property);
 	if (ret < 0) {
 		pr_err("%s: Failed to send apr packet, error %d\n", __func__,
 		       ret);

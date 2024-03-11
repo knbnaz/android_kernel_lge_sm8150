@@ -259,9 +259,9 @@ static int tfa_ext_event_ack(u16 err);
  * return the event code from the raw input
  *   for this dummy case pick 1st byte
  */
-static int tfa_ext_event_code(u8 *buf, int size)
+static enum tfadsp_event_en tfa_ext_event_code(u8 *buf, int size)
 {
-	int code;
+	enum tfadsp_event_en code;
 
 	switch(buf[0]) {
 	case 1:
@@ -348,12 +348,9 @@ The tfa_ext_registry() function will connect this.
 @return 0  success
 
 */
-#if !defined(TFADSP_DSP_MSG_BUFFERING)
-static int tfa_ext_dsp_msg(int devidx, int length, const char *buffer)
-#else
-static int tfa_ext_dsp_msg(int devidx, int length, const char *buffer,
+
+static int tfa_ext_dsp_msg(int devidx, int length, char *buffer,
 	int msg_type, int num_msgs)
-#endif // (TFADSP_DSP_MSG_BUFFERING)
 {
 
 	int error = 0, real_length;
@@ -400,7 +397,7 @@ static int tfa_ext_registry(void)
 
 	pr_debug("%s\n", __func__);
 
-	if (tfa_ext_register(NULL, tfa_ext_dsp_msg, NULL, &tfa_ext_handle_event)) {
+	if (tfa_ext_register(tfa_ext_dsp_msg, NULL, &tfa_ext_handle_event)) {
 		pr_err("Cannot register to tfa driver!\n");
 		return 1;
 	}

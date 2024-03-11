@@ -177,6 +177,10 @@ TFA_INTERNAL void tfa98xx_deferred_calibration_status
 TFA_INTERNAL int print_calibration
 (int handle, char *str, size_t size);
 
+extern void tfa_dsp_msg_register(int dev_idx, dsp_msg_t func);
+
+extern void tfa_dsp_msg_read_register(int dev_idx, dsp_msg_read_t func);
+
 #if defined(TFADSP_DSP_BUFFER_POOL)
 TFA_INTERNAL int tfa98xx_buffer_pool_access
 (int handle, int r_index, size_t g_size, int control);

@@ -1148,7 +1148,7 @@ int afe_q6_interface_prepare(void)
 	pr_debug("%s:\n", __func__);
 
 	if (this_afe.apr == NULL) {
-		this_afe.apr = apr_register("ADSP", "AFE", afe_callback,
+		this_afe.apr = (void *)apr_register("ADSP", "AFE", afe_callback,
 			0xFFFFFFFF, &this_afe);
 		if (this_afe.apr == NULL) {
 			pr_err("%s: Unable to register AFE\n", __func__);
@@ -1171,7 +1171,7 @@ static int afe_apr_send_pkt(void *data, wait_queue_head_t *wait)
 	if (wait)
 		atomic_set(&this_afe.state, 1);
 	atomic_set(&this_afe.status, 0);
-	ret = apr_send_pkt(this_afe.apr, data);
+	ret = apr_send_pkt(this_afe.apr, (uint32_t *)data);
 	if (ret > 0) {
 		if (wait) {
 			ret = wait_event_timeout(*wait,
@@ -2770,10 +2770,16 @@ done:
 }
 
 #if defined(CONFIG_SND_SOC_TFA9872)
-static int afe_tfadsp_read(int dev, int buf_size, char *buf)
+/*afe tfa dsp read message*/
+struct afe_tfa_dsp_read_msg_t {
+	struct apr_hdr hdr;
+	struct afe_rtac_get_param_v2 get_param;
+} __packed;
+
+static enum tfa98xx_error afe_tfadsp_read(int dev, int buf_size, unsigned char *buf)
 {
 	int result = 0;
-	int tfa_port_id = AFE_PORT_ID_TFA9872_RX;
+	u16 tfa_port_id = AFE_PORT_ID_TFA9872_RX;
 	int index = 0;
 
 	struct afe_tfa_dsp_read_msg_t tfa_dsp_read_msg;
@@ -2782,12 +2788,13 @@ static int afe_tfadsp_read(int dev, int buf_size, char *buf)
 	//pr_info("%s: start : buf_size = %d\n", __func__, buf_size);
 
 	if (this_afe.apr == NULL) {
-		this_afe.apr = apr_register("ADSP", "AFE", afe_callback,
+		this_afe.apr = (void *)apr_register("ADSP", "AFE", afe_callback,
 					0xFFFFFFFF, &this_afe);
 		pr_debug("%s: Register AFE\n", __func__);
 		if (this_afe.apr == NULL) {
 			pr_err("%s: Unable to register AFE\n", __func__);
-			return -ENODEV;
+			result = -ENODEV;
+			goto fail_cmd;
 		}
 		rtac_set_afe_handle(this_afe.apr);
 	}
@@ -2895,26 +2902,27 @@ static int afe_tfadsp_read(int dev, int buf_size, char *buf)
 
 fail_cmd:
 	//pr_info("%s: end\n", __func__);
-	return result;
+	return (enum tfa98xx_error)result;
 }
 #if defined(AFE_TFADSP_SHARED_MEM_IPC)
-static int afe_tfadsp_write(
-	int dev, int buf_size, char *buf, int msg_type, int num_msgs)
+static enum tfa98xx_error afe_tfadsp_write(
+	int dev, int buf_size, const char *buf)
 {
 	int result = 0;
 	int index = 0;
-	int tfa_port_id = AFE_PORT_ID_TFA9872_RX;
+	u16 tfa_port_id = AFE_PORT_ID_TFA9872_RX;
 	uint8_t *pmem = NULL;
 	struct afe_port_cmd_set_param_v2 set_param;
 	struct param_hdr_v1 pdata;
 
 	if (this_afe.apr == NULL) {
-		this_afe.apr = apr_register("ADSP", "AFE", afe_callback,
+		this_afe.apr = (void *)apr_register("ADSP", "AFE", afe_callback,
 					0xFFFFFFFF, &this_afe);
 		pr_debug("%s: Register AFE\n", __func__);
 		if (this_afe.apr == NULL) {
 			pr_err("%s: Unable to register AFE\n", __func__);
-			return -ENODEV;
+			result = -ENODEV;
+			goto fail_cmd;
 		}
 		rtac_set_afe_handle(this_afe.apr);
 	}
@@ -2937,8 +2945,8 @@ static int afe_tfadsp_write(
 		goto fail_cmd;
 	}
 
-	pr_info("%s: num_msgs = %d, msg_type = %d, buf_size = %d\n",
-					__func__, num_msgs, msg_type, buf_size);
+	pr_info("%s: buf_size = %d\n",
+					__func__, buf_size);
 
 	index = q6audio_get_port_index(tfa_port_id);
 	if (index < 0 || index >= AFE_MAX_PORTS) {
@@ -3005,13 +3013,13 @@ static int afe_tfadsp_write(
 	}
 
 fail_cmd:
-	return result;
+	return (enum tfa98xx_error)result;
 }
 #else /* AFE_TFADSP_SHARED_MEM_IPC */
-static int afe_tfadsp_write(
-	int dev, int buf_size, char *buf, int msg_type, int num_msgs)
+static enum tfa98xx_error afe_tfadsp_write(
+	int dev, int buf_size, const char *buf)
 {
-	int tfa_port_id = AFE_PORT_ID_TFA9872_RX;
+	u16 tfa_port_id = AFE_PORT_ID_TFA9872_RX;
 	int index = 0;
 	int ret = -EINVAL;
     struct param_hdr_v3 param_hdr;
@@ -3041,13 +3049,13 @@ static int afe_tfadsp_write(
 	}
 
 	if (this_afe.apr == NULL) {
-		this_afe.apr = apr_register("ADSP", "AFE", afe_callback,
+		this_afe.apr = (void *)apr_register("ADSP", "AFE", afe_callback,
 					0xFFFFFFFF, &this_afe);
 		pr_debug("%s: Register AFE\n", __func__);
 		if (this_afe.apr == NULL) {
 			pr_err("%s: Unable to register AFE\n", __func__);
 			ret = -ENODEV;
-			return ret;
+			goto fail_cmd;
 		}
 		rtac_set_afe_handle(this_afe.apr);
 	}
@@ -3055,8 +3063,8 @@ static int afe_tfadsp_write(
 	if(((buf[0]<<8)|buf[1]) == 65535)
 		pr_info("%s: [0]:0x%x-[1]:0x%x-[2]:0x%x-[3]:0x%x, [4]:0x%x-[5]:0x%x, packet_id:%d, packet_size:%d\n",
 			__func__,buf[0],buf[1],buf[2],buf[3],buf[4],buf[5],(buf[0]<<8)|buf[1],(buf[2]<<8)|buf[3]);
-	pr_debug("%s:msg_type:%d--buf_size:%d--num_msgs:%d\n",
-					__func__,msg_type,buf_size,num_msgs);
+	pr_debug("%s:buf_size:%d\n",
+					__func__,buf_size);
 
 	memset(&param_hdr, 0, sizeof(param_hdr));
 	param_hdr.module_id = AFE_MODULE_ID_TFADSP;
@@ -3086,7 +3094,7 @@ static int afe_tfadsp_write(
 fail_cmd:
 	pr_debug("%s: status %d\n", __func__, ret);
 
-	return ret;
+	return (enum tfa98xx_error)ret;
 }
 #endif /* AFE_TFADSP_SHARED_MEM_IPC */
 /*static int afe_tfa_dsp_write_reg(int devidx, unsigned char subaddress, unsigned short value)
@@ -5596,7 +5604,7 @@ int afe_loopback_gain(u16 port_id, u16 volume)
 	memset(&param_hdr, 0, sizeof(param_hdr));
 
 	if (this_afe.apr == NULL) {
-		this_afe.apr = apr_register("ADSP", "AFE", afe_callback,
+		this_afe.apr = (void *)apr_register("ADSP", "AFE", afe_callback,
 					0xFFFFFFFF, &this_afe);
 		pr_debug("%s: Register AFE\n", __func__);
 		if (this_afe.apr == NULL) {
@@ -6225,7 +6233,7 @@ int afe_cmd_memory_map(phys_addr_t dma_addr_p, u32 dma_buf_sz)
 	pr_debug("%s:\n", __func__);
 
 	if (this_afe.apr == NULL) {
-		this_afe.apr = apr_register("ADSP", "AFE", afe_callback,
+		this_afe.apr = (void *)apr_register("ADSP", "AFE", afe_callback,
 					0xFFFFFFFF, &this_afe);
 		pr_debug("%s: Register AFE\n", __func__);
 		if (this_afe.apr == NULL) {
@@ -6298,7 +6306,7 @@ int afe_cmd_memory_map_nowait(int port_id, phys_addr_t dma_addr_p,
 	pr_debug("%s:\n", __func__);
 
 	if (this_afe.apr == NULL) {
-		this_afe.apr = apr_register("ADSP", "AFE", afe_callback,
+		this_afe.apr = (void *)apr_register("ADSP", "AFE", afe_callback,
 					0xFFFFFFFF, &this_afe);
 		pr_debug("%s: Register AFE\n", __func__);
 		if (this_afe.apr == NULL) {
@@ -6447,7 +6455,7 @@ int afe_cmd_memory_unmap(u32 mem_map_handle)
 	pr_debug("%s: handle 0x%x\n", __func__, mem_map_handle);
 
 	if (this_afe.apr == NULL) {
-		this_afe.apr = apr_register("ADSP", "AFE", afe_callback,
+		this_afe.apr = (void *)apr_register("ADSP", "AFE", afe_callback,
 					0xFFFFFFFF, &this_afe);
 		pr_debug("%s: Register AFE\n", __func__);
 		if (this_afe.apr == NULL) {
@@ -6488,7 +6496,7 @@ int afe_cmd_memory_unmap_nowait(u32 mem_map_handle)
 	pr_debug("%s: handle 0x%x\n", __func__, mem_map_handle);
 
 	if (this_afe.apr == NULL) {
-		this_afe.apr = apr_register("ADSP", "AFE", afe_callback,
+		this_afe.apr = (void *)apr_register("ADSP", "AFE", afe_callback,
 					0xFFFFFFFF, &this_afe);
 		pr_debug("%s: Register AFE\n", __func__);
 		if (this_afe.apr == NULL) {
@@ -6536,7 +6544,7 @@ int afe_register_get_events(u16 port_id,
 	pr_debug("%s: port_id: 0x%x\n", __func__, port_id);
 
 	if (this_afe.apr == NULL) {
-		this_afe.apr = apr_register("ADSP", "AFE", afe_callback,
+		this_afe.apr = (void *)apr_register("ADSP", "AFE", afe_callback,
 					0xFFFFFFFF, &this_afe);
 		pr_debug("%s: Register AFE\n", __func__);
 		if (this_afe.apr == NULL) {
@@ -6596,7 +6604,7 @@ int afe_unregister_get_events(u16 port_id)
 	pr_debug("%s:\n", __func__);
 
 	if (this_afe.apr == NULL) {
-		this_afe.apr = apr_register("ADSP", "AFE", afe_callback,
+		this_afe.apr = (void *)apr_register("ADSP", "AFE", afe_callback,
 					0xFFFFFFFF, &this_afe);
 		pr_debug("%s: Register AFE\n", __func__);
 		if (this_afe.apr == NULL) {
@@ -6977,7 +6985,7 @@ int afe_dtmf_generate_rx(int64_t duration_in_ms,
 	}
 
 	if (this_afe.apr == NULL) {
-		this_afe.apr = apr_register("ADSP", "AFE", afe_callback,
+		this_afe.apr = (void *)apr_register("ADSP", "AFE", afe_callback,
 					    0xFFFFFFFF, &this_afe);
 		pr_debug("%s: Register AFE\n", __func__);
 		if (this_afe.apr == NULL) {
@@ -7732,7 +7740,7 @@ int afe_close(int port_id)
 	if ((port_id == this_afe.aanc_info.aanc_tx_port) &&
 	    (this_afe.aanc_info.aanc_active)) {
 		memset(&this_afe.aanc_info, 0x00, sizeof(this_afe.aanc_info));
-		ret = afe_aanc_mod_enable(this_afe.apr, port_id, 0);
+		ret = afe_aanc_mod_enable(this_afe.apr, (uint16_t)port_id, 0);
 		if (ret)
 			pr_err("%s: AFE mod disable failed %d\n",
 				__func__, ret);
@@ -9305,7 +9313,11 @@ int __init afe_init(void)
 #if defined(CONFIG_SND_SOC_TFA9872)
 	atomic_set(&this_afe.tfa_state, 0);
 	memset(&this_afe.tfa_cal, 0x00, sizeof(struct rtac_cal_block_data));
-	tfa_ext_register(afe_tfadsp_write, afe_tfadsp_read, NULL);
+	tfa_ext_register(NULL,NULL,NULL);
+	tfa_dsp_msg_register(0,afe_tfadsp_write);
+	tfa_dsp_msg_register(1,afe_tfadsp_write);
+	tfa_dsp_msg_read_register(0,afe_tfadsp_read);
+	tfa_dsp_msg_read_register(1,afe_tfadsp_read);
 #endif /* CONFIG_SND_SOC_TFA9872 */
 
 #if defined(CONFIG_SND_LGE_VOC_MUTE_DET)
@@ -9355,9 +9367,6 @@ void afe_exit(void)
 #endif // CONFIG_SND_LGE_VOC_MUTE_DET
 
 #if defined(CONFIG_SND_SOC_TFA9872)
-#if !defined(AFE_TFADSP_SHARED_MEM_IPC)
-	afe_tfadsp_write(-1, 0, NULL, 0, 0);
-#endif
 	afe_nxp_mmap_destroy(); /* shared mem */
 #endif /* CONFIG_SND_SOC_TFA9872 */
 

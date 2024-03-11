@@ -40,7 +40,7 @@
 #define TFA_EXT_DEBUGFS		/* enable the debugfs test interface */
 #define RCV_BUFFER_SIZE 2048
 
-static int tfa_ext_event_code(void *buf, int size);
+static enum tfadsp_event_en tfa_ext_event_code(void *buf, int size);
 
 /*
  * module globals
@@ -142,7 +142,8 @@ static u32 debugfs_status = 0;
 
 static int debugfs_event(void *data, u64 value)
 {
-    int event_call_return, event;
+    int event_call_return;
+    enum tfadsp_event_en event;
 
     debugfs_status = 0;
 
@@ -231,9 +232,9 @@ static void debugfs_cleanup_module(void)
  * return the event code from the raw input
  *   for this dummy case pick 1st byte
  */
-static int tfa_ext_event_code(void *inbuf, int size)
+static enum tfadsp_event_en tfa_ext_event_code(void *inbuf, int size)
 {
-	int code;
+	enum tfadsp_event_en code;
 	u8 *buf = (u8 *)inbuf;
 
 	switch(buf[0]) {
@@ -281,7 +282,7 @@ The tfa_ext_registry() function will connect this.
 @return 0  success
 int apr_send_pkt(void *handle, uint32_t *buf)
 */
-static int tfa_ext_dsp_msg(int devidx, int length, const char *buffer)
+static int tfa_ext_dsp_msg(int devidx, int length, char *buffer)
 {
 	int error = 0, real_length;
 	u8 *buf = (u8 *) buffer;
@@ -311,92 +312,13 @@ static int tfa_ext_dsp_msg_read(int devidx, int length, char *buffer)
 	return error;
 }
 
-/**
-@brief Register at the tfa driver and instantiate the remote interface functions.
-
-This function must be called once at startup after the tfa driver module is
-loaded.
-The tfa_ext_register() will be called to get the  event handler and dsp message
-interface functions and the remote TFADSP will be connected after successful
-return.
-
-@param void
-
-@return 0 on success
-
-*/
-//#if defined(__x86_64__) | defined(__i386__) /* for on PC testing */
-static int tfa_dsp_handle_event(int handle, enum tfadsp_event_en tfadsp_event)
-{
-	int retval = 0;// handles_local[handle].rev; /* return revid by default */
-	u8 msgbuf[200], readbuf[200], *bptr;
-//	enum tfa_error err;
-	//pr_info("event:0x%x\n", tfadsp_event);
-
-	switch( tfadsp_event )
-	{
-	case TFADSP_EXT_PWRUP: /*DSP starting*/
-		pr_info("execute read API version\n");
-		bptr = msgbuf;
-		*bptr++ = 0x00;
-		*bptr++ = 0x80;
-		*bptr++ = 0xfe; //FW_PAR_ID_GET_API_VERSION
-		retval = tfa_dsp_send_msg(3, msgbuf);
-		// chek ret ?
-		retval = tfa_dsp_read_msg(16, readbuf);
-		if ( 0 ) {
-			pr_info("ERROR return from API version call: %d\n", retval);
-		} else
-			pr_info("API version: %d.%d.%d\n",readbuf[5] , readbuf[4] ,   readbuf[3] ); //MSB ok?
-
-
-	///	handles_local[handle].ext_dsp = 1;
-		break;
-	case TFADSP_CMD_READY: /*Ready to receive commands*/
-		/* confirm */
-  	    pr_info("TFADSP_CMD_READY: call tfa_start to send msgs\n");
-		pr_info("TFADSP_CMD_READY: set cold\n");
-		//handles_local[handle].ext_dsp = 1;
-  	    //err = tfa_start(handles_local[handle].profile, handles_local[handle].vstep);
-//		if ( err == tfa_error_ok) {
-//			handles_local[handle].ext_dsp = 2; /* set warm */
-//		} else
-//			retval = -1*err;
-		break;
-	default:
-		pr_err("%s: unknown tfadsp event:0x%0x\n",__func__, tfadsp_event);
-		retval = -1;
-		break;
-	}
-	return retval;
-}
-
-//int tfa_ext_register(dsp_send_message_t tfa_send_message, dsp_read_message_t tfa_read_message, tfa_event_handler_t *tfa_event_handler)
-int tfa_ext_register(dsp_write_reg_t tfa_write_reg, dsp_send_message_t tfa_send_message, dsp_read_message_t tfa_read_message, tfa_event_handler_t *tfa_event_handler)
-{
-	//dsp_send_message_t send;
-	//dsp_read_message_t rcv;
-
-	pr_debug("fake %s\n", __func__);
-
-	pr_info(" test only\n");
-
-//	handles_local[0].dev_ops.dsp_msg = (dsp_msg_t)tfa_send_message;
-//	handles_local[0].dev_ops.dsp_msg_read = (dsp_msg_read_t)tfa_read_message;
-	if ( tfa_event_handler != NULL )
-		*tfa_event_handler = tfa_dsp_handle_event;
-
-	return 0;
-}
-//#endif
-
 static int tfa_ext_registry(void)
 {
 
 	pr_debug("%s\n", __func__);
 
 	pr_debug("apr_open / prepare ...\n");
-	if (tfa_ext_register(NULL, tfa_ext_dsp_msg, tfa_ext_dsp_msg_read, &tfa_ext_handle_event)) {
+	if (tfa_ext_register(tfa_ext_dsp_msg, tfa_ext_dsp_msg_read, &tfa_ext_handle_event)) {
 		pr_err("Cannot register to tfa driver!\n");
 		return 1;
 	}

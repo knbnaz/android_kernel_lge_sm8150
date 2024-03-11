@@ -2162,8 +2162,7 @@ enum tfa98xx_error dsp_msg(int handle, int length, const char *buf)
 				/* Send to the target selected */
 				if ((handles_local[handle]
 					.stream_state & BIT_PSTREAM) == 1) {
-					error = (*handles_local[handle]
-						.dev_ops.dsp_msg)
+					error = (handles_local[handle].dev_ops.dsp_msg)
 						(handle,
 						tfadsp_buf_size,
 						(const char *)
@@ -2193,8 +2192,7 @@ enum tfa98xx_error dsp_msg(int handle, int length, const char *buf)
 		} else {
 			if ((handles_local[handle]
 				.stream_state & BIT_PSTREAM) == 1) {
-				error = (*handles_local[handle]
-					.dev_ops.dsp_msg)
+				error = (handles_local[handle].dev_ops.dsp_msg)
 					(handle, tfadsp_buf_size, tfadsp_buf);
 			} else {
 				pr_info("%s: skip when pstream is not active\n",
@@ -2331,7 +2329,7 @@ enum tfa98xx_error dsp_msg_packet(int handle,
 #endif /* TFADSP_DSP_BUFFER_POOL */
 
 	for (packet_id = 0;
-		 packet_id < (int)(tfadsp_buf_size / (MAX_APR_MSG_SIZE - 4));
+		 packet_id < (short)(tfadsp_buf_size / (MAX_APR_MSG_SIZE - 4));
 		 packet_id++) {
 		pr_debug("packet[%d]: size (%d)\n", packet_id, packet_size);
 		apr_buff[0] = (uint8_t)(((packet_id + 1) >> 8) & 0xFF);
@@ -2340,7 +2338,7 @@ enum tfa98xx_error dsp_msg_packet(int handle,
 		apr_buff[3] = (uint8_t) (packet_size & 0xFF);
 		memcpy((void *)(apr_buff + 4), (const void *)(blob + tfadsp_buf_offset), (unsigned int)packet_size);
 		if ((handles_local[handle].stream_state & BIT_PSTREAM) == 1) {
-			error = (*handles_local[handle].dev_ops.dsp_msg)
+			error = (handles_local[handle].dev_ops.dsp_msg)
 				(handle, (int)(packet_size + 4),
 				(const char *)apr_buff);
 		} else {
@@ -2376,12 +2374,12 @@ enum tfa98xx_error dsp_msg_packet(int handle,
 			apr_buff_last = (uint8_t *)(handles_local[handle]
 				.buf_pool[apr_buff_p_index].pool);
 		} else {
-			apr_buff_last = kmalloc((size_t)(packet_size + 4), GFP_KERNEL);
+			apr_buff_last = (uint8_t *)kmalloc((size_t)(packet_size + 4), GFP_KERNEL);
 			if (apr_buff_last == NULL)
 				goto dsp_msg_packet_error_exit;
 		}
 #else
-		apr_buff_last = kmalloc((size_t)(packet_size + 4), GFP_KERNEL);
+		apr_buff_last = (uint8_t *)kmalloc((size_t)(packet_size + 4), GFP_KERNEL);
 		if (apr_buff_last == NULL)
 			goto dsp_msg_packet_error_exit;
 #endif /* TFADSP_DSP_BUFFER_POOL */
@@ -2395,7 +2393,7 @@ enum tfa98xx_error dsp_msg_packet(int handle,
 		memcpy((void *)(apr_buff_last + 4),
 			(const void *)(blob + tfadsp_buf_offset), (unsigned int)remaining_blob_size);
 		if ((handles_local[handle].stream_state & BIT_PSTREAM) == 1) {
-			error = (*handles_local[handle].dev_ops.dsp_msg)
+			error = (handles_local[handle].dev_ops.dsp_msg)
 				(handle, (int)(packet_size + 4),
 				(const char *)apr_buff_last);
 		} else {
@@ -2505,7 +2503,7 @@ dsp_msg_read(int handle, int length, unsigned char *bytes)
 	if ((handles_local[handle].stream_state & BIT_PSTREAM) == 1) {
 		if (handles_local[handle].dev_ops.dsp_msg_read) {
 			/*dsp read msg*/
-			error = (*handles_local[handle].dev_ops.dsp_msg_read)(
+			error = (handles_local[handle].dev_ops.dsp_msg_read)(
 				handle, tfadsp_buf_size, tfadsp_buf);
 
 			if (error == TFA98XX_ERROR_OK)
@@ -5112,119 +5110,22 @@ enum tfa98xx_error tfa98xx_set_boost_trip_level(void)
 	return error;
 }
 
-/*
- * tfa external interfacing and event handling
- */
-/**
- * parse the event and call driver in case of tfadsp event
- */
-static int
-tfa_dsp_handle_event(int handle,
-	enum tfadsp_event_en tfadsp_event)
-{
-	int retval = handles_local[handle].rev; /* return revid by default */
-	enum tfa98xx_error err;
-
-	switch (tfadsp_event) {
-	case TFADSP_EXT_PWRUP: /* DSP starting */
-		// pr_info("set cold\n");
-		handles_local[handle].ext_dsp = 1;
-		handles_local[handle].is_cold = 1;
-		break;
-	case TFADSP_CMD_READY: /* Ready to receive commands */
-		/* confirm */
-		pr_info("TFADSP_CMD_READY: call tfa_start to send msgs\n");
-		pr_info("TFADSP_CMD_READY: set cold\n");
-		handles_local[handle].ext_dsp = 1;
-		err = tfa_start
-			(handles_local[handle].profile,
-			handles_local[handle].vstep);
-		if (err == TFA98XX_ERROR_OK) {
-			handles_local[handle].ext_dsp = 2; /* set warm */
-			handles_local[handle].is_cold = 0;
-			retval = 0;
-		} else
-			retval = -1*err;
-		break;
-
-//	case TFADSP_WARM: /* Config complete */
-//		enable amp
-//		send Re0
-//		await pilot tone [audio power detect]
-//		audio active
-//		break;
-	case TFADSP_EXT_PWRDOWN: /* DSP stopping */
-		pr_info("disable ext dsp\n");
-		handles_local[handle].ext_dsp = 0; /* unregister */
-		/* amp off */
-		break;
-	case TFADSP_SOFT_MUTE_READY: /* [audio low power detect]: Muting completed */
-		break;
-	case TFADSP_VOLUME_READY : /* Volume change completed */
-		break;
-	case TFADSP_DAMAGED_SPEAKER : /* Damaged speaker was detected */
-		// amp off
-		break;
-	default:
-		pr_err("%s: unknown tfadsp event:0x%0x\n",
-			__func__, tfadsp_event);
-		retval = -1;
-		break;
-	}
-
-	handles_local[handle].tfadsp_event = tfadsp_event; /* record active event */
-
-	return retval;
-}
-
 /* Since this is only valid for Tiberius we can set this for 2 handles,
  * regardless if we are mono or stereo.
  */
-/*	int tfa_ext_register(dsp_write_reg_t tfa_write_reg,
- *		dsp_send_message_t tfa_send_message,
- *		dsp_read_message_t tfa_read_message,
- *		tfa_event_handler_t *tfa_event_handler)
- */
-int tfa_ext_register(dsp_send_message_t tfa_send_message,
-	dsp_read_message_t tfa_read_message,
-	tfa_event_handler_t *tfa_event_handler)
+int tfa_ext_register(dsp_send_message_t tfa_send_message, dsp_read_message_t tfa_read_message, tfa_event_handler_t *tfa_event_handler)
 {
-	// handles_local[0].rev = 0x1b72; // added for smart studio.
+	/* master device only: external is always device 0,
+	 * Don't do this for device 1!
+	 */
+	handles_local[0].ext_dsp = 1; /* set cold 1st msg */
+	handles_local[0].is_cold = 1;
 
-	// pr_info("%s: device type (0x%02x)\n", __func__, handles_local[0].rev);
-	// if (((handles_local[0].rev & 0xff) == 0x72) || (handles_local[0].ext_dsp != 0))
-	{
-#if 0
-		if (tfa_write_reg != NULL) {
-			handles_local[0].dev_ops.reg_write = (reg_write_t)tfa_write_reg;
-			handles_local[1].dev_ops.reg_write = (reg_write_t)tfa_write_reg;
-		}
-#endif
-
-		/* master device only: external is always device 0,
-		 * Don't do this for device 1!
-		 */
-		handles_local[0].ext_dsp = 1; /* set cold 1st msg */
-		handles_local[0].is_cold = 1;
-
-		handles_local[0].profile = 0;
-		handles_local[1].profile = 0;
-
-		handles_local[0].dev_ops.dsp_msg = (dsp_msg_t)tfa_send_message;
-		handles_local[1].dev_ops.dsp_msg = (dsp_msg_t)tfa_send_message;
-
-		handles_local[0].dev_ops.dsp_msg_read =
-			(dsp_msg_read_t)tfa_read_message;
-		handles_local[1].dev_ops.dsp_msg_read =
-			(dsp_msg_read_t)tfa_read_message;
-
-		if (tfa_event_handler != NULL)
-			*tfa_event_handler = tfa_dsp_handle_event;
-	}
+	handles_local[0].profile = 0;
+	handles_local[1].profile = 0;
 
 	return 0;
 }
-EXPORT_SYMBOL(tfa_ext_register);
 
 /* This is required to set the right status when remote is used */
 void tfa_ext_set_ext_dsp(int value)

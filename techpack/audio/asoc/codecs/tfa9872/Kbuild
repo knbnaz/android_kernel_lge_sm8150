@@ -6,7 +6,7 @@ else
 	KERNEL_BUILD := 0
 endif
 
-TFA_DEBUG                =1
+TFA_DEBUG                =0
 TFA_ENABLED_CODE         =1
 TFA_DISABLED_CODE        =1
 TFADSP_DEBUG             =0
@@ -107,7 +107,6 @@ CDEFINES +=	-DANI_LITTLE_BYTE_ENDIAN \
 		-D__linux__
 
 CDEFINES += -DUSE_TFA9872 \
-			-DTFA_DEBUG \
 			-DTFADSP_32BITS\
 			-DTFADSP_DSP_MSG_APR_PACKET_STRATEGY \
 			-DTFADSP_DSP_BUFFER_POOL \
