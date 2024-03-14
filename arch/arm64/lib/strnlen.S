@@ -21,10 +21,10 @@
 #define cntin		x1
 #define result		x0
 
-#define src		x2
+#define src			x2
 #define synd		x3
 #define	shift		x4
-#define tmp		x4
+#define tmp			x4
 #define cntrem		x5
 
 #define qdata		q0
