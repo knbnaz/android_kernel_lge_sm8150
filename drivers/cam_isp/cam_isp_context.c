@@ -384,7 +384,7 @@ static int cam_isp_ctx_dump_req(
 }
 
 static int __cam_isp_ctx_enqueue_request_in_order(
-	struct cam_context *ctx, struct cam_ctx_request *req)
+	struct cam_context *ctx, struct cam_ctx_request *req, bool lock)
 {
 	struct cam_ctx_request           *req_current;
 	struct cam_ctx_request           *req_prev;
@@ -392,7 +392,8 @@ static int __cam_isp_ctx_enqueue_request_in_order(
 	struct cam_isp_context           *ctx_isp;
 
 	INIT_LIST_HEAD(&temp_list);
-	spin_lock_bh(&ctx->lock);
+	if (lock)
+		spin_lock_bh(&ctx->lock);
 	if (list_empty(&ctx->pending_req_list)) {
 		list_add_tail(&req->list, &ctx->pending_req_list);
 	} else {
@@ -423,7 +424,8 @@ static int __cam_isp_ctx_enqueue_request_in_order(
 	ctx_isp = (struct cam_isp_context *) ctx->ctx_priv;
 	__cam_isp_ctx_update_event_record(ctx_isp,
 		CAM_ISP_CTX_EVENT_SUBMIT, req);
-	spin_unlock_bh(&ctx->lock);
+	if (lock)
+		spin_unlock_bh(&ctx->lock);
 	return 0;
 }
 
@@ -4221,7 +4223,7 @@ static int __cam_isp_ctx_rdi_only_sof_in_bubble_applied(
 		CAM_DBG(CAM_ISP, "move request %lld to active list(cnt = %d)",
 				req->request_id, ctx_isp->active_req_cnt);
 	} else {
-		__cam_isp_ctx_enqueue_request_in_order(ctx, req);
+		__cam_isp_ctx_enqueue_request_in_order(ctx, req, false);
 		ctx_isp->is_irq_disorder = false;
 		CAM_DBG(CAM_ISP, "move request %lld to pending list",
 			req->request_id);
@@ -5030,7 +5032,7 @@ static int __cam_isp_ctx_config_dev_in_top_state(
 						s_id, rc);
 				}
 			}
-			__cam_isp_ctx_enqueue_request_in_order(ctx, req);
+			__cam_isp_ctx_enqueue_request_in_order(ctx, req, true);
 		} else if ((ctx->state != CAM_CTX_FLUSHED) &&
 			(ctx->state >= CAM_CTX_READY) &&
 			ctx->ctx_crm_intf->add_req) {
@@ -5044,7 +5046,7 @@ static int __cam_isp_ctx_config_dev_in_top_state(
 					req->request_id);
 			} else {
 				__cam_isp_ctx_enqueue_request_in_order(
-					ctx, req);
+					ctx, req, true);
 			}
 		} else {
 			rc = -EINVAL;
