@@ -17,6 +17,11 @@
 #define __ASM_STRING_H
 
 #ifndef CONFIG_KASAN
+extern char *stpcpy(char *__restrict__ dest, const char *__restrict__ src);
+
+#define __HAVE_ARCH_STRCPY
+extern char *strcpy(char *, const char *);
+
 #define __HAVE_ARCH_STRRCHR
 extern char *strrchr(const char *, int c);
 
