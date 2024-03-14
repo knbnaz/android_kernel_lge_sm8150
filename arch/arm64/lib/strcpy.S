@@ -14,6 +14,8 @@
  * ARMv8-a, AArch64, Advanced SIMD.
  * MTE compatible.
  */
+ 
+#define L(label) .L ## label
 
 #define dstin		x0
 #define srcin		x1

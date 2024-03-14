@@ -16,6 +16,8 @@
  *
  */
  
+#define L(label) .L ## label
+ 
 #define dstin	x0
 #define val		x1
 #define valw	w1
