@@ -7,6 +7,34 @@ fwdir := $(addprefix $(srctree)/,$(filter-out /%,$(fwdir)))$(filter /%,$(fwdir))
 
 obj-y  := $(addsuffix .gen.o, $(subst $(quote),,$(CONFIG_EXTRA_FIRMWARE)))
 
+ifdef CONFIG_LGE_TOUCH_FW_PATH
+fwpath := $(subst ",,$(CONFIG_LGE_TOUCH_FW_PATH))
+ifdef CONFIG_LGE_TOUCH_MODULE_DETECT
+lge_touch_image_files := $(wildcard $(srctree)/drivers/base/firmware_loader/builtin/$(fwpath)/*/*/*)
+else
+lge_touch_image_files := $(wildcard $(srctree)/drivers/base/firmware_loader/builtin/$(fwpath)/*)
+endif
+lge_touch_firmware := $(subst $(srctree)/drivers/base/firmware_loader/builtin/,,$(lge_touch_image_files))
+fw-shipped-$(CONFIG_LGE_TOUCH_CORE_BASE) += $(lge_touch_firmware)
+endif
+
+fw-shipped-$(CONFIG_FPGA_MGR_ICE40_SPI_LGE) += lattice/rev02/lg_singlewire_m48_impl_1.img
+fw-shipped-$(CONFIG_FPGA_MGR_ICE40_SPI_LGE) += lattice/revA/lg_singlewire_m48_impl_1.img
+fw-shipped-$(CONFIG_FPGA_MGR_ICE40_SPI_LGE) += lattice/lg_singlewire_m48_impl_1.img
+fw-shipped-$(CONFIG_FPGA_MGR_ICE40_SPI_LGE) += lattice/lg_singlewire_s48_impl_1.img
+
+fw-shipped-$(CONFIG_FPGA_MGR_ICE40_SPI_LGE) += mcu/FLASH_SYSTEM.img
+
+fw-shipped-$(CONFIG_SAR_ATMF04_12QFN) += atmf04/ALMF04_Sar2CH_V1.38T.fw
+fw-shipped-$(CONFIG_SAR_ATMF04_F37) += atmf04/atmf04_2CH_V0.37.fw
+fw-shipped-all := $(fw-shipped-y) $(fw-shipped-m) $(fw-shipped-)
+
+# Directories which we _might_ need to create, so we have a rule for them.
+firmware-dirs := $(sort $(addprefix $(objtree)/$(obj)/,$(dir $(fw-external-y) $(fw-shipped-all))))
+
+quiet_cmd_copy  = COPY    $@
+      cmd_copy  = cp $(srctree)/$@ $@
+
 FWNAME    = $(patsubst $(obj)/%.gen.S,%,$@)
 comma     := ,
 FWSTR     = $(subst $(comma),_,$(subst /,_,$(subst .,_,$(subst -,_,$(FWNAME)))))
@@ -34,8 +62,15 @@ filechk_fwbin = \
 $(obj)/%.gen.S: FORCE
 	$(call filechk,fwbin)
 
+$(patsubst %,$(obj)/%.gen.S, $(fw-shipped-y)): %: $(wordsize_deps) \
+		| $(objtree)/$$(dir %)
+	$(call cmd,fwbin,$(patsubst %.gen.S,%,$@))
+
 # The .o files depend on the binaries directly; the .S files don't.
+$(patsubst %,$(obj)/%.gen.o, $(fw-shipped-y)): %.gen.o: %
 $(addprefix $(obj)/, $(obj-y)): $(obj)/%.gen.o: $(fwdir)/%
 
 targets := $(patsubst $(obj)/%,%, \
                                 $(shell find $(obj) -name \*.gen.S 2>/dev/null))
+
+obj-$(CONFIG_FIRMWARE_IN_KERNEL) += $(patsubst %,%.gen.o, $(fw-shipped-y))
