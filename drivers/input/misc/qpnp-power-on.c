@@ -28,6 +28,10 @@
 #include <linux/regulator/machine.h>
 #include <linux/regulator/of_regulator.h>
 
+#ifdef CONFIG_LGE_HANDLE_PANIC
+#include <soc/qcom/lge/lge_handle_panic.h>
+#endif
+
 #define PMIC_VER_8941				0x01
 #define PMIC_VERSION_REG			0x0105
 #define PMIC_VERSION_REV4_REG			0x0103
@@ -842,6 +846,47 @@ int qpnp_pon_is_warm_reset(void)
 }
 EXPORT_SYMBOL(qpnp_pon_is_warm_reset);
 
++#ifdef CONFIG_LGE_PM_SMPL_COUNTER
++/**
++ * qpnp_pon_read_poff_sts - Read PMIC power off reason.
++ *
++ * Returns >= 0 for power off reason index, < 0 for errors
++ *
++ */
+static int qpnp_pon_read_gen2_pon_off_reason(struct qpnp_pon *pon, u16 *reason,
+					int *reason_index_offset);
+int qpnp_pon_read_poff_sts(void)
+{
+	struct qpnp_pon *pon = sys_reset_dev;
+	int index, reason_index_offset, rc;
+	u16 poff_sts = 0;
+	u8 buf[2];
+
+	if (!pon)
+		return -EPROBE_DEFER;
+
+	if (!is_pon_gen1(pon) && pon->subtype != PON_1REG) {
+		rc = qpnp_pon_read_gen2_pon_off_reason(pon, &poff_sts,
+						&reason_index_offset);
+		if (rc)
+			return rc;
+	} else {
+		rc = regmap_bulk_read(pon->regmap, QPNP_POFF_REASON1(pon),
+			buf, 2);
+		if (rc) {
+			dev_err(pon->dev, "Unable to read POFF_REASON regs rc:%d\n",
+				rc);
+			return  rc;
+		}
+		poff_sts = buf[0] | (buf[1] << 8);
+	}
+	index = ffs(poff_sts) - 1 + reason_index_offset;
+
+	return index;
+}
+EXPORT_SYMBOL(qpnp_pon_read_poff_sts);
+#endif
+
 /**
  * qpnp_pon_wd_config() - configure the watch dog behavior for warm reset
  * @enable: to enable or disable the PON watch dog
@@ -861,6 +906,44 @@ int qpnp_pon_wd_config(bool enable)
 				QPNP_PON_WD_EN, enable ? QPNP_PON_WD_EN : 0);
 }
 EXPORT_SYMBOL(qpnp_pon_wd_config);
+
+#ifdef CONFIG_LGE_PM
+/* control S2 reset type */
+static int qpnp_pon_s2_type_set(const char* val, const struct kernel_param* kp) {
+	struct qpnp_pon* pon = sys_reset_dev;
+	uint type;
+
+	if (!kstrtouint(val, 0, &type) && !qpnp_pon_masked_write(pon,
+		QPNP_PON_KPDPWR_RESIN_S2_CNTL(pon), QPNP_PON_S2_CNTL_TYPE_MASK, type)) {
+		dev_info(pon->dev,
+			"Setting s2 reset type = 0x%02X\n", type);
+		return 0;
+	}
+	else {
+		dev_err(pon->dev,
+			"Unable to configure S2 reset type of %s\n", val);
+		return -EINVAL;
+	}
+}
+
+static int qpnp_pon_s2_type_get(char* buf, const struct kernel_param* kp) {
+	struct qpnp_pon* pon = sys_reset_dev;
+	uint temp = 0;
+
+	regmap_read(pon->regmap,
+		QPNP_PON_KPDPWR_RESIN_S2_CNTL(pon), &temp);
+
+	return snprintf(buf, QPNP_PON_BUFFER_SIZE, "%d\n",
+		temp & QPNP_PON_S2_CNTL_TYPE_MASK);
+}
+
+static struct kernel_param_ops s2_type_ops = {
+	.set = qpnp_pon_s2_type_set,
+	.get = qpnp_pon_s2_type_get,
+};
+
+module_param_cb(s2_type, &s2_type_ops, NULL, 0644);
+#endif
 
 static int qpnp_pon_get_trigger_config(enum pon_trigger_source pon_src,
 							bool *enabled)
@@ -1055,6 +1138,10 @@ static int qpnp_pon_input_dispatch(struct qpnp_pon *pon, u32 pon_type)
 
 	input_report_key(pon->pon_input, cfg->key_code, key_status);
 	input_sync(pon->pon_input);
+
+#ifdef CONFIG_LGE_HANDLE_PANIC
+	lge_gen_key_panic(cfg->key_code, key_status);
+#endif
 
 	cfg->old_state = !!key_status;
 
