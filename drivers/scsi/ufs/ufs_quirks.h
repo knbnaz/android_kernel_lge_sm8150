@@ -18,6 +18,10 @@
 #define UFS_VENDOR_SKHYNIX     0x1AD
 #define UFS_VENDOR_WDC         0x145
 
+#ifdef CONFIG_UFS_LGE_FEATURE
+#define UFS_VENDOR_SANDISK     0x145
+#endif
+
 /**
  * ufs_dev_fix - ufs device quirk info
  * @card: ufs card details
@@ -173,5 +177,9 @@ struct ufs_dev_fix {
  * suspend flow.
  */
 #define UFS_DEVICE_QUIRK_DELAY_AFTER_LPM        (1 << 11)
+
+#ifdef CONFIG_LGE_IOSCHED_EXTENSION
+#define UFS_DEVICE_QUIRK_CMD_ORDERED (1 << 15)
+#endif
 
 #endif /* UFS_QUIRKS_H_ */

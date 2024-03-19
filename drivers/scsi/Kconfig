@@ -1512,6 +1512,12 @@ config SCSI_VIRTIO
           This is the virtual HBA driver for virtio.  If the kernel will
           be used in a virtual machine, say Y or M.
 
+config SCSI_DEVICE_IDENTIFIER
+	bool "device identifier"
+	default y
+	help
+	  This is scsi device identifier flag
+
 source "drivers/scsi/csiostor/Kconfig"
 
 source "drivers/scsi/pcmcia/Kconfig"
