@@ -1593,4 +1593,6 @@ config LK_BOOT_TIME_MARKER
 source "drivers/soc/qcom/icnss2/Kconfig"
 
 source "drivers/soc/qcom/gnsssirf/Kconfig"
+
+source "drivers/soc/qcom/lge/Kconfig"
 endmenu
