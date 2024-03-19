@@ -1521,6 +1521,12 @@ config SCSI_VIRTIO_QTI_CRYPTO
 	  and implemented by QTI.
 	  Say Y or M.
 
+config SCSI_DEVICE_IDENTIFIER
+	bool "device identifier"
+	default y
+	help
+	  This is scsi device identifier flag
+
 source "drivers/scsi/csiostor/Kconfig"
 
 source "drivers/scsi/pcmcia/Kconfig"

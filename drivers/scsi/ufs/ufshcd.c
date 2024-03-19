@@ -231,6 +231,11 @@ ufs_get_desired_pm_lvl_for_dev_link_state(enum ufs_dev_pwr_mode dev_state,
 
 static struct ufs_dev_fix ufs_fixups[] = {
 	/* UFS cards deviations table */
+#ifdef CONFIG_MACH_LGE
+	/* Toshiba recommend that we should not use FASTAUTO in Toshiba-UFS-Gen3.
+	 */
+	UFS_FIX(UFS_VENDOR_TOSHIBA, "THGLF2G8J4LBATR", UFS_DEVICE_NO_FASTAUTO),
+#endif
 	UFS_FIX(UFS_VENDOR_MICRON, UFS_ANY_MODEL,
 		UFS_DEVICE_QUIRK_DELAY_BEFORE_LPM),
 	UFS_FIX(UFS_VENDOR_SAMSUNG, UFS_ANY_MODEL,
@@ -245,8 +250,17 @@ static struct ufs_dev_fix ufs_fixups[] = {
 		UFS_DEVICE_QUIRK_PA_TACTIVATE),
 	UFS_FIX(UFS_VENDOR_TOSHIBA, "THGLF2G9D8KBADG",
 		UFS_DEVICE_QUIRK_PA_TACTIVATE),
+#ifdef CONFIG_LGE_IOSCHED_EXTENSION
+	UFS_FIX(UFS_VENDOR_TOSHIBA, UFS_ANY_MODEL,
+		UFS_DEVICE_QUIRK_CMD_ORDERED),
+#endif
+#ifdef CONFIG_MACH_LGE
+	UFS_FIX(UFS_ANY_VENDOR, UFS_ANY_MODEL,
+		UFS_DEVICE_QUIRK_HOST_PA_SAVECONFIGTIME),
+#else
 	UFS_FIX(UFS_VENDOR_SKHYNIX, UFS_ANY_MODEL,
 		UFS_DEVICE_QUIRK_HOST_PA_SAVECONFIGTIME),
+#endif
 	UFS_FIX(UFS_VENDOR_SKHYNIX, "hB8aL1" /*H28U62301AMR*/,
 		UFS_DEVICE_QUIRK_HOST_VS_DEBUGSAVECONFIGTIME),
 #if defined(CONFIG_SCSI_UFSHCD_QTI)
@@ -9582,6 +9596,10 @@ int ufshcd_init(struct ufs_hba *hba, void __iomem *mmio_base, unsigned int irq)
 	host->max_cmd_len = UFS_CDB_SIZE;
 
 	hba->max_pwr_info.is_valid = false;
+
+#ifdef CONFIG_SCSI_DEVICE_IDENTIFIER
+	host->by_ufs = 1;
+#endif
 
 	/* Initailize wait queue for task management */
 	init_waitqueue_head(&hba->tm_wq);

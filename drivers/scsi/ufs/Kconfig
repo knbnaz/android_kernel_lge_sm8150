@@ -50,6 +50,12 @@ config SCSI_UFSHCD
 	  However, do not compile this as a module if your root file system
 	  (the one containing the directory /) is located on a UFS device.
 
+config UFS_LGE_FEATURE
+    tristate "Add LGE Feature for UFS device"
+    depends on SCSI_UFSHCD
+    ---help---
+    This Feature adds for LGE modification
+
 config SCSI_UFSHCD_QTI
 	tristate "Universal Flash Storage Controller Driver Core QTI"
 	depends on SCSI && SCSI_DMA && QGKI && SCSI_UFSHCD
@@ -196,3 +202,9 @@ config SCSI_UFS_CRYPTO_QTI
 	 Enable Vendor Crypto Engine Support in UFS
 	 Enabling this allows kernel to use UFS crypto operations defined
 	 and implemented by QTI.
+
+config LGE_IOSCHED_EXTENSION
+	bool "extension I/O schedule"
+	default y
+	help
+	  for extension scheduling for I/O
