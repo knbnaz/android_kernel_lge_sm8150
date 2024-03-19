@@ -17,7 +17,9 @@
 #include <linux/mmc/card.h>
 #include <linux/mmc/mmc.h>
 #include <linux/mmc/sd.h>
-
+#ifdef CONFIG_MACH_LGE
+#include <linux/mmc/slot-gpio.h>
+#endif
 #include "core.h"
 #include "card.h"
 #include "host.h"
@@ -283,6 +285,29 @@ static int mmc_read_ssr(struct mmc_card *card)
 				card->ssr.erase_timeout = (et * 1000) / es;
 				card->ssr.erase_offset = eo * 1000;
 			}
+			#ifdef CONFIG_MACH_LGE
+			/* LGE_CHANGE
+			 * Get SPEED_CLASS of SD-card.
+			 * 0:Class0, 1:Class2, 2:Class4, 3:Class6, 4:Class10
+			 * 2014/07/01, B2-BSP-FS@lge.com
+			 */
+			{
+			   unsigned int speed_class_ssr = 0;
+			   speed_class_ssr = UNSTUFF_BITS(card->raw_ssr, 440 - 384, 8);
+			   if(speed_class_ssr < 5)
+			   {
+			     printk(KERN_INFO "[LGE][MMC][%-18s( )] mmc_hostname:%s, %u ==> SPEED_CLASS %s%s%s%s%s\n", __func__,
+				mmc_hostname(card->host), speed_class_ssr,
+				((speed_class_ssr == 4) ? "10" : ""),
+				((speed_class_ssr == 3) ? "6" : ""),
+				((speed_class_ssr == 2) ? "4" : ""),
+				((speed_class_ssr == 1) ? "2" : ""),
+				((speed_class_ssr == 0) ? "0" : ""));
+			   }
+			   else
+			   printk(KERN_INFO "[LGE][MMC][%-18s( )] mmc_hostname:%s, Unknown SPEED_CLASS\n", __func__, mmc_hostname(card->host));
+			}
+			#endif
 		} else {
 			pr_warn("%s: SD Status: Invalid Allocation Unit size\n",
 				mmc_hostname(card->host));
@@ -1025,6 +1050,16 @@ static int mmc_sd_init_card(struct mmc_host *host, u32 ocr,
 
 	WARN_ON(!host->claimed);
 retry:
+	#ifdef CONFIG_MACH_LGE
+	/* LGE_CHANGE, 2015-09-23
+	 * When uSD is not inserted, return proper error-value.
+	 */
+	if (!mmc_gpio_get_cd(host)) {
+		printk(KERN_INFO "[LGE][MMC][%-18s( )] sd-no-exist. skip next\n", __func__);
+		err = -ENOMEDIUM;
+		return err;
+	}
+	#endif
 	err = mmc_sd_get_cid(host, ocr, cid, &rocr);
 	if (err)
 		return err;
@@ -1400,10 +1435,28 @@ int mmc_attach_sd(struct mmc_host *host)
 {
 	int err;
 	u32 ocr, rocr;
+#ifdef CONFIG_MACH_LGE
+	int i = 0;
+#endif
 
 	WARN_ON(!host->claimed);
 
+#ifdef CONFIG_MACH_LGE
+	for(i = 0; i < 3; i++) {
+		err = mmc_send_app_op_cond(host, 0, &ocr);
+		printk(KERN_ERR "[LGE][%s]mmc_send_app_op_cond : %d\n", __func__, err);
+		if (err) {
+			mmc_power_cycle(host, host->ocr_avail);
+			mmc_go_idle(host);
+			mmc_send_if_cond(host, host->ocr_avail);
+			printk(KERN_ERR "[LGE][%s]after mmc_power_cycle %d\n", __func__, i);
+		} else {
+			break;
+		}
+	}
+#else
 	err = mmc_send_app_op_cond(host, 0, &ocr);
+#endif
 	if (err)
 		return err;
 

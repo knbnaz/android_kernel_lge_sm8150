@@ -2290,6 +2290,23 @@ out:
 	return ret;
 }
 
+#ifdef CONFIG_MACH_LGE
+/*
+ * Reset vreg by ensuring it is off during probe. A call
+ * to enable vreg is needed to balance disable vreg
+ */
+static int sdhci_msm_vreg_reset(struct sdhci_msm_pltfm_data *pdata)
+{
+	int ret;
+
+	ret = sdhci_msm_setup_vreg(pdata, 1, true);
+	if (ret)
+		return ret;
+	ret = sdhci_msm_setup_vreg(pdata, 0, true);
+	return ret;
+}
+#endif
+
 /* This init function should be called only once for each SDHC slot */
 static int sdhci_msm_vreg_init(struct device *dev,
 				struct sdhci_msm_host *msm_host,
@@ -2322,6 +2339,15 @@ static int sdhci_msm_vreg_init(struct device *dev,
 	if (curr_vdd_io_reg)
 		ret = sdhci_msm_vreg_init_reg(dev, curr_vdd_io_reg);
 out:
+#ifdef CONFIG_MACH_LGE
+	/*
+	 * vreg reset is needed to recognize card insertion at early stage (0~4sec)
+	 * caused by pin shortage with sim tray.
+	*/
+	if (mmc_card_is_removable(msm_host->mmc))
+		ret = sdhci_msm_vreg_reset(msm_host);
+#endif
+
 	if (ret)
 		dev_err(dev, "vreg reset failed (%d)\n", ret);
 
@@ -3580,12 +3606,22 @@ static const struct sdhci_ops sdhci_msm_ops = {
 };
 
 static const struct sdhci_pltfm_data sdhci_msm_pdata = {
+#ifdef CONFIG_MACH_LGE
+	.quirks = SDHCI_QUIRK_BROKEN_CARD_DETECTION |
+		  SDHCI_QUIRK_SINGLE_POWER_WRITE |
+		  SDHCI_QUIRK_CAP_CLOCK_BASE_BROKEN |
+		  SDHCI_QUIRK_NO_ENDATTR_IN_NOPDESC |
+		  SDHCI_QUIRK_MULTIBLOCK_READ_ACMD12|
+		  SDHCI_QUIRK_DATA_TIMEOUT_USES_SDCLK |
+		  SDHCI_QUIRK_NO_LED,
+#else
 	.quirks = SDHCI_QUIRK_BROKEN_CARD_DETECTION |
 		  SDHCI_QUIRK_SINGLE_POWER_WRITE |
 		  SDHCI_QUIRK_CAP_CLOCK_BASE_BROKEN |
 		  SDHCI_QUIRK_NO_ENDATTR_IN_NOPDESC |
 		  SDHCI_QUIRK_MULTIBLOCK_READ_ACMD12 |
 		  SDHCI_QUIRK_DATA_TIMEOUT_USES_SDCLK,
+#endif
 
 	.quirks2 = SDHCI_QUIRK2_PRESET_VALUE_BROKEN,
 	.ops = &sdhci_msm_ops,
@@ -4268,6 +4304,9 @@ static void sdhci_msm_set_caps(struct sdhci_msm_host *msm_host)
 {
 	msm_host->mmc->caps |= MMC_CAP_AGGRESSIVE_PM;
 	msm_host->mmc->caps |= MMC_CAP_WAIT_WHILE_BUSY | MMC_CAP_NEED_RSP_BUSY;
+#ifdef CONFIG_MACH_LGE
+	msm_host->mmc->caps |= MMC_CAP_CD_WAKE;
+#endif
 }
 
 static int sdhci_msm_probe(struct platform_device *pdev)
@@ -4546,7 +4585,11 @@ static int sdhci_msm_probe(struct platform_device *pdev)
 
 #if defined(CONFIG_SDC_QTI)
 	host->timeout_clk_div = 4;
+#ifdef CONFIG_MACH_LGE
+	msm_host->mmc->caps2 &= ~MMC_CAP2_CLK_SCALE;
+#else
 	msm_host->mmc->caps2 |= MMC_CAP2_CLK_SCALE;
+#endif
 #endif
 	sdhci_msm_setup_pm(pdev, msm_host);
 
