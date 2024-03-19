@@ -15,6 +15,10 @@
 #include <linux/types.h>
 #include <soc/qcom/socinfo.h>
 
+#ifdef CONFIG_MACH_LGE
+#include <soc/qcom/lge/board_lge.h>
+#endif
+
 /*
  * SoC version type with major number in the upper 16 bits and minor
  * number in the lower 16 bits.
@@ -32,6 +36,10 @@
  */
 #define SMEM_HW_SW_BUILD_ID            137
 #define SMEM_IMAGE_VERSION_TABLE	469
+
+#if defined(CONFIG_MACH_SM8150_MH2LM) || defined (CONFIG_MACH_SM8150_MH2LM_5G)
+extern bool is_ddic_name(char *ddic_name);
+#endif
 
 static uint32_t socinfo_format;
 static const char *sku;
@@ -1025,6 +1033,44 @@ msm_get_images(struct device *dev,
 	return pos;
 }
 
+#ifdef CONFIG_MACH_LGE
+static ssize_t
+msm_get_hw_rev(struct device *dev,
+			struct device_attribute *attr,
+			char *buf)
+{
+	enum hw_rev_no revid = lge_get_board_rev_no();
+
+	pr_err("hw_rev called'\n");
+	pr_err("hw_rev id:%d\n",revid);
+	pr_err("hw_rev :%s",lge_get_board_revision());
+
+	return snprintf(buf, PAGE_SIZE, "%-.32s\n",
+			lge_get_board_revision());
+}
+
+#if defined(CONFIG_MACH_SM8150_MH2LM) || defined (CONFIG_MACH_SM8150_MH2LM_5G)
+static ssize_t
+msm_get_panel_rev(struct device *dev,
+		struct device_attribute *attr,
+		char *buf)
+{
+	char* d_cut_panel = "d_cut";
+	char* others      = "others";
+
+	pr_err("panel_rev called'\n");
+
+	if(is_ddic_name("r66456a") || is_ddic_name("rm692A9") || is_ddic_name("dsi_sim_cmd")){
+		pr_err("panel_rev: d-cut\n");
+		return snprintf(buf, PAGE_SIZE, "%-.32s\n", d_cut_panel);
+	} else {
+		pr_err("panel_rev: others\n");
+		return snprintf(buf, PAGE_SIZE, "%-.32s\n", others);
+	}
+}
+#endif
+#endif
+
 static struct device_attribute image_version =
 	__ATTR(image_version, 0644,
 			msm_get_image_version, msm_set_image_version);
@@ -1043,6 +1089,16 @@ static struct device_attribute select_image =
 
 static struct device_attribute images =
 	__ATTR(images, 0444, msm_get_images, NULL);
+
+#ifdef CONFIG_MACH_LGE
+static struct device_attribute msm_soc_attr_hw_rev =
+	__ATTR(hw_rev, S_IRUGO, msm_get_hw_rev, NULL);
+
+#if defined(CONFIG_MACH_SM8150_MH2LM) || defined (CONFIG_MACH_SM8150_MH2LM_5G)
+static struct device_attribute msm_soc_attr_panel_rev =
+	__ATTR(panel_rev, S_IRUGO, msm_get_panel_rev, NULL);
+#endif
+#endif
 
 
 static umode_t soc_info_attribute(struct kobject *kobj,
