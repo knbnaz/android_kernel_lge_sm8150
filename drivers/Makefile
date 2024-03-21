@@ -186,3 +186,15 @@ obj-$(CONFIG_SIOX)		+= siox/
 obj-$(CONFIG_GNSS)		+= gnss/
 obj-$(CONFIG_INTERCONNECT)	+= interconnect/
 obj-$(CONFIG_COUNTER)		+= counter/
+
+obj-$(CONFIG_TSPDRV)              += tspdrv/
+#TDMB
+obj-$(CONFIG_LGE_BROADCAST_TDMB) += broadcast/
+obj-$(CONFIG_LATTICE_ICE40)              += ice40/
+
+ifeq ($(CONFIG_TRUSTONIC_TEE),y)
+obj-$(CONFIG_TRUSTONIC_TEE) += gud/
+endif
+
+# ISDBT
+obj-$(CONFIG_LGE_BROADCAST_ISDBT_JAPAN) += broadcast/
