@@ -30,6 +30,10 @@
 
 #include <linux/phy/phy.h>
 
+#ifdef CONFIG_LGE_USB
+#include <linux/usb/usbpd.h>
+#endif
+
 #define DWC3_MSG_MAX	500
 
 /* Global constants */
@@ -1207,6 +1211,11 @@ struct dwc3 {
 	struct phy		*usb2_generic_phy;
 	struct phy		*usb3_generic_phy;
 
+#ifdef CONFIG_LGE_USB
+	struct usbpd		*usbpd;
+	struct usbpd_svid_handler usbpd_svid_handler;
+#endif
+
 	bool			phys_ready;
 
 	struct ulpi		*ulpi;
@@ -1423,6 +1432,10 @@ struct dwc3 {
 	wait_queue_head_t	wait_linkstate;
 	struct work_struct	remote_wakeup_work;
 	bool			dual_port;
+
+#ifdef CONFIG_LGE_USB
+	bool			*usb_compliance_mode;
+#endif
 };
 
 #define INCRX_BURST_MODE 0
@@ -1722,6 +1735,10 @@ enum dwc3_notify_event {
 	DWC3_CONTROLLER_SET_CURRENT_DRAW_EVENT,
 	DWC3_CONTROLLER_NOTIFY_DISABLE_UPDXFER,
 	DWC3_CONTROLLER_PULLUP,
+#ifdef CONFIG_LGE_USB
+	DWC3_CONTROLLER_WAKEUP_EVENT,
+	DWC3_CONTROLLER_SUSPEND_EVENT,
+#endif
 
 	/* USB GSI event buffer related notification */
 	DWC3_GSI_EVT_BUF_ALLOC,

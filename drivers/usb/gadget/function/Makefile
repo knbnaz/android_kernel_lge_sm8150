@@ -17,8 +17,13 @@ obj-$(CONFIG_USB_F_SERIAL)	+= usb_f_serial.o
 usb_f_obex-y			:= f_obex.o
 obj-$(CONFIG_USB_F_OBEX)	+= usb_f_obex.o
 obj-$(CONFIG_USB_U_ETHER)	+= u_ether.o
+ifeq ($(CONFIG_LGE_USB_GADGET), y)
+usb_f_ncm_lge-y			:= f_ncm_lge.o
+obj-$(CONFIG_USB_F_NCM)		+= usb_f_ncm_lge.o
+else
 usb_f_ncm-y			:= f_ncm.o
 obj-$(CONFIG_USB_F_NCM)		+= usb_f_ncm.o
+endif
 usb_f_ecm-y			:= f_ecm.o
 obj-$(CONFIG_USB_F_ECM)		+= usb_f_ecm.o
 usb_f_phonet-y			:= f_phonet.o
@@ -67,3 +72,5 @@ ifeq ($(CONFIG_USB_F_RNDIS),)
 usb_f_gsi-y			+= rndis.o
 endif
 obj-$(CONFIG_USB_F_GSI)		+= usb_f_gsi.o
+usb_f_laf-y         := f_laf.o
+obj-$(CONFIG_LGE_USB_F_LAF) += usb_f_laf.o
