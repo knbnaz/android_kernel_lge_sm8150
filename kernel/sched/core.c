@@ -7887,6 +7887,27 @@ static u64 cpu_uclamp_ls_read_u64(struct cgroup_subsys_state *css,
 }
 #endif /* CONFIG_UCLAMP_TASK_GROUP */
 
+#ifdef CONFIG_SCHED_CAS
+#ifdef CONFIG_UCLAMP_TASK_GROUP
+void set_uclamp_touch(struct task_group *top_tg, unsigned int value)
+{
+	mutex_lock(&uclamp_mutex);
+	rcu_read_lock();
+
+	uclamp_se_set(&top_tg->uclamp_req[UCLAMP_MIN], value, false);
+	cpu_util_update_eff(&top_tg->css);
+
+	rcu_read_unlock();
+	mutex_unlock(&uclamp_mutex);
+}
+#else
+void set_uclamp_touch(struct task_group *top_tg, unsigned int value)
+{
+	return;
+}
+#endif
+#endif
+
 #ifdef CONFIG_FAIR_GROUP_SCHED
 static int cpu_shares_write_u64(struct cgroup_subsys_state *css,
 				struct cftype *cftype, u64 shareval)

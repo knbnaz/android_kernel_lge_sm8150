@@ -135,6 +135,74 @@ static ssize_t show_input_boost_freq(struct kobject *kobj,
 
 cpu_boost_attr_rw(input_boost_freq);
 
+static DEFINE_PER_CPU(unsigned int, sub_boost_freq);
+#define MIN_INPUT_INTERVAL_MS 40
+#define MIN_INPUT_INTERVAL_US (MIN_INPUT_INTERVAL_MS * USEC_PER_MSEC)
+#define MAX_PRECEDING_BOOST_TIME 200
+static bool sub_boost_enabled = false;
+static unsigned int prec_boost_ms = 0;
+static unsigned int boost_step = 0;
+static struct work_struct input_boost_multi_step_work;
+static ssize_t store_sub_boost_freq(struct kobject *kobj,
+                      struct kobj_attribute *attr,
+                      const char *buf, size_t count)
+{
+        int i, ntokens = 0;
+        unsigned int val, cpu;
+        const char *cp = buf;
+        bool enabled = false;
+        while ((cp = strpbrk(cp + 1, " :")))
+                ntokens++;
+        /* single number: apply to all CPUs */
+        if (!ntokens) {
+                if (sscanf(buf, "%u\n", &val) != 1)
+                        return -EINVAL;
+                for_each_possible_cpu(i)
+                        per_cpu(sub_boost_freq, i) = val;
+                goto check_enable;
+        }
+        /* CPU:value pair */
+        if (!(ntokens % 2))
+                return -EINVAL;
+        cp = buf;
+        for (i = 0; i < ntokens; i += 2) {
+                if (sscanf(cp, "%u:%u", &cpu, &val) != 2)
+                        return -EINVAL;
+                if (cpu >= num_possible_cpus())
+                        return -EINVAL;
+                per_cpu(sub_boost_freq, cpu) = val;
+                cp = strchr(cp, ' ');
+                cp++;
+        }
+check_enable:
+        for_each_possible_cpu(i) {
+                if (per_cpu(sub_boost_freq, i)) {
+                        enabled = true;
+                        break;
+                }
+        }
+        sub_boost_enabled = enabled;
+        return count;
+}
+static ssize_t show_sub_boost_freq(struct kobject *kobj,
+                     struct kobj_attribute *attr, char *buf)
+{
+        int cnt = 0, cpu;
+        unsigned int val;
+        for_each_possible_cpu(cpu) {
+                val = per_cpu(sub_boost_freq, cpu);
+                cnt += snprintf(buf + cnt, PAGE_SIZE - cnt,
+                                "%d:%u ", cpu, val);
+        }
+        cnt += snprintf(buf + cnt, PAGE_SIZE - cnt, "\n");
+        return cnt;
+}
+cpu_boost_attr_rw(sub_boost_freq);
+/*
+ * The CPUFREQ_ADJUST notifier is used to override the current policy min to
+ * make sure policy min >= boost_min. The cpufreq framework then does the job
+ * of enforcing the new policy.
+ */
 static void boost_adjust_notify(struct cpufreq_policy *policy)
 {
 	unsigned int cpu = policy->cpu;
@@ -203,6 +271,8 @@ static void do_input_boost_rem(struct work_struct *work)
 			pr_err("cpu-boost: sched boost disable failed\n");
 		sched_boost_active = false;
 	}
+	
+	boost_step = 0;
 }
 
 static void do_input_boost(struct work_struct *work)
@@ -239,6 +309,57 @@ static void do_input_boost(struct work_struct *work)
 					msecs_to_jiffies(input_boost_ms));
 }
 
+static void do_input_boost_multi_step(struct work_struct *work)
+{
+        unsigned int i, ret;
+        struct cpu_sync *i_sync_info;
+        cancel_delayed_work_sync(&input_boost_rem);
+        if (boost_step == 0) {
+                // step 1
+                pr_debug("Multi step boost: step 1\n");
+                if (sched_boost_active) {
+                        sched_set_boost(0);
+                        sched_boost_active = false;
+                }
+                for_each_possible_cpu(i) {
+                        i_sync_info = &per_cpu(sync_info, i);
+                        i_sync_info->input_boost_min = i_sync_info->input_boost_freq;
+                }
+                update_policy_online();
+                if (sched_boost_on_input > 0) {
+                        ret = sched_set_boost(sched_boost_on_input);
+                        if (ret)
+                                pr_err("cpu-boost: HMP boost enable failed\n");
+                        else
+                                sched_boost_active = true;
+                }
+                if (sub_boost_enabled) {
+                        boost_step = 1;
+                        prec_boost_ms = 0;
+                }
+        } else if (boost_step == 1) {
+                // step 2
+                prec_boost_ms += MIN_INPUT_INTERVAL_MS;
+                if (prec_boost_ms >= MAX_PRECEDING_BOOST_TIME) {
+                        pr_debug("Multi step boost: step 2\n");
+                        for_each_possible_cpu(i) {
+                                i_sync_info = &per_cpu(sync_info, i);
+                                i_sync_info->input_boost_min = per_cpu(sub_boost_freq, i);
+                        }
+                        update_policy_online();
+                        if (sched_boost_active) {
+                                ret = sched_set_boost(0);
+                                if (ret)
+                                        pr_err("cpu-boost: HMP boost disable failed\n");
+                                sched_boost_active = false;
+                        }
+                        boost_step = 2;
+                }
+        }
+        queue_delayed_work(cpu_boost_wq, &input_boost_rem,
+                                        msecs_to_jiffies(input_boost_ms));
+}
+
 static void cpuboost_input_event(struct input_handle *handle,
 		unsigned int type, unsigned int code, int value)
 {
@@ -246,6 +367,17 @@ static void cpuboost_input_event(struct input_handle *handle,
 
 	if (!input_boost_enabled)
 		return;
+
+        { // multi-step boost
+                now = ktime_to_us(ktime_get());
+                if (now - last_input_time < MIN_INPUT_INTERVAL_US)
+                        return;
+                if (work_pending(&input_boost_multi_step_work))
+                        return;
+                queue_work(cpu_boost_wq, &input_boost_multi_step_work);
+                last_input_time = ktime_to_us(ktime_get());
+                return;
+        }
 
 	now = ktime_to_us(ktime_get());
 	if (now - last_input_time < MIN_INPUT_INTERVAL)
@@ -343,6 +475,7 @@ int cpu_boost_init(void)
 
 	INIT_WORK(&input_boost_work, do_input_boost);
 	INIT_DELAYED_WORK(&input_boost_rem, do_input_boost_rem);
+	INIT_WORK(&input_boost_multi_step_work, do_input_boost_multi_step);
 
 	for_each_possible_cpu(cpu) {
 		s = &per_cpu(sync_info, cpu);
@@ -382,6 +515,10 @@ int cpu_boost_init(void)
 				&sched_boost_on_input_attr.attr);
 	if (ret)
 		pr_err("Failed to create sched_boost_on_input node: %d\n", ret);
+
+    ret = sysfs_create_file(cpu_boost_kobj, &sub_boost_freq_attr.attr);
+    if (ret)
+        pr_err("Failed to create sub_boost_freq node: %d\n", ret);
 
 	ret = input_register_handler(&cpuboost_input_handler);
 	return 0;
