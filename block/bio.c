@@ -647,6 +647,10 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_src)
 
 	bio_clone_blkg_association(bio, bio_src);
 	blkcg_bio_issue_init(bio);
+
+#ifdef CONFIG_LGE_IOSCHED_EXTENSION
+	bio->bi_excontrol = bio_src->bi_excontrol;
+#endif
 }
 EXPORT_SYMBOL(__bio_clone_fast);
 
