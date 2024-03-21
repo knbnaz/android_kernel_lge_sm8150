@@ -527,6 +527,9 @@ struct mmc_host {
 	unsigned int		retune_period;	/* re-tuning period in secs */
 	struct timer_list	retune_timer;	/* for periodic re-tuning */
 
+#ifdef CONFIG_LGE_TRAY_EVENT
+	struct work_struct tray_work;
+#endif
 	bool			trigger_card_event; /* card_event necessary */
 
 	struct mmc_card		*card;		/* device attached to this host */
