@@ -312,6 +312,15 @@ done:
 	 * is cleared, we must wait at least 50ms before accessing the PHY
 	 * domain (synchronization delay).
 	 */
+#ifdef CONFIG_LGE_USB
+	/*
+	 * Do not delay in usb compliance mode. Otherwise, it may fail at "TD
+	 * 4.7.5 Try. SNK DRP Connect Sink Test" of "USB-C Functional Tests".
+	 */
+	if (!(dwc->usb_compliance_mode &&
+	      *dwc->usb_compliance_mode &&
+	      (dwc->usb2_phy->flags & PHY_HOST_MODE)))
+#endif
 	if (dwc3_is_usb31(dwc) && dwc->revision <= DWC3_USB31_REVISION_180A)
 		msleep(50);
 
@@ -1232,6 +1241,9 @@ static int dwc3_core_get_phy(struct dwc3 *dwc)
 			for (i = 0; i < dwc->num_ssphy; i++)
 				dwc->usb3_phy[i] = devm_usb_get_phy_by_phandle(dev,
 							"usb-phy", 2 * i + 1);
+#ifdef CONFIG_LGE_USB
+		dwc->usbpd = devm_usbpd_get_by_phandle(dev, "usbpd");
+#endif
 	} else {
 		dwc->usb2_phy[0] = devm_usb_get_phy(dev, USB_PHY_TYPE_USB2);
 		dwc->usb3_phy[0] = devm_usb_get_phy(dev, USB_PHY_TYPE_USB3);
@@ -1289,6 +1301,20 @@ static int dwc3_core_get_phy(struct dwc3 *dwc)
 			return ret;
 		}
 	}
+
+#ifdef CONFIG_LGE_USB
+	if (IS_ERR(dwc->usbpd)) {
+		ret = PTR_ERR(dwc->usbpd);
+		if (ret == -ENXIO || ret == -ENODEV) {
+			dwc->usbpd = NULL;
+		} else if (ret == -EPROBE_DEFER) {
+			return ret;
+		} else {
+			dev_err(dev, "no usbpd configured\n");
+			return ret;
+		}
+	}
+#endif
 
 	return 0;
 }

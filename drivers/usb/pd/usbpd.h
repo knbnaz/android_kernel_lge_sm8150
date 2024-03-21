@@ -53,6 +53,14 @@ struct pd_phy_params {
 	u8		frame_filter_val;
 };
 
+#ifdef CONFIG_LGE_USB
+struct pd_phy_emul_params {
+	int		(*signal_cb)(const void *emul, enum pd_sig_type sig);
+	int		(*msg_rx_cb)(const void *emul, enum pd_sop_type sop,
+					u8 *buf, size_t len);
+};
+#endif
+
 struct pd_phy_ops {
 	int (*open)(struct pd_phy_params *params);
 	int (*signal)(enum pd_sig_type sig);
