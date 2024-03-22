@@ -1164,6 +1164,10 @@ int tavil_mbhc_init(struct wcd934x_mbhc **mbhc,
 					0x01, 0x01);
 	}
 
+#if defined(CONFIG_MACH_SM8150_ALPHA) || defined(CONFIG_MACH_SM8150_FLASH) || defined(CONFIG_MACH_SM8150_MH2LM)
+	snd_soc_component_write(component, WCD934X_MICB2_TEST_CTL_3, 0x24);
+#endif
+
 	return 0;
 err:
 	devm_kfree(component->dev, wcd934x_mbhc);

@@ -23,6 +23,15 @@
 #include <dt-bindings/sound/audio-codec-port-types.h>
 #include <asoc/msm-cdc-supply.h>
 
+#ifdef CONFIG_MACH_LGE // add extcon dev for SAR backoff
+#include <linux/extcon.h>
+
+static const unsigned int extcon_sar_backoff[] = {
+	EXTCON_MECHANICAL,
+	EXTCON_NONE,
+};
+#endif /* CONFIG_MACH_LGE */
+
 #include "wcd937x-registers.h"
 #include "wcd937x.h"
 #include "internal.h"
@@ -1039,6 +1048,12 @@ static int wcd937x_codec_enable_ear_pa(struct snd_soc_dapm_widget *w,
 				WCD937X_ANA_EAR_COMPANDER_CTL, 0x80, 0x80);
 		break;
 	case SND_SOC_DAPM_POST_PMU:
+#ifdef CONFIG_MACH_LGE  // SAR backoff
+		if( wcd937x->sar != NULL ) {
+			pr_info("%s : enable SAR backoff\n", __func__);
+			extcon_set_state_sync(wcd937x->sar, EXTCON_MECHANICAL, true);
+        }
+#endif /* CONFIG_MACH_LGE */
 		usleep_range(6000, 6010);
 		if (hph_mode == CLS_AB || hph_mode == CLS_AB_HIFI)
 			snd_soc_component_update_bits(component,
@@ -1068,6 +1083,12 @@ static int wcd937x_codec_enable_ear_pa(struct snd_soc_dapm_widget *w,
 						(WCD_RX1 << 0x10 | 0x1));
 		break;
 	case SND_SOC_DAPM_POST_PMD:
+#ifdef CONFIG_MACH_LGE  // SAR backoff
+		if( wcd937x->sar != NULL ) {
+			pr_info("%s : disable SAR backoff\n", __func__);
+			extcon_set_state_sync(wcd937x->sar, EXTCON_MECHANICAL, false);
+		}
+#endif /* CONFIG_MACH_LGE */
 		if (!wcd937x->comp1_enable)
 			snd_soc_component_update_bits(component,
 				WCD937X_ANA_EAR_COMPANDER_CTL, 0x80, 0x00);
@@ -3380,6 +3401,22 @@ static int wcd937x_bind(struct device *dev)
 				__func__);
 		goto err_irq;
 	}
+#ifdef CONFIG_MACH_LGE	 // SAR backoff
+	wcd937x->sar = devm_extcon_dev_allocate(dev, extcon_sar_backoff);
+	if (IS_ERR(wcd937x->sar)) {
+		dev_err(dev, "failed to allocate extcon device\n");
+		return -ENOMEM;
+	}
+
+	wcd937x->sar->name = "sar_backoff";
+	ret = devm_extcon_dev_register(dev, wcd937x->sar);
+	if (ret < 0) {
+		dev_err(dev, "extcon_dev_register() failed: %d\n",
+			ret);
+		return ret;
+	}
+		pr_info("%s register sar_backoff extcon device\n",__func__);
+#endif  /* CONFIG_MACH_LGE */
 
 	return ret;
 err_irq:
@@ -3397,6 +3434,11 @@ static void wcd937x_unbind(struct device *dev)
 {
 	struct wcd937x_priv *wcd937x = dev_get_drvdata(dev);
 	struct wcd937x_pdata *pdata = dev_get_platdata(wcd937x->dev);
+
+#ifdef CONFIG_MACH_LGE // SAR backoff
+	if( wcd937x->sar != NULL )
+		devm_extcon_dev_unregister(dev, wcd937x->sar);
+#endif /* CONFIG_MACH_LGE */
 
 	wcd_irq_exit(&wcd937x->irq_info, wcd937x->virq);
 	snd_soc_unregister_component(dev);
