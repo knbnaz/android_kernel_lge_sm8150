@@ -42,9 +42,7 @@
  *
  * byungchul.park@lge.com 20120503
  */
-#ifdef CONFIG_LGE_SREADAHEAD
 #include "sreadahead_prof.h"
-#endif
 /* LGE_CHAGE_E */
 
 int do_truncate(struct dentry *dentry, loff_t length, unsigned int time_attrs,
@@ -1117,9 +1115,7 @@ long do_sys_open(int dfd, const char __user *filename, int flags, umode_t mode)
 			*
 			* byungchul.park@lge.com 20120503
 			*/
-#ifdef CONFIG_LGE_SREADAHEAD
 			sreadahead_prof( f, 0, 0);
-#endif
 			/* LGE_CHANGE_E */
 		}
 	}
