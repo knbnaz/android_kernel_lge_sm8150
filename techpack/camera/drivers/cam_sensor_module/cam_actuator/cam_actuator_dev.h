@@ -115,6 +115,12 @@ struct cam_actuator_ctrl_t {
 	struct cam_actuator_query_cap act_info;
 	struct actuator_intf_params bridge_intf;
 	uint32_t last_flush_req;
+#ifdef CONFIG_MACH_LGE
+	/* LGE Actuator */
+	struct msm_act_readout_buffer buf;
+	spinlock_t hall_lock;
+	struct class *camera_class;
+#endif
 };
 
 /**

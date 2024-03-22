@@ -1848,6 +1848,9 @@ int32_t cam_cci_core_cfg(struct v4l2_subdev *sd,
 	int32_t rc = 0;
 	struct cci_device *cci_dev = v4l2_get_subdevdata(sd);
 	enum cci_i2c_master_t master = MASTER_MAX;
+#ifdef CONFIG_MACH_LGE
+	mutex_lock(&cci_dev->global_mutex);
+#endif
 
 	if (!cci_dev) {
 		CAM_ERR(CAM_CCI, "CCI_DEV IS NULL");
@@ -1914,5 +1917,8 @@ int32_t cam_cci_core_cfg(struct v4l2_subdev *sd,
 
 	cci_ctrl->status = rc;
 
+#ifdef CONFIG_MACH_LGE
+	mutex_unlock(&cci_dev->global_mutex);
+#endif
 	return rc;
 }

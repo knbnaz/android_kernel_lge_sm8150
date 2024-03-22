@@ -10,6 +10,11 @@
 #include "cam_debug_util.h"
 #include "camera_main.h"
 
+#ifdef CONFIG_MACH_LGE
+extern void oeis_create_sysfs(void);
+extern void oeis_destroy_sysfs(void);
+#endif
+
 static int cam_ois_subdev_close_internal(struct v4l2_subdev *sd,
 	struct v4l2_subdev_fh *fh)
 {
@@ -224,6 +229,12 @@ static int cam_ois_i2c_driver_probe(struct i2c_client *client,
 	if (rc)
 		goto soc_free;
 
+#ifdef CONFIG_MACH_LGE
+	spin_lock_init(&o_ctrl->gyro_lock);
+	oeis_create_sysfs();
+	o_ctrl->ois_thread_running = false;
+#endif
+
 	o_ctrl->cam_ois_state = CAM_OIS_INIT;
 
 	return rc;
@@ -248,6 +259,9 @@ static int cam_ois_i2c_driver_remove(struct i2c_client *client)
 		CAM_ERR(CAM_OIS, "ois device is NULL");
 		return -EINVAL;
 	}
+#ifdef CONFIG_MACH_LGE
+	oeis_destroy_sysfs();
+#endif
 
 	CAM_INFO(CAM_OIS, "i2c driver remove invoked");
 	soc_info = &o_ctrl->soc_info;
@@ -388,6 +402,12 @@ static int32_t cam_ois_platform_driver_probe(
 {
 	int rc = 0;
 
+#ifdef CONFIG_MACH_LGE
+	spin_lock_init(&o_ctrl->gyro_lock);
+	oeis_create_sysfs();
+	o_ctrl->ois_thread_running = false;
+#endif
+
 	CAM_DBG(CAM_OIS, "Adding OIS Sensor component");
 	rc = component_add(&pdev->dev, &cam_ois_component_ops);
 	if (rc)
@@ -398,6 +418,10 @@ static int32_t cam_ois_platform_driver_probe(
 
 static int cam_ois_platform_driver_remove(struct platform_device *pdev)
 {
+#ifdef CONFIG_MACH_LGE
+	oeis_destroy_sysfs();
+#endif
+
 	component_del(&pdev->dev, &cam_ois_component_ops);
 	return 0;
 }
