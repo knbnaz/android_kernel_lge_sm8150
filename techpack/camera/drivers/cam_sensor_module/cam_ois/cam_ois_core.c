@@ -16,6 +16,22 @@
 #include "cam_common_util.h"
 #include "cam_packet_util.h"
 
+#define LIMIT_STATUS_POLLING	(15)
+#if defined(CONFIG_MACH_SM8150_BETA) || defined(CONFIG_MACH_SM8150_MH2LM)
+extern int32_t sunny_imx363_init_set_onsemi_ois(struct cam_ois_ctrl_t *o_ctrl);
+extern int sunny_imx363_onsemi_ois_poll_ready(int limit);
+#else
+extern int32_t lgit_imx363_init_set_onsemi_ois(struct cam_ois_ctrl_t *o_ctrl);
+extern int lgit_imx363_onsemi_ois_poll_ready(int limit);
+#endif
+extern void msm_ois_create_sysfs(void);
+extern void msm_ois_destroy_sysfs(void);
+#ifdef CONFIG_MACH_LGE
+extern int msm_stopGyroThread(void);
+extern int parse_ois_userdata(struct cam_cmd_ois_userdata *ois_userdata,
+		struct cam_ois_ctrl_t *o_ctrl);
+#endif
+
 int32_t cam_ois_construct_default_power_setting(
 	struct cam_sensor_power_ctrl_t *power_info)
 {
@@ -190,6 +206,13 @@ static int cam_ois_power_down(struct cam_ois_ctrl_t *o_ctrl)
 		return -EINVAL;
 	}
 
+#ifdef CONFIG_MACH_LGE
+	if(o_ctrl->ois_thread_running == true) {
+		msm_stopGyroThread();
+		o_ctrl->ois_thread_running = false;
+	}
+#endif
+
 	soc_private =
 		(struct cam_ois_soc_private *)o_ctrl->soc_info.soc_private;
 	power_info = &soc_private->power_info;
@@ -293,6 +316,12 @@ static int cam_ois_apply_settings(struct cam_ois_ctrl_t *o_ctrl,
 				return rc;
 			}
 		} else if (i2c_list->op_code == CAM_SENSOR_I2C_POLL) {
+/* LGE_CHANGE_S, use LGE POLL function, 2018-01-16, hongs.lee@lge.com */
+#if defined(CONFIG_MACH_SM8150_BETA) || defined(CONFIG_MACH_SM8150_MH2LM)
+			rc = sunny_imx363_onsemi_ois_poll_ready(LIMIT_STATUS_POLLING);
+#else
+			rc = lgit_imx363_onsemi_ois_poll_ready(LIMIT_STATUS_POLLING);
+#endif
 			size = i2c_list->i2c_settings.size;
 			for (i = 0; i < size; i++) {
 				rc = camera_io_dev_poll(
@@ -498,6 +527,12 @@ static int cam_ois_pkt_parse(struct cam_ois_ctrl_t *o_ctrl, void *arg)
 	struct cam_ois_soc_private     *soc_private =
 		(struct cam_ois_soc_private *)o_ctrl->soc_info.soc_private;
 	struct cam_sensor_power_ctrl_t  *power_info = &soc_private->power_info;
+	struct cam_cmd_ois_userdata *ois_userdata;
+#ifdef CONFIG_MACH_LGE
+	struct v4l2_subdev *cci_subdev = cam_cci_get_subdev(CCI_DEVICE_0);
+	struct cci_device *cci_dev = v4l2_get_subdevdata(cci_subdev);
+	unsigned long rem_jiffies = 0;
+#endif
 
 	ioctl_ctrl = (struct cam_control *)arg;
 	if (copy_from_user(&dev_config,
@@ -637,6 +672,16 @@ static int cam_ois_pkt_parse(struct cam_ois_ctrl_t *o_ctrl, void *arg)
 			cam_mem_put_cpu_buf(cmd_desc[i].mem_handle);
 		}
 
+#ifdef CONFIG_MACH_LGE
+		rem_jiffies = wait_for_completion_timeout(&cci_dev->sensor_complete, CCI_TIMEOUT);
+		if (!rem_jiffies) {
+			rc = -ETIMEDOUT;
+			CAM_ERR(CAM_OIS, " sensor is not ready");
+			goto rel_pkt;
+		}
+		reinit_completion(&cci_dev->sensor_complete);
+#endif
+
 		if (o_ctrl->cam_ois_state != CAM_OIS_CONFIG) {
 			rc = cam_ois_power_up(o_ctrl);
 			if (rc) {
@@ -663,6 +708,11 @@ static int cam_ois_pkt_parse(struct cam_ois_ctrl_t *o_ctrl, void *arg)
 			rc = cam_ois_apply_settings(o_ctrl,
 				&o_ctrl->i2c_init_data);
 		}
+#if defined(CONFIG_MACH_SM8150_BETA) || defined(CONFIG_MACH_SM8150_MH2LM)
+		rc = sunny_imx363_init_set_onsemi_ois(o_ctrl);
+#else
+		rc = lgit_imx363_init_set_onsemi_ois(o_ctrl);
+#endif
 		if (rc < 0) {
 			CAM_ERR(CAM_OIS,
 				"Cannot apply Init settings: rc = %d",
@@ -842,6 +892,43 @@ static int cam_ois_pkt_parse(struct cam_ois_ctrl_t *o_ctrl, void *arg)
 		}
 		break;
 	}
+#ifdef CONFIG_MACH_LGE
+	case CAM_OIS_PACKET_OPCODE_OIS_USERDATA:
+		if (o_ctrl->cam_ois_state < CAM_OIS_CONFIG) {
+			rc = -EINVAL;
+			CAM_WARN(CAM_OIS,
+					"Not in right state to parse userdata OIS: %d",
+					o_ctrl->cam_ois_state);
+			return rc;
+		}
+		offset = (uint32_t *)&csl_packet->payload;
+		offset += (csl_packet->cmd_buf_offset / sizeof(uint32_t));
+		cmd_desc = (struct cam_cmd_buf_desc *)(offset);
+
+		total_cmd_buf_in_bytes = cmd_desc[0].length;
+
+		if (!total_cmd_buf_in_bytes) {
+			CAM_ERR(CAM_OIS, "No total cmd buf bytes !!");
+			break;
+		}
+		rc = cam_mem_get_cpu_buf(cmd_desc[0].mem_handle,
+				&generic_ptr, &len_of_buff);
+		if (rc < 0) {
+			CAM_ERR(CAM_OIS, "Failed to get cpu buf");
+			return rc;
+		}
+		cmd_buf = (uint32_t *)generic_ptr;
+		if (!cmd_buf) {
+			CAM_ERR(CAM_OIS, "invalid cmd buf");
+			return -EINVAL;
+		}
+		cmd_buf += cmd_desc[0].offset / sizeof(uint32_t);
+		cmm_hdr = (struct common_header *)cmd_buf;
+
+		ois_userdata = (struct cam_cmd_ois_userdata *)cmd_buf;
+		parse_ois_userdata(ois_userdata, o_ctrl);
+		break;
+#endif
 	default:
 		CAM_ERR(CAM_OIS, "Invalid Opcode: %d",
 			(csl_packet->header.op_code & 0xFFFFFF));

@@ -218,6 +218,10 @@ static void cam_cci_init_cci_params(struct cci_device *new_cci_dev)
 {
 	uint8_t i = 0, j = 0;
 
+#ifdef CONFIG_MACH_LGE
+	mutex_init(&new_cci_dev->global_mutex);
+	init_completion(&new_cci_dev->sensor_complete);
+#endif
 	for (i = 0; i < MASTER_MAX; i++) {
 		new_cci_dev->cci_master_info[i].status = 0;
 		new_cci_dev->cci_master_info[i].freq_ref_cnt = 0;

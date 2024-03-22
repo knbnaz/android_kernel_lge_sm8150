@@ -13,6 +13,9 @@
 #include "cam_common_util.h"
 #include "cam_packet_util.h"
 
+#if defined(CONFIG_MACH_SM8150_BETA) || defined(CONFIG_MACH_SM8150_MH2LM)
+#include <soc/qcom/lge/lge_regulator_mode_change.h>
+#endif
 
 static int cam_sensor_update_req_mgr(
 	struct cam_sensor_ctrl_t *s_ctrl,
@@ -1195,6 +1198,10 @@ int cam_sensor_power_up(struct cam_sensor_ctrl_t *s_ctrl)
 	struct cam_camera_slave_info *slave_info;
 	struct cam_hw_soc_info *soc_info =
 		&s_ctrl->soc_info;
+#ifdef CONFIG_MACH_LGE
+	struct v4l2_subdev *cci_subdev = cam_cci_get_subdev(CCI_DEVICE_0);
+	struct cci_device *cci_dev = v4l2_get_subdevdata(cci_subdev);
+#endif
 
 	if (!s_ctrl) {
 		CAM_ERR(CAM_SENSOR, "failed: %pK", s_ctrl);
@@ -1208,7 +1215,19 @@ int cam_sensor_power_up(struct cam_sensor_ctrl_t *s_ctrl)
 		CAM_ERR(CAM_SENSOR, "failed: %pK %pK", power_info, slave_info);
 		return -EINVAL;
 	}
-
+#if defined(CONFIG_MACH_SM8150_BETA)
+    if (slave_info->sensor_slave_addr == 0x7a)
+    {
+        CAM_INFO(CAM_SENSOR, "bob_mode_enable", slave_info->sensor_slave_addr);
+        bob_mode_enable();
+    }
+#elif defined(CONFIG_MACH_SM8150_MH2LM)
+	if ((isEnable == FALSE) && (slave_info->sensor_slave_addr == 0x20)) {
+		CAM_INFO(CAM_SENSOR, "bob_mode_enable", slave_info->sensor_slave_addr);
+		bob_mode_enable();
+		isEnable = TRUE;
+	}
+#endif
 	if (s_ctrl->bob_pwm_switch) {
 		rc = cam_sensor_bob_pwm_mode_switch(soc_info,
 			s_ctrl->bob_reg_index, true);
@@ -1231,6 +1250,16 @@ int cam_sensor_power_up(struct cam_sensor_ctrl_t *s_ctrl)
 		goto cci_failure;
 	}
 
+#ifdef CONFIG_MACH_LGE
+	complete(&cci_dev->sensor_complete);
+#endif
+
+#ifdef CONFIG_MACH_LGE
+	CAM_ERR(CAM_SENSOR, "slave_addr:0x%x,sensor_id:0x%x",
+		s_ctrl->sensordata->slave_info.sensor_slave_addr,
+		s_ctrl->sensordata->slave_info.sensor_id);
+#endif
+
 	return rc;
 cci_failure:
 	if (cam_sensor_util_power_down(power_info, soc_info))
@@ -1245,6 +1274,13 @@ int cam_sensor_power_down(struct cam_sensor_ctrl_t *s_ctrl)
 	struct cam_sensor_power_ctrl_t *power_info;
 	struct cam_hw_soc_info *soc_info;
 	int rc = 0;
+#ifdef CONFIG_MACH_LGE
+	struct v4l2_subdev *cci_subdev = cam_cci_get_subdev(CCI_DEVICE_0);
+struct cci_device *cci_dev = v4l2_get_subdevdata(cci_subdev);
+#endif
+#if defined(CONFIG_MACH_SM8150_BETA) || defined(CONFIG_MACH_SM8150_MH2LM)
+   struct cam_camera_slave_info *slave_info = &(s_ctrl->sensordata->slave_info);
+#endif
 
 	if (!s_ctrl) {
 		CAM_ERR(CAM_SENSOR, "failed: s_ctrl %pK", s_ctrl);
@@ -1263,7 +1299,19 @@ int cam_sensor_power_down(struct cam_sensor_ctrl_t *s_ctrl)
 		CAM_ERR(CAM_SENSOR, "power down the core is failed:%d", rc);
 		return rc;
 	}
-
+#if defined(CONFIG_MACH_SM8150_BETA)
+    if (slave_info->sensor_slave_addr == 0x7a)
+    {
+        CAM_INFO(CAM_SENSOR, "bob_mode_disable", slave_info->sensor_slave_addr);
+        bob_mode_disable();
+    }
+#elif defined(CONFIG_MACH_SM8150_MH2LM)
+	if ((isEnable == TRUE) && (slave_info->sensor_slave_addr == 0x20)) {
+		CAM_INFO(CAM_SENSOR, "bob_mode_disable", slave_info->sensor_slave_addr);
+		bob_mode_disable();
+		isEnable = FALSE;
+	}
+#endif
 	if (s_ctrl->bob_pwm_switch) {
 		rc = cam_sensor_bob_pwm_mode_switch(soc_info,
 			s_ctrl->bob_reg_index, false);
@@ -1275,6 +1323,16 @@ int cam_sensor_power_down(struct cam_sensor_ctrl_t *s_ctrl)
 	}
 
 	camera_io_release(&(s_ctrl->io_master_info));
+
+#ifdef CONFIG_MACH_LGE
+	reinit_completion(&cci_dev->sensor_complete);
+#endif
+
+#ifdef CONFIG_MACH_LGE
+	CAM_ERR(CAM_SENSOR, "slave_addr:0x%x,sensor_id:0x%x",
+		s_ctrl->sensordata->slave_info.sensor_slave_addr,
+		s_ctrl->sensordata->slave_info.sensor_id);
+#endif
 
 	return rc;
 }
