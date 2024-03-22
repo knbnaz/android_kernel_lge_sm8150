@@ -227,6 +227,10 @@ ifdef CONFIG_SND_SWR_HAPTICS
 	SWR_HAP_OBJS += swr-haptics.o
 endif
 
+ifdef CONFIG_SND_SOC_ES9218P
+	ES9218_OBJS += es9218p.o
+endif
+
 LINUX_INC +=	-Iinclude/linux
 
 INCS +=		$(COMMON_INC) \
@@ -274,6 +278,9 @@ ifeq ($(KERNEL_BUILD), 1)
 	obj-y	+= bolero/
 	obj-y	+= wsa883x/
 	obj-y	+= rouleur/
+	obj-y	+= sma6101/
+	obj-y	+= tfa9872/
+	obj-y	+= cs35l41/
 endif
 # Module information used by KBuild framework
 obj-$(CONFIG_WCD9XXX_CODEC_CORE) += wcd_core_dlkm.o

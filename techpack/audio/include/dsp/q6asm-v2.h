@@ -770,4 +770,8 @@ int q6asm_adjust_session_clock(struct audio_client *ac,
 /* Provide default asm channel mapping for given channel count */
 int q6asm_map_channels(u8 *channel_mapping, uint32_t channels,
 		bool use_back_flavor);
+#ifdef CONFIG_SND_LGE_MQA
+int q6asm_set_lgmqa_param_one(struct audio_client *ac, int cmd, int val);
+int q6asm_set_lgmqa_param_properties(struct audio_client *ac, long *val);
+#endif
 #endif /* __Q6_ASM_H__ */

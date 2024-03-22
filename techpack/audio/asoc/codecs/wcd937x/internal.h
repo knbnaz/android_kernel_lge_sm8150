@@ -93,6 +93,9 @@ struct wcd937x_priv {
 	u8 tx_master_ch_map[WCD937X_MAX_SLAVE_CH_TYPES];
 	bool usbc_hs_status;
 	u32 tx_ch_pwr[MAX_TX_PWR_CH];
+#ifdef CONFIG_MACH_LGE // add extcon dev for SAR backoff
+	struct extcon_dev* sar;
+#endif
 };
 
 struct wcd937x_micbias_setting {
