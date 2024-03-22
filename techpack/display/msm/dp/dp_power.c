@@ -14,6 +14,10 @@
 
 #define DP_CLIENT_NAME_SIZE	20
 
+#if defined (CONFIG_LGE_DUAL_SCREEN)
+#include <linux/lge_ds2.h>
+#endif
+
 struct dp_power_private {
 	struct dp_parser *parser;
 	struct dp_pll *pll;
@@ -437,6 +441,13 @@ static void dp_power_set_gpio(struct dp_power_private *power, bool flip)
 		if (dp_power_find_gpio(config->gpio_name, "aux-sel"))
 			config->value = flip;
 
+#if defined (CONFIG_LGE_DUAL_SCREEN)
+		if (is_ds2_connected()) {
+			pr_info("ds2 connected. invert flip\n");
+			config->value = !flip;
+		}
+#endif
+
 		if (gpio_is_valid(config->gpio)) {
 			DP_DEBUG("gpio %s, value %d\n", config->gpio_name,
 				config->value);
@@ -475,12 +486,33 @@ static int dp_power_config_gpios(struct dp_power_private *power, bool flip,
 
 		dp_power_set_gpio(power, flip);
 	} else {
+#ifdef CONFIG_LGE_COVER_DISPLAY
 		for (i = 0; i < mp->num_gpio; i++) {
 			if (gpio_is_valid(config[i].gpio)) {
 				gpio_set_value(config[i].gpio, 0);
 				gpio_free(config[i].gpio);
 			}
 		}
+#else
+		config = mp->gpio_config;
+		for (i = 0; i < mp->num_gpio; i++) {
+			if (gpio_is_valid(config->gpio)) {
+				if (dp_power_find_gpio(config->gpio_name, "aux-en")) {
+					gpio_set_value(config->gpio, 1);
+					gpio_free(config->gpio);
+				} else if (dp_power_find_gpio(config->gpio_name, "aux-sel")) {
+					gpio_set_value(config->gpio, 0);
+					gpio_free(config->gpio);
+				} else {
+					gpio_set_value(config->gpio, 0);
+					gpio_free(config->gpio);
+				}
+				pr_info("gpio %s -> %d, flip %d\n ", config->gpio_name,
+					gpio_get_value(config->gpio), flip ? 1 : 0);
+			}
+			config++;
+		}
+#endif
 	}
 
 	return 0;

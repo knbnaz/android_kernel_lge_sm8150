@@ -43,6 +43,39 @@
 
 #define DP_MAX_LANES 4
 
+#if defined(CONFIG_LGE_COVER_DISPLAY) || defined(CONFIG_LGE_DUAL_SCREEN)
+#include <linux/hall_ic.h>
+#include "../lge/cover/lge_cover_ctrl.h"
+struct hallic_dev dd_lt_dev = {
+	.name = "dd_lt_status",
+	.state = 0,
+};
+#endif
+
+#ifdef CONFIG_LGE_COVER_DISPLAY
+#include "../lge/cover/lge_cover_ctrl_ops.h"
+extern bool is_dd_connected(void);
+extern bool is_dd_button_enabled(void);
+extern struct lge_dp_display* get_lge_dp(void);
+extern struct ice40 *global_ice40;
+extern int ice40_mcu_reg_write_norecovery(struct ice40 *ice40, uint addr, uint val);
+int link_tr_state;
+EXPORT_SYMBOL(link_tr_state);
+int mainlink_state;
+EXPORT_SYMBOL(mainlink_state);
+int color_mode_state;
+EXPORT_SYMBOL(color_mode_state);
+#endif
+
+#ifdef CONFIG_LGE_DUAL_SCREEN
+#include <linux/lge_ds2.h>
+extern bool is_ds2_connected(void);
+#endif
+
+#ifdef CONFIG_LGE_DISPLAY_COMMON
+bool dp_lt1_state;
+#endif
+
 struct dp_mst_ch_slot_info {
 	u32 start_slot;
 	u32 tot_slots;
@@ -151,6 +184,14 @@ trigger_idle:
 		DP_WARN("time out\n");
 	else
 		DP_DEBUG("mainlink off done\n");
+#ifdef CONFIG_LGE_DISPLAY_COMMON
+#if defined(CONFIG_LGE_COVER_DISPLAY)
+	link_tr_state = 0;
+	mainlink_state = 0;
+	color_mode_state = 0;
+#endif
+	dp_lt1_state = false;
+#endif
 }
 
 /**
@@ -437,7 +478,18 @@ static int dp_ctrl_link_rate_down_shift(struct dp_ctrl_private *ctrl)
 		ctrl->link->link_params.bw_code = DP_LINK_BW_1_62;
 		break;
 	}
-
+#if defined(CONFIG_LGE_COVER_DISPLAY)
+	if (is_dd_connected()) {
+		pr_info("Force set BW 5.4G for DD\n");
+		ctrl->link->link_params.bw_code = DP_LINK_BW_5_4;
+	}
+#endif
+#if defined(CONFIG_LGE_DUAL_SCREEN)
+	if (is_ds2_connected()) {
+		pr_info("Force set BW 2.7G for DS2\n");
+		ctrl->link->link_params.bw_code = DP_LINK_BW_2_7;
+	}
+#endif
 	DP_DEBUG("new bw code=0x%x\n", ctrl->link->link_params.bw_code);
 
 	return ret;
@@ -537,7 +589,22 @@ static int dp_ctrl_link_train(struct dp_ctrl_private *ctrl)
 	struct drm_dp_link link_info = {0};
 
 	ctrl->link->phy_params.p_level = 0;
+#ifdef CONFIG_LGE_DISPLAY_COMMON
+	if (ctrl->parser->lge_dp_use && !dp_lt1_state)
+		ctrl->link->phy_params.v_level = 2;
+#ifdef CONFIG_LGE_DUAL_SCREEN
+	else if (is_ds2_connected())
+		ctrl->link->phy_params.v_level = 2;
+#endif
+#ifdef CONFIG_LGE_COVER_DISPLAY
+	else if (is_dd_connected())
+		ctrl->link->phy_params.v_level = 2;
+#endif
+	else
+		ctrl->link->phy_params.v_level = 0;
+#else //QCT origin
 	ctrl->link->phy_params.v_level = 0;
+#endif
 
 	link_info.num_lanes = ctrl->link->link_params.lane_count;
 	link_info.rate = drm_dp_bw_code_to_link_rate(
@@ -563,10 +630,36 @@ static int dp_ctrl_link_train(struct dp_ctrl_private *ctrl)
 	}
 
 	ret = dp_ctrl_link_training_1(ctrl);
+#if defined(CONFIG_LGE_DISPLAY_COMMON)
+	if (ret) {
+#if defined(CONFIG_LGE_COVER_DISPLAY)
+		if (is_dd_connected()) {
+			pr_err("link training #1 failed but keep going\n");
+			msleep(100);
+			pr_info("Add 100ms between LT1 - LT2 for keyssa\n");
+		} else {
+			if (ctrl->parser->lge_dp_use) {
+				dp_lt1_state = true;
+				pr_err("dp_lt1_state: %d\n", dp_lt1_state?1:0);
+			}
+			pr_err("link training #1 failed\n");
+			goto end;
+		}
+#else
+		if (ctrl->parser->lge_dp_use) {
+			dp_lt1_state = true;
+			pr_err("dp_lt1_state: %d\n", dp_lt1_state?1:0);
+		}
+		pr_err("link training #1 failed\n");
+		goto end;
+#endif
+	}
+#else // QCT origin
 	if (ret) {
 		DP_ERR("link training #1 failed\n");
 		goto end;
 	}
+#endif
 
 	/* print success info as this is a result of user initiated action */
 	DP_INFO("link training #1 successful\n");
@@ -574,6 +667,15 @@ static int dp_ctrl_link_train(struct dp_ctrl_private *ctrl)
 	ret = dp_ctrl_link_training_2(ctrl);
 	if (ret) {
 		DP_ERR("link training #2 failed\n");
+
+#if defined(CONFIG_LGE_COVER_DISPLAY)
+		if (get_lge_cover_ops() && is_dd_connected()) {
+			struct lge_cover_ops *ops = get_lge_cover_ops();
+			if (ops->get_recovery_state() == RECOVERY_NONE) {
+				ops->set_recovery_state(RECOVERY_LTFAIL_DETECTED);
+			}
+		}
+#endif
 		goto end;
 	}
 
@@ -586,6 +688,11 @@ end:
 	wmb();
 
 	dp_ctrl_clear_training_pattern(ctrl);
+#if defined(CONFIG_LGE_COVER_DISPLAY)
+	if (is_dd_connected() && !ret) {
+		link_tr_state = 1;
+	}
+#endif
 	return ret;
 }
 
@@ -698,6 +805,10 @@ static int dp_ctrl_link_setup(struct dp_ctrl_private *ctrl, bool shallow)
 
 	catalog->phy_lane_cfg(catalog, ctrl->orientation,
 				link_params->lane_count);
+#if defined(CONFIG_LGE_COVER_DISPLAY)
+	if (is_dd_connected())
+		link_train_max_retries = 20;
+#endif
 
 	while (1) {
 		DP_DEBUG("bw_code=%d, lane_count=%d\n",
@@ -724,8 +835,29 @@ static int dp_ctrl_link_setup(struct dp_ctrl_private *ctrl, bool shallow)
 		dp_ctrl_select_training_pattern(ctrl, downgrade);
 
 		rc = dp_ctrl_setup_main_link(ctrl);
+#if defined(CONFIG_LGE_COVER_DISPLAY) || defined(CONFIG_LGE_DUAL_SCREEN)
+		if(!rc) {
+#if defined(CONFIG_LGE_DUAL_SCREEN)
+			if (is_ds2_connected()) {
+				hallic_set_state(&dd_lt_dev, 1);
+			}
+#endif
+#if defined(CONFIG_LGE_COVER_DISPLAY)
+			if (is_dd_connected()) {
+				hallic_set_state(&dd_lt_dev, 1);
+
+				if (get_lge_cover_ops() && is_dd_connected()) {
+					struct lge_cover_ops *ops = get_lge_cover_ops();
+					ops->set_recovery_state(RECOVERY_NONE);
+				}
+			}
+#endif
+			break;
+		}
+#else
 		if (!rc)
 			break;
+#endif
 
 		/*
 		 * Shallow means link training failure is not important.
@@ -753,6 +885,24 @@ static int dp_ctrl_link_setup(struct dp_ctrl_private *ctrl, bool shallow)
 		/* hw recommended delays before retrying link training */
 		msleep(20);
 	}
+
+#if defined(CONFIG_LGE_COVER_DISPLAY)
+	if (!link_train_max_retries && is_dd_connected()) {
+		struct lge_dp_display *lge_dp = get_lge_dp();
+
+		if (!lge_dp || !lge_dp->cover_ops) {
+			hallic_set_state(&dd_lt_dev, -1);
+		} else {
+			struct lge_cover_ops *ops = lge_dp->cover_ops;
+			if (ops->get_recovery_state() == RECOVERY_LTFAIL_TIMEDOUT) {
+				ops->set_recovery_state(RECOVERY_NONE);
+				hallic_set_state(&dd_lt_dev, -1);
+			} else if (ops->get_recovery_state() == RECOVERY_LTFAIL_BEGIN) {
+				ops->set_recovery_state(RECOVERY_LTFAIL_BEGIN);
+			}
+		}
+	}
+#endif
 
 	return rc;
 }
@@ -1240,6 +1390,11 @@ static int dp_ctrl_stream_on(struct dp_ctrl *dp_ctrl, struct dp_panel *panel)
 	/* wait for link training completion before fec config as per spec */
 	dp_ctrl_fec_dsc_setup(ctrl);
 
+#if defined(CONFIG_LGE_COVER_DISPLAY)
+	if (is_dd_connected())
+		mainlink_state = 1;
+#endif
+
 	return rc;
 }
 
@@ -1276,11 +1431,28 @@ static void dp_ctrl_stream_pre_off(struct dp_ctrl *dp_ctrl,
 		struct dp_panel *panel)
 {
 	struct dp_ctrl_private *ctrl;
+#if defined(CONFIG_LGE_COVER_DISPLAY)
+	struct lge_cover_ops *ops = NULL;
+#endif
 
 	if (!dp_ctrl || !panel) {
 		DP_ERR("invalid input\n");
 		return;
 	}
+
+#if defined(CONFIG_LGE_COVER_DISPLAY)
+	ops = get_lge_cover_ops();
+
+	if (is_dd_connected()) {
+		if (ops && ops->set_stream_preoff_state && is_dd_button_enabled()) {
+			ops->set_stream_preoff_state(true);
+		}
+
+		if (ice40_mcu_reg_write_norecovery(global_ice40, ICE40_BL_REG, 0) < 0)
+			pr_err("unable to set backlight\n");
+		msleep(50);
+	}
+#endif
 
 	ctrl = container_of(dp_ctrl, struct dp_ctrl_private, dp_ctrl);
 
@@ -1357,6 +1529,16 @@ static int dp_ctrl_on(struct dp_ctrl *dp_ctrl, bool mst_mode,
 	rc = dp_ctrl_link_setup(ctrl, shallow);
 	if (!rc)
 		ctrl->power_on = true;
+
+#if defined(CONFIG_LGE_COVER_DISPLAY)
+	if (is_dd_connected() && get_lge_cover_ops()) {
+		struct lge_cover_ops *ops = get_lge_cover_ops();
+
+		if (ops->get_recovery_state() != RECOVERY_NONE)
+			ops->set_recovery_state(RECOVERY_NONE);
+	}
+#endif
+
 end:
 	return rc;
 }
@@ -1382,6 +1564,9 @@ static void dp_ctrl_off(struct dp_ctrl *dp_ctrl)
 
 	dp_ctrl_disable_link_clock(ctrl);
 
+#if defined(CONFIG_LGE_COVER_DISPLAY) || defined(CONFIG_LGE_DUAL_SCREEN)
+	dd_lt_dev.state = 0;
+#endif
 	ctrl->mst_mode = false;
 	ctrl->fec_mode = false;
 	ctrl->dsc_mode = false;
@@ -1495,6 +1680,13 @@ struct dp_ctrl *dp_ctrl_get(struct dp_ctrl_in *in)
 	dp_ctrl->stream_pre_off = dp_ctrl_stream_pre_off;
 	dp_ctrl->set_mst_channel_info = dp_ctrl_set_mst_channel_info;
 	dp_ctrl->set_sim_mode = dp_ctrl_set_sim_mode;
+#if defined(CONFIG_LGE_COVER_DISPLAY) || defined(CONFIG_LGE_DUAL_SCREEN)
+	if (hallic_register(&dd_lt_dev) < 0 ) {
+		pr_err("dd_lt_dev registration failed\n");
+	} else {
+		pr_info("dd_lt_dev registration success\n");
+	}
+#endif
 
 	return dp_ctrl;
 error:

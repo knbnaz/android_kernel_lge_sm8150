@@ -177,6 +177,10 @@ struct drm_panel_esd_config {
 	u32 groups;
 };
 
+#if IS_ENABLED(CONFIG_LGE_DISPLAY_COMMON)
+#include "../lge/lge_dsi_panel_def.h"
+#endif
+
 struct dsi_panel_spr_info {
 	bool enable;
 	enum msm_display_spr_pack_type pack_type;
@@ -266,6 +270,9 @@ struct dsi_panel {
 	u32 tlmm_gpio_count;
 
 	struct dsi_panel_ops panel_ops;
+#if IS_ENABLED(CONFIG_LGE_DISPLAY_COMMON)
+	struct lge_dsi_panel lge;
+#endif
 };
 
 static inline bool dsi_panel_ulps_feature_enabled(struct dsi_panel *panel)
