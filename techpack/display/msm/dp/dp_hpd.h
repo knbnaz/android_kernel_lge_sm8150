@@ -32,6 +32,13 @@ enum dp_hpd_plug_orientation {
  * @DP_HPD_BUILTIN: Controller built-in HPD
  */
 
+#ifdef CONFIG_LGE_COVER_DISPLAY
+#include <linux/ktime.h>
+
+#define CONSECUTIVE_RECOVERY_TIME 10000
+#define MAX_RECOVERY_COUNT 1
+#endif
+
 enum dp_hpd_type {
 	DP_HPD_ALTMODE,
 	DP_HPD_USBPD,
@@ -81,6 +88,10 @@ struct dp_hpd {
 	bool multi_func;
 	bool peer_usb_comm;
 	bool force_multi_func;
+#ifdef CONFIG_LGE_COVER_DISPLAY
+	ktime_t last_recovery_time;
+	int recovery_count;
+#endif
 
 	void (*isr)(struct dp_hpd *dp_hpd);
 	int (*register_hpd)(struct dp_hpd *dp_hpd);

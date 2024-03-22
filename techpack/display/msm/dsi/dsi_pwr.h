@@ -114,4 +114,15 @@ int dsi_pwr_panel_regulator_mode_set(struct dsi_regulator_info *regs,
  * return: error code in case of failure or 0 for success.
  */
 int dsi_pwr_config_vreg_opt_mode(struct dsi_regulator_info *regs, bool enable);
+
+#if IS_ENABLED(CONFIG_LGE_DISPLAY_COMMON)
+/**
+ * dsi_pwr_set_regulator() - enable a set of regulators
+ * @regs:       Pointer to set of regulators to enable or disable.
+ * @mode:		regulators mode.
+ *
+ * return: error code in case of failure or 0 for success.
+ */
+int dsi_pwr_set_regulator(struct dsi_regulator_info *regs, int mode);
+#endif
 #endif /* _DSI_PWR_H_ */
