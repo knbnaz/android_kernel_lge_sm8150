@@ -42,9 +42,7 @@
 #include <linux/psi.h>
 #include <linux/ramfs.h>
 #include "internal.h"
-#ifdef CONFIG_LGE_SREADAHEAD
 #include "../fs/sreadahead_prof.h"
-#endif
 
 #define CREATE_TRACE_POINTS
 #include <trace/events/filemap.h>
