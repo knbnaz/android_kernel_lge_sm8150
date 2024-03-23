@@ -365,6 +365,7 @@ enum custom_effect_param {
 
 enum pmic_type {
 	PM8350B,
+	PM8310B,
 	PM5100,
 };
 
@@ -1017,7 +1018,7 @@ static int haptics_get_closeloop_lra_period_v2(
 
 	rc_clk_cal = ((val[0] & CAL_RC_CLK_MASK) >> CAL_RC_CLK_SHIFT);
 	/* read auto resonance calibration result */
-	if (in_boot && (chip->pmic_type == PM8350B)) {
+	if (in_boot && (chip->pmic_type == PM8350B || hip->pmic_type == PM8150B)) {
 		if (chip->hap_cfg_nvmem == NULL) {
 			dev_dbg(chip->dev, "nvmem device for hap_cfg is not defined\n");
 			return -EINVAL;
@@ -2675,6 +2676,7 @@ static int haptics_config_wa(struct haptics_chip *chip)
 {
 	switch (chip->pmic_type) {
 	case PM8350B:
+	case PM8150B:
 		chip->wa_flags |= TOGGLE_CAL_RC_CLK;
 		break;
 	case PM5100:
@@ -4874,11 +4876,19 @@ static const struct dev_pm_ops haptics_pm_ops = {
 static const struct of_device_id haptics_match_table[] = {
 	{
 		.compatible = "qcom,hv-haptics",
+#ifdef CONFIG_ARCH_SM8150
+		.data = (void *)PM8150B,
+#else
 		.data = (void *)PM8350B,
+#endif
 	},
 	{
 		.compatible = "qcom,pm8350b-haptics",
 		.data = (void *)PM8350B,
+	},
+	{
+		.compatible = "qcom,pm8150b-haptics",
+		.data = (void *)PM8150B,
 	},
 	{
 		.compatible = "qcom,pm5100-haptics",
