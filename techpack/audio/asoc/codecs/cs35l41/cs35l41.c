@@ -164,8 +164,8 @@ EXPORT_SYMBOL(tfa98xx_extcon_set_state);
 static int cs35l41_dsp_power_ev(struct snd_soc_dapm_widget *w,
 		       struct snd_kcontrol *kcontrol, int event)
 {
-	struct snd_soc_codec *codec = snd_soc_dapm_to_codec(w->dapm);
-	struct cs35l41_private *cs35l41 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_dapm_to_component(w->dapm);
+	struct cs35l41_private *cs35l41 = snd_soc_component_get_drvdata(component);
 
 	switch (event) {
 	case SND_SOC_DAPM_PRE_PMU:
@@ -188,8 +188,8 @@ static int cs35l41_dsp_power_ev(struct snd_soc_dapm_widget *w,
 static int cs35l41_dsp_load_ev(struct snd_soc_dapm_widget *w,
 		       struct snd_kcontrol *kcontrol, int event)
 {
-	struct snd_soc_codec *codec = snd_soc_dapm_to_codec(w->dapm);
-	struct cs35l41_private *cs35l41 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_dapm_to_component(w->dapm);
+	struct cs35l41_private *cs35l41 = snd_soc_component_get_drvdata(component);
 
 	switch (event) {
 	case SND_SOC_DAPM_POST_PMU:
@@ -205,8 +205,8 @@ static int cs35l41_dsp_load_ev(struct snd_soc_dapm_widget *w,
 static int cs35l41_halo_booted_get(struct snd_kcontrol *kcontrol,
 			   struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct cs35l41_private *cs35l41 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct cs35l41_private *cs35l41 = snd_soc_component_get_drvdata(component);
 
 	ucontrol->value.integer.value[0] = cs35l41->halo_booted;
 
@@ -216,8 +216,8 @@ static int cs35l41_halo_booted_get(struct snd_kcontrol *kcontrol,
 static int cs35l41_halo_booted_put(struct snd_kcontrol *kcontrol,
 			   struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct cs35l41_private *cs35l41 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct cs35l41_private *cs35l41 = snd_soc_component_get_drvdata(component);
 
 	cs35l41->halo_booted = ucontrol->value.integer.value[0];
 
@@ -235,8 +235,8 @@ static const char *cs35l41_fast_switch_text[] = {
 static int cs35l41_fast_switch_en_get(struct snd_kcontrol *kcontrol,
 				      struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct cs35l41_private *cs35l41 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct cs35l41_private *cs35l41 = snd_soc_component_get_drvdata(component);
 
 	ucontrol->value.integer.value[0] = cs35l41->fast_switch_en;
 
@@ -381,8 +381,8 @@ static int cs35l41_fast_switch_en_put(struct snd_kcontrol *kcontrol,
 {
 	int			ret = 0;
 
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct cs35l41_private *cs35l41 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct cs35l41_private *cs35l41 = snd_soc_component_get_drvdata(component);
 #ifndef CONFIG_MACH_LGE
 	if (!cs35l41->fast_switch_en && ucontrol->value.integer.value[0])
 		/*
@@ -407,15 +407,15 @@ static int cs35l41_fast_switch_en_put(struct snd_kcontrol *kcontrol,
 static int cs35l41_fast_switch_file_put(struct snd_kcontrol *kcontrol,
 					struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec	*codec = snd_soc_kcontrol_codec(kcontrol);
-	struct cs35l41_private	*cs35l41 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct cs35l41_private *cs35l41 = snd_soc_component_get_drvdata(component);
 	struct soc_enum		*soc_enum;
 	unsigned int		i = ucontrol->value.enumerated.item[0];
 
 	soc_enum = (struct soc_enum *)kcontrol->private_value;
 
 	if (i >= soc_enum->items) {
-		dev_err(codec->dev, "Invalid mixer input (%u)\n", i);
+		dev_err(component->dev, "Invalid mixer input (%u)\n", i);
 		return -EINVAL;
 	}
 
@@ -427,8 +427,8 @@ static int cs35l41_fast_switch_file_put(struct snd_kcontrol *kcontrol,
 static int cs35l41_fast_switch_file_get(struct snd_kcontrol *kcontrol,
 					struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec	*codec = snd_soc_kcontrol_codec(kcontrol);
-	struct cs35l41_private	*cs35l41 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component	*component = snd_soc_kcontrol_component(kcontrol);
+	struct cs35l41_private	*cs35l41 = snd_soc_component_get_drvdata(component);
 
 	ucontrol->value.enumerated.item[0] = cs35l41->fast_switch_file_idx;
 
@@ -438,8 +438,8 @@ static int cs35l41_fast_switch_file_get(struct snd_kcontrol *kcontrol,
 static int cs35l41_pcm_vol_get(struct snd_kcontrol *kcontrol,
 				      struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct cs35l41_private *cs35l41 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct cs35l41_private *cs35l41 = snd_soc_component_get_drvdata(component);
 
 	ucontrol->value.integer.value[0] = cs35l41->pcm_vol;
 
@@ -449,8 +449,8 @@ static int cs35l41_pcm_vol_get(struct snd_kcontrol *kcontrol,
 static int cs35l41_pcm_vol_put(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct cs35l41_private *cs35l41 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct cs35l41_private *cs35l41 = snd_soc_component_get_drvdata(component);
 
 	dev_dbg(cs35l41->dev, "%s: 0x%lx\n", __func__,
 	ucontrol->value.integer.value[0]);
@@ -482,8 +482,8 @@ static SOC_ENUM_SINGLE_DECL(pcm_sft_ramp,
 static int cs35l41_reload_tuning_get(struct snd_kcontrol *kcontrol,
 				     struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct cs35l41_private *cs35l41 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct cs35l41_private *cs35l41 = snd_soc_component_get_drvdata(component);
 
 	ucontrol->value.integer.value[0] = cs35l41->reload_tuning;
 
@@ -493,8 +493,8 @@ static int cs35l41_reload_tuning_get(struct snd_kcontrol *kcontrol,
 static int cs35l41_reload_tuning_put(struct snd_kcontrol *kcontrol,
 			   struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct cs35l41_private *cs35l41 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct cs35l41_private *cs35l41 = snd_soc_component_get_drvdata(component);
 
 	cs35l41->reload_tuning = ucontrol->value.integer.value[0];
 
@@ -1000,8 +1000,8 @@ static const struct reg_sequence cs35l41_pdn_patch[] = {
 static int cs35l41_main_amp_event(struct snd_soc_dapm_widget *w,
 		struct snd_kcontrol *kcontrol, int event)
 {
-	struct snd_soc_codec *codec = snd_soc_dapm_to_codec(w->dapm);
-	struct cs35l41_private *cs35l41 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_dapm_to_component(w->dapm);
+	struct cs35l41_private *cs35l41 = snd_soc_component_get_drvdata(component);
 	enum cs35l41_cspl_mboxcmd mboxcmd = CSPL_MBOX_CMD_NONE;
 	int ret = 0;
 	enum cs35l41_cspl_mboxstate fw_status = CSPL_MBOX_STS_RUNNING;
@@ -1087,7 +1087,7 @@ static int cs35l41_main_amp_event(struct snd_soc_dapm_widget *w,
 					ARRAY_SIZE(cs35l41_pdn_patch));
 		break;
 	default:
-		dev_err(codec->dev, "Invalid event = 0x%x\n", event);
+		dev_err(component->dev, "Invalid event = 0x%x\n", event);
 		ret = -EINVAL;
 	}
 	return ret;
@@ -1235,7 +1235,7 @@ static const struct wm_adsp_region cs35l41_dsp1_regions[] = {
 static int cs35l41_set_dai_fmt(struct snd_soc_dai *codec_dai, unsigned int fmt)
 {
 	struct cs35l41_private *cs35l41 =
-			snd_soc_codec_get_drvdata(codec_dai->codec);
+			snd_soc_component_get_drvdata(codec_dai->component);
 	unsigned int asp_fmt, lrclk_fmt, sclk_fmt, slave_mode;
 
 	switch (fmt & SND_SOC_DAIFMT_MASTER_MASK) {
@@ -1349,8 +1349,8 @@ static int cs35l41_convert_ramp_rate(struct cs35l41_private *cs35l41,
 
 static int cs35l41_pcm_mute(struct snd_soc_dai *dai, int mute)
 {
-	struct snd_soc_codec *codec = dai->codec;
-	struct cs35l41_private *cs35l41 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = dai->component;
+	struct cs35l41_private *cs35l41 = snd_soc_component_get_drvdata(component);
 	unsigned int vol, vol_ramp;
 	int vol_ramp_ms;
 
@@ -1404,7 +1404,7 @@ static int cs35l41_pcm_hw_params(struct snd_pcm_substream *substream,
 				 struct snd_pcm_hw_params *params,
 				 struct snd_soc_dai *dai)
 {
-	struct cs35l41_private *cs35l41 = snd_soc_codec_get_drvdata(dai->codec);
+	struct cs35l41_private *cs35l41 = snd_soc_component_get_drvdata(dai->component);
 	int i;
 	unsigned int rate = params_rate(params);
 	u8 asp_width, asp_wl;
@@ -1418,7 +1418,7 @@ static int cs35l41_pcm_hw_params(struct snd_pcm_substream *substream,
 	}
 
 #ifdef CONFIG_MACH_LGE
-	ret = snd_soc_codec_set_sysclk(dai->codec,0, 0, 3072000, 0);
+	ret = snd_soc_component_set_sysclk(dai->component,0, 0, 3072000, 0);
 	if (ret < 0)
 		dev_dbg(cs35l41->dev, "%s: set pll fail for cs35l41, err:%d\n",__func__,ret);
 #endif
@@ -1498,11 +1498,11 @@ static int cs35l41_pcm_startup(struct snd_pcm_substream *substream,
 	return 0;
 }
 
-static int cs35l41_codec_set_sysclk(struct snd_soc_codec *codec,
+static int cs35l41_codec_set_sysclk(struct snd_soc_component *component,
 				int clk_id, int source, unsigned int freq,
 				int dir)
 {
-	struct cs35l41_private *cs35l41 = snd_soc_codec_get_drvdata(codec);
+	struct cs35l41_private *cs35l41 = snd_soc_component_get_drvdata(component);
 
 	cs35l41->extclk_freq = freq;
 
@@ -1523,14 +1523,14 @@ static int cs35l41_codec_set_sysclk(struct snd_soc_codec *codec,
 		cs35l41->clksrc = CS35L41_PLLSRC_MCLK;
 		break;
 	default:
-		dev_err(codec->dev, "Invalid CLK Config\n");
+		dev_err(component->dev, "Invalid CLK Config\n");
 		return -EINVAL;
 	}
 
 	cs35l41->extclk_cfg = cs35l41_get_clk_config(freq);
 
 	if (cs35l41->extclk_cfg < 0) {
-		dev_err(codec->dev, "Invalid CLK Config: %d, freq: %u\n",
+		dev_err(component->dev, "Invalid CLK Config: %d, freq: %u\n",
 			cs35l41->extclk_cfg, freq);
 		return -EINVAL;
 	}
@@ -1559,14 +1559,14 @@ static int cs35l41_codec_set_sysclk(struct snd_soc_codec *codec,
 static int cs35l41_dai_set_sysclk(struct snd_soc_dai *dai,
 					int clk_id, unsigned int freq, int dir)
 {
-	struct snd_soc_codec *codec = dai->codec;
-	struct cs35l41_private *cs35l41 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = dai->component;
+	struct cs35l41_private *cs35l41 = snd_soc_component_get_drvdata(component);
 	unsigned int fs1_val = 0;
 	unsigned int fs2_val = 0;
 	unsigned int val;
 
 	if (cs35l41_get_clk_config(freq) < 0) {
-		dev_err(codec->dev, "Invalid CLK Config freq: %u\n", freq);
+		dev_err(component->dev, "Invalid CLK Config freq: %u\n", freq);
 		return -EINVAL;
 	}
 
@@ -1698,9 +1698,9 @@ int cs35l41_module_dep(void)
 }
 EXPORT_SYMBOL(cs35l41_module_dep);
 #endif
-static int cs35l41_codec_probe(struct snd_soc_codec *codec)
+static int cs35l41_codec_probe(struct snd_soc_component *component)
 {
-	struct cs35l41_private *cs35l41 = snd_soc_codec_get_drvdata(codec);
+	struct cs35l41_private *cs35l41 = snd_soc_component_get_drvdata(component);
 	struct classh_cfg *classh = &cs35l41->pdata.classh_config;
 	struct snd_kcontrol_new	*kcontrol;
 	int ret;
@@ -1834,7 +1834,7 @@ static int cs35l41_codec_probe(struct snd_soc_codec *codec)
 					CS35L41_CH_WKFET_THLD_SHIFT);
 	}
 
-	wm_adsp2_codec_probe(&cs35l41->dsp, codec);
+	wm_adsp2_codec_probe(&cs35l41->dsp, component);
 
 	/* Add run-time mixer control for fast use case switch */
 	kcontrol = kzalloc(sizeof(*kcontrol), GFP_KERNEL);
@@ -1849,10 +1849,10 @@ static int cs35l41_codec_probe(struct snd_soc_codec *codec)
 	kcontrol->get	= cs35l41_fast_switch_file_get;
 	kcontrol->put	= cs35l41_fast_switch_file_put;
 	kcontrol->private_value	= (unsigned long)&cs35l41->fast_switch_enum;
-	ret = snd_soc_add_codec_controls(codec, kcontrol, 1);
+	ret = snd_soc_add_component_controls(component, kcontrol, 1);
 	if (ret < 0)
 		dev_err(cs35l41->dev,
-			"snd_soc_add_codec_controls failed (%d)\n", ret);
+			"snd_soc_add_component_controls failed (%d)\n", ret);
 	kfree(kcontrol);
 exit:
 	return ret;
@@ -1912,11 +1912,11 @@ static int cs35l41_irq_gpio_config(struct cs35l41_private *cs35l41)
 	return irq_pol;
 }
 
-static int cs35l41_codec_remove(struct snd_soc_codec *codec)
+static int cs35l41_codec_remove(struct snd_soc_component *component)
 {
-	struct cs35l41_private *cs35l41 = snd_soc_codec_get_drvdata(codec);
+	struct cs35l41_private *cs35l41 = snd_soc_component_get_drvdata(component);
 
-	wm_adsp2_codec_remove(&cs35l41->dsp, codec);
+	wm_adsp2_codec_remove(&cs35l41->dsp, component);
 	return 0;
 }
 
@@ -2440,7 +2440,7 @@ int cs35l41_probe(struct cs35l41_private *cs35l41,
 			CS35L41_DSP1_CCM_CORE_CTRL, 0);
 	cs35l41_dsp_init(cs35l41);
 
-	ret =  snd_soc_register_codec(cs35l41->dev, &soc_codec_dev_cs35l41,
+	ret =  snd_soc_register_component(cs35l41->dev, &soc_codec_dev_cs35l41,
 					cs35l41_dai, ARRAY_SIZE(cs35l41_dai));
 	if (ret < 0) {
 		dev_err(cs35l41->dev, "%s: Register codec failed\n", __func__);
