@@ -223,7 +223,7 @@ static void write_file(struct device *dev, char *data, int write_time)
 	int fd = 0;
 	char *fname = NULL;
 	char time_string[TIME_STR_LEN] = {0};
-	struct timespec my_time = {0, };
+	time64_t my_time;
 	struct tm my_date = {0, };
 	int boot_mode = TOUCH_NORMAL_BOOT;
 	mm_segment_t old_fs = get_fs();
@@ -261,8 +261,8 @@ static void write_file(struct device *dev, char *data, int write_time)
 
 	if (fd >= 0) {
 		if (write_time == TIME_INFO_WRITE) {
-			my_time = current_kernel_time();
-			time_to_tm(my_time.tv_sec, sys_tz.tz_minuteswest * 60 * (-1), &my_date);
+			my_time = ktime_get_real_seconds();
+			time64_to_tm(my_time.tv_sec, sys_tz.tz_minuteswest * 60 * (-1), &my_date);
 			snprintf(time_string, TIME_STR_LEN,
 					"\n[%02d-%02d %02d:%02d:%02d.%03lu]\n",
 					my_date.tm_mon + 1,
