@@ -513,19 +513,6 @@ static void dpm_show_time(ktime_t starttime, pm_message_t state, int error,
 		  usecs / USEC_PER_MSEC, usecs % USEC_PER_MSEC);
 
 #if defined(CONFIG_MACH_LGE)
-#ifdef SUPPORT_DEBUGFS
-	if (!create_debugfs) {
-		debugfs_resume_time = debugfs_create_file("resume_time",
-				S_IRUGO, NULL, NULL,
-				&resume_time_fops);
-		create_debugfs = 1;
-	}
-#else
-	if (!create_debugfs) {
-		proc_create("resume_time", S_IRUGO, NULL, &resume_time_fops);
-		create_debugfs = 1;
-	}
-#endif
 
 	if (state.event == PM_EVENT_RESUME) {
 		dpm_resume_time = dpm_resume_time + usecs / USEC_PER_MSEC;
