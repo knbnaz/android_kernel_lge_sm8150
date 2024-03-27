@@ -211,7 +211,7 @@ source "drivers/input/sensors/smi130/Kconfig"
 
 source "drivers/input/sensors/smi230/Kconfig"
 
-source "drivers/input/fingerprint/Kconfig
+source "drivers/input/fingerprint/Kconfig"
 
 endif
 
