@@ -213,7 +213,7 @@ enum {
 
 
 struct es9218_priv {
-    struct  snd_soc_codec   *codec;
+    struct  snd_soc_component   *component;
     struct  i2c_client      *i2c_client;
     struct  es9218_data     *es9218_data;
     struct  delayed_work    hifi_in_standby_work;
