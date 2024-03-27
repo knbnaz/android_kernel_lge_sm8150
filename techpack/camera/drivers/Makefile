@@ -236,8 +236,12 @@ obj-$(CONFIG_MACH_LGE) += camera_class/
 obj-$(CONFIG_MACH_LGE) += cam_sensor_module/cam_actuator/lgit_onsemi/lgit_onsemi_actuator_utils.o
 obj-$(CONFIG_MACH_SM8150_ALPHA) += cam_sensor_module/cam_ois/lgit_onsemi/lgit_imx363_onsemi_ois.o
 obj-$(CONFIG_MACH_SM8150_FLASH) += cam_sensor_module/cam_ois/lgit_onsemi/lgit_imx363_onsemi_ois.o
-obj-$(CONFIG_MACH_SM8150_BETA) += cam_sensor_module/cam_ois/sunny_onsemi/sunny_imx363_onsemi_ois.o sunny_onsemi/PhoneUpdate.o sunny_onsemi/OisCmd.o
-obj-$(CONFIG_MACH_SM8150_MH2LM) += cam_sensor_module/cam_ois/sunny_onsemi/sunny_imx363_onsemi_ois.o sunny_onsemi/PhoneUpdate.o sunny_onsemi/OisCmd.o
+obj-$(CONFIG_MACH_SM8150_BETA) += cam_sensor_module/cam_ois/sunny_onsemi/sunny_imx363_onsemi_ois.o \
+								  cam_sensor_module/cam_ois/sunny_onsemi/PhoneUpdate.o \
+								  cam_sensor_module/cam_ois/sunny_onsemi/OisCmd.o
+obj-$(CONFIG_MACH_SM8150_MH2LM) += cam_sensor_module/cam_ois/sunny_onsemi/sunny_imx363_onsemi_ois.o \
+								   cam_sensor_module/cam_ois/sunny_onsemi/PhoneUpdate.o \
+								   cam_sensor_module/cam_ois/sunny_onsemi/OisCmd.o
 
 ifeq ($(CONFIG_SPECTRA_CAMERA),m)
 $(info "SPECTRA CAMERA IS BUILT AS DLKM")
