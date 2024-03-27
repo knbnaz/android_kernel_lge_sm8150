@@ -313,9 +313,9 @@ TEMP_GAIN_MATCH("100.0", 1000, 0xd, 0, 0, 1), /* max */
 };
 #endif
 
-static int sma6101_setup_fdpec_gain(struct snd_soc_codec *, unsigned int);
-static int sma6101_startup(struct snd_soc_codec *);
-static int sma6101_shutdown(struct snd_soc_codec *);
+static int sma6101_setup_fdpec_gain(struct snd_soc_component *, unsigned int);
+static int sma6101_startup(struct snd_soc_component *);
+static int sma6101_shutdown(struct snd_soc_component *);
 static int sma6101_thermal_compensation(struct sma6101_priv *sma6101,
 					bool ocp_status);
 
@@ -554,8 +554,8 @@ static const DECLARE_TLV_DB_SCALE(sma6101_spk_tlv, -6000, 50, 0);
 static int bytes_ext_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol, int reg)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	struct soc_bytes_ext *params = (void *)kcontrol->private_value;
 	unsigned int i, reg_val;
 	u8 *val;
@@ -576,8 +576,8 @@ static int bytes_ext_get(struct snd_kcontrol *kcontrol,
 static int bytes_ext_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol, int reg)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	struct soc_bytes_ext *params = (void *)kcontrol->private_value;
 	void *data;
 	u8 *val;
@@ -592,7 +592,7 @@ static int bytes_ext_put(struct snd_kcontrol *kcontrol,
 	for (i = 0; i < params->max; i++) {
 		ret = regmap_write(sma6101->regmap, reg + i, *(val + i));
 		if (ret) {
-			dev_err(codec->dev,
+			dev_err(component->dev,
 				"configuration fail, register: %x ret: %d\n",
 				reg + i, ret);
 			kfree(data);
@@ -607,8 +607,8 @@ static int bytes_ext_put(struct snd_kcontrol *kcontrol,
 static int power_up_down_control_get(struct snd_kcontrol *kcontrol,
 		struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 
 	ucontrol->value.integer.value[0] = sma6101->amp_power_status;
 
@@ -618,17 +618,17 @@ static int power_up_down_control_get(struct snd_kcontrol *kcontrol,
 static int power_up_down_control_put(struct snd_kcontrol *kcontrol,
 		struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 1))
 		return -EINVAL;
 
 	if (sel && !(sma6101->force_amp_power_down))
-		sma6101_startup(codec);
+		sma6101_startup(component);
 	else
-		sma6101_shutdown(codec);
+		sma6101_shutdown(component);
 
 	return 0;
 }
@@ -636,8 +636,8 @@ static int power_up_down_control_put(struct snd_kcontrol *kcontrol,
 static int power_down_control_get(struct snd_kcontrol *kcontrol,
 		struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 
 	ucontrol->value.integer.value[0] = sma6101->force_amp_power_down;
 
@@ -647,16 +647,16 @@ static int power_down_control_get(struct snd_kcontrol *kcontrol,
 static int power_down_control_put(struct snd_kcontrol *kcontrol,
 		struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 
 	sma6101->force_amp_power_down = ucontrol->value.integer.value[0];
 
 	if (sma6101->force_amp_power_down) {
-		dev_info(codec->dev, "%s\n", "Force AMP power down mode");
-		sma6101_shutdown(codec);
+		dev_info(component->dev, "%s\n", "Force AMP power down mode");
+		sma6101_shutdown(component);
 	} else
-		dev_info(codec->dev, "%s\n",
+		dev_info(component->dev, "%s\n",
 				"Force AMP power down out of mode");
 
 	return 0;
@@ -674,8 +674,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_clk_system_text),
 static int sma6101_clk_system_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_00_SYSTEM_CTRL, &val);
@@ -687,8 +687,8 @@ static int sma6101_clk_system_get(struct snd_kcontrol *kcontrol,
 static int sma6101_clk_system_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 7))
@@ -713,8 +713,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_input_format_text),
 static int sma6101_input_format_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_01_INPUT1_CTRL1, &val);
@@ -726,8 +726,8 @@ static int sma6101_input_format_get(struct snd_kcontrol *kcontrol,
 static int sma6101_input_format_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 7))
@@ -750,8 +750,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_in_audio_mode_text),
 static int sma6101_in_audio_mode_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_02_INPUT1_CTRL2, &val);
@@ -763,8 +763,8 @@ static int sma6101_in_audio_mode_get(struct snd_kcontrol *kcontrol,
 static int sma6101_in_audio_mode_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 3))
@@ -789,8 +789,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_pcm_n_slot_text),
 static int sma6101_pcm_n_slot_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_03_INPUT1_CTRL3, &val);
@@ -802,8 +802,8 @@ static int sma6101_pcm_n_slot_get(struct snd_kcontrol *kcontrol,
 static int sma6101_pcm_n_slot_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 15))
@@ -826,8 +826,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_pcm1_slot_text), sma6101_pcm1_slot_text);
 static int sma6101_pcm1_slot_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_04_INPUT1_CTRL4, &val);
@@ -839,8 +839,8 @@ static int sma6101_pcm1_slot_get(struct snd_kcontrol *kcontrol,
 static int sma6101_pcm1_slot_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 15))
@@ -863,8 +863,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_pcm2_slot_text), sma6101_pcm2_slot_text);
 static int sma6101_pcm2_slot_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_04_INPUT1_CTRL4, &val);
@@ -876,8 +876,8 @@ static int sma6101_pcm2_slot_get(struct snd_kcontrol *kcontrol,
 static int sma6101_pcm2_slot_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 15))
@@ -912,8 +912,8 @@ static const struct soc_enum sma6101_port_config_enum =
 static int sma6101_port_config_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_09_OUTPUT_CTRL, &val);
@@ -925,8 +925,8 @@ static int sma6101_port_config_get(struct snd_kcontrol *kcontrol,
 static int sma6101_port_config_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 3))
@@ -949,8 +949,8 @@ static const struct soc_enum sma6101_port_out_format_enum =
 static int sma6101_port_out_format_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_09_OUTPUT_CTRL, &val);
@@ -962,8 +962,8 @@ static int sma6101_port_out_format_get(struct snd_kcontrol *kcontrol,
 static int sma6101_port_out_format_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 3))
@@ -989,8 +989,8 @@ static const struct soc_enum sma6101_port_out_sel_enum =
 static int sma6101_port_out_sel_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_09_OUTPUT_CTRL, &val);
@@ -1002,8 +1002,8 @@ static int sma6101_port_out_sel_get(struct snd_kcontrol *kcontrol,
 static int sma6101_port_out_sel_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 7))
@@ -1042,8 +1042,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_attack_lvl_3_text),
 static int sma6101_attack_lvl_3_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_0D_CLASS_H_CTRL_LVL3, &val);
@@ -1055,8 +1055,8 @@ static int sma6101_attack_lvl_3_get(struct snd_kcontrol *kcontrol,
 static int sma6101_attack_lvl_3_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 15))
@@ -1085,8 +1085,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_release_time_3_text),
 static int sma6101_release_time_3_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_0D_CLASS_H_CTRL_LVL3, &val);
@@ -1098,8 +1098,8 @@ static int sma6101_release_time_3_get(struct snd_kcontrol *kcontrol,
 static int sma6101_release_time_3_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 15))
@@ -1123,8 +1123,8 @@ static const struct soc_enum sma6101_vol_slope_enum =
 static int sma6101_vol_slope_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_0E_MUTE_VOL_CTRL, &val);
@@ -1136,8 +1136,8 @@ static int sma6101_vol_slope_get(struct snd_kcontrol *kcontrol,
 static int sma6101_vol_slope_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 3))
@@ -1161,8 +1161,8 @@ static const struct soc_enum sma6101_mute_slope_enum =
 static int sma6101_mute_slope_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_0E_MUTE_VOL_CTRL, &val);
@@ -1174,8 +1174,8 @@ static int sma6101_mute_slope_get(struct snd_kcontrol *kcontrol,
 static int sma6101_mute_slope_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 3))
@@ -1202,8 +1202,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_attack_lvl_4_text),
 static int sma6101_attack_lvl_4_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_0F_CLASS_H_CTRL_LVL4, &val);
@@ -1215,8 +1215,8 @@ static int sma6101_attack_lvl_4_get(struct snd_kcontrol *kcontrol,
 static int sma6101_attack_lvl_4_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 15))
@@ -1245,8 +1245,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_release_time_4_text),
 static int sma6101_release_time_4_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_0F_CLASS_H_CTRL_LVL4, &val);
@@ -1258,8 +1258,8 @@ static int sma6101_release_time_4_get(struct snd_kcontrol *kcontrol,
 static int sma6101_release_time_4_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 15))
@@ -1283,8 +1283,8 @@ static const struct soc_enum sma6101_spkmode_enum =
 static int sma6101_spkmode_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_10_SYSTEM_CTRL1, &val);
@@ -1296,8 +1296,8 @@ static int sma6101_spkmode_get(struct snd_kcontrol *kcontrol,
 static int sma6101_spkmode_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 7))
@@ -1325,8 +1325,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_input_gain_text),
 static int sma6101_input_gain_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_12_SYSTEM_CTRL3, &val);
@@ -1338,8 +1338,8 @@ static int sma6101_input_gain_get(struct snd_kcontrol *kcontrol,
 static int sma6101_input_gain_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 3))
@@ -1361,8 +1361,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_input_r_gain_text),
 static int sma6101_input_r_gain_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_12_SYSTEM_CTRL3, &val);
@@ -1374,8 +1374,8 @@ static int sma6101_input_r_gain_get(struct snd_kcontrol *kcontrol,
 static int sma6101_input_r_gain_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 3))
@@ -1397,8 +1397,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_fdpec_i_text), sma6101_fdpec_i_text);
 static int sma6101_fdpec_i_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_13_FDPEC_CTRL1, &val);
@@ -1410,8 +1410,8 @@ static int sma6101_fdpec_i_get(struct snd_kcontrol *kcontrol,
 static int sma6101_fdpec_i_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 3))
@@ -1433,8 +1433,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(fdpec_gain_control_text),
 static int fdpec_gain_control_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 
 	ucontrol->value.integer.value[0] = sma6101->fdpec_gain_control;
 
@@ -1444,13 +1444,13 @@ static int fdpec_gain_control_get(struct snd_kcontrol *kcontrol,
 static int fdpec_gain_control_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 3))
 		return -EINVAL;
 
-	sma6101_setup_fdpec_gain(codec, sel);
+	sma6101_setup_fdpec_gain(component, sel);
 
 	return 0;
 }
@@ -1466,8 +1466,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_spk_hysfb_text), sma6101_spk_hysfb_text);
 static int sma6101_spk_hysfb_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_14_MODULATOR, &val);
@@ -1479,8 +1479,8 @@ static int sma6101_spk_hysfb_get(struct snd_kcontrol *kcontrol,
 static int sma6101_spk_hysfb_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 3))
@@ -1542,8 +1542,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_tdm_l_slot_text),
 static int sma6101_tdm_l_slot_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_21_TDM_RX, &val);
@@ -1555,8 +1555,8 @@ static int sma6101_tdm_l_slot_get(struct snd_kcontrol *kcontrol,
 static int sma6101_tdm_l_slot_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 7))
@@ -1579,8 +1579,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_tdm_r_slot_text),
 static int sma6101_tdm_r_slot_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_21_TDM_RX, &val);
@@ -1592,8 +1592,8 @@ static int sma6101_tdm_r_slot_get(struct snd_kcontrol *kcontrol,
 static int sma6101_tdm_r_slot_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 7))
@@ -1630,8 +1630,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_otp_mode_text), sma6101_otp_mode_text);
 static int sma6101_otp_mode_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_36_PROTECTION, &val);
@@ -1643,8 +1643,8 @@ static int sma6101_otp_mode_get(struct snd_kcontrol *kcontrol,
 static int sma6101_otp_mode_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 7))
@@ -1787,8 +1787,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_attack_lvl_1_text),
 static int sma6101_attack_lvl_1_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_90_CLASS_H_CTRL_LVL1, &val);
@@ -1800,8 +1800,8 @@ static int sma6101_attack_lvl_1_get(struct snd_kcontrol *kcontrol,
 static int sma6101_attack_lvl_1_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 15))
@@ -1830,8 +1830,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_release_time_1_text),
 static int sma6101_release_time_1_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_90_CLASS_H_CTRL_LVL1, &val);
@@ -1843,8 +1843,8 @@ static int sma6101_release_time_1_get(struct snd_kcontrol *kcontrol,
 static int sma6101_release_time_1_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 15))
@@ -1870,8 +1870,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_attack_lvl_2_text),
 static int sma6101_attack_lvl_2_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_91_CLASS_H_CTRL_LVL2, &val);
@@ -1883,8 +1883,8 @@ static int sma6101_attack_lvl_2_get(struct snd_kcontrol *kcontrol,
 static int sma6101_attack_lvl_2_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 15))
@@ -1913,8 +1913,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_release_time_2_text),
 static int sma6101_release_time_2_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_91_CLASS_H_CTRL_LVL2, &val);
@@ -1926,8 +1926,8 @@ static int sma6101_release_time_2_get(struct snd_kcontrol *kcontrol,
 static int sma6101_release_time_2_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 15))
@@ -1950,8 +1950,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_fdpec_gain_trm_text),
 static int sma6101_fdpec_gain_trm_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_92_FDPEC_CTRL2, &val);
@@ -1963,8 +1963,8 @@ static int sma6101_fdpec_gain_trm_get(struct snd_kcontrol *kcontrol,
 static int sma6101_fdpec_gain_trm_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 3))
@@ -1989,8 +1989,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_trm_vref_text), sma6101_trm_vref_text);
 static int sma6101_trm_vref_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_93_BOOST_CTRL0, &val);
@@ -2002,8 +2002,8 @@ static int sma6101_trm_vref_get(struct snd_kcontrol *kcontrol,
 static int sma6101_trm_vref_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 15))
@@ -2013,7 +2013,7 @@ static int sma6101_trm_vref_put(struct snd_kcontrol *kcontrol,
 		regmap_update_bits(sma6101->regmap, SMA6101_93_BOOST_CTRL0,
 			0xF0, (sel << 4));
 	} else  {
-		dev_info(codec->dev, "Trimming of VBG reference does not change on REV3 and above\n");
+		dev_info(component->dev, "Trimming of VBG reference does not change on REV3 and above\n");
 	}
 
 	return 0;
@@ -2030,8 +2030,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_trm_vbst1_text), sma6101_trm_vbst1_text);
 static int sma6101_trm_vbst1_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_93_BOOST_CTRL0, &val);
@@ -2043,15 +2043,15 @@ static int sma6101_trm_vbst1_get(struct snd_kcontrol *kcontrol,
 static int sma6101_trm_vbst1_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 15))
 		return -EINVAL;
 
 	if (sma6101->rev_num < REV_NUM_REV3) {
-		dev_info(codec->dev, "%s : Trimming of boost output voltage %dV\n",
+		dev_info(component->dev, "%s : Trimming of boost output voltage %dV\n",
 					__func__, (sel + 6));
 #if defined(CONFIG_MACH_LGE)
 		sma6101->trm_vbst1 = sel;
@@ -2063,7 +2063,7 @@ static int sma6101_trm_vbst1_put(struct snd_kcontrol *kcontrol,
 				0x0F, sel);
 #endif
 	} else {
-		dev_info(codec->dev, "Trimming of boost output voltage does not change on REV3 and above\n");
+		dev_info(component->dev, "Trimming of boost output voltage does not change on REV3 and above\n");
 	}
 
 	return 0;
@@ -2079,8 +2079,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_trm_comp2_text), sma6101_trm_comp2_text);
 static int sma6101_trm_comp2_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_94_BOOST_CTRL1, &val);
@@ -2092,8 +2092,8 @@ static int sma6101_trm_comp2_get(struct snd_kcontrol *kcontrol,
 static int sma6101_trm_comp2_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 3))
@@ -2115,8 +2115,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_trm_osc_text), sma6101_trm_osc_text);
 static int sma6101_trm_osc_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_94_BOOST_CTRL1, &val);
@@ -2128,8 +2128,8 @@ static int sma6101_trm_osc_get(struct snd_kcontrol *kcontrol,
 static int sma6101_trm_osc_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 7))
@@ -2151,8 +2151,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_trm_rmp_text), sma6101_trm_rmp_text);
 static int sma6101_trm_rmp_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_94_BOOST_CTRL1, &val);
@@ -2164,8 +2164,8 @@ static int sma6101_trm_rmp_get(struct snd_kcontrol *kcontrol,
 static int sma6101_trm_rmp_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 7))
@@ -2188,8 +2188,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_trm_ocl_text), sma6101_trm_ocl_text);
 static int sma6101_trm_ocl_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_95_BOOST_CTRL2, &val);
@@ -2201,8 +2201,8 @@ static int sma6101_trm_ocl_get(struct snd_kcontrol *kcontrol,
 static int sma6101_trm_ocl_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 7))
@@ -2228,8 +2228,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_trm_comp_text), sma6101_trm_comp_text);
 static int sma6101_trm_comp_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_95_BOOST_CTRL2, &val);
@@ -2241,8 +2241,8 @@ static int sma6101_trm_comp_get(struct snd_kcontrol *kcontrol,
 static int sma6101_trm_comp_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 15))
@@ -2267,8 +2267,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_trm_dt_text), sma6101_trm_dt_text);
 static int sma6101_trm_dt_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_96_BOOST_CTRL3, &val);
@@ -2280,8 +2280,8 @@ static int sma6101_trm_dt_get(struct snd_kcontrol *kcontrol,
 static int sma6101_trm_dt_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 15))
@@ -2302,8 +2302,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_trm_slw_text), sma6101_trm_slw_text);
 static int sma6101_trm_slw_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_96_BOOST_CTRL3, &val);
@@ -2315,8 +2315,8 @@ static int sma6101_trm_slw_get(struct snd_kcontrol *kcontrol,
 static int sma6101_trm_slw_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 3))
@@ -2359,8 +2359,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_trm_vbst2_text), sma6101_trm_vbst2_text);
 static int sma6101_trm_vbst2_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_97_BOOST_CTRL4, &val);
@@ -2372,8 +2372,8 @@ static int sma6101_trm_vbst2_get(struct snd_kcontrol *kcontrol,
 static int sma6101_trm_vbst2_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 63))
@@ -2394,8 +2394,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_trm_tmin_text), sma6101_trm_tmin_text);
 static int sma6101_trm_tmin_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_97_BOOST_CTRL4, &val);
@@ -2407,8 +2407,8 @@ static int sma6101_trm_tmin_get(struct snd_kcontrol *kcontrol,
 static int sma6101_trm_tmin_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 3))
@@ -2431,8 +2431,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_o_format_text), sma6101_o_format_text);
 static int sma6101_o_format_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_A4_SDO_OUT_FMT, &val);
@@ -2444,8 +2444,8 @@ static int sma6101_o_format_get(struct snd_kcontrol *kcontrol,
 static int sma6101_o_format_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 7))
@@ -2466,8 +2466,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_sck_rate_text), sma6101_sck_rate_text);
 static int sma6101_sck_rate_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_A4_SDO_OUT_FMT, &val);
@@ -2479,8 +2479,8 @@ static int sma6101_sck_rate_get(struct snd_kcontrol *kcontrol,
 static int sma6101_sck_rate_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 3))
@@ -2501,8 +2501,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_wd_length_text), sma6101_wd_length_text);
 static int sma6101_wd_length_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_A4_SDO_OUT_FMT, &val);
@@ -2514,8 +2514,8 @@ static int sma6101_wd_length_get(struct snd_kcontrol *kcontrol,
 static int sma6101_wd_length_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 3))
@@ -2538,8 +2538,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_tdm_n_slot_text),
 static int sma6101_tdm_n_slot_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_A5_TDM_TX1, &val);
@@ -2551,8 +2551,8 @@ static int sma6101_tdm_n_slot_get(struct snd_kcontrol *kcontrol,
 static int sma6101_tdm_n_slot_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 3))
@@ -2575,8 +2575,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_tdm_slot1_text), sma6101_tdm_slot1_text);
 static int sma6101_tdm_slot1_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_A6_TDM_TX2, &val);
@@ -2588,8 +2588,8 @@ static int sma6101_tdm_slot1_get(struct snd_kcontrol *kcontrol,
 static int sma6101_tdm_slot1_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 15))
@@ -2612,8 +2612,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_tdm_slot2_text), sma6101_tdm_slot2_text);
 static int sma6101_tdm_slot2_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_A6_TDM_TX2, &val);
@@ -2625,8 +2625,8 @@ static int sma6101_tdm_slot2_get(struct snd_kcontrol *kcontrol,
 static int sma6101_tdm_slot2_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 15))
@@ -2648,8 +2648,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_test_clock_mon_time_sel_text),
 static int sma6101_test_clock_mon_time_sel_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_A7_TOP_MAN3, &val);
@@ -2661,8 +2661,8 @@ static int sma6101_test_clock_mon_time_sel_get(struct snd_kcontrol *kcontrol,
 static int sma6101_test_clock_mon_time_sel_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 3))
@@ -2686,8 +2686,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_tone_freq_text), sma6101_tone_freq_text);
 static int sma6101_tone_freq_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_A8_TONE_GENERATOR, &val);
@@ -2699,8 +2699,8 @@ static int sma6101_tone_freq_get(struct snd_kcontrol *kcontrol,
 static int sma6101_tone_freq_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 15))
@@ -2762,8 +2762,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_sync_delay_text),
 static int sma6101_sync_delay_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_AD_SPK_OCP_LVL, &val);
@@ -2775,8 +2775,8 @@ static int sma6101_sync_delay_get(struct snd_kcontrol *kcontrol,
 static int sma6101_sync_delay_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 3))
@@ -2798,8 +2798,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_ocp_filter_text),
 static int sma6101_ocp_filter_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_AD_SPK_OCP_LVL, &val);
@@ -2811,8 +2811,8 @@ static int sma6101_ocp_filter_get(struct snd_kcontrol *kcontrol,
 static int sma6101_ocp_filter_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 3))
@@ -2833,8 +2833,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(sma6101_ocp_lvl_text), sma6101_ocp_lvl_text);
 static int sma6101_ocp_lvl_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int val;
 
 	regmap_read(sma6101->regmap, SMA6101_AD_SPK_OCP_LVL, &val);
@@ -2846,8 +2846,8 @@ static int sma6101_ocp_lvl_get(struct snd_kcontrol *kcontrol,
 static int sma6101_ocp_lvl_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int sel = (int)ucontrol->value.integer.value[0];
 
 	if ((sel < 0) || (sel > 3))
@@ -2924,8 +2924,8 @@ static int sma6101_reset_gpio_put(struct snd_kcontrol *kcontrol,
 {
 	int ret = 0;
 	int value = 0;
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 
 	value = (int)ucontrol->value.integer.value[0];
 	ret = __sma6101_reset_gpio_set(sma6101,value);
@@ -2937,8 +2937,8 @@ static int sma6101_reset_gpio_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
 	int ret = 0;
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 
 	ret = __sma6101_reset_gpio_get(sma6101);
 	ucontrol->value.integer.value[0] = ret;
@@ -2958,8 +2958,8 @@ static int sma6101_low_battery_status_put(struct snd_kcontrol *kcontrol,
 {
 	int ret = 0;
 	int val = 0;
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 
 	val = (int)ucontrol->value.integer.value[0];
 
@@ -2973,8 +2973,8 @@ static int sma6101_low_battery_status_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
 	int ret = 0;
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 
 	ucontrol->value.integer.value[0] = sma6101->lowbattery_status;
 
@@ -3069,9 +3069,9 @@ skip:
 	return ret;
 }
 
-static void sma6101_msm_release_pinctrl(struct snd_soc_codec *codec)
+static void sma6101_msm_release_pinctrl(struct snd_soc_component *component)
 {
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	struct msm_pinctrl_info *pinctrl_info = &sma6101->pinctrl_info;
 
 	if (pinctrl_info->pinctrl) {
@@ -3080,10 +3080,10 @@ static void sma6101_msm_release_pinctrl(struct snd_soc_codec *codec)
 	}
 }
 
-static int sma6101_msm_get_pinctrl(struct snd_soc_codec *codec)
+static int sma6101_msm_get_pinctrl(struct snd_soc_component *component)
 {
-	struct platform_device *pdev = to_platform_device(codec->dev);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct platform_device *pdev = to_platform_device(component->dev);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	struct msm_pinctrl_info *pinctrl_info = NULL;
 	struct pinctrl *pinctrl;
 	int ret = 0;
@@ -3156,15 +3156,15 @@ static int sma6101_clock_control(struct clk *clk,int enable)
 	return ret;
 }
 
-static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_codec *codec,bool enable) {
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_component *component,bool enable) {
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 
 	if(enable) {
 		if (sma6101->rev_num < REV_NUM_REV3) {
 			switch (sma6101->voice_music_class_h_mode_for_volume_boost) {
 			case SMA6101_CLASS_H_VOICE_MODE:
 				/* Class-H operation Level in voice scenario */
-				dev_info(codec->dev, "%s : Class-H operation Level in voice scenario\n",
+				dev_info(component->dev, "%s : Class-H operation Level in voice scenario\n",
 						__func__);
 				regmap_write(sma6101->regmap,
 					SMA6101_0D_CLASS_H_CTRL_LVL3, 0xAA);
@@ -3178,7 +3178,7 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_codec *codec,b
 
 			case SMA6101_CLASS_H_MUSIC_MODE:
 				/* Class-H operation Level in music scenario */
-				dev_info(codec->dev, "%s : Class-H operation Level in music scenario\n",
+				dev_info(component->dev, "%s : Class-H operation Level in music scenario\n",
 						__func__);
 				regmap_write(sma6101->regmap,
 					SMA6101_0D_CLASS_H_CTRL_LVL3, 0xFA);
@@ -3191,7 +3191,7 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_codec *codec,b
 				break;
 
 			default:
-				dev_info(codec->dev, "%s : Class-H operation Level off\n",
+				dev_info(component->dev, "%s : Class-H operation Level off\n",
 						__func__);
 				regmap_write(sma6101->regmap,
 					SMA6101_0D_CLASS_H_CTRL_LVL3, 0xFA);
@@ -3207,9 +3207,9 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_codec *codec,b
 			switch (sma6101->voice_music_class_h_mode_for_volume_boost) {
 			case SMA6101_CLASS_H_VOICE_MODE:
 			/* FDPEC gain & Boost voltage in voice scenario */
-			dev_info(codec->dev, "%s : FDPEC gain 6 & Boost 14V in voice scenario\n",
+			dev_info(component->dev, "%s : FDPEC gain 6 & Boost 14V in voice scenario\n",
 					__func__);
-			sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x6);
+			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x6);
 
 			regmap_update_bits(sma6101->regmap,
 				SMA6101_93_BOOST_CTRL0,
@@ -3218,9 +3218,9 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_codec *codec,b
 
 			case SMA6101_CLASS_H_MUSIC_MODE:
 			/* FDPEC gain & Boost voltage in music scenario */
-			dev_info(codec->dev, "%s : FDPEC gain 8 & Boost 17V in music scenario\n",
+			dev_info(component->dev, "%s : FDPEC gain 8 & Boost 17V in music scenario\n",
 					__func__);
-			sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x8);
+			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x8);
 
 			regmap_update_bits(sma6101->regmap,
 				SMA6101_93_BOOST_CTRL0,
@@ -3228,9 +3228,9 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_codec *codec,b
 			break;
 
 			default:
-			dev_info(codec->dev, "%s : FDPEC gain 6 & Boost 14V default\n",
+			dev_info(component->dev, "%s : FDPEC gain 6 & Boost 14V default\n",
 					__func__);
-			sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x6);
+			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x6);
 
 			regmap_update_bits(sma6101->regmap,
 				SMA6101_93_BOOST_CTRL0,
@@ -3243,9 +3243,9 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_codec *codec,b
 			/* FDPEC gain & Boost voltage in
 			 * voice scenario
 			 */
-			dev_info(codec->dev, "%s : FDPEC gain 6 & Boost 15V in voice scenario\n",
+			dev_info(component->dev, "%s : FDPEC gain 6 & Boost 15V in voice scenario\n",
 					__func__);
-			sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x6);
+			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x6);
 
 			regmap_update_bits(sma6101->regmap,
 				SMA6101_93_BOOST_CTRL0,
@@ -3256,9 +3256,9 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_codec *codec,b
 			/* FDPEC gain & Boost voltage in
 			 * music scenario
 			 */
-			dev_info(codec->dev, "%s : FDPEC gain 8 & Boost 15V in music scenario\n",
+			dev_info(component->dev, "%s : FDPEC gain 8 & Boost 15V in music scenario\n",
 					__func__);
-			sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x8);
+			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x8);
 
 			regmap_update_bits(sma6101->regmap,
 				SMA6101_93_BOOST_CTRL0,
@@ -3269,9 +3269,9 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_codec *codec,b
 			/* FDPEC gain & Boost voltage in
 			 * low noise voice scenario
 			 */
-			dev_info(codec->dev, "%s : FDPEC gain 4 & Boost 10V in Low Noise voice scenario\n",
+			dev_info(component->dev, "%s : FDPEC gain 4 & Boost 10V in Low Noise voice scenario\n",
 					__func__);
-			sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x4);
+			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x4);
 
 			regmap_update_bits(sma6101->regmap,
 				SMA6101_93_BOOST_CTRL0,
@@ -3282,10 +3282,10 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_codec *codec,b
 			/* FDPEC gain & Boost voltage in
 			 * ultra low noise voice scenario
 			 */
-			dev_info(codec->dev,
+			dev_info(component->dev,
 				"%s : FDPEC gain 2.6 & Boost 7V in Ultra Low Noise voice scenario\n",
 					__func__);
-			sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x2P6);
+			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x2P6);
 
 			regmap_update_bits(sma6101->regmap,
 				SMA6101_93_BOOST_CTRL0,
@@ -3293,9 +3293,9 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_codec *codec,b
 			break;
 
 			default:
-			dev_info(codec->dev, "%s : FDPEC gain 6 & Boost 15V default\n",
+			dev_info(component->dev, "%s : FDPEC gain 6 & Boost 15V default\n",
 					__func__);
-			sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x6);
+			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x6);
 
 			regmap_update_bits(sma6101->regmap,
 				SMA6101_93_BOOST_CTRL0,
@@ -3308,7 +3308,7 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_codec *codec,b
 			switch (sma6101->voice_music_class_h_mode) {
 			case SMA6101_CLASS_H_VOICE_MODE:
 				/* Class-H operation Level in voice scenario */
-				dev_info(codec->dev, "%s : Class-H operation Level in voice scenario\n",
+				dev_info(component->dev, "%s : Class-H operation Level in voice scenario\n",
 						__func__);
 				regmap_write(sma6101->regmap,
 					SMA6101_0D_CLASS_H_CTRL_LVL3, 0xAA);
@@ -3322,7 +3322,7 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_codec *codec,b
 
 			case SMA6101_CLASS_H_MUSIC_MODE:
 				/* Class-H operation Level in music scenario */
-				dev_info(codec->dev, "%s : Class-H operation Level in music scenario\n",
+				dev_info(component->dev, "%s : Class-H operation Level in music scenario\n",
 						__func__);
 				regmap_write(sma6101->regmap,
 					SMA6101_0D_CLASS_H_CTRL_LVL3, 0xFA);
@@ -3335,7 +3335,7 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_codec *codec,b
 				break;
 
 			default:
-				dev_info(codec->dev, "%s : Class-H operation Level off\n",
+				dev_info(component->dev, "%s : Class-H operation Level off\n",
 						__func__);
 				regmap_write(sma6101->regmap,
 					SMA6101_0D_CLASS_H_CTRL_LVL3, 0xFA);
@@ -3351,9 +3351,9 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_codec *codec,b
 			switch (sma6101->voice_music_class_h_mode) {
 			case SMA6101_CLASS_H_VOICE_MODE:
 			/* FDPEC gain & Boost voltage in voice scenario */
-			dev_info(codec->dev, "%s : FDPEC gain 6 & Boost 14V in voice scenario\n",
+			dev_info(component->dev, "%s : FDPEC gain 6 & Boost 14V in voice scenario\n",
 					__func__);
-			sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x6);
+			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x6);
 
 			regmap_update_bits(sma6101->regmap,
 				SMA6101_93_BOOST_CTRL0,
@@ -3362,9 +3362,9 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_codec *codec,b
 
 			case SMA6101_CLASS_H_MUSIC_MODE:
 			/* FDPEC gain & Boost voltage in music scenario */
-			dev_info(codec->dev, "%s : FDPEC gain 8 & Boost 17V in music scenario\n",
+			dev_info(component->dev, "%s : FDPEC gain 8 & Boost 17V in music scenario\n",
 					__func__);
-			sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x8);
+			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x8);
 
 			regmap_update_bits(sma6101->regmap,
 				SMA6101_93_BOOST_CTRL0,
@@ -3372,9 +3372,9 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_codec *codec,b
 			break;
 
 			default:
-			dev_info(codec->dev, "%s : FDPEC gain 6 & Boost 14V default\n",
+			dev_info(component->dev, "%s : FDPEC gain 6 & Boost 14V default\n",
 					__func__);
-			sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x6);
+			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x6);
 
 			regmap_update_bits(sma6101->regmap,
 				SMA6101_93_BOOST_CTRL0,
@@ -3387,9 +3387,9 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_codec *codec,b
 			/* FDPEC gain & Boost voltage in
 			 * voice scenario
 			 */
-			dev_info(codec->dev, "%s : FDPEC gain 6 & Boost 15V in voice scenario\n",
+			dev_info(component->dev, "%s : FDPEC gain 6 & Boost 15V in voice scenario\n",
 					__func__);
-			sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x6);
+			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x6);
 
 			regmap_update_bits(sma6101->regmap,
 				SMA6101_93_BOOST_CTRL0,
@@ -3400,9 +3400,9 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_codec *codec,b
 			/* FDPEC gain & Boost voltage in
 			 * music scenario
 			 */
-			dev_info(codec->dev, "%s : FDPEC gain 8 & Boost 15V in music scenario\n",
+			dev_info(component->dev, "%s : FDPEC gain 8 & Boost 15V in music scenario\n",
 					__func__);
-			sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x8);
+			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x8);
 
 			regmap_update_bits(sma6101->regmap,
 				SMA6101_93_BOOST_CTRL0,
@@ -3413,9 +3413,9 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_codec *codec,b
 			/* FDPEC gain & Boost voltage in
 			 * low noise voice scenario
 			 */
-			dev_info(codec->dev, "%s : FDPEC gain 4 & Boost 10V in Low Noise voice scenario\n",
+			dev_info(component->dev, "%s : FDPEC gain 4 & Boost 10V in Low Noise voice scenario\n",
 					__func__);
-			sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x4);
+			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x4);
 
 			regmap_update_bits(sma6101->regmap,
 				SMA6101_93_BOOST_CTRL0,
@@ -3426,10 +3426,10 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_codec *codec,b
 			/* FDPEC gain & Boost voltage in
 			 * ultra low noise voice scenario
 			 */
-			dev_info(codec->dev,
+			dev_info(component->dev,
 				"%s : FDPEC gain 2.6 & Boost 7V in Ultra Low Noise voice scenario\n",
 					__func__);
-			sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x2P6);
+			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x2P6);
 
 			regmap_update_bits(sma6101->regmap,
 				SMA6101_93_BOOST_CTRL0,
@@ -3437,9 +3437,9 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_codec *codec,b
 			break;
 
 			default:
-			dev_info(codec->dev, "%s : FDPEC gain 6 & Boost 15V default\n",
+			dev_info(component->dev, "%s : FDPEC gain 6 & Boost 15V default\n",
 					__func__);
-			sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x6);
+			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x6);
 
 			regmap_update_bits(sma6101->regmap,
 				SMA6101_93_BOOST_CTRL0,
@@ -3462,8 +3462,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(voice_music_class_h_mode_for_volume_boost_text),
 static int voice_music_class_h_mode_for_volume_boost_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 
 	ucontrol->value.integer.value[0] = sma6101->voice_music_class_h_mode_for_volume_boost;
 
@@ -3473,8 +3473,8 @@ static int voice_music_class_h_mode_for_volume_boost_get(struct snd_kcontrol *kc
 static int voice_music_class_h_mode_for_volume_boost_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	bool boost_enable = false;
 	int temp = 0;
 
@@ -3484,7 +3484,7 @@ static int voice_music_class_h_mode_for_volume_boost_put(struct snd_kcontrol *kc
 
 	if(temp <=3) { //set volume boost mode //set this variable only boot up by mixer default setting
 		sma6101->voice_music_class_h_mode_for_volume_boost= temp;
-		dev_info(codec->dev, "%s : set volume boost FDPEC Gain %d\n", __func__,sma6101->voice_music_class_h_mode_for_volume_boost);
+		dev_info(component->dev, "%s : set volume boost FDPEC Gain %d\n", __func__,sma6101->voice_music_class_h_mode_for_volume_boost);
 		return 0;
 	} else if (temp == 4) //set boost disable
 		boost_enable = false;
@@ -3492,13 +3492,13 @@ static int voice_music_class_h_mode_for_volume_boost_put(struct snd_kcontrol *kc
 		boost_enable = true;
 
 	if(sma6101->voice_music_class_h_mode_for_volume_boost == sma6101->voice_music_class_h_mode) {
-		dev_info(codec->dev, "%s : don't need to change FDPEC Gain\n",__func__);
+		dev_info(component->dev, "%s : don't need to change FDPEC Gain\n",__func__);
 		return 0;
 	}
 
-	dev_info(codec->dev, "%s : boost_enable %d\n", 	__func__,boost_enable);
+	dev_info(component->dev, "%s : boost_enable %d\n", 	__func__,boost_enable);
 
-	set_voice_class_h_mode_for_volume_boost(codec,boost_enable);
+	set_voice_class_h_mode_for_volume_boost(component,boost_enable);
 	return 0;
 }
 #endif
@@ -3513,8 +3513,8 @@ SOC_ENUM_SINGLE_EXT(ARRAY_SIZE(voice_music_class_h_mode_text),
 static int voice_music_class_h_mode_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 
 	ucontrol->value.integer.value[0] = sma6101->voice_music_class_h_mode;
 
@@ -3524,8 +3524,8 @@ static int voice_music_class_h_mode_get(struct snd_kcontrol *kcontrol,
 static int voice_music_class_h_mode_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 
 	sma6101->voice_music_class_h_mode = ucontrol->value.integer.value[0];
 
@@ -3537,7 +3537,7 @@ static int voice_music_class_h_mode_put(struct snd_kcontrol *kcontrol,
 		switch (sma6101->voice_music_class_h_mode) {
 		case SMA6101_CLASS_H_VOICE_MODE:
 			/* Class-H operation Level in voice scenario */
-			dev_info(codec->dev, "%s : Class-H operation Level in voice scenario\n",
+			dev_info(component->dev, "%s : Class-H operation Level in voice scenario\n",
 					__func__);
 			regmap_write(sma6101->regmap,
 				SMA6101_0D_CLASS_H_CTRL_LVL3, 0xAA);
@@ -3551,7 +3551,7 @@ static int voice_music_class_h_mode_put(struct snd_kcontrol *kcontrol,
 
 		case SMA6101_CLASS_H_MUSIC_MODE:
 			/* Class-H operation Level in music scenario */
-			dev_info(codec->dev, "%s : Class-H operation Level in music scenario\n",
+			dev_info(component->dev, "%s : Class-H operation Level in music scenario\n",
 					__func__);
 			regmap_write(sma6101->regmap,
 				SMA6101_0D_CLASS_H_CTRL_LVL3, 0xFA);
@@ -3564,7 +3564,7 @@ static int voice_music_class_h_mode_put(struct snd_kcontrol *kcontrol,
 			break;
 
 		default:
-			dev_info(codec->dev, "%s : Class-H operation Level off\n",
+			dev_info(component->dev, "%s : Class-H operation Level off\n",
 					__func__);
 			regmap_write(sma6101->regmap,
 				SMA6101_0D_CLASS_H_CTRL_LVL3, 0xFA);
@@ -3580,9 +3580,9 @@ static int voice_music_class_h_mode_put(struct snd_kcontrol *kcontrol,
 		switch (sma6101->voice_music_class_h_mode) {
 		case SMA6101_CLASS_H_VOICE_MODE:
 		/* FDPEC gain & Boost voltage in voice scenario */
-		dev_info(codec->dev, "%s : FDPEC gain 6 & Boost 14V in voice scenario\n",
+		dev_info(component->dev, "%s : FDPEC gain 6 & Boost 14V in voice scenario\n",
 				__func__);
-		sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x6);
+		sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x6);
 
 		regmap_update_bits(sma6101->regmap,
 			SMA6101_93_BOOST_CTRL0,
@@ -3591,9 +3591,9 @@ static int voice_music_class_h_mode_put(struct snd_kcontrol *kcontrol,
 
 		case SMA6101_CLASS_H_MUSIC_MODE:
 		/* FDPEC gain & Boost voltage in music scenario */
-		dev_info(codec->dev, "%s : FDPEC gain 8 & Boost 17V in music scenario\n",
+		dev_info(component->dev, "%s : FDPEC gain 8 & Boost 17V in music scenario\n",
 				__func__);
-		sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x8);
+		sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x8);
 
 		regmap_update_bits(sma6101->regmap,
 			SMA6101_93_BOOST_CTRL0,
@@ -3601,9 +3601,9 @@ static int voice_music_class_h_mode_put(struct snd_kcontrol *kcontrol,
 		break;
 
 		default:
-		dev_info(codec->dev, "%s : FDPEC gain 6 & Boost 14V default\n",
+		dev_info(component->dev, "%s : FDPEC gain 6 & Boost 14V default\n",
 				__func__);
-		sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x6);
+		sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x6);
 
 		regmap_update_bits(sma6101->regmap,
 			SMA6101_93_BOOST_CTRL0,
@@ -3616,9 +3616,9 @@ static int voice_music_class_h_mode_put(struct snd_kcontrol *kcontrol,
 		/* FDPEC gain & Boost voltage in
 		 * voice scenario
 		 */
-		dev_info(codec->dev, "%s : FDPEC gain 6 & Boost 15V in voice scenario\n",
+		dev_info(component->dev, "%s : FDPEC gain 6 & Boost 15V in voice scenario\n",
 				__func__);
-		sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x6);
+		sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x6);
 
 		regmap_update_bits(sma6101->regmap,
 			SMA6101_93_BOOST_CTRL0,
@@ -3629,9 +3629,9 @@ static int voice_music_class_h_mode_put(struct snd_kcontrol *kcontrol,
 		/* FDPEC gain & Boost voltage in
 		 * music scenario
 		 */
-		dev_info(codec->dev, "%s : FDPEC gain 8 & Boost 15V in music scenario\n",
+		dev_info(component->dev, "%s : FDPEC gain 8 & Boost 15V in music scenario\n",
 				__func__);
-		sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x8);
+		sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x8);
 
 		regmap_update_bits(sma6101->regmap,
 			SMA6101_93_BOOST_CTRL0,
@@ -3642,9 +3642,9 @@ static int voice_music_class_h_mode_put(struct snd_kcontrol *kcontrol,
 		/* FDPEC gain & Boost voltage in
 		 * low noise voice scenario
 		 */
-		dev_info(codec->dev, "%s : FDPEC gain 4 & Boost 10V in Low Noise voice scenario\n",
+		dev_info(component->dev, "%s : FDPEC gain 4 & Boost 10V in Low Noise voice scenario\n",
 				__func__);
-		sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x4);
+		sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x4);
 
 		regmap_update_bits(sma6101->regmap,
 			SMA6101_93_BOOST_CTRL0,
@@ -3655,10 +3655,10 @@ static int voice_music_class_h_mode_put(struct snd_kcontrol *kcontrol,
 		/* FDPEC gain & Boost voltage in
 		 * ultra low noise voice scenario
 		 */
-		dev_info(codec->dev,
+		dev_info(component->dev,
 			"%s : FDPEC gain 2.6 & Boost 7V in Ultra Low Noise voice scenario\n",
 				__func__);
-		sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x2P6);
+		sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x2P6);
 
 		regmap_update_bits(sma6101->regmap,
 			SMA6101_93_BOOST_CTRL0,
@@ -3666,9 +3666,9 @@ static int voice_music_class_h_mode_put(struct snd_kcontrol *kcontrol,
 		break;
 
 		default:
-		dev_info(codec->dev, "%s : FDPEC gain 6 & Boost 15V default\n",
+		dev_info(component->dev, "%s : FDPEC gain 6 & Boost 15V default\n",
 				__func__);
-		sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x6);
+		sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x6);
 
 		regmap_update_bits(sma6101->regmap,
 			SMA6101_93_BOOST_CTRL0,
@@ -3706,8 +3706,8 @@ static int voice_music_class_h_mode_put(struct snd_kcontrol *kcontrol,
 static int sma6101_put_volsw(struct snd_kcontrol *kcontrol,
 		struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	struct soc_mixer_control *mc =
 		(struct soc_mixer_control *)kcontrol->private_value;
 	unsigned int reg = mc->reg;
@@ -3724,7 +3724,7 @@ static int sma6101_put_volsw(struct snd_kcontrol *kcontrol,
 	regmap_read(sma6101->regmap, reg, &val);
 
 	if (val != sma6101->init_vol) {
-		dev_dbg(codec->dev, "%s :  init vol[%d] updated to vol[%d]\n",
+		dev_dbg(component->dev, "%s :  init vol[%d] updated to vol[%d]\n",
 		__func__, sma6101->init_vol, val);
 
 		sma6101->init_vol = val;
@@ -4046,17 +4046,17 @@ SOC_ENUM_EXT("Class H mode(4:X,3:ULNV,2:LNV,1:M,0:V)",
 #endif
 };
 
-static int sma6101_startup(struct snd_soc_codec *codec)
+static int sma6101_startup(struct snd_soc_component *component)
 {
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 
 	if (sma6101->amp_power_status) {
-		dev_info(codec->dev, "%s : %s\n",
+		dev_info(component->dev, "%s : %s\n",
 			__func__, "Already AMP Power on");
 		return 0;
 	}
 
-	dev_info(codec->dev, "%s\n", __func__);
+	dev_info(component->dev, "%s\n", __func__);
 
 	if (sma6101->rev_num == REV_NUM_REV3) {
 		/* Trimming of VBG reference - 1.1125V,
@@ -4084,12 +4084,12 @@ static int sma6101_startup(struct snd_soc_codec *codec)
 	 */
 		regmap_update_bits(sma6101->regmap, SMA6101_93_BOOST_CTRL0,
 				TRM_VBST1_MASK, TRM_VBST1_6V);
-		dev_info(codec->dev, "%s : Trimming of boost output voltage 6V\n",
+		dev_info(component->dev, "%s : Trimming of boost output voltage 6V\n",
 				__func__);
 
 		regmap_write(sma6101->regmap,
 				SMA6101_0F_CLASS_H_CTRL_LVL4, 0x03);
-		dev_info(codec->dev, "%s : ATTACK_LVL disabled and BOOST LV4 always on\n",
+		dev_info(component->dev, "%s : ATTACK_LVL disabled and BOOST LV4 always on\n",
 				__func__);
 	} else if (sma6101->rev_num == REV_NUM_REV3) {
 		/* Changed gain to reduce pop noise */
@@ -4128,7 +4128,7 @@ static int sma6101_startup(struct snd_soc_codec *codec)
 		/* Changed gain to reduce pop noise */
 		if (sma6101->voice_music_class_h_mode ==
 				SMA6101_CLASS_H_MUSIC_MODE) {
-			sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x2P6);
+			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x2P6);
 		}
 
 		if (sma6101->voice_music_class_h_mode ==
@@ -4180,15 +4180,15 @@ static int sma6101_startup(struct snd_soc_codec *codec)
 
 	if (sma6101->voice_music_class_h_mode ==
 			SMA6101_CLASS_H_MUSIC_MODE)
-		sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x8);
+		sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x8);
 	else if (sma6101->voice_music_class_h_mode ==
 			SMA6101_CLASS_H_LN_VOICE_MODE)
-		sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x4);
+		sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x4);
 	else if (sma6101->voice_music_class_h_mode ==
 			SMA6101_CLASS_H_ULN_VOICE_MODE)
-		sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x2P6);
+		sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x2P6);
 	else
-		sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x6);
+		sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x6);
 
 	if (sma6101->check_thermal_vbat_enable) {
 		if ((sma6101->voice_music_class_h_mode ==
@@ -4220,18 +4220,18 @@ static int sma6101_startup(struct snd_soc_codec *codec)
 }
 
 
-static int sma6101_shutdown(struct snd_soc_codec *codec)
+static int sma6101_shutdown(struct snd_soc_component *component)
 {
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	unsigned int cur_vol;
 
 	if (!(sma6101->amp_power_status)) {
-		dev_info(codec->dev, "%s : %s\n",
+		dev_info(component->dev, "%s : %s\n",
 			__func__, "Already AMP Shutdown");
 		return 0;
 	}
 
-	dev_info(codec->dev, "%s\n", __func__);
+	dev_info(component->dev, "%s\n", __func__);
 
 	regmap_update_bits(sma6101->regmap, SMA6101_0E_MUTE_VOL_CTRL,
 				SPK_MUTE_MASK, SPK_MUTE);
@@ -4271,7 +4271,7 @@ static int sma6101_shutdown(struct snd_soc_codec *codec)
 				SMA6101_13_FDPEC_CTRL1,
 				FDPEC_GAIN_MASK, FDPEC_GAIN_6);
 		} else if (sma6101->rev_num == REV_NUM_REV4) {
-			sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x2P6);
+			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x2P6);
 		}
 	}
 
@@ -4285,12 +4285,12 @@ static int sma6101_shutdown(struct snd_soc_codec *codec)
 	 */
 		regmap_update_bits(sma6101->regmap, SMA6101_93_BOOST_CTRL0,
 				TRM_VBST1_MASK, TRM_VBST1_6V);
-		dev_info(codec->dev, "%s : Trimming of boost output voltage 6V\n",
+		dev_info(component->dev, "%s : Trimming of boost output voltage 6V\n",
 			__func__);
 
 		regmap_write(sma6101->regmap,
 				SMA6101_0F_CLASS_H_CTRL_LVL4, 0xF3);
-		dev_info(codec->dev, "%s : ATTACK_LVL disabled and BOOST LV4 off\n",
+		dev_info(component->dev, "%s : ATTACK_LVL disabled and BOOST LV4 off\n",
 			__func__);
 		msleep(20);
 	}
@@ -4315,7 +4315,7 @@ static int sma6101_shutdown(struct snd_soc_codec *codec)
 						&cur_vol);
 
 			if (cur_vol > sma6101->init_vol)
-				dev_info(codec->dev, "%s : cur vol[%d]  new vol[%d]\n",
+				dev_info(component->dev, "%s : cur vol[%d]  new vol[%d]\n",
 				__func__, cur_vol, sma6101->init_vol);
 				regmap_write(sma6101->regmap,
 					SMA6101_0A_SPK_VOL, sma6101->init_vol);
@@ -4331,16 +4331,16 @@ static int sma6101_shutdown(struct snd_soc_codec *codec)
 static int sma6101_clk_supply_event(struct snd_soc_dapm_widget *w,
 			struct snd_kcontrol *kcontrol, int event)
 {
-	struct snd_soc_codec *codec = snd_soc_dapm_to_codec(w->dapm);
+	struct snd_soc_component *component = snd_soc_dapm_to_component(w->dapm);
 #if defined(CONFIG_MACH_LGE)
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
     struct msm_pinctrl_info *pinctrl_info = &sma6101->pinctrl_info;
     int ret_pinctrl = 0;
 #endif
 
 	switch (event) {
 	case SND_SOC_DAPM_PRE_PMU:
-		dev_info(codec->dev, "%s : PRE_PMU\n", __func__);
+		dev_info(component->dev, "%s : PRE_PMU\n", __func__);
 #if defined(CONFIG_MACH_LGE)
         if(sma6101->sys_clk_id == SMA6101_EXTERNAL_CLOCK_24_576) {
 			ret_pinctrl = sma6101_msm_set_pinctrl(pinctrl_info, STATE_SEC_MI2S_MCLK_ACTIVE);
@@ -4357,7 +4357,7 @@ static int sma6101_clk_supply_event(struct snd_soc_dapm_widget *w,
 	break;
 
 	case SND_SOC_DAPM_POST_PMD:
-		dev_info(codec->dev, "%s : POST_PMD\n", __func__);
+		dev_info(component->dev, "%s : POST_PMD\n", __func__);
 #if defined(CONFIG_MACH_LGE)
         if(sma6101->sys_clk_id == SMA6101_EXTERNAL_CLOCK_24_576) {
 			ret_pinctrl = sma6101_msm_set_pinctrl(pinctrl_info, STATE_SEC_MI2S_MCLK_SLEEP);
@@ -4380,19 +4380,19 @@ static int sma6101_clk_supply_event(struct snd_soc_dapm_widget *w,
 static int sma6101_dac_event(struct snd_soc_dapm_widget *w,
 			struct snd_kcontrol *kcontrol, int event)
 {
-	struct snd_soc_codec *codec = snd_soc_dapm_to_codec(w->dapm);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_dapm_to_component(w->dapm);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 
 	switch (event) {
 	case SND_SOC_DAPM_PRE_PMU:
-		dev_info(codec->dev, "%s : PRE_PMU\n", __func__);
+		dev_info(component->dev, "%s : PRE_PMU\n", __func__);
 
 		if (sma6101->force_amp_power_down == false)
-			sma6101_startup(codec);
+			sma6101_startup(component);
 		break;
 
 	case SND_SOC_DAPM_POST_PMU:
-		dev_info(codec->dev, "%s : POST_PMU\n", __func__);
+		dev_info(component->dev, "%s : POST_PMU\n", __func__);
 
 		if (sma6101->force_amp_power_down == false)
 			regmap_update_bits(sma6101->regmap, SMA6101_AE_TOP_MAN4,
@@ -4400,9 +4400,9 @@ static int sma6101_dac_event(struct snd_soc_dapm_widget *w,
 		break;
 
 	case SND_SOC_DAPM_PRE_PMD:
-		dev_info(codec->dev, "%s : PRE_PMD\n", __func__);
+		dev_info(component->dev, "%s : PRE_PMD\n", __func__);
 
-		sma6101_shutdown(codec);
+		sma6101_shutdown(component);
 
 		if (atomic_read(&sma6101->irq_enabled)) {
 			disable_irq((unsigned int)sma6101->irq);
@@ -4414,7 +4414,7 @@ static int sma6101_dac_event(struct snd_soc_dapm_widget *w,
 		break;
 
 	case SND_SOC_DAPM_POST_PMD:
-		dev_info(codec->dev, "%s : POST_PMD\n", __func__);
+		dev_info(component->dev, "%s : POST_PMD\n", __func__);
 
 		/* PLL LDO bypass disable */
 		if (sma6101->sys_clk_id == SMA6101_PLL_CLKIN_MCLK
@@ -4431,12 +4431,12 @@ static int sma6101_dac_event(struct snd_soc_dapm_widget *w,
 static int sma6101_dac_feedback_event(struct snd_soc_dapm_widget *w,
 			struct snd_kcontrol *kcontrol, int event)
 {
-	struct snd_soc_codec *codec = snd_soc_dapm_to_codec(w->dapm);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_dapm_to_component(w->dapm);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 
 	switch (event) {
 	case SND_SOC_DAPM_PRE_PMU:
-		dev_info(codec->dev, "%s : DAC feedback ON\n", __func__);
+		dev_info(component->dev, "%s : DAC feedback ON\n", __func__);
 		regmap_update_bits(sma6101->regmap,
 			SMA6101_09_OUTPUT_CTRL,
 				PORT_CONFIG_MASK|PORT_OUT_SEL_MASK,
@@ -4458,7 +4458,7 @@ static int sma6101_dac_feedback_event(struct snd_soc_dapm_widget *w,
 		break;
 
 	case SND_SOC_DAPM_PRE_PMD:
-		dev_info(codec->dev, "%s : DAC feedback OFF\n", __func__);
+		dev_info(component->dev, "%s : DAC feedback OFF\n", __func__);
 		regmap_update_bits(sma6101->regmap,
 			SMA6101_09_OUTPUT_CTRL, PORT_OUT_SEL_MASK,
 				DISABLE);
@@ -4491,15 +4491,15 @@ static const struct snd_soc_dapm_route sma6101_audio_map[] = {
 {"DAC_FEEDBACK", NULL, "SDO"},
 };
 
-static int sma6101_setup_pll(struct snd_soc_codec *codec,
+static int sma6101_setup_pll(struct snd_soc_component *component,
 		struct snd_pcm_hw_params *params)
 {
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	int i = 0;
 	int calc_to_bclk = params_rate(params) * params_physical_width(params)
 					* params_channels(params);
 
-	dev_info(codec->dev, "%s : rate = %d : bit size = %d : channel = %d\n",
+	dev_info(component->dev, "%s : rate = %d : bit size = %d : channel = %d\n",
 		__func__, params_rate(params), params_physical_width(params),
 			params_channels(params));
 
@@ -4553,10 +4553,10 @@ static int sma6101_setup_pll(struct snd_soc_codec *codec,
 	return 0;
 }
 
-static int sma6101_setup_fdpec_gain(struct snd_soc_codec *codec,
+static int sma6101_setup_fdpec_gain(struct snd_soc_component *component,
 		unsigned int value)
 {
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 
 	regmap_update_bits(sma6101->regmap,
 		SMA6101_13_FDPEC_CTRL1, FDPEC_GAIN_MASK,
@@ -4576,11 +4576,11 @@ static int sma6101_setup_fdpec_gain(struct snd_soc_codec *codec,
 static int sma6101_dai_hw_params_amp(struct snd_pcm_substream *substream,
 		struct snd_pcm_hw_params *params, struct snd_soc_dai *dai)
 {
-	struct snd_soc_codec *codec = dai->codec;
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = dai->component;
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	unsigned int input_format = 0;
 
-	dev_info(codec->dev, "%s : rate = %d : bit size = %d\n",
+	dev_info(component->dev, "%s : rate = %d : bit size = %d\n",
 		__func__, params_rate(params), params_width(params));
 
 	if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK) {
@@ -4605,9 +4605,9 @@ static int sma6101_dai_hw_params_amp(struct snd_pcm_substream *substream,
 				SMA6101_03_INPUT1_CTRL3,
 				BP_SRC_MASK, BP_SRC_NORMAL);
 
-			sma6101_shutdown(codec);
-			sma6101_setup_pll(codec, params);
-			sma6101_startup(codec);
+			sma6101_shutdown(component);
+			sma6101_setup_pll(component, params);
+			sma6101_startup(component);
 		}
 
 		if (sma6101->force_amp_power_down == false &&
@@ -4644,7 +4644,7 @@ static int sma6101_dai_hw_params_amp(struct snd_pcm_substream *substream,
 		break;
 
 		default:
-			dev_err(codec->dev, "%s not support rate : %d\n",
+			dev_err(component->dev, "%s not support rate : %d\n",
 				__func__, params_rate(params));
 
 		return -EINVAL;
@@ -4655,7 +4655,7 @@ static int sma6101_dai_hw_params_amp(struct snd_pcm_substream *substream,
 		switch (params_format(params)) {
 
 		case SNDRV_PCM_FORMAT_S16_LE:
-			dev_info(codec->dev,
+			dev_info(component->dev,
 				"%s set format SNDRV_PCM_FORMAT_S16_LE\n",
 				__func__);
 			regmap_update_bits(sma6101->regmap,
@@ -4664,7 +4664,7 @@ static int sma6101_dai_hw_params_amp(struct snd_pcm_substream *substream,
 			break;
 
 		case SNDRV_PCM_FORMAT_S24_LE:
-			dev_info(codec->dev,
+			dev_info(component->dev,
 				"%s set format SNDRV_PCM_FORMAT_S24_LE\n",
 				__func__);
 			regmap_update_bits(sma6101->regmap,
@@ -4673,7 +4673,7 @@ static int sma6101_dai_hw_params_amp(struct snd_pcm_substream *substream,
 			break;
 
 		default:
-			dev_err(codec->dev,
+			dev_err(component->dev,
 				"%s not support data bit : %d\n", __func__,
 						params_format(params));
 			return -EINVAL;
@@ -4709,7 +4709,7 @@ static int sma6101_dai_hw_params_amp(struct snd_pcm_substream *substream,
 		break;
 
 	default:
-		dev_err(codec->dev,
+		dev_err(component->dev,
 			"%s not support data bit : %d\n", __func__,
 					params_format(params));
 		return -EINVAL;
@@ -4724,10 +4724,10 @@ static int sma6101_dai_hw_params_amp(struct snd_pcm_substream *substream,
 static int sma6101_dai_set_sysclk_amp(struct snd_soc_dai *dai,
 			int clk_id, unsigned int freq, int dir)
 {
-	struct snd_soc_codec *codec = dai->codec;
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = dai->component;
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 
-	dev_info(codec->dev, "%s\n", __func__);
+	dev_info(component->dev, "%s\n", __func__);
 
 	/* Requested clock frequency is already setup */
 	if (freq == sma6101->mclk_in)
@@ -4746,7 +4746,7 @@ static int sma6101_dai_set_sysclk_amp(struct snd_soc_dai *dai,
 	case SMA6101_PLL_CLKIN_MCLK:
 		if (freq < 1536000 || freq > 24576000) {
 			/* out of range PLL_CLKIN, fall back to use BCLK */
-			dev_warn(codec->dev, "Out of range PLL_CLKIN: %u\n",
+			dev_warn(component->dev, "Out of range PLL_CLKIN: %u\n",
 				freq);
 			clk_id = SMA6101_PLL_CLKIN_BCLK;
 			freq = 0;
@@ -4754,7 +4754,7 @@ static int sma6101_dai_set_sysclk_amp(struct snd_soc_dai *dai,
 	case SMA6101_PLL_CLKIN_BCLK:
 		break;
 	default:
-		dev_err(codec->dev, "Invalid clk id: %d\n", clk_id);
+		dev_err(component->dev, "Invalid clk id: %d\n", clk_id);
 		return -EINVAL;
 	}
 	sma6101->sys_clk_id = clk_id;
@@ -4764,25 +4764,25 @@ static int sma6101_dai_set_sysclk_amp(struct snd_soc_dai *dai,
 
 static int sma6101_dai_digital_mute(struct snd_soc_dai *codec_dai, int mute)
 {
-	struct snd_soc_codec *codec = codec_dai->codec;
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = codec_dai->component;
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 
 	if (!(sma6101->amp_power_status)) {
-		dev_info(codec->dev, "%s : %s\n",
+		dev_info(component->dev, "%s : %s\n",
 			__func__, "Already AMP Shutdown");
 		return 0;
 	}
 
 	if (mute) {
 
-		dev_info(codec->dev, "%s : %s\n", __func__, "MUTE");
+		dev_info(component->dev, "%s : %s\n", __func__, "MUTE");
 
 		regmap_update_bits(sma6101->regmap, SMA6101_0E_MUTE_VOL_CTRL,
 					SPK_MUTE_MASK, SPK_MUTE);
 
 	} else {
 
-		dev_info(codec->dev, "%s : %s\n", __func__, "UNMUTE");
+		dev_info(component->dev, "%s : %s\n", __func__, "UNMUTE");
 
 		regmap_update_bits(sma6101->regmap, SMA6101_0E_MUTE_VOL_CTRL,
 					SPK_MUTE_MASK, SPK_UNMUTE);
@@ -4794,13 +4794,13 @@ static int sma6101_dai_digital_mute(struct snd_soc_dai *codec_dai, int mute)
 static int sma6101_dai_set_fmt_amp(struct snd_soc_dai *codec_dai,
 					unsigned int fmt)
 {
-	struct snd_soc_codec *codec = codec_dai->codec;
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = codec_dai->component;
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 
 	switch (fmt & SND_SOC_DAIFMT_MASTER_MASK) {
 
 	case SND_SOC_DAIFMT_CBS_CFS:
-		dev_info(codec->dev, "%s : %s\n", __func__, "I2S slave mode");
+		dev_info(component->dev, "%s : %s\n", __func__, "I2S slave mode");
 		/* I2S/PCM clock mode - slave mode */
 		regmap_update_bits(sma6101->regmap, SMA6101_01_INPUT1_CTRL1,
 					MASTER_SLAVE_MASK, SLAVE_MODE);
@@ -4809,7 +4809,7 @@ static int sma6101_dai_set_fmt_amp(struct snd_soc_dai *codec_dai,
 		break;
 
 	case SND_SOC_DAIFMT_CBM_CFM:
-		dev_info(codec->dev, "%s : %s\n", __func__, "I2S master mode");
+		dev_info(component->dev, "%s : %s\n", __func__, "I2S master mode");
 		/* I2S/PCM clock mode - master mode */
 		regmap_update_bits(sma6101->regmap, SMA6101_01_INPUT1_CTRL1,
 					MASTER_SLAVE_MASK, MASTER_MODE);
@@ -4818,7 +4818,7 @@ static int sma6101_dai_set_fmt_amp(struct snd_soc_dai *codec_dai,
 		break;
 
 	default:
-		dev_err(codec->dev, "Unsupported MASTER/SLAVE : 0x%x\n", fmt);
+		dev_err(component->dev, "Unsupported MASTER/SLAVE : 0x%x\n", fmt);
 		return -EINVAL;
 	}
 
@@ -4831,7 +4831,7 @@ static int sma6101_dai_set_fmt_amp(struct snd_soc_dai *codec_dai,
 		break;
 
 	default:
-		dev_err(codec->dev, "Unsupported I2S FORMAT : 0x%x\n", fmt);
+		dev_err(component->dev, "Unsupported I2S FORMAT : 0x%x\n", fmt);
 		return -EINVAL;
 	}
 
@@ -4871,33 +4871,33 @@ static struct snd_soc_dai_driver sma6101_dai[] = {
 }
 };
 
-static int sma6101_set_bias_level(struct snd_soc_codec *codec,
+static int sma6101_set_bias_level(struct snd_soc_component *component,
 			enum snd_soc_bias_level level)
 {
 	switch (level) {
 	case SND_SOC_BIAS_ON:
 
-		dev_info(codec->dev, "%s\n", "SND_SOC_BIAS_ON");
-		sma6101_startup(codec);
+		dev_info(component->dev, "%s\n", "SND_SOC_BIAS_ON");
+		sma6101_startup(component);
 
 		break;
 
 	case SND_SOC_BIAS_PREPARE:
 
-		dev_info(codec->dev, "%s\n", "SND_SOC_BIAS_PREPARE");
+		dev_info(component->dev, "%s\n", "SND_SOC_BIAS_PREPARE");
 
 		break;
 
 	case SND_SOC_BIAS_STANDBY:
 
-		dev_info(codec->dev, "%s\n", "SND_SOC_BIAS_STANDBY");
+		dev_info(component->dev, "%s\n", "SND_SOC_BIAS_STANDBY");
 
 		break;
 
 	case SND_SOC_BIAS_OFF:
 
-		dev_info(codec->dev, "%s\n", "SND_SOC_BIAS_OFF");
-		sma6101_shutdown(codec);
+		dev_info(component->dev, "%s\n", "SND_SOC_BIAS_OFF");
+		sma6101_shutdown(component);
 
 		break;
 	}
@@ -5317,18 +5317,18 @@ static int sma6101_thermal_compensation(struct sma6101_priv *sma6101,
 }
 
 #ifdef CONFIG_PM
-static int sma6101_suspend(struct snd_soc_codec *codec)
+static int sma6101_suspend(struct snd_soc_component *component)
 {
 
-	dev_info(codec->dev, "%s\n", __func__);
+	dev_info(component->dev, "%s\n", __func__);
 
 	return 0;
 }
 
-static int sma6101_resume(struct snd_soc_codec *codec)
+static int sma6101_resume(struct snd_soc_component *component)
 {
 
-	dev_info(codec->dev, "%s\n", __func__);
+	dev_info(component->dev, "%s\n", __func__);
 
 	return 0;
 }
@@ -5337,16 +5337,16 @@ static int sma6101_resume(struct snd_soc_codec *codec)
 #define sma6101_resume NULL
 #endif
 
-static int sma6101_reset(struct snd_soc_codec *codec)
+static int sma6101_reset(struct snd_soc_component *component)
 {
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	struct reg_default *reg_val;
 	int cnt, ret;
 	unsigned int status;
 	int eq_len = sma6101->eq_reg_array_len / sizeof(uint32_t);
 	int bo_len = sma6101->bo_reg_array_len / sizeof(uint32_t);
 
-	dev_info(codec->dev, "%s\n", __func__);
+	dev_info(component->dev, "%s\n", __func__);
 
 	ret = regmap_read(sma6101->regmap, SMA6101_FA_STATUS1, &status);
 
@@ -5356,7 +5356,7 @@ static int sma6101_reset(struct snd_soc_codec *codec)
 	else
 		sma6101->rev_num = status & REV_NUM_STATUS;
 
-	dev_info(codec->dev, "SMA6101 chip revision ID - %d\n",
+	dev_info(component->dev, "SMA6101 chip revision ID - %d\n",
 			((sma6101->rev_num) >> 3));
 
 	/* Trimming of VBG reference - 1.1125V,
@@ -5579,7 +5579,7 @@ static int sma6101_reset(struct snd_soc_codec *codec)
 	}
 
 	if (sma6101->src_bypass == true) {
-		dev_info(codec->dev, "If do not use SRC, mono mix does not work property\n");
+		dev_info(component->dev, "If do not use SRC, mono mix does not work property\n");
 		regmap_update_bits(sma6101->regmap, SMA6101_03_INPUT1_CTRL3,
 			BP_SRC_MASK, BP_SRC_BYPASS);
 		/* Fine volume adj(-0.125dB) for SRC block enabling */
@@ -5600,7 +5600,7 @@ static int sma6101_reset(struct snd_soc_codec *codec)
 			BP_SRC_MASK, BP_SRC_NORMAL);
 	}
 
-	dev_info(codec->dev,
+	dev_info(component->dev,
 		"%s init_vol is 0x%x\n", __func__, sma6101->init_vol);
 	/* EQ register value writing
 	 * if register value is available from DT
@@ -5609,7 +5609,7 @@ static int sma6101_reset(struct snd_soc_codec *codec)
 		for (cnt = 0; cnt < eq_len; cnt += 2) {
 			reg_val = (struct reg_default *)
 				&sma6101->eq_reg_array[cnt];
-			dev_dbg(codec->dev, "%s reg_write [0x%02x, 0x%02x]",
+			dev_dbg(component->dev, "%s reg_write [0x%02x, 0x%02x]",
 					__func__, be32_to_cpu(reg_val->reg),
 						be32_to_cpu(reg_val->def));
 			regmap_write(sma6101->regmap, be32_to_cpu(reg_val->reg),
@@ -5623,7 +5623,7 @@ static int sma6101_reset(struct snd_soc_codec *codec)
 		for (cnt = 0; cnt < bo_len; cnt += 2) {
 			reg_val = (struct reg_default *)
 				&sma6101->bo_reg_array[cnt];
-			dev_dbg(codec->dev, "%s reg_write [0x%02x, 0x%02x]",
+			dev_dbg(component->dev, "%s reg_write [0x%02x, 0x%02x]",
 					__func__, be32_to_cpu(reg_val->reg),
 						be32_to_cpu(reg_val->def));
 			regmap_write(sma6101->regmap, be32_to_cpu(reg_val->reg),
@@ -6067,20 +6067,20 @@ static struct attribute_group sma6101_attr_group = {
 	.name = "thermal_comp",
 };
 
-static int sma6101_probe(struct snd_soc_codec *codec)
+static int sma6101_probe(struct snd_soc_component *component)
 {
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
-	struct snd_soc_dapm_context *dapm = snd_soc_codec_get_dapm(codec);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
+	struct snd_soc_dapm_context *dapm = snd_soc_component_get_dapm(component);
 	char *dapm_widget_str = NULL;
 	int prefix_len, ret = 0;
 	int str_max = 30;
 
-	dev_info(codec->dev, "%s\n", __func__);
+	dev_info(component->dev, "%s\n", __func__);
 
 #if defined(CONFIG_MACH_LGE)
 	if(sma6101->sys_clk_id == SMA6101_EXTERNAL_CLOCK_24_576) {
 		/* Parse pinctrl info from devicetree */
-		ret = sma6101_msm_get_pinctrl(codec);
+		ret = sma6101_msm_get_pinctrl(component);
 		if (!ret) {
 			pr_debug("%s: pinctrl parsing successful\n", __func__);
 		} else {
@@ -6088,7 +6088,7 @@ static int sma6101_probe(struct snd_soc_codec *codec)
 			ret = 0;
 		}
 	} else if(sma6101->sys_clk_id == SMA6101_PLL_CLKIN_MCLK) {
-		sma6101->ln_bb_clk3 = devm_clk_get(codec->dev, "ln_bb_clk3");
+		sma6101->ln_bb_clk3 = devm_clk_get(component->dev, "ln_bb_clk3");
 		if (IS_ERR(sma6101->ln_bb_clk3)) {
 			ret = PTR_ERR(sma6101->ln_bb_clk3);
 			pr_err("%s(): ln_bb_clk3 clock get fail %d\n", __func__,ret);
@@ -6096,24 +6096,24 @@ static int sma6101_probe(struct snd_soc_codec *codec)
 		}
 	}
 #endif
-	if (codec->component.name_prefix != NULL) {
-		dev_info(codec->dev, "%s : component name prefix - %s\n",
-			__func__, codec->component.name_prefix);
+	if (component->name_prefix != NULL) {
+		dev_info(component->dev, "%s : component name prefix - %s\n",
+			__func__, component->name_prefix);
 
-		prefix_len = strlen(codec->component.name_prefix);
+		prefix_len = strlen(component->name_prefix);
 		dapm_widget_str = kzalloc(prefix_len + str_max, GFP_KERNEL);
 
 		if (!dapm_widget_str)
 			return -ENOMEM;
 
-		strcpy(dapm_widget_str, codec->component.name_prefix);
+		strcpy(dapm_widget_str, component->name_prefix);
 		strcat(dapm_widget_str, " Playback");
 
 		snd_soc_dapm_ignore_suspend(dapm, dapm_widget_str);
 
 		memset(dapm_widget_str + prefix_len, 0, str_max);
 
-		strcpy(dapm_widget_str, codec->component.name_prefix);
+		strcpy(dapm_widget_str, component->name_prefix);
 		strcat(dapm_widget_str, " SPK");
 
 		snd_soc_dapm_ignore_suspend(dapm, dapm_widget_str);
@@ -6127,29 +6127,29 @@ static int sma6101_probe(struct snd_soc_codec *codec)
 	if (dapm_widget_str != NULL)
 		kfree(dapm_widget_str);
 
-	sma6101_reset(codec);
+	sma6101_reset(component);
 
 	ret = kfifo_alloc(&sma6101->data_fifo,
 		sizeof(struct outside_status) * FIFO_BUFFER_SIZE,
 		GFP_KERNEL);
 	if (ret)
-		dev_err(codec->dev, "%s: fifo alloc failed\n", __func__);
+		dev_err(component->dev, "%s: fifo alloc failed\n", __func__);
 
 	return ret;
 }
 
-static int sma6101_remove(struct snd_soc_codec *codec)
+static int sma6101_remove(struct snd_soc_component *component)
 {
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 #if defined(CONFIG_MACH_LGE)
 	if(sma6101->sys_clk_id == SMA6101_EXTERNAL_CLOCK_24_576)
-		sma6101_msm_release_pinctrl(codec);
+		sma6101_msm_release_pinctrl(component);
 	else if(sma6101->sys_clk_id == SMA6101_PLL_CLKIN_MCLK)	
 		sma6101_clock_control(sma6101->ln_bb_clk3,0); //disable the clk
 #endif
-	dev_info(codec->dev, "%s\n", __func__);
+	dev_info(component->dev, "%s\n", __func__);
 
-	sma6101_set_bias_level(codec, SND_SOC_BIAS_OFF);
+	sma6101_set_bias_level(component, SND_SOC_BIAS_OFF);
 	devm_free_irq(sma6101->dev, sma6101->irq, sma6101);
 	devm_kfree(sma6101->dev, sma6101);
 
@@ -6158,7 +6158,7 @@ static int sma6101_remove(struct snd_soc_codec *codec)
 	return 0;
 }
 
-static struct snd_soc_codec_driver soc_codec_dev_sma6101 = {
+static struct snd_soc_component_driver soc_codec_dev_sma6101 = {
 	.probe = sma6101_probe,
 	.remove = sma6101_remove,
 	.suspend = sma6101_suspend,
@@ -6411,7 +6411,7 @@ static int sma6101_i2c_probe(struct i2c_client *client,
 	sma6101->voice_music_class_h_mode_for_volume_boost = 0;
 #endif
 
-	ret = snd_soc_register_codec(&client->dev,
+	ret = snd_soc_register_component(&client->dev,
 		&soc_codec_dev_sma6101, sma6101_dai, ARRAY_SIZE(sma6101_dai));
 
 	/* Create sma6101 sysfs attributes */
@@ -6441,7 +6441,7 @@ static int sma6101_i2c_remove(struct i2c_client *client)
 		devm_kfree(&client->dev, sma6101);
 	}
 
-	snd_soc_unregister_codec(&client->dev);
+	snd_soc_unregister_component(&client->dev);
 
 	return 0;
 }
