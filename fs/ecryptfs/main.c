@@ -218,10 +218,10 @@ out:
 }
 
 static void ecryptfs_init_mount_crypt_stat(
-+#ifdef FEATURE_SDCARD_ENCRYPTION
-+	struct ecryptfs_mount_crypt_stat *mount_crypt_stat,
-+	struct ecryptfs_mount_sd_crypt_stat *mount_sd_crypt_stat)
-+#else
+#ifdef FEATURE_SDCARD_ENCRYPTION
+	struct ecryptfs_mount_crypt_stat *mount_crypt_stat,
+	struct ecryptfs_mount_sd_crypt_stat *mount_sd_crypt_stat)
+#else
 	struct ecryptfs_mount_crypt_stat *mount_crypt_stat)
 #endif
 {
