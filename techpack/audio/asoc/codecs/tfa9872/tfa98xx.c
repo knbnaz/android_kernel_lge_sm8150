@@ -3088,7 +3088,7 @@ tfa98xx_container_loaded(const struct firmware *cont,	void *context)
 	tfa98xx->dsp_fw_state = TFA98XX_DSP_FW_OK;
 
 #if defined(TFA_DBGFS_CHECK_MTPEX)
-	value = snd_soc_read(tfa98xx->component, TFA98XX_KEY2_PROTECTED_MTP0);
+	value = snd_soc_component_read(tfa98xx->component, TFA98XX_KEY2_PROTECTED_MTP0);
 
 	if (value != -1) {
 		tfa98xx->calibrate_done =
@@ -3250,7 +3250,7 @@ static void tfa98xx_monitor(struct work_struct *work)
 		 * check IC status bits: cold start
 		 * and DSP watch dog bit to re init
 		 */
-		val = snd_soc_read(tfa98xx->component, TFA98XX_STATUS_FLAGS0);
+		val = snd_soc_component_read(tfa98xx->component, TFA98XX_STATUS_FLAGS0);
 		pr_debug("STATUS_FLAG0: 0x%04x\n", val);
 
 		if (tfa98xx->pstream != 0) {
@@ -3430,13 +3430,13 @@ static void tfa98xx_interrupt(struct work_struct *work)
 			int no_clk = TFA_GET_BF(tfa98xx->handle, NOCLK);
 			/* Detect for clock is lost! (clock is not stable) */
 			if ((tfa98xx->handle == 0) && (no_clk == 1)) {
-				enum tfa98xx_error err;
+				enum tfa_error err;
 				/* Clock is lost. Set I2CR to remove POP noise */
 				pr_info("No clock detected. Resetting I2CR to avoid pop on 72!\n");
 				err = tfa98xx_tfa_start
 					(tfa98xx, tfa98xx_profile,
 					tfa98xx_vsteps);
-				if (err != TFA98XX_ERROR_OK)
+				if (err != tfa_error_ok)
 					pr_err("Error loading i2c registers (tfa_start), err=%d\n",
 						err);
 				else
@@ -3708,7 +3708,7 @@ static int tfa98xx_hw_params(struct snd_pcm_substream *substream,
 	struct snd_pcm_hw_params *params,
 	struct snd_soc_dai *dai)
 {
-	struct snd_soc_component *codec = dai->component;
+	struct snd_soc_component *component = dai->component;
 	struct tfa98xx *tfa98xx = snd_soc_component_get_drvdata(component);
 	unsigned int rate;
 	int prof_idx;
@@ -4025,7 +4025,7 @@ static int tfa98xx_probe(struct snd_soc_component *component)
 	return ret;
 }
 
-static int tfa98xx_remove(struct snd_soc_component *component)
+static void tfa98xx_remove(struct snd_soc_component *component)
 {
 	struct tfa98xx *tfa98xx = snd_soc_component_get_drvdata(component);
 #if defined(TFADSP_DSP_BUFFER_POOL)
@@ -4054,24 +4054,11 @@ static int tfa98xx_remove(struct snd_soc_component *component)
 	for (index = 0; index < POOL_MAX_INDEX; index++)
 		tfa_buffer_pool(index, 0, POOL_FREE);
 #endif
-
-	return 0;
 }
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,16,0)
-struct regmap *tfa98xx_get_regmap(struct device *dev)
-{
-	struct tfa98xx *tfa98xx = dev_get_drvdata(dev);
-
-	return tfa98xx->regmap;
-}
-#endif
 static struct snd_soc_component_driver soc_codec_dev_tfa98xx = {
 	.probe =	tfa98xx_probe,
 	.remove =	tfa98xx_remove,
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,16,0)
-	.get_regmap = tfa98xx_get_regmap,
-#endif
 #if defined(TFA_EXCEPTION_AT_TRANSITION)
 	.controls = tfa98xx_ext_snd_controls,
 	.num_controls = ARRAY_SIZE(tfa98xx_ext_snd_controls),
