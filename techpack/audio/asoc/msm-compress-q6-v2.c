@@ -93,10 +93,10 @@
 /* decoder parameter length */
 #define DDP_DEC_MAX_NUM_PARAM		18
 
-+#if defined(CONFIG_SND_LGE_MABL) || defined(CONFIG_SND_LGE_DTS)
-+int lgesound_current_be_id = MSM_FRONTEND_DAI_MULTIMEDIA4;
-+#endif
-+
+#if defined(CONFIG_SND_LGE_MABL) || defined(CONFIG_SND_LGE_DTS)
+int lgesound_current_be_id = MSM_FRONTEND_DAI_MULTIMEDIA4;
+#endif
+
 #if defined(CONFIG_SND_LGE_MABL)
 #include "lge_dsp_sound_mabl.h"
 int lgesoundmabl_devicespeaker;
