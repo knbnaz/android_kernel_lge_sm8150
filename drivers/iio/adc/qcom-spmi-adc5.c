@@ -1007,43 +1007,39 @@ static const struct adc5_channels adc5_chans_pmic[ADC5_MAX_CHANNEL] = {
 
 #if defined(CONFIG_MACH_SM8150_ALPHA) || defined(CONFIG_MACH_SM8150_FLASH) || defined(CONFIG_MACH_SM8150_BETA) || defined(CONFIG_MACH_SM8150_MH2LM)
 /* For PM8150L/A ADC */
-static const struct adc5_channels adc_chans_pmic5_pm8150l[ADC_MAX_CHANNEL] = {
-	[ADC5_REF_GND]		= ADC_CHAN_VOLT("ref_gnd", 1,
+static const struct adc5_channels adc_chans_pmic5_pm8150l[ADC5_MAX_CHANNEL] = {
+	[ADC5_REF_GND]		= ADC5_CHAN_VOLT("ref_gnd", 1,
 					SCALE_HW_CALIB_DEFAULT)
-	[ADC5_1P25VREF]		= ADC_CHAN_VOLT("vref_1p25", 1,
+	[ADC5_1P25VREF]		= ADC5_CHAN_VOLT("vref_1p25", 1,
 					SCALE_HW_CALIB_DEFAULT)
-	[ADC5_VPH_PWR]		= ADC_CHAN_VOLT("vph_pwr", 3,
+	[ADC5_VPH_PWR]		= ADC5_CHAN_VOLT("vph_pwr", 3,
 					SCALE_HW_CALIB_DEFAULT)
-	[ADC5_VBAT_SNS]		= ADC_CHAN_VOLT("vbat_sns", 3,
+	[ADC5_VBAT_SNS]		= ADC5_CHAN_VOLT("vbat_sns", 3,
 					SCALE_HW_CALIB_DEFAULT)
-	[ADC5_DIE_TEMP]		= ADC_CHAN_TEMP("die_temp", 1,
+	[ADC5_DIE_TEMP]		= ADC5_CHAN_TEMP("die_temp", 1,
 					SCALE_HW_CALIB_PMIC_THERM)
-	[ADC5_USB_IN_I]		= ADC_CHAN_VOLT("usb_in_i_uv", 1,
+	[ADC5_USB_IN_I]		= ADC5_CHAN_VOLT("usb_in_i_uv", 1,
 					SCALE_HW_CALIB_DEFAULT)
-	[ADC5_USB_IN_V_16]	= ADC_CHAN_VOLT("usb_in_v_div_16", 16,
+	[ADC5_USB_IN_V_16]	= ADC5_CHAN_VOLT("usb_in_v_div_16", 16,
 					SCALE_HW_CALIB_DEFAULT)
-	[ADC5_CHG_TEMP]		= ADC_CHAN_TEMP("chg_temp", 1,
+	[ADC5_CHG_TEMP]		= ADC5_CHAN_TEMP("chg_temp", 1,
 					SCALE_HW_CALIB_PM5_CHG_TEMP)
 	/* Charger prescales SBUx and MID_CHG to fit within 1.8V upper unit */
-	[ADC5_SBUx]		= ADC_CHAN_VOLT("chg_sbux", 3,
+	[ADC5_SBUx]		= ADC5_CHAN_VOLT("chg_sbux", 3,
 					SCALE_HW_CALIB_DEFAULT)
-	[ADC5_MID_CHG_DIV6]	= ADC_CHAN_VOLT("chg_mid_chg", 6,
+	[ADC5_MID_CHG_DIV6]	= ADC5_CHAN_VOLT("chg_mid_chg", 6,
 					SCALE_HW_CALIB_DEFAULT)
-	[ADC5_XO_THERM_100K_PU]	= ADC_CHAN_TEMP("xo_therm", 1,
+	[ADC5_XO_THERM_100K_PU]	= ADC5_CHAN_TEMP("xo_therm", 1,
 					SCALE_HW_CALIB_XOTHERM)
-	[ADC5_AMUX_THM1_100K_PU]	= ADC_CHAN_VOLT("amux_thm1_pu2", 1,
+	[ADC5_AMUX_THM1_100K_PU]	= ADC5_CHAN_VOLT("amux_thm1_pu2", 1,
 					SCALE_HW_CALIB_DEFAULT)
-	[ADC5_AMUX_THM2_100K_PU]	= ADC_CHAN_TEMP("amux_thm2_pu2", 1,
+	[ADC5_AMUX_THM2_100K_PU]	= ADC5_CHAN_TEMP("amux_thm2_pu2", 1,
 					SCALE_HW_CALIB_THERM_100K_PULLUP)
-	[ADC5_AMUX_THM3_100K_PU]	= ADC_CHAN_TEMP("amux_thm3_pu2", 1,
+	[ADC5_AMUX_THM3_100K_PU]	= ADC5_CHAN_TEMP("amux_thm3_pu2", 1,
 					SCALE_HW_CALIB_THERM_100K_PULLUP)
-	[ADC5_INT_EXT_ISENSE_VBAT_VDATA]	= ADC_CHAN_POWER("int_ext_isense", 1,
-					SCALE_HW_CALIB_CUR)
-	[ADC5_EXT_ISENSE_VBAT_VDATA]	= ADC_CHAN_POWER("ext_isense", 1,
-					SCALE_HW_CALIB_CUR)
-	[ADC5_PARALLEL_ISENSE_VBAT_VDATA] = ADC_CHAN_POWER("parallel_isense", 1,
-					SCALE_HW_CALIB_CUR)
-	[ADC5_AMUX_THM2]			= ADC_CHAN_VOLT("amux_thm2", 1,
+	[ADC5_PARALLEL_ISENSE] = ADC5_CHAN_VOLT("parallel_isense", 1,
+					SCALE_HW_CALIB_PM5_CUR)
+	[ADC5_AMUX_THM2]			= ADC5_CHAN_VOLT("amux_thm2", 1,
 					SCALE_HW_CALIB_DEFAULT)
 };
 #endif
@@ -1285,12 +1281,16 @@ static const struct adc5_data adc5_data_pmic = {
 /* For PM8150L/A ADC */
 static const struct adc5_data data_pmic5_pm8150l = {
 	.full_scale_code_volt = 0x70e4,
-	/* On PM8150B, IBAT LSB = 10A/32767 */
-	.full_scale_code_cur = 10000,
+	.full_scale_code_cur = 0x2710,
 	.adc_chans = adc_chans_pmic5_pm8150l,
-	.decimation = (unsigned int []) {250, 420, 840},
-	.hw_settle = (unsigned int []) {15, 100, 200, 300, 400, 500, 600, 700,
-					800, 900, 1, 2, 4, 6, 8, 10},
+	.decimation = (unsigned int [ADC5_DECIMATION_SAMPLES_MAX]) 
+				{250, 420, 840},
+	.hw_settle_1 = (unsigned int [VADC_HW_SETTLE_SAMPLES_MAX])
+				{15, 100, 200, 300, 400, 500, 600, 700,
+				800, 900, 1, 2, 4, 6, 8, 10},
+	.hw_settle_2 = (unsigned int [VADC_HW_SETTLE_SAMPLES_MAX])
+				{15, 100, 200, 300, 400, 500, 600, 700,
+				1, 2, 4, 8, 16, 32, 64, 128},
 };
 #endif
 
