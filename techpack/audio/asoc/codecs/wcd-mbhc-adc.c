@@ -978,7 +978,7 @@ correct_plug_type:
 			}
 #else
 			if (mbhc->current_plug == MBHC_PLUG_TYPE_HEADSET) {
-				pr_debug"[LGE MBHC] %s: cable is HIGH_HPH in correct-loop. Report 4-pin Headset.\n", __func__);
+				pr_debug("[LGE MBHC] %s: cable is HIGH_HPH in correct-loop. Report 4-pin Headset.\n", __func__);
 				#ifndef CONFIG_SND_LGE_SM6150
 				if ((snd_soc_component_read32(mbhc->component, 0x0623) & 0x3f) != 0x22) {
 					pr_debug("[LGE MBHC] %s: Raise mic bias to 2.7v in correct-loop\n", __func__);
