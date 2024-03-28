@@ -571,11 +571,11 @@ static long gf_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 
 	if (_IOC_DIR(cmd) & _IOC_READ)
 		retval =
-			!access_ok(VERIFY_WRITE, (void __user *)arg,
+			!access_ok((void __user *)arg,
 					_IOC_SIZE(cmd));
 	if ((retval == 0) && (_IOC_DIR(cmd) & _IOC_WRITE))
 		retval =
-			!access_ok(VERIFY_READ, (void __user *)arg, _IOC_SIZE(cmd));
+			!access_ok((void __user *)arg, _IOC_SIZE(cmd));
 	if (retval)
 		return -EFAULT;
 
