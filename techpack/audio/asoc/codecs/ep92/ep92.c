@@ -234,7 +234,7 @@ int ep92_set_ext_mclk(struct snd_soc_component *component, uint32_t mclk_freq)
 		__func__, mclk_freq, samp_freq,
 		EP92_GENERAL_CONTROL_2, EP92_MCLK_MUL_MASK & value);
 
-	ret = snd_soc_update_bits(component, EP92_GENERAL_CONTROL_2,
+	ret = snd_soc_component_update_bits(component, EP92_GENERAL_CONTROL_2,
 					EP92_MCLK_MUL_MASK, value);
 
 	return (((ret == 0) || (ret == 1)) ? 0 : ret);

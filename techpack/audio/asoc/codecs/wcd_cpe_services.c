@@ -292,7 +292,7 @@ static enum cpe_svc_result cpe_update_bits(u32 reg,
 {
 	int ret = 0;
 
-	ret = snd_soc_update_bits(cpe_d.cdc_priv, reg,
+	ret = snd_soc_component_update_bits(cpe_d.cdc_priv, reg,
 				  mask, value);
 	if (ret < 0)
 		return CPE_SVC_FAILED;
@@ -308,7 +308,7 @@ static int cpe_register_write(u32 reg, u32 val)
 		pr_debug("%s: reg = 0x%x, value = 0x%x\n",
 			  __func__, reg, val);
 
-	ret = snd_soc_write(cpe_d.cdc_priv, reg, val);
+	ret = snd_soc_component_write(cpe_d.cdc_priv, reg, val);
 	if (ret < 0)
 		return CPE_SVC_FAILED;
 
