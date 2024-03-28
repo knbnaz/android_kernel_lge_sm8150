@@ -2143,7 +2143,7 @@ static int tdm_get_sample_rate_val(int sample_rate)
 	case SAMPLING_RATE_352P8KHZ:
 		sample_rate_val = 5;
 		break;
-#enif
+#endif
 	default:
 		sample_rate_val = 3;
 		break;
