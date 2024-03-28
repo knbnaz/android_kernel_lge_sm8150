@@ -6138,7 +6138,7 @@ static int sma6101_probe(struct snd_soc_component *component)
 	return ret;
 }
 
-static int sma6101_remove(struct snd_soc_component *component)
+static void sma6101_remove(struct snd_soc_component *component)
 {
 	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 #if defined(CONFIG_MACH_LGE)
@@ -6154,8 +6154,6 @@ static int sma6101_remove(struct snd_soc_component *component)
 	devm_kfree(sma6101->dev, sma6101);
 
 	kfifo_free(&sma6101->data_fifo);
-
-	return 0;
 }
 
 static struct snd_soc_component_driver soc_codec_dev_sma6101 = {
@@ -6163,15 +6161,13 @@ static struct snd_soc_component_driver soc_codec_dev_sma6101 = {
 	.remove = sma6101_remove,
 	.suspend = sma6101_suspend,
 	.resume = sma6101_resume,
-	.component_driver = {
-		.controls = sma6101_snd_controls,
-		.num_controls = ARRAY_SIZE(sma6101_snd_controls),
-		.dapm_widgets = sma6101_dapm_widgets,
-		.num_dapm_widgets = ARRAY_SIZE(sma6101_dapm_widgets),
-		.dapm_routes = sma6101_audio_map,
-		.num_dapm_routes = ARRAY_SIZE(sma6101_audio_map),
-	},
-	.idle_bias_off = true,
+	.controls = sma6101_snd_controls,
+	.num_controls = ARRAY_SIZE(sma6101_snd_controls),
+	.dapm_widgets = sma6101_dapm_widgets,
+	.num_dapm_widgets = ARRAY_SIZE(sma6101_dapm_widgets),
+	.dapm_routes = sma6101_audio_map,
+	.num_dapm_routes = ARRAY_SIZE(sma6101_audio_map),
+	.idle_bias_on = false,
 };
 
 const struct regmap_config sma_i2c_regmap = {
