@@ -89,7 +89,7 @@ int afe_smartamp_set_calib_data(uint32_t param_id,struct afe_smartamp_set_params
 int afe_smartamp_algo_ctrl(u8 *user_data, uint32_t param_id,
 	uint8_t get_set, uint32_t length, uint32_t module_id);
 
-void msm_smartamp_add_controls(struct snd_soc_codec *codec);
+void msm_smartamp_add_controls(struct snd_soc_component *component);
 
 int tas_calib_init(void);
 

@@ -129,7 +129,7 @@ struct cpe_lsm_lab {
 
 struct cpe_priv {
 	void *core_handle;
-	struct snd_soc_codec *codec;
+	struct snd_soc_component *component;
 	struct wcd_cpe_lsm_ops lsm_ops;
 	struct wcd_cpe_afe_ops afe_ops;
 	bool afe_mad_ctl;
@@ -756,7 +756,7 @@ static int msm_cpe_lsm_open(struct snd_pcm_substream *substream)
 	struct wcd_cpe_lsm_ops *lsm_ops;
 	int rc = 0;
 
-	if (!cpe || !cpe->codec) {
+	if (!cpe || !cpe->component) {
 		dev_err(rtd->dev,
 			"%s: Invalid private data\n",
 			__func__);
@@ -792,7 +792,7 @@ static int msm_cpe_lsm_open(struct snd_pcm_substream *substream)
 		return -EINVAL;
 	}
 
-	cpe->core_handle = wcd_cpe_get_core_handle(cpe->codec);
+	cpe->core_handle = wcd_cpe_get_core_handle(cpe->component);
 
 	if (!cpe->core_handle) {
 		dev_err(rtd->dev,
@@ -3222,7 +3222,7 @@ static int msm_asoc_cpe_lsm_probe(struct snd_soc_component *component)
 {
 	struct snd_soc_card *card;
 	struct snd_soc_pcm_runtime *rtd;
-	struct snd_soc_codec *codec;
+	struct snd_soc_component *component;
 	struct cpe_priv *cpe_priv;
 	struct snd_soc_component *component_rtd = NULL;
 	const struct snd_kcontrol_new *kcontrol;
@@ -3266,14 +3266,14 @@ static int msm_asoc_cpe_lsm_probe(struct snd_soc_component *component)
 		port_id = 1;
 	}
 
-	codec = rtd->codec;
+	component = rtd->component;
 
 	cpe_priv = kzalloc(sizeof(struct cpe_priv),
 			   GFP_KERNEL);
 	if (!cpe_priv)
 		return -ENOMEM;
 
-	cpe_priv->codec = codec;
+	cpe_priv->component = component;
 	cpe_priv->input_port_id = port_id;
 	wcd_cpe_get_lsm_ops(&cpe_priv->lsm_ops);
 	wcd_cpe_get_afe_ops(&cpe_priv->afe_ops);

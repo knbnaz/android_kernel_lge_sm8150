@@ -190,17 +190,17 @@ struct ep92_mclk_cfg_info {
  *
  * Returns 0 for sucess or appropriate negative error code
  */
-int ep92_set_ext_mclk(struct snd_soc_codec *codec, uint32_t mclk_freq)
+int ep92_set_ext_mclk(struct snd_soc_component *component, uint32_t mclk_freq)
 {
 	unsigned int samp_freq = 0;
 	struct ep92_pdata *ep92 = NULL;
 	uint8_t value = 0;
 	int ret = 0;
 
-	if (!codec)
+	if (!component)
 		return -EINVAL;
 
-	ep92 = snd_soc_codec_get_drvdata(codec);
+	ep92 = snd_soc_component_get_drvdata(component);
 
 	samp_freq = ep92_samp_freq_table[(ep92->ai.audio_status) &
 						EP92_AI_RATE_MASK];
@@ -225,7 +225,7 @@ int ep92_set_ext_mclk(struct snd_soc_codec *codec, uint32_t mclk_freq)
 		value = EP92_MCLK_MUL_128;
 		break;
 	default:
-		dev_err(codec->dev, "unsupported mclk:%u for sample freq:%u\n",
+		dev_err(component->dev, "unsupported mclk:%u for sample freq:%u\n",
 					mclk_freq, samp_freq);
 		return -EINVAL;
 	}
@@ -234,7 +234,7 @@ int ep92_set_ext_mclk(struct snd_soc_codec *codec, uint32_t mclk_freq)
 		__func__, mclk_freq, samp_freq,
 		EP92_GENERAL_CONTROL_2, EP92_MCLK_MUL_MASK & value);
 
-	ret = snd_soc_update_bits(codec, EP92_GENERAL_CONTROL_2,
+	ret = snd_soc_update_bits(component, EP92_GENERAL_CONTROL_2,
 					EP92_MCLK_MUL_MASK, value);
 
 	return (((ret == 0) || (ret == 1)) ? 0 : ret);
@@ -680,16 +680,16 @@ static void ep92_read_audio_info(struct snd_soc_component *component,
 	}
 
 	old = ep92->ai.system_status_1;
-	ep92->ai.system_status_1 = snd_soc_read(codec,
+	ep92->ai.system_status_1 = snd_soc_component_read32(component,
 		EP92_AUDIO_INFO_SYSTEM_STATUS_1);
 	if (ep92->ai.system_status_1 == 0xff) {
-		dev_dbg(codec->dev,
+		dev_dbg(component->dev,
 			"ep92 EP92_AUDIO_INFO_SYSTEM_STATUS_1 read 0xff\n");
 		ep92->ai.system_status_1 = old;
 	}
 	change = ep92->ai.system_status_1 ^ old;
 	if (change & EP92_AI_DSD_RATE_MASK) {
-		dev_dbg(codec->dev, "ep92 dsd rate changed to %d\n",
+		dev_dbg(component->dev, "ep92 dsd rate changed to %d\n",
 			ep92_dsd_freq_table[(ep92->ai.system_status_1 &
 				EP92_AI_DSD_RATE_MASK)
 				>> EP92_AI_DSD_RATE_SHIFT]);
@@ -1053,7 +1053,7 @@ static ssize_t ep92_sysfs_rda_dsd_rate(struct device *dev,
 	int val;
 	struct ep92_pdata *ep92 = dev_get_drvdata(dev);
 
-	if (!ep92 || !ep92->codec) {
+	if (!ep92 || !ep92->component) {
 		dev_err(dev, "%s: device error\n", __func__);
 		return -ENODEV;
 	}

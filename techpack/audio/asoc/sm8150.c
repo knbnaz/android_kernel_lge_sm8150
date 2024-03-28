@@ -7311,9 +7311,8 @@ static struct snd_soc_dapm_route cs35l41_audio_paths[] = {
 static int cs35l41_codec_init(struct snd_soc_pcm_runtime *rtd)
 {
 	int ret = 0;
-	struct snd_soc_codec *codec = rtd->codec;
-	struct snd_soc_dapm_context *dapm = snd_soc_codec_get_dapm(codec);
-	struct snd_soc_component *component = NULL;
+	struct snd_soc_component *component = rtd->component;
+	struct snd_soc_dapm_context *dapm = snd_soc_codec_get_dapm(component);
 	struct snd_soc_card *card = rtd->card;
 	char *dapm_widget_str = NULL;
 	int prefix_len = 0;
@@ -8093,7 +8092,7 @@ static int msm_wsa881x_init(struct snd_soc_component *component)
 			snd_soc_dapm_ignore_suspend(dapm, "SpkrLeft SPKR");
 		}
 	} else if (!strcmp(component->name_prefix, "SpkrRight")) {
-		dev_dbg(codec->dev, "%s: setting right ch map to component %s\n",
+		dev_dbg(component->dev, "%s: setting right ch map to component %s\n",
 			__func__, component->name);
 		wsa881x_set_channel_map(component, &spkright_ports[0],
 				WSA881X_MAX_SWR_PORTS, &ch_mask[0],
@@ -8103,7 +8102,7 @@ static int msm_wsa881x_init(struct snd_soc_component *component)
 			snd_soc_dapm_ignore_suspend(dapm, "SpkrRight SPKR");
 		}
 	} else {
-		dev_err(codec->dev, "%s: wrong component name %s\n", __func__,
+		dev_err(component->dev, "%s: wrong component name %s\n", __func__,
 			component->name);
 		ret = -EINVAL;
 		goto err;

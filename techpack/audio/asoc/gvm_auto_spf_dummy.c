@@ -185,7 +185,7 @@ struct msm_asoc_mach_data {
 	struct device_node *hph_en1_gpio_p; /* used by pinctrl API */
 	struct device_node *hph_en0_gpio_p; /* used by pinctrl API */
 	struct device_node *fsa_handle;
-	struct snd_soc_codec *codec;
+	struct snd_soc_component *component;
 	struct work_struct adsp_power_up_work;
 	struct tdm_conf tdm_intf_conf[TDM_INTERFACE_MAX];
 };

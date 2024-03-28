@@ -25,7 +25,7 @@ struct firmware_cal {
 	size_t size;
 };
 
-struct snd_soc_codec;
+struct snd_soc_component;
 int wcd_cal_create_hwdep(void *fw, int node,
 			 struct snd_soc_component *component);
 struct firmware_cal *wcdcal_get_fw_cal(struct fw_info *fw_data,

@@ -1912,12 +1912,11 @@ static int cs35l41_irq_gpio_config(struct cs35l41_private *cs35l41)
 	return irq_pol;
 }
 
-static int cs35l41_codec_remove(struct snd_soc_component *component)
+static void cs35l41_codec_remove(struct snd_soc_component *component)
 {
 	struct cs35l41_private *cs35l41 = snd_soc_component_get_drvdata(component);
 
 	wm_adsp2_codec_remove(&cs35l41->dsp, component);
-	return 0;
 }
 
 static const struct snd_soc_dai_ops cs35l41_ops = {
@@ -1951,19 +1950,17 @@ static struct snd_soc_dai_driver cs35l41_dai[] = {
 	},
 };
 
-static struct snd_soc_codec_driver soc_codec_dev_cs35l41 = {
+static struct snd_soc_component_driver soc_codec_dev_cs35l41 = {
 	.probe = cs35l41_codec_probe,
 	.remove = cs35l41_codec_remove,
 
-	.component_driver = {
-		.dapm_widgets = cs35l41_dapm_widgets,
-		.num_dapm_widgets = ARRAY_SIZE(cs35l41_dapm_widgets),
-		.dapm_routes = cs35l41_audio_map,
-		.num_dapm_routes = ARRAY_SIZE(cs35l41_audio_map),
+	.dapm_widgets = cs35l41_dapm_widgets,
+	.num_dapm_widgets = ARRAY_SIZE(cs35l41_dapm_widgets),
+	.dapm_routes = cs35l41_audio_map,
+	.num_dapm_routes = ARRAY_SIZE(cs35l41_audio_map),
 
-		.controls = cs35l41_aud_controls,
-		.num_controls = ARRAY_SIZE(cs35l41_aud_controls),
-	},
+	.controls = cs35l41_aud_controls,
+	.num_controls = ARRAY_SIZE(cs35l41_aud_controls),
 
 	.set_sysclk = cs35l41_codec_set_sysclk,
 	.ignore_pmdown_time = true,

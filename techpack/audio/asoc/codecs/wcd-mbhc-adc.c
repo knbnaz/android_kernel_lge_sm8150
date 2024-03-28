@@ -748,7 +748,7 @@ static void wcd_correct_swch_plug(struct work_struct *work)
 			pr_debug("[LGE MBHC] %s: Impedance zl=%d, zr=%d \n", __func__, mbhc->zl, mbhc->zr);
 			mbhc->extn_cable = true;
 			if ((mbhc->zl < LGE_ADVANCED_HEADSET_THRESHOLD) || (mbhc->zr < LGE_ADVANCED_HEADSET_THRESHOLD)) {
-				mbhc->mbhc_cb->mbhc_micb_ctrl_thr_mic(mbhc->codec,MIC_BIAS_2, true);
+				mbhc->mbhc_cb->mbhc_micb_ctrl_thr_mic(mbhc->component,MIC_BIAS_2, true);
 				pr_debug("[LGE MBHC] %s: Force 4pin Headset. plug_type:0x%x, zl=%d , zr=%d\n",
 					__func__, plug_type,mbhc->zl,mbhc->zr);
 				mbhc->micbias_enable = true;
@@ -786,7 +786,7 @@ static void wcd_correct_swch_plug(struct work_struct *work)
 #ifdef CONFIG_SND_USE_MBHC_EXTN_CABLE
 	if(mbhc->extn_cable && (plug_type == MBHC_PLUG_TYPE_HEADSET) && !mbhc->micbias_enable) {
 		pr_debug("[LGE MBHC] %s: Gender + Headset(4 pole). Enable micbias to 2.7 \n", __func__);
-		mbhc->mbhc_cb->mbhc_micb_ctrl_thr_mic(mbhc->codec,MIC_BIAS_2, true);
+		mbhc->mbhc_cb->mbhc_micb_ctrl_thr_mic(mbhc->component,MIC_BIAS_2, true);
 		mbhc->micbias_enable = true;
 	}
 #endif
@@ -950,9 +950,9 @@ correct_plug_type:
 					pr_debug("[LGE MBHC] %s: re-check Impedance zl=%d, zr=%d \n", __func__, mbhc->zl, mbhc->zr);
 				}
 				if ((mbhc->zl < LGE_ADVANCED_HEADSET_THRESHOLD) || (mbhc->zr < LGE_ADVANCED_HEADSET_THRESHOLD)) {
-					if ((snd_soc_read(mbhc->codec, 0x0623) & 0x3f) != 0x22) {
+					if ((snd_soc_component_read32(mbhc->component, 0x0623) & 0x3f) != 0x22) {
 						pr_debug("[LGE MBHC] %s: Raise mic bias to 2.7v in correct-loop\n", __func__);
-						mbhc->mbhc_cb->mbhc_micb_ctrl_thr_mic(mbhc->codec,
+						mbhc->mbhc_cb->mbhc_micb_ctrl_thr_mic(mbhc->component,
 											MIC_BIAS_2, true);
 					}
 					pr_debug("[LGE MBHC] %s: High Impedance Headset found. current_plug[%d], plug_type[%d], zl[%d], zr[%d], extn_exception[%d]. \n",
@@ -980,9 +980,9 @@ correct_plug_type:
 			if (mbhc->current_plug == MBHC_PLUG_TYPE_HEADSET) {
 				pr_debug"[LGE MBHC] %s: cable is HIGH_HPH in correct-loop. Report 4-pin Headset.\n", __func__);
 				#ifndef CONFIG_SND_LGE_SM6150
-				if ((snd_soc_read(mbhc->codec, 0x0623) & 0x3f) != 0x22) {
+				if ((snd_soc_component_read32(mbhc->component, 0x0623) & 0x3f) != 0x22) {
 					pr_debug("[LGE MBHC] %s: Raise mic bias to 2.7v in correct-loop\n", __func__);
-					mbhc->mbhc_cb->mbhc_micb_ctrl_thr_mic(mbhc->codec, MIC_BIAS_2, true);
+					mbhc->mbhc_cb->mbhc_micb_ctrl_thr_mic(mbhc->component, MIC_BIAS_2, true);
 				}
 				#endif
 				plug_type = MBHC_PLUG_TYPE_HEADSET;
@@ -1096,9 +1096,9 @@ report:
 #endif
 		pr_debug("%s: Change HIGH HPH to Headset. \n", __func__);
 		plug_type = MBHC_PLUG_TYPE_HEADSET;
-		if ((snd_soc_read(mbhc->codec, 0x0623) & 0x3f) != 0x22) {
+		if ((snd_soc_component_read32(mbhc->component, 0x0623) & 0x3f) != 0x22) {
 			pr_debug("[LGE MBHC] %s: Raise mic bias to 2.7v. \n", __func__);
-			mbhc->mbhc_cb->mbhc_micb_ctrl_thr_mic(mbhc->codec, MIC_BIAS_2, true);
+			mbhc->mbhc_cb->mbhc_micb_ctrl_thr_mic(mbhc->component, MIC_BIAS_2, true);
 			mbhc->micbias_enable = true;
 		}
 	}
@@ -1330,7 +1330,7 @@ static irqreturn_t wcd_mbhc_adc_hs_rem_irq(int irq, void *data)
 #ifdef CONFIG_SND_USE_MBHC_EXTN_CABLE
 	if (mbhc->mbhc_cb->mbhc_micbias_control && mbhc->micbias_enable) {
 		pr_info("[LGE MBHC] %s: disable MIC BIAS \n", __func__);
-		mbhc->mbhc_cb->mbhc_micbias_control(mbhc->codec, MIC_BIAS_2,
+		mbhc->mbhc_cb->mbhc_micbias_control(mbhc->component, MIC_BIAS_2,
 			MICB_DISABLE);
 	}
 #endif

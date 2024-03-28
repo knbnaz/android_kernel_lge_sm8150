@@ -283,7 +283,7 @@ static enum cpe_svc_result cpe_is_command_valid(
 
 static int cpe_register_read(u32 reg, u8 *val)
 {
-	*(val) = snd_soc_read(cpe_d.cdc_priv, reg);
+	*(val) = snd_soc_component_read32(cpe_d.cdc_priv, reg);
 	return 0;
 }
 
@@ -317,8 +317,8 @@ static int cpe_register_write(u32 reg, u32 val)
 
 static int cpe_register_write_repeat(u32 reg, u8 *ptr, u32 to_write)
 {
-	struct snd_soc_codec *codec = cpe_d.cdc_priv;
-	struct wcd9xxx *wcd9xxx = dev_get_drvdata(codec->dev->parent);
+	struct snd_soc_component *component = cpe_d.cdc_priv;
+	struct wcd9xxx *wcd9xxx = dev_get_drvdata(component->dev->parent);
 	int ret = 0;
 
 	ret = wcd9xxx_slim_write_repeat(wcd9xxx, reg, to_write, ptr);

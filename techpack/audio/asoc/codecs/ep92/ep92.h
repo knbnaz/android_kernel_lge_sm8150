@@ -154,6 +154,6 @@ enum {
 	EP92_KCTL_MAX
 };
 
-int ep92_set_ext_mclk(struct snd_soc_codec *codec, uint32_t mclk_freq);
+int ep92_set_ext_mclk(struct snd_soc_component *component, uint32_t mclk_freq);
 
 #endif /* __EP92_H__ */
