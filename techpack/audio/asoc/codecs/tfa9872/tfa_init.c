@@ -100,25 +100,25 @@ static enum tfa98xx_error tfa9896_specific(tfa98xx_handle_t handle)
         if (!tfa98xx_handle_is_open(handle))
                 return TFA98XX_ERROR_NOT_OPEN;
 
-        /* all i2C registers must already set to default POR value */
+	/* all i2C registers must already set to default POR value */
 
-        /* $48:[3] - 1 ==> 0; iddqtestbst - default value changed.
-         * When Iddqtestbst is set to "0", the slewrate is reduced.
-         * This will lower the overshoot on IN-B to avoid NMOS damage of booster.
-         */
-		/* ----- generated code start ----- */
-		/*v17*/
-		reg_write(handle, 0x06, 0x000b); //POR=0x0001
-		reg_write(handle, 0x07, 0x3e7f); //POR=0x1e7f
-		reg_write(handle, 0x0a, 0x0d8a); //POR=0x0592
-		reg_write(handle, 0x48, 0x0300); //POR=0x0308
-		reg_write(handle, 0x88, 0x0100); //POR=0x0000
-		/* ----- generated code end   ----- */
-        /* $49:[0] - 1 ==> 0; CLIP - default value changed. 0 means CLIPPER on
-         */
-        error = reg_read(handle, 0x49, &check_value);
-        check_value &= ~0x1;
-        error = reg_write(handle, 0x49, check_value);
+	/* $48:[3] - 1 ==> 0; iddqtestbst - default value changed.
+	 * When Iddqtestbst is set to "0", the slewrate is reduced.
+	 * This will lower the overshoot on IN-B to avoid NMOS damage of booster.
+	 */
+	/* ----- generated code start ----- */
+	/*v17*/
+	reg_write(handle, 0x06, 0x000b); //POR=0x0001
+	reg_write(handle, 0x07, 0x3e7f); //POR=0x1e7f
+	reg_write(handle, 0x0a, 0x0d8a); //POR=0x0592
+	reg_write(handle, 0x48, 0x0300); //POR=0x0308
+	reg_write(handle, 0x88, 0x0100); //POR=0x0000
+	/* ----- generated code end   ----- */
+	/* $49:[0] - 1 ==> 0; CLIP - default value changed. 0 means CLIPPER on
+	 */
+	error = reg_read(handle, 0x49, &check_value);
+	check_value &= ~0x1;
+	error = reg_write(handle, 0x49, check_value);
 
         return error;
 }
@@ -131,19 +131,19 @@ static enum tfa98xx_error tfa9897_specific(tfa98xx_handle_t handle)
         if (!tfa98xx_handle_is_open(handle))
                 return TFA98XX_ERROR_NOT_OPEN;
 
-        /* all i2C registers must already set to default POR value */
+	/* all i2C registers must already set to default POR value */
 
-        /* $48:[3] - 1 ==> 0; iddqtestbst - default value changed.
-         * When Iddqtestbst is set to "0", the slewrate is reduced.
-         * This will lower the overshoot on IN-B to avoid NMOS damage of booster.
-         */
-        error = reg_write(handle, 0x48, 0x0300); /* POR value = 0x308 */
+	/* $48:[3] - 1 ==> 0; iddqtestbst - default value changed.
+	 * When Iddqtestbst is set to "0", the slewrate is reduced.
+	 * This will lower the overshoot on IN-B to avoid NMOS damage of booster.
+	 */
+	error = reg_write(handle, 0x48, 0x0300); /* POR value = 0x308 */
 
-        /* $49:[0] - 1 ==> 0; CLIP - default value changed. 0 means CLIPPER on
-         */
-        error = reg_read(handle, 0x49, &check_value);
-        check_value &= ~0x1;
-        error = reg_write(handle, 0x49, check_value);
+	/* $49:[0] - 1 ==> 0; CLIP - default value changed. 0 means CLIPPER on
+	 */
+	error = reg_read(handle, 0x49, &check_value);
+	check_value &= ~0x1;
+	error = reg_write(handle, 0x49, check_value);
 
         return error;
 }
