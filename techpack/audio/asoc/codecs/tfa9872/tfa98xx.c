@@ -3088,7 +3088,7 @@ tfa98xx_container_loaded(const struct firmware *cont,	void *context)
 	tfa98xx->dsp_fw_state = TFA98XX_DSP_FW_OK;
 
 #if defined(TFA_DBGFS_CHECK_MTPEX)
-	value = snd_soc_component_read(tfa98xx->component, TFA98XX_KEY2_PROTECTED_MTP0);
+	value = snd_soc_component_read32(tfa98xx->component, TFA98XX_KEY2_PROTECTED_MTP0);
 
 	if (value != -1) {
 		tfa98xx->calibrate_done =
@@ -3250,7 +3250,7 @@ static void tfa98xx_monitor(struct work_struct *work)
 		 * check IC status bits: cold start
 		 * and DSP watch dog bit to re init
 		 */
-		val = snd_soc_component_read(tfa98xx->component, TFA98XX_STATUS_FLAGS0);
+		val = snd_soc_component_read32(tfa98xx->component, TFA98XX_STATUS_FLAGS0);
 		pr_debug("STATUS_FLAG0: 0x%04x\n", val);
 
 		if (tfa98xx->pstream != 0) {
@@ -3269,7 +3269,7 @@ static void tfa98xx_monitor(struct work_struct *work)
 					val);
 
 			if (tfa98xx->flags & TFA98XX_FLAG_TDM_DEVICE) {
-					val = snd_soc_read
+					val = snd_soc_component_read32
 						(tfa98xx->component, TFA98XX_STATUS_FLAGS1);
 				pr_debug("STATUS_FLAG1: 0x%04x\n", val);
 					if (val & TFA98XX_STATUS_FLAGS1_TDMERR)
@@ -3283,17 +3283,17 @@ static void tfa98xx_monitor(struct work_struct *work)
 		}
 
 		// temporal debugging
-		val = snd_soc_read(tfa98xx->component, TFA98XX_SYS_CONTROL0);
+		val = snd_soc_component_read32(tfa98xx->component, TFA98XX_SYS_CONTROL0);
 		pr_debug("SYS_CONTROL0: 0x%04x\n", val);
-		val = snd_soc_read(tfa98xx->component, TFA98XX_SYS_CONTROL1);
+		val = snd_soc_component_read32(tfa98xx->component, TFA98XX_SYS_CONTROL1);
 		pr_debug("SYS_CONTROL1: 0x%04x\n", val);
-		val = snd_soc_read(tfa98xx->component, TFA98XX_SYS_CONTROL2);
+		val = snd_soc_component_read32(tfa98xx->component, TFA98XX_SYS_CONTROL2);
 		pr_debug("SYS_CONTROL2: 0x%04x\n", val);
-		val = snd_soc_read(tfa98xx->component, TFA98XX_CLOCK_CONTROL);
+		val = snd_soc_component_read32(tfa98xx->component, TFA98XX_CLOCK_CONTROL);
 		pr_debug("CLOCK_CONTROL: 0x%04x\n", val);
-		val = snd_soc_read(tfa98xx->component, TFA98XX_STATUS_FLAGS4);
+		val = snd_soc_component_read32(tfa98xx->component, TFA98XX_STATUS_FLAGS4);
 		pr_debug("STATUS_FLAG4: 0x%04x\n", val);
-		val = snd_soc_read(tfa98xx->component, TFA98XX_TDM_CONFIG0);
+		val = snd_soc_component_read32(tfa98xx->component, TFA98XX_TDM_CONFIG0);
 		pr_debug("TDM_CONFIG0: 0x%04x\n", val);
 	}
 
