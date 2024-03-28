@@ -212,7 +212,7 @@ static void ftm4_write_file(struct device *dev, char *data, int write_time)
 	char *fname = NULL;
 	int fd = 0;
 	mm_segment_t old_fs = get_fs();
-	time64_t my_time;
+	struct timespec64 my_time;
 	struct tm my_date;
 	char time_string[TIME_STR_LEN] = {0};
 
@@ -250,7 +250,7 @@ static void ftm4_write_file(struct device *dev, char *data, int write_time)
 
 	if (fd >= 0) {
 		if (write_time == TIME_INFO_WRITE) {
-			my_time = __ktime_get_real_seconds();
+			ktime_get_coarse_real_ts64(&my_time);
 			time64_to_tm(my_time.tv_sec,
 					sys_tz.tz_minuteswest * 60 * (-1),
 					&my_date);
