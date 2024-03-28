@@ -1552,7 +1552,7 @@ static int wdsp_ssr_put(struct snd_kcontrol *kcontrol,
 	if(ret)
 	{
 		pr_err("%s(): WDSP SSR Irq\n", __func__);
-		snd_soc_component_write(componentc,WCD934X_CPE_SS_BACKUP_INT,0x02);
+		snd_soc_component_write(component,WCD934X_CPE_SS_BACKUP_INT,0x02);
 	}
 	return 0;
 }
