@@ -31,8 +31,7 @@
 #include "codecs/wcd934x/wcd934x-mbhc.h"
 #include "codecs/wsa881x.h"
 #include <asoc/wcd-mbhc-v2.h>
-#include "msm_talos_dailink.h"
-#include "talos-port-config.h"
+#include "msm_dailink.h"
 #ifdef CONFIG_MACH_LGE
 #include <linux/regulator/consumer.h>
 #endif
