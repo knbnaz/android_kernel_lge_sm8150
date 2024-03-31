@@ -8,12 +8,12 @@
 #include <linux/lge_panel_notify.h>
 #include <soc/qcom/lge/board_lge.h>
 
-#include "msm_drv.h"
-#include "dsi_panel.h"
-#include "dsi_ctrl_hw.h"
-#include "dsi_display.h"
-#include "sde_connector.h"
-#include "sde_encoder.h"
+#include "../msm_drv.h"
+#include "../dsi/dsi_panel.h"
+#include "../dsi/dsi_ctrl_hw.h"
+#include "../dsi/dsi_display.h"
+#include "../sde/sde_connector.h"
+#include "../sde/sde_encoder.h"
 #include <drm/drm_mode.h>
 #include "dsi_drm.h"
 #include "drs/lge_drs_mngr.h"
