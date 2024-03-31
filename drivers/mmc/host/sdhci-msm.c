@@ -3,7 +3,7 @@
  * drivers/mmc/host/sdhci-msm.c - Qualcomm SDHCI Platform driver
  *
  * Copyright (c) 2013-2014,2020. The Linux Foundation. All rights reserved.
- * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2024 Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
 #include <linux/module.h>
@@ -1878,6 +1878,10 @@ static bool sdhci_msm_populate_pdata(struct device *dev,
 	if (sdhci_msm_dt_parse_hsr_info(dev, msm_host))
 		goto out;
 
+	msm_host->mmc->partial_init_broken =
+		of_property_read_bool(dev->of_node,
+			"qcom,partial_init_broken");
+
 	if (!sdhci_msm_dt_get_array(dev, "qcom,ice-clk-rates",
 			&ice_clk_table, &ice_clk_table_len, 0)) {
 		if (ice_clk_table && ice_clk_table_len) {
@@ -2295,6 +2299,8 @@ static int sdhci_msm_vreg_init(struct device *dev,
 	int ret = 0;
 	struct sdhci_msm_vreg_data *curr_slot;
 	struct sdhci_msm_reg_data *curr_vdd_reg, *curr_vdd_io_reg;
+	struct mmc_host *mmc = msm_host->mmc;
+	struct sdhci_host *host = mmc_priv(mmc);
 
 	curr_slot = msm_host->vreg_data;
 	if (!curr_slot)
@@ -2316,8 +2322,17 @@ static int sdhci_msm_vreg_init(struct device *dev,
 		if (ret)
 			goto out;
 	}
-	if (curr_vdd_io_reg)
+	if (curr_vdd_io_reg) {
 		ret = sdhci_msm_vreg_init_reg(dev, curr_vdd_io_reg);
+		if (ret)
+			goto out;
+
+		/* In eMMC case vdd-io might be a fixed 1.8V regulator */
+		if ((mmc->caps & MMC_CAP_NONREMOVABLE)
+			&& (mmc->caps2 & MMC_CAP2_NO_SD)
+			&& (mmc->caps2 & MMC_CAP2_NO_SDIO))
+			host->flags &= ~SDHCI_SIGNALING_330;
+	}
 out:
 #ifdef CONFIG_MACH_LGE
 	/*
@@ -4314,6 +4329,15 @@ static void sdhci_msm_set_caps(struct sdhci_msm_host *msm_host)
 #ifdef CONFIG_MACH_LGE
 	msm_host->mmc->caps |= MMC_CAP_CD_WAKE;
 #endif
+
+#if defined(CONFIG_SDC_QTI)
+	if (!msm_host->mmc->partial_init_broken)
+#ifdef CONFIG_MACH_LGE
+		msm_host->mmc->caps2 &= ~MMC_CAP2_CLK_SCALE;
+#else
+		msm_host->mmc->caps2 |= MMC_CAP2_CLK_SCALE;
+#endif
+#endif
 }
 
 #ifdef CONFIG_HIBERNATION
@@ -4659,12 +4683,8 @@ static int sdhci_msm_probe(struct platform_device *pdev)
 
 #if defined(CONFIG_SDC_QTI)
 	host->timeout_clk_div = 4;
-#ifdef CONFIG_MACH_LGE
-	msm_host->mmc->caps2 &= ~MMC_CAP2_CLK_SCALE;
-#else
-	msm_host->mmc->caps2 |= MMC_CAP2_CLK_SCALE;
 #endif
-#endif
+
 	sdhci_msm_setup_pm(pdev, msm_host);
 
 	host->mmc_host_ops.execute_tuning = sdhci_msm_execute_tuning;
