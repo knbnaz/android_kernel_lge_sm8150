@@ -4,6 +4,7 @@
 #include <linux/device.h>
 #include <linux/hall_ic.h>
 #include <linux/err.h>
+#include <linux/kdev_t.h>
 
 #ifdef CONFIG_LGE_COVER_DISPLAY
 #include <linux/lge_panel_notify.h>
