@@ -987,23 +987,23 @@ static int write_calibration_data(struct atmf04_data *data, char *filename)
 
     PINFO("write_calibration_data Entered[%d]",data->platform_data->irq_gpio);
     set_fs(KERNEL_DS);
-    fd = sys_open(filename, O_WRONLY|O_CREAT, 0664);
+    fd = ksys_open(filename, O_WRONLY|O_CREAT, 0664);
 
     if (fd >= 0) {
 #if 1 // debugging calibration paused
         if(cal_result) {
             strncpy(file_result, CAP_CAL_RESULT_PASS, strlen(CAP_CAL_RESULT_PASS));
-            sys_write(fd, file_result, sizeof(file_result));
+            ksys_write(fd, file_result, sizeof(file_result));
         } else {
             strncpy(file_result, CAP_CAL_RESULT_FAIL, strlen(CAP_CAL_RESULT_FAIL));
-            sys_write(fd, file_result, sizeof(file_result));
+            ksys_write(fd, file_result, sizeof(file_result));
         }
         PINFO("%s: write [%s] to %s, cal_result %d", __FUNCTION__, file_result, filename, cal_result);
-        sys_close(fd);
+        ksys_close(fd);
         set_fs(old_fs);
 #else
-        sys_write(fd,0,sizeof(int));
-        sys_close(fd);
+        ksys_write(fd,0,sizeof(int));
+        ksys_close(fd);
 #endif
     } else {
         PINFO("%s: %s open failed [%d]......", __FUNCTION__, filename, fd);

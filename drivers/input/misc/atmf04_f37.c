@@ -780,9 +780,9 @@ static unsigned char load_firmware(struct atmf04_data *data, struct i2c_client *
 
 			if(chk_done(FL_EFLA_TIMEOUT_CNT, client) == RTN_TIMEOUT)
 			{
-			  if (fw)
-			    release_firmware(fw);
-			    return RTN_TIMEOUT;
+				if (fw)
+					release_firmware(fw);
+				return RTN_TIMEOUT;
 			}
 
 			count++;
@@ -869,25 +869,25 @@ static int write_calibration_data(struct atmf04_data *data, char *filename)
 
 	PINFO("write_calibration_data Entered[%d]",data->platform_data->irq_gpio);
 	set_fs(KERNEL_DS);
-	fd = sys_open(filename, O_WRONLY|O_CREAT, 0664);
+	fd = ksys_open(filename, O_WRONLY|O_CREAT, 0664);
 
 	if (fd >= 0) {
 #if 1 // debugging calibration paused
 		if(cal_result) {
 			file_result[0] = CAP_CAL_RESULT_PASS;
 			file_result[1] = '\0';
-			sys_write(fd, file_result, 1);
+			ksys_write(fd, file_result, 1);
 		} else {
 			strncpy(file_result, CAP_CAL_RESULT_FAIL, strlen(CAP_CAL_RESULT_FAIL));
 			file_result[1] = '\0';
-			sys_write(fd, file_result, 1);
+			ksys_write(fd, file_result, 1);
 		}
 		PINFO("%s: write [%s] to %s", __FUNCTION__, file_result, filename);
-		sys_close(fd);
-    set_fs(old_fs);
+		ksys_close(fd);
+		set_fs(old_fs);
 #else
-		sys_write(fd,0,sizeof(int));
-		sys_close(fd);
+		ksys_write(fd,0,sizeof(int));
+		ksys_close(fd);
 #endif
 	} else {
 		PINFO("%s: %s open failed [%d]......", __FUNCTION__, filename, fd);
