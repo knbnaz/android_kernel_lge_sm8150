@@ -846,13 +846,13 @@ int qpnp_pon_is_warm_reset(void)
 }
 EXPORT_SYMBOL(qpnp_pon_is_warm_reset);
 
-+#ifdef CONFIG_LGE_PM_SMPL_COUNTER
-+/**
-+ * qpnp_pon_read_poff_sts - Read PMIC power off reason.
-+ *
-+ * Returns >= 0 for power off reason index, < 0 for errors
-+ *
-+ */
+#ifdef CONFIG_LGE_PM_SMPL_COUNTER
+/**
+ * qpnp_pon_read_poff_sts - Read PMIC power off reason.
+ *
+ * Returns >= 0 for power off reason index, < 0 for errors
+ *
+ */
 static int qpnp_pon_read_gen2_pon_off_reason(struct qpnp_pon *pon, u16 *reason,
 					int *reason_index_offset);
 int qpnp_pon_read_poff_sts(void)

@@ -15,7 +15,7 @@
 #include <drm/drmP.h>
 #include <drm/drm_crtc.h>
 
-#include "msm_drv.h"
+#include "../msm_drv.h"
 #include "dsi_defs.h"
 #include "dsi_ctrl.h"
 #include "dsi_phy.h"
