@@ -344,6 +344,13 @@ static int cam_actuator_component_bind(struct device *dev,
 	a_ctrl->cam_act_state = CAM_ACTUATOR_INIT;
 	CAM_DBG(CAM_ACTUATOR, "Component bound successfully");
 
+#ifdef CONFIG_MACH_LGE
+	spin_lock_init(&a_ctrl->hall_lock);
+	a_ctrl->camera_class = NULL;
+	CAM_INFO(CAM_ACTUATOR, "Create act_tele_hall_class!! index : %d",a_ctrl->soc_info.index);
+	actuator_create_sysfs(a_ctrl);
+#endif
+
 	return rc;
 
 free_mem:
@@ -354,6 +361,12 @@ free_cci_client:
 	kfree(a_ctrl->io_master_info.cci_client);
 free_ctrl:
 	devm_kfree(&pdev->dev, a_ctrl);
+#ifdef CONFIG_MACH_LGE
+	spin_lock_init(&a_ctrl->hall_lock);
+	a_ctrl->camera_class = NULL;
+	CAM_INFO(CAM_ACTUATOR, "Create act_tele_hall_class!! index : %d",a_ctrl->soc_info.index);
+	actuator_create_sysfs(a_ctrl);
+#endif
 	return rc;
 }
 
@@ -370,6 +383,10 @@ static void cam_actuator_component_unbind(struct device *dev,
 		CAM_ERR(CAM_ACTUATOR, "Actuator device is NULL");
 		return;
 	}
+
+#ifdef CONFIG_MACH_LGE
+	actuator_destroy_sysfs(a_ctrl);
+#endif
 
 	mutex_lock(&(a_ctrl->actuator_mutex));
 	cam_actuator_shutdown(a_ctrl);
@@ -400,9 +417,6 @@ const static struct component_ops cam_actuator_component_ops = {
 static int32_t cam_actuator_platform_remove(
 	struct platform_device *pdev)
 {
-#ifdef CONFIG_MACH_LGE
-	actuator_destroy_sysfs(a_ctrl);
-#endif
 	component_del(&pdev->dev, &cam_actuator_component_ops);
 	return 0;
 }
@@ -457,13 +471,6 @@ static int32_t cam_actuator_driver_platform_probe(
 	rc = component_add(&pdev->dev, &cam_actuator_component_ops);
 	if (rc)
 		CAM_ERR(CAM_ICP, "failed to add component rc: %d", rc);
-
-#ifdef CONFIG_MACH_LGE
-	spin_lock_init(&a_ctrl->hall_lock);
-	a_ctrl->camera_class = NULL;
-	CAM_INFO(CAM_ACTUATOR, "Create act_tele_hall_class!! index : %d",a_ctrl->soc_info.index);
-	actuator_create_sysfs(a_ctrl);
-#endif
 
 	return rc;
 }
