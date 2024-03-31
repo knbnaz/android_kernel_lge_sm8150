@@ -167,7 +167,7 @@ static void msm_ois_read_work(struct work_struct *work)
 
 	// Read Hall data sequencelly (Timestamp -> Hall X & Y)
 	rc = ois_i2c_read_seq(OIS_HALL_SEQ_ADDR, buf, 6);
-	x_readout_time = y_readout_time  = arch_counter_get_cntvct();
+	x_readout_time = y_readout_time  = __arch_counter_get_cntvct();
 
 	x_shift = (int32_t)((int16_t)((buf[0] << 8) | (buf[1])));
 	y_shift = (int32_t)((int16_t)((buf[2] << 8) | (buf[3])));

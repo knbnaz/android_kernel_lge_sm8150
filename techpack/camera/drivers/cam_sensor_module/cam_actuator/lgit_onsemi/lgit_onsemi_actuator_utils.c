@@ -48,7 +48,7 @@ extern bool msm_act_data_enqueue(uint32_t reg_addr, uint32_t reg_data,
     }
 
     o_buf = &(a_ctrl_in->buf);
-    hall_readout_time = arch_counter_get_cntvct();
+    hall_readout_time = __arch_counter_get_cntvct();
     act_hall = (reg_data & 0x800) ? (0xF000 | (0xFFF & reg_data)) : (0xFFF & reg_data);
 
 	CAM_DBG(CAM_ACTUATOR, "[AFHALL] ACT_HALL : %u soc_id : %d", act_hall, a_ctrl->soc_info.index);

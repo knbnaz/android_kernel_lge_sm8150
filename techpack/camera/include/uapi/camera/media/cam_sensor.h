@@ -145,8 +145,35 @@ struct cam_cmd_ois_info {
 	__u8                  cmd_type;
 	__u8                  ois_fw_flag;
 	__u8                  is_ois_calib;
+	__u8                  is_ois_aat; /* LGE_CHANGE, OIS AAT, hongs.lee@lge.com */
 	char                  ois_name[MAX_OIS_NAME_SIZE];
 	struct cam_ois_opcode opcode;
+} __attribute__((packed));
+
+/**
+ * struct cam_cmd_ois_userdata - Contains OIS userdata
+ *
+ * @select                :    pointing which var is updated
+ * @oisThreadNeeded       :    ois thread needed
+ * @reserved              :    reserved
+ */
+struct cam_cmd_ois_userdata {
+	uint8_t               select;
+	uint8_t               oisThreadNeeded;
+	uint32_t              reserved;
+} __attribute__((packed));
+
+/**
+ * struct cam_cmd_actuator_userdata - Contains Actuator userdata
+ *
+ * @select                :    pointing which var is updated
+ * @oisThreadNeeded       :    actuator thread needed
+ * @reserved              :    reserved
+ */
+struct cam_cmd_actuator_userdata {
+	uint8_t               select;
+	uint8_t               actuatorThreadNeeded;
+	uint32_t              reserved;
 } __attribute__((packed));
 
 /**

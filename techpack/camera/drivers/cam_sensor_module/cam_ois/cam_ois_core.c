@@ -677,7 +677,7 @@ static int cam_ois_pkt_parse(struct cam_ois_ctrl_t *o_ctrl, void *arg)
 		if (!rem_jiffies) {
 			rc = -ETIMEDOUT;
 			CAM_ERR(CAM_OIS, " sensor is not ready");
-			goto rel_pkt;
+			goto pwr_dwn;
 		}
 		reinit_completion(&cci_dev->sensor_complete);
 #endif

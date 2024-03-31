@@ -341,6 +341,13 @@ static int cam_ois_component_bind(struct device *dev,
 	o_ctrl->bridge_intf.device_hdl = -1;
 
 	platform_set_drvdata(pdev, o_ctrl);
+
+#ifdef CONFIG_MACH_LGE
+	spin_lock_init(&o_ctrl->gyro_lock);
+	oeis_create_sysfs();
+	o_ctrl->ois_thread_running = false;
+#endif
+
 	o_ctrl->cam_ois_state = CAM_OIS_INIT;
 	CAM_DBG(CAM_OIS, "Component bound successfully");
 	return rc;
@@ -370,6 +377,10 @@ static void cam_ois_component_unbind(struct device *dev,
 		CAM_ERR(CAM_OIS, "ois device is NULL");
 		return;
 	}
+
+#ifdef CONFIG_MACH_LGE
+	oeis_destroy_sysfs();
+#endif
 
 	CAM_INFO(CAM_OIS, "platform driver remove invoked");
 	soc_info = &o_ctrl->soc_info;
@@ -402,12 +413,6 @@ static int32_t cam_ois_platform_driver_probe(
 {
 	int rc = 0;
 
-#ifdef CONFIG_MACH_LGE
-	spin_lock_init(&o_ctrl->gyro_lock);
-	oeis_create_sysfs();
-	o_ctrl->ois_thread_running = false;
-#endif
-
 	CAM_DBG(CAM_OIS, "Adding OIS Sensor component");
 	rc = component_add(&pdev->dev, &cam_ois_component_ops);
 	if (rc)
@@ -418,9 +423,6 @@ static int32_t cam_ois_platform_driver_probe(
 
 static int cam_ois_platform_driver_remove(struct platform_device *pdev)
 {
-#ifdef CONFIG_MACH_LGE
-	oeis_destroy_sysfs();
-#endif
 
 	component_del(&pdev->dev, &cam_ois_component_ops);
 	return 0;
