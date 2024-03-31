@@ -9,7 +9,7 @@
 #include <linux/kernel.h>
 #include <linux/err.h>
 
-#include "msm_drv.h"
+#include "../msm_drv.h"
 
 #define SDE_DBG_NAME			"sde"
 

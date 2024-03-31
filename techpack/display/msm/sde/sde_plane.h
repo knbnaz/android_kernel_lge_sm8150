@@ -21,7 +21,7 @@
 
 #include <drm/drm_crtc.h>
 
-#include "msm_prop.h"
+#include "../msm_prop.h"
 #include "sde_kms.h"
 #include "sde_hw_mdss.h"
 #include "sde_hw_sspp.h"

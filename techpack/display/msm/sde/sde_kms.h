@@ -24,10 +24,10 @@
 #include <linux/pm_domain.h>
 #include <linux/pm_qos.h>
 
-#include "msm_drv.h"
-#include "msm_kms.h"
-#include "msm_mmu.h"
-#include "msm_gem.h"
+#include "../msm_drv.h"
+#include "../msm_kms.h"
+#include "../msm_mmu.h"
+#include "../msm_gem.h"
 #include "sde_dbg.h"
 #include "sde_hw_catalog.h"
 #include "sde_hw_ctl.h"

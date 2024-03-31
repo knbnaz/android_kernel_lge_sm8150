@@ -52,7 +52,7 @@ v----------+----------v	  |	divsel_two	|    |	   divsel_four	   |
 #include <linux/iopoll.h>
 #include <linux/delay.h>
 #include <linux/regmap.h>
-#include "clk-regmap-mux.h"
+#include "../../../../drivers/clk/qcom/clk-regmap-mux.h"
 #include "dp_hpd.h"
 #include "dp_debug.h"
 

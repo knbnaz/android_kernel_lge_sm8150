@@ -8,7 +8,7 @@
 
 #include <linux/list.h>
 
-#include "msm_kms.h"
+#include "../msm_kms.h"
 #include "sde_hw_top.h"
 
 #define SINGLE_CTL	1

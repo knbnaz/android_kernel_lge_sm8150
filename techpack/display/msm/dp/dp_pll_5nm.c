@@ -61,7 +61,7 @@
 #include <linux/iopoll.h>
 #include <linux/kernel.h>
 #include <linux/regmap.h>
-#include "clk-regmap-mux.h"
+#include "../../../../drivers/clk/qcom/clk-regmap-mux.h"
 #include "dp_hpd.h"
 #include "dp_debug.h"
 #include "dp_pll.h"

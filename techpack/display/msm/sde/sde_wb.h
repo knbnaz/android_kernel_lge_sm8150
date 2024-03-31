@@ -8,7 +8,7 @@
 
 #include <linux/platform_device.h>
 
-#include "msm_kms.h"
+#include "../msm_kms.h"
 #include "sde_kms.h"
 #include "sde_connector.h"
 

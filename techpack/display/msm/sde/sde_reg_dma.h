@@ -6,7 +6,7 @@
 #ifndef _SDE_REG_DMA_H
 #define _SDE_REG_DMA_H
 
-#include "msm_drv.h"
+#include "../msm_drv.h"
 #include "sde_hw_catalog.h"
 #include "sde_hw_mdss.h"
 #include "sde_hw_top.h"

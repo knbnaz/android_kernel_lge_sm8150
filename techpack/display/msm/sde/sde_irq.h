@@ -9,7 +9,7 @@
 #include <linux/kernel.h>
 #include <linux/irqdomain.h>
 
-#include "msm_kms.h"
+#include "../msm_kms.h"
 
 /**
  * sde_irq_controller - define MDSS level interrupt controller context

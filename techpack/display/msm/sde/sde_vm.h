@@ -6,7 +6,7 @@
 #ifndef __SDE_VM_H__
 #define __SDE_VM_H__
 
-#include "msm_drv.h"
+#include "../msm_drv.h"
 
 #define TRUSTED_VM_MAX_ENCODER_PER_CRTC	1
 

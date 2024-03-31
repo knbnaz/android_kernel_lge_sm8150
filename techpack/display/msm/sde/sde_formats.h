@@ -7,7 +7,7 @@
 #define _SDE_FORMATS_H
 
 #include <drm/drm_fourcc.h>
-#include "msm_gem.h"
+#include "../msm_gem.h"
 #include "sde_hw_mdss.h"
 
 /**
