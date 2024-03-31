@@ -631,35 +631,6 @@ static int touch_init_pm(struct touch_core_data *ts)
 	return 0;
 }
 
-#elif defined(CONFIG_DRM) && defined(CONFIG_FB)
-static int touch_drm_notifier_callback(struct notifier_block *self,
-		unsigned long event, void *data)
-{
-	struct touch_core_data *ts =
-		container_of(self, struct touch_core_data, drm_notif);
-	struct msm_drm_notifier *ev = (struct msm_drm_notifier *)data;
-
-	if (ev && ev->data && event == MSM_DRM_EVENT_BLANK) {
-		int *blank = (int *)ev->data;
-
-		if (*blank == MSM_DRM_BLANK_UNBLANK)
-			touch_resume(ts->dev);
-		else if (*blank == MSM_DRM_BLANK_POWERDOWN)
-			touch_suspend(ts->dev);
-	}
-
-	return 0;
-}
-
-static int touch_init_pm(struct touch_core_data *ts)
-{
-	TOUCH_TRACE();
-
-	ts->drm_notif.notifier_call = touch_drm_notifier_callback;
-	ts->driver->init_pm(ts->dev);
-	return msm_drm_register_client(&ts->drm_notif);
-}
-
 #elif defined(CONFIG_FB)
 static int touch_fb_notifier_callback(struct notifier_block *self,
 		unsigned long event, void *data)
@@ -1368,8 +1339,6 @@ static int touch_core_remove(struct platform_device *pdev)
 
 #if defined(CONFIG_HAS_EARLYSUSPEND)
 	unregister_early_suspend(&ts->early_suspend);
-#elif defined(CONFIG_DRM) && defined(CONFIG_FB)
-	msm_drm_unregister_client(&ts->drm_notif);
 #elif defined(CONFIG_FB)
 	fb_unregister_client(&ts->fb_notif);
 #endif

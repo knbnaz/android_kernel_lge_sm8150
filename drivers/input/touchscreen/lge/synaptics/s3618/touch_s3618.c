@@ -3200,30 +3200,7 @@ error:
 	return ret;
 }
 
-#if defined(CONFIG_DRM) && defined(CONFIG_FB)
-#if defined(CONFIG_LGE_TOUCH_USE_PANEL_NOTIFY)
-static int s3618_drm_notifier_callback(struct notifier_block *self,
-		unsigned long event, void *data)
-{
-	struct touch_core_data *ts =
-		container_of(self, struct touch_core_data, drm_notif);
-	struct s3618_data *d = to_s3618_data(ts->dev);
-	struct msm_drm_notifier *ev = (struct msm_drm_notifier *)data;
-
-	TOUCH_TRACE();
-
-	if (ev && ev->data && event == MSM_DRM_EVENT_BLANK) {
-		int *blank = (int *)ev->data;
-
-		d->blank_status.prev = d->blank_status.curr;
-		d->blank_status.curr = *blank;
-		TOUCH_I("%s: msm_drm_blank - prev[%d] curr[%d]\n",
-				__func__, d->blank_status.prev, d->blank_status.curr);
-	}
-	return 0;
-}
-#endif
-#elif defined(CONFIG_FB)
+#if defined(CONFIG_FB)
 static int s3618_fb_notifier_callback(struct notifier_block *self,
 		unsigned long event, void *data)
 {
@@ -3442,13 +3419,7 @@ static int s3618_suspend(struct device *dev)
 
 	touch_interrupt_control(dev, INTERRUPT_ENABLE);
 
-#if defined(CONFIG_DRM) && defined(CONFIG_FB)
-#if defined(CONFIG_LGE_TOUCH_USE_PANEL_NOTIFY)
-#else
-	d->lcd_mode = LCD_MODE_U0;
-	TOUCH_I("Force LCD Mode setting : d->lcd_mode = %d\n", d->lcd_mode);
-#endif
-#elif defined(CONFIG_FB)
+#if defined(CONFIG_FB)
 #endif
 
 	boot_mode = touch_check_boot_mode(dev);
@@ -3511,13 +3482,7 @@ static int s3618_resume(struct device *dev)
 
 	touch_interrupt_control(dev, INTERRUPT_ENABLE);
 
-#if defined(CONFIG_DRM) && defined(CONFIG_FB)
-#if defined(CONFIG_LGE_TOUCH_USE_PANEL_NOTIFY)
-#else
-	d->lcd_mode = LCD_MODE_U3;
-	TOUCH_I("Force LCD Mode setting : d->lcd_mode = %d\n", d->lcd_mode);
-#endif
-#elif defined(CONFIG_FB)
+#if defined(CONFIG_FB)
 #endif
 
 	boot_mode = touch_check_boot_mode(dev);
@@ -3918,14 +3883,7 @@ static int s3618_notify(struct device *dev, ulong event, void *data)
 
 static int s3618_init_pm(struct device *dev)
 {
-#if defined(CONFIG_DRM) && defined(CONFIG_FB)
-#if defined(CONFIG_LGE_TOUCH_USE_PANEL_NOTIFY)
-	struct touch_core_data *ts = to_touch_core(dev);
-
-	TOUCH_I("%s: drm_notif change\n", __func__);
-	ts->drm_notif.notifier_call = s3618_drm_notifier_callback;
-#endif
-#elif defined(CONFIG_FB)
+#if defined(CONFIG_FB)
 	struct touch_core_data *ts = to_touch_core(dev);
 
 	TOUCH_I("%s: fb_notif change\n", __func__);

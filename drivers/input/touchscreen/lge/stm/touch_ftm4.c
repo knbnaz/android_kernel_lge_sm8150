@@ -2456,40 +2456,7 @@ static int ftm4_notify(struct device *dev, ulong event, void *data)
 	return ret;
 }
 
-#if defined(CONFIG_DRM) && defined(CONFIG_FB)
-#if defined(CONFIG_LGE_TOUCH_USE_PANEL_NOTIFY)
-static int ftm4_drm_notifier_callback(struct notifier_block *self,
-		unsigned long event, void *data)
-{
-	struct touch_core_data *ts =
-		container_of(self, struct touch_core_data, drm_notif);
-	struct ftm4_data *d = to_ftm4_data(ts->dev);
-	struct msm_drm_notifier *ev = (struct msm_drm_notifier *)data;
-
-	TOUCH_TRACE();
-
-	if (ev && ev->data && event == MSM_DRM_EVENT_BLANK) {
-		int *blank = (int *)ev->data;
-
-		d->blank_status.prev = d->blank_status.curr;
-		d->blank_status.curr = *blank;
-		TOUCH_I("%s: msm_drm_blank - prev[%d] curr[%d]\n",
-				__func__, d->blank_status.prev, d->blank_status.curr);
-
-		/* [Bringup] drm notifier cannot notify U2, U2 unblank. use touch_notifier
-		if (d->blank_status.curr == MSM_DRM_BLANK_UNBLANK) {
-			touch_resume(ts->dev);
-		} else {
-			if (d->blank_status.prev == MSM_DRM_BLANK_UNBLANK)
-				touch_suspend(ts->dev);
-		}
-		*/
-	}
-
-	return 0;
-}
-#endif
-#elif defined(CONFIG_FB)
+#if defined(CONFIG_FB)
 static int ftm4_fb_notifier_callback(struct notifier_block *self,
 		unsigned long event, void *data)
 {
@@ -2524,13 +2491,7 @@ static int ftm4_fb_notifier_callback(struct notifier_block *self,
 
 static int ftm4_init_pm(struct device *dev)
 {
-#if defined(CONFIG_DRM) && defined(CONFIG_FB)
-#if defined(CONFIG_LGE_TOUCH_USE_PANEL_NOTIFY)
-	struct touch_core_data *ts = to_touch_core(dev);
-	TOUCH_I("%s: drm_notif change\n", __func__);
-	ts->drm_notif.notifier_call = ftm4_drm_notifier_callback;
-#endif
-#elif defined(CONFIG_FB)
+#if defined(CONFIG_FB)
 	struct touch_core_data *ts = to_touch_core(dev);
 	TOUCH_I("%s: fb_notif change\n", __func__);
 	ts->fb_notif.notifier_call = ftm4_fb_notifier_callback;

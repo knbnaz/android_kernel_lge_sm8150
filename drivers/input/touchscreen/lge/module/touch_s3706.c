@@ -2450,15 +2450,6 @@ static int s3706_suspend(struct device *dev)
 
 	TOUCH_TRACE();
 
-#if defined(CONFIG_DRM) && defined(CONFIG_FB)
-#if defined(CONFIG_LGE_TOUCH_USE_PANEL_NOTIFY)
-#else
-	d->lcd_mode = LCD_MODE_U0;
-	TOUCH_I("Force LCD Mode setting : d->lcd_mode = %d\n", d->lcd_mode);
-#endif
-#elif defined(CONFIG_FB)
-#endif
-
 	boot_mode = touch_check_boot_mode(dev);
 
 	switch (boot_mode) {
@@ -2519,15 +2510,6 @@ static int s3706_resume(struct device *dev)
 	int ret = 0;
 
 	TOUCH_TRACE();
-
-#if defined(CONFIG_DRM) && defined(CONFIG_FB)
-#if defined(CONFIG_LGE_TOUCH_USE_PANEL_NOTIFY)
-#else
-	d->lcd_mode = LCD_MODE_U3;
-	TOUCH_I("Force LCD Mode setting : d->lcd_mode = %d\n", d->lcd_mode);
-#endif
-#elif defined(CONFIG_FB)
-#endif
 
 	if (d->lpwg_abs.enable) {
 		TOUCH_I("%s: disable lpwg_abs\n", __func__);

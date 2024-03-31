@@ -25,8 +25,6 @@
 #include <linux/platform_device.h>
 #if defined(CONFIG_HAS_EARLYSUSPEND)
 #include <linux/earlysuspend.h>
-#elif defined(CONFIG_DRM) && defined(CONFIG_FB)
-#include <linux/msm_drm_notify.h>
 #elif defined(CONFIG_FB)
 #include <linux/fb.h>
 #endif
@@ -585,8 +583,6 @@ struct touch_core_data {
 	struct atomic_notify_event notify_event_arr[ATOMIC_NOTIFY_EVENT_SIZE];
 #if defined(CONFIG_HAS_EARLYSUSPEND)
 	struct early_suspend early_suspend;
-#elif defined(CONFIG_DRM) & defined(CONFIG_FB)
-	struct notifier_block drm_notif;
 #elif defined(CONFIG_FB)
 	struct notifier_block fb_notif;
 #endif
