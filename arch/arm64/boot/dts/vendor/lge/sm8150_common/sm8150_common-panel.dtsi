@@ -12,7 +12,7 @@
  */
 
 #include <dt-bindings/clock/mdss-10nm-pll-clk.h>
-#include "../../qcom/sm8150-sde-display-lge.dtsi"
+#include "../../qcom/display/display/sm8150-sde-display-lge.dtsi"
 
 #include "./settings_panel/dsi-panel-sw43408a-dsc-qhd-cmd.dtsi"
 #include "./settings_panel/dsi-panel-rm69299-tianma-fhd-cmd.dtsi"
