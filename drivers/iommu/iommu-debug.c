@@ -15,7 +15,9 @@
 
 #define pr_fmt(fmt) "iommu-debug: %s: " fmt, __func__
 
+#ifdef CONFIG_IOMMU_DEBUGFS
 #include <linux/debugfs.h>
+#endif
 #include <linux/device.h>
 #include <linux/dma-iommu.h>
 #include <linux/iommu.h>
@@ -113,7 +115,9 @@ static const char *iommu_debug_attr_to_string(enum iommu_attr attr)
 #endif
 
 static LIST_HEAD(iommu_debug_devices);
+#ifdef CONFIG_IOMMU_DEBUGFS
 static struct dentry *debugfs_tests_dir;
+#endif
 static u32 iters_per_op = 1;
 static void *test_virt_addr;
 static DEFINE_MUTEX(test_virt_addr_lock);
@@ -405,8 +409,10 @@ static int nr_iters_get(void *data, u64 *val)
 	return 0;
 }
 
+#ifdef CONFIG_IOMMU_DEBUGFS
 DEFINE_DEBUGFS_ATTRIBUTE(iommu_debug_nr_iters_ops, nr_iters_get, nr_iters_set,
 			 "%llu\n");
+#endif
 
 static void iommu_debug_device_profiling(struct seq_file *s,
 					struct iommu_debug_device *ddev,
@@ -2078,7 +2084,9 @@ static const struct file_operations ptdump_fops = {
 static int iommu_debug_device_setup(struct device *dev)
 {
 	struct iommu_debug_device *ddev;
+#ifdef CONFIG_IOMMU_DEBUGFS
 	struct dentry *dir;
+#endif
 
 	if (!of_find_property(dev->of_node, "iommus", NULL))
 		return -EINVAL;
@@ -2093,6 +2101,7 @@ static int iommu_debug_device_setup(struct device *dev)
 
 	mutex_init(&ddev->state_lock);
 	ddev->dev = dev;
+#ifdef CONFIG_IOMMU_DEBUGFS
 	dir = debugfs_create_dir(dev_name(dev), debugfs_tests_dir);
 	if (!dir) {
 		pr_err_ratelimited("Couldn't create iommu/devices/%s debugfs dir\n",
@@ -2234,12 +2243,15 @@ static int iommu_debug_device_setup(struct device *dev)
 		goto err_rmdir;
 	}
 #endif
+#endif
 
 	list_add(&ddev->list, &iommu_debug_devices);
 	return 0;
 
+#ifdef CONFIG_IOMMU_DEBUGFS
 err_rmdir:
 	debugfs_remove_recursive(dir);
+#endif
 err:
 	kfree(ddev);
 	return 0;
@@ -2247,18 +2259,22 @@ err:
 
 static int iommu_debug_init_tests(void)
 {
+#ifdef CONFIG_IOMMU_DEBUGFS
 	debugfs_tests_dir = debugfs_create_dir("tests", iommu_debugfs_dir);
 	if (!debugfs_tests_dir) {
 		pr_err_ratelimited("Couldn't create iommu/tests debugfs directory\n");
 		return -ENODEV;
 	}
+#endif
 
 	return 0;
 }
 
 static void iommu_debug_destroy_tests(void)
 {
+#ifdef CONFIG_IOMMU_DEBUGFS
 	debugfs_remove_recursive(debugfs_tests_dir);
+#endif
 }
 #else
 static inline int iommu_debug_init_tests(void) { return 0; }
