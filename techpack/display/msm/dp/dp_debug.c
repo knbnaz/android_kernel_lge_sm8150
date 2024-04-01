@@ -11,8 +11,8 @@
 #include "dp_catalog.h"
 #include "dp_aux.h"
 #include "dp_debug.h"
-#include "drm_connector.h"
-#include "sde_connector.h"
+#include <drm/drm_connector.h>
+#include "../sde/sde_connector.h"
 #include "dp_display.h"
 #include "dp_pll.h"
 #include "dp_hpd.h"

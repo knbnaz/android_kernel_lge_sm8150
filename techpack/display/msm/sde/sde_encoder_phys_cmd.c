@@ -10,7 +10,7 @@
 #include "sde_formats.h"
 #include "sde_trace.h"
 #if IS_ENABLED(CONFIG_LGE_DISPLAY_COMMON)
-#include "dsi_display.h"
+#include "../dsi/dsi_display.h"
 #endif
 
 #define SDE_DEBUG_CMDENC(e, fmt, ...) SDE_DEBUG("enc%d intf%d " fmt, \

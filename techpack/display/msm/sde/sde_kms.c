@@ -30,16 +30,16 @@
 #include <drm/drm_atomic_uapi.h>
 #include <drm/drm_probe_helper.h>
 
-#include "msm_drv.h"
-#include "msm_mmu.h"
-#include "msm_gem.h"
+#include "../msm_drv.h"
+#include "../msm_mmu.h"
+#include "../msm_gem.h"
 
-#include "dsi_display.h"
-#include "dsi_drm.h"
+#include "../dsi/dsi_display.h"
+#include "../dsi/dsi_drm.h"
 #include "sde_wb.h"
-#include "dp_display.h"
-#include "dp_drm.h"
-#include "dp_mst_drm.h"
+#include "../dp/dp_display.h"
+#include "../dp/dp_drm.h"
+#include "../dp/dp_mst_drm.h"
 
 #include "sde_kms.h"
 #include "sde_core_irq.h"

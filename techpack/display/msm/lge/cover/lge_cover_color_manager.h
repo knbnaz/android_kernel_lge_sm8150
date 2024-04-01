@@ -15,7 +15,7 @@
 #ifndef LGE_COVER_COLOR_MANAGER_H
 #define LGE_COVER_COLOR_MANAGER_H
 
-#include "dsi_panel.h"
+#include "../../dsi/dsi_panel.h"
 #include "../lge_dsi_panel.h"
 
 int lge_cover_color_manager_create_sysfs(struct device *panel_sysfs_dev);

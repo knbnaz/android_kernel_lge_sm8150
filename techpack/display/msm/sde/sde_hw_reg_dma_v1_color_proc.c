@@ -11,7 +11,7 @@
 #include "sde_hw_sspp.h"
 #include "sde_hwio.h"
 #include "sde_hw_lm.h"
-#include "sde_dbg.h"
+#include "../sde_dbg.h"
 #include "sde_hw_util.h"
 
 /* Reserve space of 128 words for LUT dma payload set-up */

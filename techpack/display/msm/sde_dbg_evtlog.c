@@ -15,7 +15,7 @@
 #include <linux/sched/clock.h>
 
 #include "sde_dbg.h"
-#include "sde_trace.h"
+#include "sde/sde_trace.h"
 
 #define SDE_EVTLOG_FILTER_STRSIZE	64
 

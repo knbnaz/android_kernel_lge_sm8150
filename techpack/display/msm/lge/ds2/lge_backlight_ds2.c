@@ -13,16 +13,16 @@
  */
 
 #define pr_fmt(fmt)	"[Display][lge-backlight-ds2:%s:%d] " fmt, __func__, __LINE__
-#include "msm_drv.h"
-#include "sde_dbg.h"
+#include "../../msm_drv.h"
+#include "../../sde_dbg.h"
 
-#include "sde_kms.h"
-#include "sde_connector.h"
-#include "sde_encoder.h"
+#include "../../sde/sde_kms.h"
+#include "../../sde/sde_connector.h"
+#include "../../sde/sde_encoder.h"
 #include <linux/backlight.h>
-#include "dsi_drm.h"
-#include "dsi_display.h"
-#include "sde_crtc.h"
+#include "../../dsi/dsi_drm.h"
+#include "../../dsi/dsi_display.h"
+#include "../../sde/sde_crtc.h"
 
 #include "../lge_dsi_panel.h"
 #include "lge_backlight_ds2.h"

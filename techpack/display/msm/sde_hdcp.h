@@ -16,7 +16,7 @@
 #include <drm/drm_crtc.h>
 #include <drm/drm_edid.h>
 #include <linux/hdcp_qseecom.h>
-#include "sde_kms.h"
+#include "sde/sde_kms.h"
 
 #define MAX_STREAM_COUNT 2
 

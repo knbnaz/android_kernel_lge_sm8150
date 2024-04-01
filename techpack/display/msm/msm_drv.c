@@ -49,7 +49,7 @@
 #include "msm_gem.h"
 #include "msm_kms.h"
 #include "msm_mmu.h"
-#include "sde_wb.h"
+#include "sde/sde_wb.h"
 #include "sde_dbg.h"
 
 /*

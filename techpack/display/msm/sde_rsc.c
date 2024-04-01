@@ -22,7 +22,7 @@
 #include <drm/drm_irq.h>
 #include "sde_rsc_priv.h"
 #include "sde_dbg.h"
-#include "sde_trace.h"
+#include "sde/sde_trace.h"
 
 #define SDE_RSC_DRV_DBG_NAME		"sde_rsc_drv"
 #define SDE_RSC_WRAPPER_DBG_NAME	"sde_rsc_wrapper"

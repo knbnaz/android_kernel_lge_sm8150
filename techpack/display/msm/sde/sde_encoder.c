@@ -24,7 +24,7 @@
 #include <linux/seq_file.h>
 #include <linux/sde_rsc.h>
 
-#include "msm_drv.h"
+#include "../msm_drv.h"
 #include "sde_kms.h"
 #include <drm/drm_crtc.h>
 #include <drm/drm_probe_helper.h>

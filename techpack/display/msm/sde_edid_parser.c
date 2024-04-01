@@ -6,7 +6,7 @@
 #include <drm/drm_edid.h>
 #include <linux/hdmi.h>
 
-#include "sde_kms.h"
+#include "sde/sde_kms.h"
 #include "sde_edid_parser.h"
 #include "sde/sde_connector.h"
 

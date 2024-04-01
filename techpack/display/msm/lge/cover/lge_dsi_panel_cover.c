@@ -20,8 +20,8 @@
 #include <linux/of_gpio.h>
 #include <video/mipi_display.h>
 
-#include "dsi_panel.h"
-#include "dsi_ctrl_hw.h"
+#include "../../dsi/dsi_panel.h"
+#include "../../dsi/dsi_ctrl_hw.h"
 #include "lge_dsi_panel_cover.h"
 #include "lge_cover_ctrl.h"
 #include "../dp/lge_dp_def.h"

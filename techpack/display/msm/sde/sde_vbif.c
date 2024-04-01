@@ -10,7 +10,7 @@
 #include "sde_vbif.h"
 #include "sde_hw_vbif.h"
 #include "sde_trace.h"
-#include "sde_rotator_vbif.h"
+#include "../../rotator/sde_rotator_vbif.h"
 
 #define MAX_XIN_CLIENT	16
 

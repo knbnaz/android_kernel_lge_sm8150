@@ -8,7 +8,7 @@
 #include <drm/sde_drm.h>
 #include <drm/drm_probe_helper.h>
 
-#include "msm_kms.h"
+#include "../msm_kms.h"
 #include "sde_kms.h"
 #include "sde_wb.h"
 #include "sde_formats.h"

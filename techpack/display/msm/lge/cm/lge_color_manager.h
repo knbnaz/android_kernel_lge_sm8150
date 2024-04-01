@@ -13,7 +13,7 @@
 #ifndef LGE_COLOR_MANAGER_H
 #define LGE_COLOR_MANAGER_H
 
-#include "dsi_panel.h"
+#include "../../dsi/dsi_panel.h"
 #include "../lge_dsi_panel.h"
 
 #define BC_DIM_TIME msecs_to_jiffies(550)

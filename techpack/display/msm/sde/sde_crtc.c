@@ -37,7 +37,7 @@
 #include "sde_encoder.h"
 #include "sde_connector.h"
 #include "sde_vbif.h"
-#include "sde_power_handle.h"
+#include "../sde_power_handle.h"
 #include "sde_core_perf.h"
 #include "sde_trace.h"
 #include "sde_vm.h"

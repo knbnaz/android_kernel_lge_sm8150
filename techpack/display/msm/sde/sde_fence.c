@@ -6,7 +6,7 @@
 #define pr_fmt(fmt)	"[drm:%s:%d] " fmt, __func__, __LINE__
 #include <linux/sync_file.h>
 #include <linux/dma-fence.h>
-#include "msm_drv.h"
+#include "../msm_drv.h"
 #include "sde_kms.h"
 #include "sde_fence.h"
 

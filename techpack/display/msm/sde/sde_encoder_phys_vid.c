@@ -8,7 +8,7 @@
 #include "sde_hw_interrupts.h"
 #include "sde_core_irq.h"
 #include "sde_formats.h"
-#include "dsi_display.h"
+#include "../dsi/dsi_display.h"
 #include "sde_trace.h"
 #if IS_ENABLED(CONFIG_LGE_COVER_DISPLAY)
 #include <asm/atomic.h>

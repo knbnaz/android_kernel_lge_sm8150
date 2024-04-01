@@ -14,7 +14,7 @@
 #ifndef LGE_ERR_DETECT_H
 #define LGE_ERR_DETECT_H
 
-#include "dsi_panel.h"
+#include "../../dsi/dsi_panel.h"
 
 #include <linux/gpio.h>
 #include <linux/interrupt.h>

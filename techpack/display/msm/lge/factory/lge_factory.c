@@ -6,7 +6,7 @@
 #include <linux/of_gpio.h>
 #include <video/mipi_display.h>
 
-#include "dsi_panel.h"
+#include "../../dsi/dsi_panel.h"
 #include "lge_factory.h"
 
 static ssize_t check_vert_black_line(struct device *dev,

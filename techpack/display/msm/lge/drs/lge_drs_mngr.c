@@ -3,9 +3,9 @@
 #include <linux/device.h>
 #include <linux/mutex.h>
 #include "lge_drs_mngr.h"
-#include "dsi_panel.h"
-#include "dsi_drm.h"
-#include "drm_connector.h"
+#include "../../dsi/dsi_panel.h"
+#include "../../dsi/dsi_drm.h"
+#include <drm/drm_connector.h>
 #include "../lge_ddic_ops_helper.h"
 
 static struct lge_drs_mngr *gdrs_mngr = NULL;

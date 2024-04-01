@@ -18,7 +18,7 @@
 #include <linux/sde_rsc.h>
 
 #include "sde_power_handle.h"
-#include "sde_trace.h"
+#include "sde/sde_trace.h"
 #include "sde_dbg.h"
 
 #define KBPS2BPS(x) ((x) * 1000ULL)

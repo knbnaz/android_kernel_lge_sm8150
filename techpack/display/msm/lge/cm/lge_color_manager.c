@@ -18,7 +18,7 @@
 #include "lge_color_manager.h"
 #include "lge_dsi_panel_def.h"
 #include "lge_dsi_panel.h"
-#include "dsi_display.h"
+#include "../../dsi/dsi_display.h"
 #include <linux/delay.h>
 
 static ssize_t daylight_mode_get(struct device *dev,

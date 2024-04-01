@@ -9,7 +9,7 @@
 
 #include "dp_parser.h"
 #include "dp_pll.h"
-#include "sde_power_handle.h"
+#include "../sde_power_handle.h"
 
 /**
  * sruct dp_power - DisplayPort's power related data

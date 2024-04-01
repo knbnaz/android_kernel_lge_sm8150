@@ -8,7 +8,7 @@
 #include <drm/drm_fixed.h>
 #include "dp_debug.h"
 #include <drm/drm_dsc.h>
-#include "sde_dsc_helper.h"
+#include "../sde_dsc_helper.h"
 #include <drm/drm_edid.h>
 
 #define DP_KHZ_TO_HZ 1000

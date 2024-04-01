@@ -18,7 +18,7 @@
 #include "lge_cover_color_manager.h"
 #include "lge_dsi_panel_def.h"
 #include "lge_dsi_panel.h"
-#include "dsi_display.h"
+#include "../../dsi/dsi_display.h"
 #include <linux/delay.h>
 
 #define ICE40_SMODE 0x000D

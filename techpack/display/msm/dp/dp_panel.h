@@ -10,9 +10,9 @@
 
 #include "dp_aux.h"
 #include "dp_link.h"
-#include "sde_edid_parser.h"
-#include "sde_connector.h"
-#include "msm_drv.h"
+#include "../sde_edid_parser.h"
+#include "../sde/sde_connector.h"
+#include "../msm_drv.h"
 
 #define DP_RECEIVER_DSC_CAP_SIZE    15
 #define DP_RECEIVER_FEC_STATUS_SIZE 3

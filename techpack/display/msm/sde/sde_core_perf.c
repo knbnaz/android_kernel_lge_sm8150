@@ -15,7 +15,7 @@
 #include <linux/platform_device.h>
 #include <linux/soc/qcom/llcc-qcom.h>
 
-#include "msm_prop.h"
+#include "../msm_prop.h"
 
 #include "sde_kms.h"
 #include "sde_trace.h"

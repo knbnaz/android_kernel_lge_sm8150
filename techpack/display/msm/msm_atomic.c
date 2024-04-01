@@ -20,7 +20,7 @@
 #include "msm_drv.h"
 #include "msm_gem.h"
 #include "msm_kms.h"
-#include "sde_trace.h"
+#include "sde/sde_trace.h"
 #include <drm/drm_atomic_uapi.h>
 
 #define MULTIPLE_CONN_DETECTED(x) (x > 1)

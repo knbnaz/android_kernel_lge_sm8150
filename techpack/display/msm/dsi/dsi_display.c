@@ -11,7 +11,7 @@
 
 #include "../msm_drv.h"
 #include "../sde/sde_connector.h"
-#include "msm_mmu.h"
+#include "../msm_mmu.h"
 #include "dsi_display.h"
 #include "dsi_panel.h"
 #include "dsi_ctrl.h"
@@ -19,7 +19,7 @@
 #include "dsi_drm.h"
 #include "dsi_clk.h"
 #include "dsi_pwr.h"
-#include "sde_dbg.h"
+#include "../sde_dbg.h"
 #include "../dsi_parser.h"
 
 #ifdef CONFIG_LGE_PM_PRM

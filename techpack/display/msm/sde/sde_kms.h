@@ -38,7 +38,7 @@
 #include "sde_hw_top.h"
 #include "sde_hw_uidle.h"
 #include "sde_rm.h"
-#include "sde_power_handle.h"
+#include "../sde_power_handle.h"
 #include "sde_irq.h"
 #include "sde_core_perf.h"
 

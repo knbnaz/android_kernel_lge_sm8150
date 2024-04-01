@@ -17,8 +17,8 @@
 #include <linux/sysfs.h>
 #include <linux/device.h>
 #include <linux/lge_panel_notify.h>
-#include "dsi_display.h"
-#include "sde_connector.h"
+#include "../../dsi/dsi_display.h"
+#include "../../sde/sde_connector.h"
 
 static BLOCKING_NOTIFIER_HEAD(lge_panel_notifier_list);
 

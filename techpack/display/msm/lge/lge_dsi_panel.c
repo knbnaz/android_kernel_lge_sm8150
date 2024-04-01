@@ -15,7 +15,7 @@
 #include "../sde/sde_connector.h"
 #include "../sde/sde_encoder.h"
 #include <drm/drm_mode.h>
-#include "dsi_drm.h"
+#include "../dsi/dsi_drm.h"
 #include "drs/lge_drs_mngr.h"
 #include "lge_ddic_ops_helper.h"
 #include "brightness/lge_brightness_def.h"

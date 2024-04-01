@@ -1,6 +1,6 @@
 #define pr_fmt(fmt)	"[Display][r66456-ops:%s:%d] " fmt, __func__, __LINE__
 
-#include "dsi_panel.h"
+#include "../dsi/dsi_panel.h"
 #include "lge_ddic_ops_helper.h"
 #include "cm/lge_color_manager.h"
 #include "brightness/lge_brightness_def.h"

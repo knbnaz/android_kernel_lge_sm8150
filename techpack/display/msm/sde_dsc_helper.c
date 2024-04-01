@@ -5,7 +5,7 @@
 
 #include "msm_drv.h"
 #include "sde_dsc_helper.h"
-#include "sde_kms.h"
+#include "sde/sde_kms.h"
 
 
 #define SDE_DSC_PPS_SIZE       128

@@ -26,7 +26,7 @@
 #include "sde_hw_mdss.h"
 #include "sde_kms.h"
 #include "sde_connector.h"
-#include "sde_power_handle.h"
+#include "../sde_power_handle.h"
 
 /*
  * Two to anticipate panels that can do cmd/vid dynamic switching

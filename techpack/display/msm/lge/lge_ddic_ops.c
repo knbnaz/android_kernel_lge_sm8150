@@ -1,7 +1,7 @@
 #define pr_fmt(fmt)	"[Display][ddic-ops:%s:%d] " fmt, __func__, __LINE__
 
-#include "dsi_display.h"
-#include "dsi_panel.h"
+#include "../dsi/dsi_display.h"
+#include "../dsi/dsi_panel.h"
 #include "err_detect/lge_err_detect.h"
 #include "cm/lge_color_manager.h"
 

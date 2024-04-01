@@ -6,8 +6,8 @@
 #include <linux/of_gpio.h>
 #include <video/mipi_display.h>
 
-#include "dsi_panel.h"
-#include "dsi_ctrl_hw.h"
+#include "../dsi/dsi_panel.h"
+#include "../dsi/dsi_ctrl_hw.h"
 
 extern void dsi_panel_destroy_cmd_packets(struct dsi_panel_cmd_set *set);
 

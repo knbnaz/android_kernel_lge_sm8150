@@ -23,8 +23,8 @@
 #include <drm/sde_drm.h>
 #include <drm/msm_drm_pp.h>
 
-#include "msm_prop.h"
-#include "msm_drv.h"
+#include "../msm_prop.h"
+#include "../msm_drv.h"
 
 #include "sde_kms.h"
 #include "sde_fence.h"

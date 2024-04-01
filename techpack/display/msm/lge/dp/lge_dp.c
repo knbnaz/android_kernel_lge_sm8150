@@ -103,7 +103,7 @@ module_exit(dp_noti_class_exit);
 
 #include "lge_dp.h"
 #include "lge_dp_def.h"
-#include "dp_display.h"
+#include "../../dp/dp_display.h"
 
 extern struct lge_dp_display* get_lge_dp(void);
 

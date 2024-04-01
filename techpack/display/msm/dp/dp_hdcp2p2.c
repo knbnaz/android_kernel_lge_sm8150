@@ -13,7 +13,7 @@
 #include <linux/kfifo.h>
 #include <drm/drm_dp_helper.h>
 
-#include "sde_hdcp_2x.h"
+#include "../sde_hdcp_2x.h"
 #include "dp_debug.h"
 
 #define DP_INTR_STATUS2				(0x00000024)

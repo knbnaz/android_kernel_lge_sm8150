@@ -1,8 +1,8 @@
 #define pr_fmt(fmt)	"[Display][rm692A9-ops:%s:%d] " fmt, __func__, __LINE__
 
-#include "dsi_panel.h"
-#include "dsi_display.h"
-#include "sde_connector.h"
+#include "../dsi/dsi_panel.h"
+#include "../dsi/dsi_display.h"
+#include "../sde/sde_connector.h"
 #include "lge_ddic_ops_helper.h"
 #include "cm/lge_color_manager.h"
 #include "brightness/lge_brightness_def.h"

@@ -6,8 +6,8 @@
 #include <linux/of_gpio.h>
 #include <video/mipi_display.h>
 
-#include "dsi_panel.h"
-#include "dsi_ctrl_hw.h"
+#include "../..//dsi/dsi_panel.h"
+#include "../..//dsi/dsi_ctrl_hw.h"
 
 #define SANITIZE(x) do { (x) = ((x)<0)?0:(x); } while(0)
 

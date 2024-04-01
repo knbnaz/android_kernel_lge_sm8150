@@ -11,7 +11,7 @@
 #include <linux/kthread.h>
 
 #include "sde_core_irq.h"
-#include "sde_power_handle.h"
+#include "../sde_power_handle.h"
 
 /**
  * sde_core_irq_callback_handler - dispatch core interrupts

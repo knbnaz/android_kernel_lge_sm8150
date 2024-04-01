@@ -8,7 +8,7 @@
 #include <linux/seq_file.h>
 #include <linux/sde_rsc.h>
 
-#include "msm_drv.h"
+#include "../msm_drv.h"
 #include "sde_kms.h"
 #include <drm/drm_crtc.h>
 #include <drm/drm_crtc_helper.h>
@@ -18,14 +18,14 @@
 #include "sde_hw_ctl.h"
 #include "sde_formats.h"
 #include "sde_encoder_phys.h"
-#include "sde_power_handle.h"
+#include "../sde_power_handle.h"
 #include "sde_hw_dsc.h"
 #include "sde_hw_vdc.h"
 #include "sde_crtc.h"
 #include "sde_trace.h"
 #include "sde_core_irq.h"
-#include "sde_dsc_helper.h"
-#include "sde_vdc_helper.h"
+#include "../sde_dsc_helper.h"
+#include "../sde_vdc_helper.h"
 
 #define SDE_DEBUG_DCE(e, fmt, ...) SDE_DEBUG("enc%d " fmt,\
 		(e) ? (e)->base.base.id : -1, ##__VA_ARGS__)

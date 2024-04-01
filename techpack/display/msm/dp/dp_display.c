@@ -27,7 +27,7 @@
 #include "dp_ctrl.h"
 #include "dp_audio.h"
 #include "dp_display.h"
-#include "sde_hdcp.h"
+#include "../sde_hdcp.h"
 #include "dp_debug.h"
 #include "dp_pll.h"
 #include "../sde_dbg.h"
