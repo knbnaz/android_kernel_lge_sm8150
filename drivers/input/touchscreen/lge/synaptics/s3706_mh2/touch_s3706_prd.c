@@ -172,11 +172,15 @@ static void log_file_size_check(struct device *dev)
 				} else {
 					touch_snprintf(buf2, sizeof(buf2), "%s.%d", fname, (i + 1));
 
-					if (ksys_rename(buf1, buf2) < 0) {
-						TOUCH_E("failed to rename file [%s] -> [%s]\n",
-								buf1, buf2);
-						goto error;
-					}
+                    if (ksys_link(buf1, buf2) < 0) {
+                        TOUCH_E("%s : failed to link file [%s] -> [%s]\n", __func__, buf1, buf2);
+                        goto error;
+                    }
+
+                    if (ksys_unlink(buf1) < 0) {
+                        TOUCH_E("%s : failed to remove file [%s]\n", __func__, buf1);
+                        goto error;
+                    }
 
 					TOUCH_I("%s : rename file [%s] -> [%s]\n",
 							__func__, buf1, buf2);
