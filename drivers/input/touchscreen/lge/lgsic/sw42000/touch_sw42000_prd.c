@@ -163,7 +163,7 @@ static void log_file_size_check(struct device *dev)
 
 	if (fname) {
 		file = filp_open(fname, O_RDONLY, 0666);
-		sys_chmod(fname, 0666);
+		ksys_chmod(fname, 0666);
 	} else {
 		TOUCH_E("%s : fname is NULL, can not open FILE\n", __func__);
 		goto error;
@@ -188,13 +188,13 @@ static void log_file_size_check(struct device *dev)
 			else
 				snprintf(buf1, sizeof(buf1), "%s.%d", fname, i);
 
-			ret = sys_access(buf1, 0);
+			ret = ksys_access(buf1, 0);
 
 			if (ret == 0) {
 				TOUCH_I("%s : file [%s] exist\n", __func__, buf1);
 
 				if (i == (MAX_LOG_FILE_COUNT - 1)) {
-					if (sys_unlink(buf1) < 0) {
+					if (ksys_unlink(buf1) < 0) {
 						TOUCH_E("%s : failed to remove file [%s]\n", __func__, buf1);
 						goto error;
 					}
@@ -202,7 +202,7 @@ static void log_file_size_check(struct device *dev)
 					TOUCH_I("%s : remove file [%s]\n", __func__, buf1);
 				} else {
 					snprintf(buf2, sizeof(buf2), "%s.%d", fname, (i + 1));
-					if (sys_rename(buf1, buf2) < 0) {
+					if (ksys_rename(buf1, buf2) < 0) {
 						TOUCH_E("%s : failed to rename file [%s] -> [%s]\n", __func__, buf1, buf2);
 						goto error;
 					}
@@ -251,8 +251,8 @@ static void write_file(struct device *dev, char *data, int write_time)
 
 
 	if (fname) {
-		fd = sys_open(fname, O_WRONLY|O_CREAT|O_APPEND, 0666);
-		sys_chmod(fname, 0666);
+		fd = ksys_open(fname, O_WRONLY|O_CREAT|O_APPEND, 0666);
+		ksys_chmod(fname, 0666);
 	} else {
 		TOUCH_E("%s : fname is NULL, can not open FILE\n", __func__);
 		set_fs(old_fs);
@@ -269,11 +269,11 @@ static void write_file(struct device *dev, char *data, int write_time)
 					my_date.tm_mday, my_date.tm_hour,
 					my_date.tm_min, my_date.tm_sec,
 					(unsigned long) my_time.tv_nsec / 1000000);
-			sys_write(fd, time_string, strlen(time_string));
+			ksys_write(fd, time_string, strlen(time_string));
 
 		}
-		sys_write(fd, data, strlen(data));
-		sys_close(fd);
+		ksys_write(fd, data, strlen(data));
+		ksys_close(fd);
 	} else {
 		TOUCH_I("File open failed\n");
 	}
@@ -615,9 +615,9 @@ static int sdcard_spec_file_read(struct device *dev)
 	else
 		path_idx = 0;
 	set_fs(KERNEL_DS);
-	fd = sys_open(path[path_idx], O_RDONLY, 0);
+	fd = ksys_open(path[path_idx], O_RDONLY, 0);
 	if (fd >= 0) {
-		size = sys_lseek(fd, 0, SEEK_END);
+		size = ksys_lseek(fd, 0, SEEK_END);
 
 		if (line) {
 			TOUCH_I("%s: line is already allocated. kfree line\n",
@@ -629,14 +629,14 @@ static int sdcard_spec_file_read(struct device *dev)
 		line = kzalloc(size, GFP_KERNEL);
 		if (line == NULL) {
 			TOUCH_E("failed to kzalloc line\n");
-			sys_close(fd);
+			ksys_close(fd);
 			set_fs(old_fs);
 			return -ENOMEM;
 		}
 
-		sys_lseek(fd, 0, SEEK_SET);
-		sys_read(fd, line, sizeof(line));
-		sys_close(fd);
+		ksys_lseek(fd, 0, SEEK_SET);
+		ksys_read(fd, line, sizeof(line));
+		ksys_close(fd);
 		TOUCH_I("%s file existing\n", path[path_idx]);
 		ret = 1;
 	}
