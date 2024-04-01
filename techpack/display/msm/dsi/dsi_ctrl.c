@@ -10,9 +10,9 @@
 #include <linux/of_irq.h>
 #include <video/mipi_display.h>
 
-#include "msm_drv.h"
-#include "msm_kms.h"
-#include "msm_mmu.h"
+#include "../msm_drv.h"
+#include "../msm_kms.h"
+#include "../msm_mmu.h"
 #include "dsi_ctrl.h"
 #include "dsi_ctrl_hw.h"
 #include "dsi_clk.h"
@@ -20,7 +20,7 @@
 #include "dsi_catalog.h"
 #include "dsi_panel.h"
 
-#include "sde_dbg.h"
+#include "../sde_dbg.h"
 
 #define DSI_CTRL_DEFAULT_LABEL "MDSS DSI CTRL"
 

@@ -8,7 +8,7 @@
 #include "sde_hw_catalog.h"
 #include "sde_hw_wb.h"
 #include "sde_formats.h"
-#include "sde_dbg.h"
+#include "../sde_dbg.h"
 #include "sde_kms.h"
 
 #define WB_DST_FORMAT			0x000

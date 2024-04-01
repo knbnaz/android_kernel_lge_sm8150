@@ -9,8 +9,8 @@
 #include <linux/of_gpio.h>
 #include <linux/err.h>
 
-#include "msm_drv.h"
-#include "sde_connector.h"
+#include "../msm_drv.h"
+#include "../sde/sde_connector.h"
 #include "msm_mmu.h"
 #include "dsi_display.h"
 #include "dsi_panel.h"
@@ -20,10 +20,10 @@
 #include "dsi_clk.h"
 #include "dsi_pwr.h"
 #include "sde_dbg.h"
-#include "dsi_parser.h"
+#include "../dsi_parser.h"
 
 #ifdef CONFIG_LGE_PM_PRM
-#include "../../../soc/qcom/lge/power/main/lge_prm.h"
+#include "../../../../drivers/soc/qcom/lge/power/main/lge_prm.h"
 #endif
 
 #if IS_ENABLED(CONFIG_LGE_DISPLAY_COMMON)

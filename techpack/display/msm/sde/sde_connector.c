@@ -4,17 +4,17 @@
  */
 
 #define pr_fmt(fmt)	"[drm:%s:%d] " fmt, __func__, __LINE__
-#include "msm_drv.h"
-#include "sde_dbg.h"
+#include "../msm_drv.h"
+#include "../sde_dbg.h"
 
 #include "sde_kms.h"
 #include "sde_connector.h"
 #include "sde_encoder.h"
-#include "msm_cooling_device.h"
+#include "../msm_cooling_device.h"
 #include <linux/backlight.h>
 #include <linux/string.h>
-#include "dsi_drm.h"
-#include "dsi_display.h"
+#include "../dsi/dsi_drm.h"
+#include "../dsi/dsi_display.h"
 #include "sde_crtc.h"
 #include "sde_rm.h"
 #include "sde_vm.h"

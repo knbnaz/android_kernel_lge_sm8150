@@ -6,7 +6,7 @@
 #include <linux/delay.h>
 #include "sde_hwio.h"
 #include "sde_hw_ctl.h"
-#include "sde_dbg.h"
+#include "../sde_dbg.h"
 #include "sde_kms.h"
 #include "sde_reg_dma.h"
 

@@ -6,7 +6,7 @@
 #include "sde_hwio.h"
 #include "sde_hw_catalog.h"
 #include "sde_hw_top.h"
-#include "sde_dbg.h"
+#include "../sde_dbg.h"
 #include "sde_kms.h"
 
 #define SSPP_SPARE                        0x28

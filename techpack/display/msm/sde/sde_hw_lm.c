@@ -10,7 +10,7 @@
 #include "sde_hwio.h"
 #include "sde_hw_lm.h"
 #include "sde_hw_mdss.h"
-#include "sde_dbg.h"
+#include "../sde_dbg.h"
 #include "sde_kms.h"
 
 #define LM_OP_MODE                        0x00

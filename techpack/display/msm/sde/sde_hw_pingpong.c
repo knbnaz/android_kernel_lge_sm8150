@@ -9,7 +9,7 @@
 #include "sde_hwio.h"
 #include "sde_hw_catalog.h"
 #include "sde_hw_pingpong.h"
-#include "sde_dbg.h"
+#include "../sde_dbg.h"
 #include "sde_kms.h"
 
 #define PP_TEAR_CHECK_EN                0x000

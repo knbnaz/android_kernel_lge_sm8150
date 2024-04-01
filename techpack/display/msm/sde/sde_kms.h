@@ -28,7 +28,7 @@
 #include "../msm_kms.h"
 #include "../msm_mmu.h"
 #include "../msm_gem.h"
-#include "sde_dbg.h"
+#include "../sde_dbg.h"
 #include "sde_hw_catalog.h"
 #include "sde_hw_ctl.h"
 #include "sde_hw_lm.h"

@@ -10,15 +10,15 @@
 #include <linux/clk.h>
 #include <linux/list.h>
 
-#include "msm_drv.h"
-#include "msm_kms.h"
+#include "../msm_drv.h"
+#include "../msm_kms.h"
 #include "dsi_phy.h"
 #include "dsi_phy_hw.h"
 #include "dsi_clk.h"
 #include "dsi_pwr.h"
 #include "dsi_catalog.h"
 
-#include "sde_dbg.h"
+#include "../sde_dbg.h"
 
 #define DSI_PHY_DEFAULT_LABEL "MDSS PHY CTRL"
 

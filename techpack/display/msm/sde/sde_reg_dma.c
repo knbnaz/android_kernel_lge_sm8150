@@ -6,7 +6,7 @@
 #define pr_fmt(fmt)	"[drm:%s:%d] " fmt, __func__, __LINE__
 #include "sde_reg_dma.h"
 #include "sde_hw_reg_dma_v1.h"
-#include "sde_dbg.h"
+#include "../sde_dbg.h"
 
 #define REG_DMA_VER_1_0 0x00010000
 #define REG_DMA_VER_1_1 0x00010001

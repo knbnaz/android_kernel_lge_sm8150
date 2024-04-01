@@ -5,7 +5,7 @@
 
 #include "sde_hw_ds.h"
 #include "sde_formats.h"
-#include "sde_dbg.h"
+#include "../sde_dbg.h"
 #include "sde_kms.h"
 
 /* Destination scaler TOP registers */

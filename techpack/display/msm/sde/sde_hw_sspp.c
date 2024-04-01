@@ -8,7 +8,7 @@
 #include "sde_hw_lm.h"
 #include "sde_hw_sspp.h"
 #include "sde_hw_color_processing.h"
-#include "sde_dbg.h"
+#include "../sde_dbg.h"
 #include "sde_kms.h"
 #include "sde_hw_reg_dma_v1_color_proc.h"
 

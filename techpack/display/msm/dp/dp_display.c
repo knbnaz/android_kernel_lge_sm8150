@@ -14,9 +14,9 @@
 #include <linux/usb/phy.h>
 #include <linux/jiffies.h>
 
-#include "sde_connector.h"
+#include "../sde/sde_connector.h"
 
-#include "msm_drv.h"
+#include "../msm_drv.h"
 #include "dp_hpd.h"
 #include "dp_parser.h"
 #include "dp_power.h"
@@ -30,7 +30,7 @@
 #include "sde_hdcp.h"
 #include "dp_debug.h"
 #include "dp_pll.h"
-#include "sde_dbg.h"
+#include "../sde_dbg.h"
 
 #if IS_ENABLED(CONFIG_LGE_COVER_DISPLAY) || IS_ENABLED(CONFIG_LGE_DUAL_SCREEN)
 #include <linux/extcon.h>

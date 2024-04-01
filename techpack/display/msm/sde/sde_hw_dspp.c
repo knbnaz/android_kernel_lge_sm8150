@@ -9,7 +9,7 @@
 #include "sde_hw_catalog.h"
 #include "sde_hw_dspp.h"
 #include "sde_hw_color_processing.h"
-#include "sde_dbg.h"
+#include "../sde_dbg.h"
 #include "sde_ad4.h"
 #include "sde_hw_rc.h"
 #include "sde_kms.h"

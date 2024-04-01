@@ -7,7 +7,7 @@
 #include "sde_hwio.h"
 #include "sde_hw_catalog.h"
 #include "sde_hw_vbif.h"
-#include "sde_dbg.h"
+#include "../sde_dbg.h"
 
 #define VBIF_VERSION			0x0000
 #define VBIF_CLKON			0x0004

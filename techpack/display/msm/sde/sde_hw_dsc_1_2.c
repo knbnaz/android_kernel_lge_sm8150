@@ -8,7 +8,7 @@
 #include "sde_hw_catalog.h"
 #include "sde_hw_dsc.h"
 #include "sde_hw_pingpong.h"
-#include "sde_dbg.h"
+#include "../sde_dbg.h"
 #include "sde_kms.h"
 
 

@@ -8,10 +8,10 @@
 #include "sde_hw_catalog.h"
 #include "sde_hw_dsc.h"
 #include "sde_hw_pingpong.h"
-#include "sde_dbg.h"
+#include "../sde_dbg.h"
 #include "sde_kms.h"
 #include "sde_hw_vdc.h"
-#include "sde_vdc_helper.h"
+#include "../sde_vdc_helper.h"
 
 #define VDC_CMN_MAIN_CNF           0x00
 

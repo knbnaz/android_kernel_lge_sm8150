@@ -7,9 +7,9 @@
 #include "sde_hw_mdss.h"
 #include "sde_hw_ctl.h"
 #include "sde_hw_reg_dma_v1.h"
-#include "msm_drv.h"
-#include "msm_mmu.h"
-#include "sde_dbg.h"
+#include "../msm_drv.h"
+#include "../msm_mmu.h"
+#include "../sde_dbg.h"
 
 #define GUARD_BYTES (BIT(8) - 1)
 #define ALIGNED_OFFSET (U32_MAX & ~(GUARD_BYTES))

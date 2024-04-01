@@ -7,7 +7,7 @@
 #include "sde_hwio.h"
 #include "sde_hw_catalog.h"
 #include "sde_hw_intf.h"
-#include "sde_dbg.h"
+#include "../sde_dbg.h"
 
 #define INTF_TIMING_ENGINE_EN           0x000
 #define INTF_CONFIG                     0x004

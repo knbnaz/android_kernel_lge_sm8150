@@ -9,7 +9,7 @@
 #include <linux/platform_device.h>
 
 #include "sde_kms.h"
-#include "sde_dbg.h"
+#include "../sde_dbg.h"
 #include "sde_hw_qdss.h"
 
 #define QDSS_CONFIG	0x0

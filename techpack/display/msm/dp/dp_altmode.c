@@ -14,7 +14,7 @@
 
 #include "dp_altmode.h"
 #include "dp_debug.h"
-#include "sde_dbg.h"
+#include "../sde_dbg.h"
 
 
 #define ALTMODE_CONFIGURE_MASK (0x3f)

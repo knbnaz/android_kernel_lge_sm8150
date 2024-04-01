@@ -13,9 +13,9 @@
 #include "dsi_panel.h"
 #include "dsi_ctrl_hw.h"
 #include "dsi_parser.h"
-#include "sde_dbg.h"
-#include "sde_dsc_helper.h"
-#include "sde_vdc_helper.h"
+#include "../sde_dbg.h"
+#include "../sde_dsc_helper.h"
+#include "../sde_vdc_helper.h"
 
 #if IS_ENABLED(CONFIG_LGE_DISPLAY_COMMON)
 #include "../lge/lge_dsi_panel.h"

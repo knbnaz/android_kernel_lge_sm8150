@@ -11,7 +11,7 @@
 #include <linux/clk-provider.h>
 #include <linux/of_device.h>
 #include "dp_parser.h"
-#include "sde_dbg.h"
+#include "../sde_dbg.h"
 
 #define DP_VCO_HSCLK_RATE_1620MHZDIV1000	1620000UL
 #define DP_VCO_HSCLK_RATE_2160MHZDIV1000        2160000UL

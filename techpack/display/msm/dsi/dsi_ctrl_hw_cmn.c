@@ -12,9 +12,9 @@
 #include "dsi_hw.h"
 #include "dsi_panel.h"
 #include "dsi_catalog.h"
-#include "sde_dbg.h"
-#include "sde_dsc_helper.h"
-#include "sde_vdc_helper.h"
+#include "../sde_dbg.h"
+#include "../sde_dsc_helper.h"
+#include "../sde_vdc_helper.h"
 
 #define MMSS_MISC_CLAMP_REG_OFF           0x0014
 #define DSI_CTRL_DYNAMIC_FORCE_ON         (0x23F|BIT(8)|BIT(9)|BIT(11)|BIT(21))

@@ -11,7 +11,7 @@
 
 #include "dp_ctrl.h"
 #include "dp_debug.h"
-#include "sde_dbg.h"
+#include "../sde_dbg.h"
 #include "dp_pll.h"
 
 #define DP_MST_DEBUG(fmt, ...) DP_DEBUG(fmt, ##__VA_ARGS__)
