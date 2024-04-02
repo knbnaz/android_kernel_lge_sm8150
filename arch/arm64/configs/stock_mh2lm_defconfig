@@ -1585,6 +1585,7 @@ CONFIG_SCSI_DMA=y
 # CONFIG_SCSI_NETLINK is not set
 # CONFIG_SCSI_MQ_DEFAULT is not set
 CONFIG_SCSI_PROC_FS=y
+CONFIG_SCSI_UFSHCD_QTI=y
 
 #
 # SCSI support type (disk, tape, CD-ROM)
