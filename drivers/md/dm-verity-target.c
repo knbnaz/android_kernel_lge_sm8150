@@ -37,7 +37,7 @@
 
 #define DM_VERITY_OPTS_MAX		(4 + DM_VERITY_OPTS_FEC + \
 					 DM_VERITY_ROOT_HASH_VERIFICATION_OPTS)
-+#define DM_VERITY_MEMORY_DUMP
+#define DM_VERITY_MEMORY_DUMP
 static unsigned dm_verity_prefetch_cluster = DM_VERITY_DEFAULT_PREFETCH_SIZE;
 
 module_param_named(prefetch_cluster, dm_verity_prefetch_cluster, uint, S_IRUGO | S_IWUSR);
@@ -582,7 +582,6 @@ static int verity_verify_io(struct dm_verity_io *io)
 #ifdef DM_VERITY_MEMORY_DUMP
 	struct bvec_iter prev_iter;
 	unsigned todo;
-	struct bio *bio;
 #endif // DM_VERITY_MEMORY_DUMP
 
 	unsigned b;
@@ -661,7 +660,6 @@ static int verity_verify_io(struct dm_verity_io *io)
 							verity_io_want_digest(v, io), v->digest_size);
 
 			todo = 1 << v->data_dev_block_bits;
-			bio = dm_bio_from_per_bio_data(io, v->ti->per_io_data_size);
 			do {
 				u8 *page;
 				unsigned len;
