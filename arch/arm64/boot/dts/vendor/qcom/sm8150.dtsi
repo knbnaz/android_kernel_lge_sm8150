@@ -993,6 +993,7 @@
 	disp_rsc: rsc@af20000 {
 		label = "disp_rsc";
 		compatible = "qcom,rpmh-rsc";
+		#mbox-cells = <1>;
 		reg = <0xaf20000 0x10000>;
 		reg-names = "drv-0";
 		interrupts = <GIC_SPI 129 IRQ_TYPE_LEVEL_HIGH>;
