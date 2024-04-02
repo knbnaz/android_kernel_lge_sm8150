@@ -2279,14 +2279,14 @@ out:
  * Reset vreg by ensuring it is off during probe. A call
  * to enable vreg is needed to balance disable vreg
  */
-static int sdhci_msm_vreg_reset(struct sdhci_msm_pltfm_data *pdata)
+static int sdhci_msm_vreg_reset(struct sdhci_msm_host *msm_host)
 {
 	int ret;
 
-	ret = sdhci_msm_setup_vreg(pdata, 1, true);
+	ret = sdhci_msm_setup_vreg(msm_host, 1, true);
 	if (ret)
 		return ret;
-	ret = sdhci_msm_setup_vreg(pdata, 0, true);
+	ret = sdhci_msm_setup_vreg(msm_host, 0, true);
 	return ret;
 }
 #endif
