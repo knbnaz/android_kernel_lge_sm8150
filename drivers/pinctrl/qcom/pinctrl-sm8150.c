@@ -1661,7 +1661,7 @@ static int sm8150_pinctrl_probe(struct platform_device *pdev)
 	}
 
 	if (of_find_property(pdev->dev.of_node, "dirconn-list", &len)) {
-		ret = sm8150_pinctrl_dir_conn_probe(pdev);
+		ret = sm8150_pinctrl_dirconn_list_probe(pdev);
 		if (ret) {
 			dev_err(&pdev->dev,
 				"Unable to parse TLMM direct connects\n");
