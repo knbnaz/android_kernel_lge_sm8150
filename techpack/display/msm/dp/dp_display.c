@@ -1616,11 +1616,11 @@ static int dp_display_init_aux_switch(struct dp_display_private *dp)
 	nb.notifier_call = dp_display_fsa4480_callback;
 	nb.priority = 0;
 
-/*
 	/*
 	 * Iteratively wait for reg notifier which confirms that fsa driver is probed.
 	 * Bootup DP with cable connected usecase can hit this scenario.
 	 */
+/*
 	for (retry = 0; retry < max_retries; retry++) {
 		rc = fsa4480_reg_notifier(&nb, dp->aux_switch_node);
 		if (rc == 0) {
@@ -4279,8 +4279,10 @@ bool is_dp_connected()
 {
 	struct dp_display* dp_display;
 	struct dp_display_private *dp;
+	int i;
 
-	dp_display = g_dp_display;
+	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++)
+		dp_display[i] = g_dp_display[i];
 
 	dp = container_of(dp_display, struct dp_display_private, dp_display);
 	return dp->hpd->hpd_high;
@@ -4294,8 +4296,10 @@ bool is_dd_connected()
 	struct dp_display* dp_display;
 	struct dp_display_private *dp;
 	bool ret;
+	int i;
 
-	dp_display = g_dp_display;
+	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++)
+		dp_display[i] = g_dp_display[i];
 
 	dp = container_of(dp_display, struct dp_display_private, dp_display);
 	if (IS_ERR_OR_NULL(dp) || IS_ERR_OR_NULL(dp->dd_hpd)) {
@@ -4314,8 +4318,10 @@ bool is_dd_display_recovery_working()
 	struct dp_display* dp_display;
 	struct dp_display_private *dp;
 	bool ret;
+	int i;
 
-	dp_display = g_dp_display;
+	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++)
+		dp_display[i] = g_dp_display[i];
 
 	dp = container_of(dp_display, struct dp_display_private, dp_display);
 	if (IS_ERR_OR_NULL(dp) || IS_ERR_OR_NULL(dp->dd_hpd)) {
@@ -4334,8 +4340,10 @@ bool is_dd_powermode()
 	struct dp_display* dp_display;
 	struct dp_display_private *dp;
 	bool ret;
+	int i;
 
-	dp_display = g_dp_display;
+	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++)
+		dp_display[i] = g_dp_display[i];
 
 	dp = container_of(dp_display, struct dp_display_private, dp_display);
 	if (IS_ERR_OR_NULL(dp)) {
@@ -4350,8 +4358,11 @@ EXPORT_SYMBOL(is_dd_powermode);
 
 struct extcon_dev *dd_extcon_get(int id)
 {
-	if (!g_dp_display)
-		return ERR_PTR(1);
+	int i;
+
+	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++)
+		if (!g_dp_display[i])
+			return ERR_PTR(1);
 
 	return g_dp_display->dd_extcon_sdev[id];
 }
@@ -4371,11 +4382,15 @@ EXPORT_SYMBOL(is_dd_working);
 struct lge_dp_display *get_lge_dp(void)
 {
 	struct dp_display* dp_display;
+	int i;
 
-	if (!g_dp_display)
-		return ERR_PTR(-EINVAL);
+	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++) {
+		if (!g_dp_display[i])
+			return ERR_PTR(-EINVAL);
 
-	dp_display = g_dp_display;
+		dp_display[i] = g_dp_display[i];
+	}
+	
 	return &dp_display->lge_dp;
 }
 #endif
@@ -4465,11 +4480,13 @@ static void dp_display_set_mst_state(void *dp_display,
 int dp_display_external_block(struct lge_dp_display *lge_dp, int block)
 {
 	struct dp_display_private *dp = NULL;
+	int i;
 
-	if (!g_dp_display || !lge_dp) {
-		pr_debug("dp display not initialized\n");
-		return -EINVAL;
-	}
+	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++)
+		if (!g_dp_display[i] || !lge_dp[i]) {
+			pr_debug("dp display not initialized\n");
+			return -EINVAL;
+		}
 
 	dp = container_of(g_dp_display, struct dp_display_private, dp_display);
 	if (!dp || !dp_display_is_ready(dp)) {
@@ -4479,9 +4496,9 @@ int dp_display_external_block(struct lge_dp_display *lge_dp, int block)
 
 	lge_dp->block_state = block;
 	if (lge_dp->block_state == 1)
-		dp_display_audio_enable(dp, false);
+		dp_audio_enable(dp, false);
 	else {
-		dp_display_audio_enable(dp, true);
+		dp_audio_enable(dp, true);
 	}
 
 	return 0;
@@ -4494,11 +4511,13 @@ int dp_display_send_id_event(struct lge_dp_display *lge_dp)
 	struct dp_display_private *dp = NULL;
 	char id[HPD_STRING_SIZE];
 	char *envp[2];
+	int i;
 
-	if (!g_dp_display || !lge_dp) {
-		pr_debug("invalid value\n");
-		return -EINVAL;
-	}
+	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++)
+		if (!g_dp_display[i] || !lge_dp[i]) {
+			pr_debug("invalid value\n");
+			return -EINVAL;
+		}
 
 	dp = container_of(g_dp_display, struct dp_display_private, dp_display);
 	if (!dp) {
@@ -4653,10 +4672,13 @@ void send_hpd_event(void)
 {
 	struct dp_display_private *dp = NULL;
 	struct dp_display *dp_display = NULL;
+	int i;
 
-	dp_display = g_dp_display;
-	if (dp_display == NULL)
-		return;
+	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++) {
+		dp_display[i] = g_dp_display[i];
+		if (dp_display[i] == NULL)
+			return;
+	}
 
 	dp = container_of(dp_display, struct dp_display_private, dp_display);
 	if (dp == NULL)

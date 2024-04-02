@@ -378,8 +378,7 @@ static void dp_catalog_aux_cfg_change(struct dp_catalog_aux *aux,
 	io_data = catalog->io.dp_phy;
 
 	pr_info("Force set aux cfg#%d index to %d(0x%08x)\n", type, index, cfg[type].lut[index]);
-	dp_write(catalog->exe_mode, io_data, cfg[type].offset,
-			cfg[type].lut[index]);
+	dp_write(cfg[type].offset, cfg[type].lut[index]);
 }
 #endif
 
