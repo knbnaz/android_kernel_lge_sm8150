@@ -133,7 +133,7 @@ static size_t snapshot_os(struct kgsl_device *device,
 			sizeof(header->version));
 
 	/* Get the Unix time for the timestamp */
-	header->seconds = get_seconds();
+	header->seconds = ktime_get_real_seconds();
 
 	/* Remember the power information */
 	header->power_flags = pwr->power_flags;
@@ -220,7 +220,7 @@ static size_t snapshot_os_no_ctxt(struct kgsl_device *device,
 			sizeof(header->version));
 
 	/* Get the Unix time for the timestamp */
-	header->seconds = get_seconds();
+	header->seconds = ktime_get_real_seconds();
 
 	/* Remember the power information */
 	header->power_flags = pwr->power_flags;
@@ -870,7 +870,7 @@ void kgsl_device_snapshot(struct kgsl_device *device,
 	 */
 
 	getboottime(&boot);
-	snapshot->timestamp = get_seconds() - boot.tv_sec;
+	snapshot->timestamp = ktime_get_real_seconds() - boot.tv_sec;
 
 	/* Store the instance in the device until it gets dumped */
 	device->snapshot = snapshot;
