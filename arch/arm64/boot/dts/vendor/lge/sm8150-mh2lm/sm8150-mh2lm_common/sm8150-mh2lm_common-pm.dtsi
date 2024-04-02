@@ -164,7 +164,7 @@
 
 &pm8150b_vadc {
 	mmw-pa2-lge {
-		reg = <ADC_AMUX_THM1_PU2>;
+		reg = <ADC5_AMUX_THM1_100K_PU>;
 		label = "mmw-pa2-lge";
 		qcom,ratiometic;
 		qcom,hw-settle-time = <200>;

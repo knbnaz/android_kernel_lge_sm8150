@@ -288,19 +288,19 @@
 
 &pm8150b_vadc {
 	bat_therm_pu1 {
-		reg = <ADC_BAT_THERM_PU1>;
+		reg = <ADC5_BAT_THERM_30K_PU>;
 		label = "bat_therm_pu1";
 		qcom,pre-scaling = <1 1>;
 	};
 
 	bat_therm_pu2 {
-		reg = <ADC_BAT_THERM_PU2>;
+		reg = <ADC5_BAT_THERM_100K_PU>;
 		label = "bat_therm_pu2";
 		qcom,pre-scaling = <1 1>;
 	};
 
 	bat_therm_pu3 {
-		reg = <ADC_BAT_THERM_PU3>;
+		reg = <ADC5_BAT_THERM_400K_PU>;
 		label = "bat_therm_pu3";
 		qcom,pre-scaling = <1 1>;
 	};
