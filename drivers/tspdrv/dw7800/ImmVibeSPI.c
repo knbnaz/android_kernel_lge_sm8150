@@ -629,10 +629,10 @@ int a2v_seq_write(u8* data, u32 size)
 		dw791x_seq_write(dw791x->rtp_input, 0x0, RAM_ADDR0, (u8*)data, size);
 	}
 #endif
-    int ret;
+	int ret;
 
-    if(is_immersion_haptic_on)
-        return -1;
+	if(is_immersion_haptic_on)
+		return -1;
 
 	ret = I2CWrite(DW7800_DATA, size, data);
 
@@ -766,7 +766,7 @@ VibeStatus I2CWriteData(unsigned char address, VibeUInt16 nBufferSizeInBytes, Vi
 {
     unsigned char buf1[I2C_BUF_MAX];
     int buf_remain_size = nBufferSizeInBytes % I2C_BUF_MAX + 2;
-    unsigned char buf2[buf_remain_size];
+    unsigned char *buf2 = NULL;
 
     if (!dw7800.i2c)
         return VIBE_E_FAIL;
@@ -933,7 +933,7 @@ IMMVIBESPIAPI int ImmVibeSPI_ForceOut_BufferFull(void)
     return fifo > DW7800_FIFOFULL_TARGET;
 }
 
-IMMVIBESPIAPI bool i2c_probe_success()
+IMMVIBESPIAPI bool i2c_probe_success(void)
 {
 	return is_i2c_probe_success;
 }

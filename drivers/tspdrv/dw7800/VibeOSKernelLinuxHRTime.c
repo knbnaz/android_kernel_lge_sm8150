@@ -115,7 +115,8 @@ static void VibeOSKernelLinuxInitTimer(void)
 
     /* Initialize a 5ms-timer with VibeOSKernelTimerProc as timer callback (interrupt driven)*/
     g_tspTimer.function = VibeOSKernelTimerProc;
-	wakeup_source_init(&g_tspWakelock, "tspdrv");
+	wakeup_source_create("tspdrv");
+	wakeup_source_add(&g_tspWakelock);
 }
 
 static void VibeOSKernelLinuxStartTimer(void)
@@ -210,7 +211,8 @@ static void VibeOSKernelLinuxTerminateTimer(void)
 {
     VibeOSKernelLinuxStopTimer();
     hrtimer_cancel(&g_tspTimer);
-    wakeup_source_trash(&g_tspWakelock);
+    wakeup_source_remove(&g_tspWakelock);
+    wakeup_source_destroy(&g_tspWakelock);
 
     if (VibeSemIsLocked(&g_hSemaphore)) up(&g_hSemaphore);
 }
