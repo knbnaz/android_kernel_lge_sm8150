@@ -3,7 +3,7 @@
  * Copyright (c) 2016-2019, 2021, The Linux Foundation. All rights reserved.
  */
 
-#include <drm/msm_drm_pp.h>
+#include "../../include/uapi/display/drm/msm_drm_pp.h"
 #include "sde_hw_color_processing_v1_7.h"
 #include "sde_hw_ctl.h"
 

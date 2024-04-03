@@ -20,8 +20,8 @@
 
 #include <linux/debugfs.h>
 #include <linux/dma-buf.h>
-#include <drm/sde_drm.h>
-#include <drm/msm_drm_pp.h>
+#include "../../include/uapi/display/drm/sde_drm.h"
+#include "../../include/uapi/display/drm/msm_drm_pp.h"
 
 #include "../msm_prop.h"
 #include "../msm_drv.h"

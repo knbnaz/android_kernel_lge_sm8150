@@ -17,7 +17,7 @@
 #define SDE_POWER_HANDLE_CONT_SPLASH_BUS_IB_QUOTA	3000000000ULL
 #define SDE_POWER_HANDLE_CONT_SPLASH_BUS_AB_QUOTA	3000000000ULL
 
-#include <linux/sde_io_util.h>
+#include "../include/linux/sde_io_util.h"
 #include <linux/interconnect.h>
 
 /* event will be triggered before power handler disable */

@@ -7,7 +7,7 @@
 
 #include <linux/dma-buf.h>
 #include <linux/string.h>
-#include <drm/msm_drm_pp.h>
+#include "../../include/uapi/display/drm/msm_drm_pp.h"
 #include "sde_color_processing.h"
 #include "sde_kms.h"
 #include "sde_crtc.h"

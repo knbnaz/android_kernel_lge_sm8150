@@ -7,7 +7,7 @@
 #define __SDE_ENCODER_PHYS_H__
 
 #include <linux/jiffies.h>
-#include <linux/sde_rsc.h>
+#include "../../include/linux/sde_rsc.h"
 
 #include "sde_kms.h"
 #include "sde_hw_intf.h"

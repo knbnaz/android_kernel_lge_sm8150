@@ -8,8 +8,8 @@
 #define _SDE_RSC_PRIV_H_
 
 #include <linux/kernel.h>
-#include <linux/sde_io_util.h>
-#include <linux/sde_rsc.h>
+#include "../include/linux/sde_io_util.h"
+#include "../include/linux/sde_rsc.h"
 
 #include <soc/qcom/tcs.h>
 #include "sde_power_handle.h"

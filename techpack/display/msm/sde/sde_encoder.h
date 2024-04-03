@@ -20,7 +20,7 @@
 #define __SDE_ENCODER_H__
 
 #include <drm/drm_crtc.h>
-#include <linux/sde_rsc.h>
+#include "../../include/linux/sde_rsc.h"
 
 #include "../msm_prop.h"
 #include "sde_hw_mdss.h"

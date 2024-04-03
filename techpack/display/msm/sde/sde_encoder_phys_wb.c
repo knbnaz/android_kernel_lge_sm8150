@@ -5,7 +5,7 @@
 
 #define pr_fmt(fmt)	"[drm:%s:%d] " fmt, __func__, __LINE__
 #include <linux/debugfs.h>
-#include <drm/sde_drm.h>
+#include "../../include/uapi/display/drm/sde_drm.h"
 
 #include "sde_encoder_phys.h"
 #include "sde_formats.h"

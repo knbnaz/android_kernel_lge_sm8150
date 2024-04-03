@@ -7,7 +7,7 @@
 #ifndef _DP_PARSER_H_
 #define _DP_PARSER_H_
 
-#include <linux/sde_io_util.h>
+#include "../../include/linux/sde_io_util.h"
 
 #define DP_LABEL "MDSS DP DISPLAY"
 #define AUX_CFG_LEN	10

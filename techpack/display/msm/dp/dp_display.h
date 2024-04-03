@@ -9,7 +9,7 @@
 
 #include <linux/list.h>
 #include <drm/drmP.h>
-#include <drm/sde_drm.h>
+#include "../../include/uapi/display/drm/sde_drm.h"
 
 #include "dp_panel.h"
 #include "dp_parser.h"

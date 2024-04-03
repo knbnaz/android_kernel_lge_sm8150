@@ -14,8 +14,8 @@
 #include <linux/mutex.h>
 #include <linux/of_platform.h>
 
-#include <linux/sde_io_util.h>
-#include <linux/sde_rsc.h>
+#include "../include/linux/sde_io_util.h"
+#include "../include/linux/sde_rsc.h"
 
 #include "sde_power_handle.h"
 #include "sde/sde_trace.h"

@@ -7,8 +7,8 @@
 #define _SDE_RSC_HW_H_
 
 #include <linux/kernel.h>
-#include <linux/sde_io_util.h>
-#include <linux/sde_rsc.h>
+#include "../include/linux/sde_io_util.h"
+#include "../include/linux/sde_rsc.h"
 
 /* display rsc offset */
 #define SDE_RSCC_RSC_ID_DRV0				0x0

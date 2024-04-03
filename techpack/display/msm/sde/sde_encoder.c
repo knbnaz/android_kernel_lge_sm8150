@@ -22,7 +22,7 @@
 #include <linux/debugfs.h>
 #include <linux/input.h>
 #include <linux/seq_file.h>
-#include <linux/sde_rsc.h>
+#include "../../include/linux/sde_rsc.h"
 
 #include "../msm_drv.h"
 #include "sde_kms.h"

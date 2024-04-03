@@ -33,8 +33,8 @@
 #include <linux/types.h>
 #include <linux/of_graph.h>
 #include <linux/of_device.h>
-#include <linux/sde_io_util.h>
-#include <linux/sde_vm_event.h>
+#include "../include/linux/sde_io_util.h"
+#include "../include/linux/sde_vm_event.h"
 #include <linux/sizes.h>
 #include <linux/kthread.h>
 
@@ -44,7 +44,7 @@
 #include <drm/drm_plane_helper.h>
 #include <drm/drm_fb_helper.h>
 #include <drm/msm_drm.h>
-#include <drm/sde_drm.h>
+#include "../include/uapi/display/drm/sde_drm.h"
 #include <drm/drm_gem.h>
 #include <drm/drm_dsc.h>
 

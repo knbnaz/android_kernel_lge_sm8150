@@ -6,7 +6,7 @@
 #ifndef _DP_PANEL_H_
 #define _DP_PANEL_H_
 
-#include <drm/sde_drm.h>
+#include "../../include/uapi/display/drm/sde_drm.h"
 
 #include "dp_aux.h"
 #include "dp_link.h"

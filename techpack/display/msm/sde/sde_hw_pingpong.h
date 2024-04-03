@@ -10,7 +10,7 @@
 #include "sde_hw_mdss.h"
 #include "sde_hw_util.h"
 #include "sde_hw_blk.h"
-#include <drm/msm_drm_pp.h>
+#include "../../include/uapi/display/drm/msm_drm_pp.h"
 
 struct sde_hw_pingpong;
 struct sde_hw_merge_3d;

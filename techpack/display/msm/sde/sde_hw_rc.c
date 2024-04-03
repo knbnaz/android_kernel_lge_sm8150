@@ -3,7 +3,7 @@
  * Copyright (c) 2020, The Linux Foundation. All rights reserved.
  */
 
-#include <drm/msm_drm_pp.h>
+#include "../../include/uapi/display/drm/msm_drm_pp.h"
 #include "sde_kms.h"
 #include "sde_reg_dma.h"
 #include "sde_hw_rc.h"

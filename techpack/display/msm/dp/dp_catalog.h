@@ -8,7 +8,7 @@
 #define _DP_CATALOG_H_
 
 #include <drm/drm_dp_helper.h>
-#include <drm/sde_drm.h>
+#include "../../include/uapi/display/drm/sde_drm.h"
 
 #include "dp_parser.h"
 

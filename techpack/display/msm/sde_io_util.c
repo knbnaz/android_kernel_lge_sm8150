@@ -9,8 +9,8 @@
 #include <linux/regulator/consumer.h>
 #include <linux/soc/qcom/spmi-pmic-arb.h>
 #include <linux/delay.h>
-#include <linux/sde_io_util.h>
-#include <linux/sde_vm_event.h>
+#include "../include/linux/sde_io_util.h"
+#include "../include/linux/sde_vm_event.h"
 #include "sde_dbg.h"
 
 #define MAX_I2C_CMDS  16

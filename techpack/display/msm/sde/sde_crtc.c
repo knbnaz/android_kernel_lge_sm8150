@@ -20,7 +20,7 @@
 #include <linux/sort.h>
 #include <linux/debugfs.h>
 #include <linux/ktime.h>
-#include <drm/sde_drm.h>
+#include "../../include/uapi/display/drm/sde_drm.h"
 #include <drm/drm_mode.h>
 #include <drm/drm_crtc.h>
 #include <drm/drm_probe_helper.h>

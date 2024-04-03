@@ -11,7 +11,7 @@
 #include <linux/sort.h>
 #include <linux/clk.h>
 #include <linux/bitmap.h>
-#include <linux/sde_rsc.h>
+#include "../../include/linux/sde_rsc.h"
 #include <linux/platform_device.h>
 #include <linux/soc/qcom/llcc-qcom.h>
 
