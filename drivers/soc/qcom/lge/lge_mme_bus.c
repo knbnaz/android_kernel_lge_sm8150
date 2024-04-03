@@ -32,8 +32,6 @@
 #include <linux/qseecom.h>
 #include <soc/qcom/qseecom_scm.h>
 #include <soc/qcom/socinfo.h>
-#include <linux/msm-bus.h>
-#include <linux/msm-bus-board.h>
 #include <linux/delay.h>
 #include <linux/compat.h>
 
@@ -49,9 +47,6 @@
 #define BUS_BOOST_STR_MAX	64
 
 struct lge_mme_bus_device {
-#ifdef CONFIG_LGE_MME_BOOST_EBI
-	u32 msm_bus_handle;
-#endif
 #ifdef CONFIG_LGE_MME_PM_QOS_DMA_LATENCY
 	struct pm_qos_request pm_qos_req;
 	struct cpumask awake_cpu;
@@ -73,70 +68,6 @@ static char which_boost_long_term[BUS_BOOST_STR_MAX];
 #endif
 
 static struct lge_mme_bus_device lge_mme_bus_dev;
-
-#ifdef CONFIG_LGE_MME_BOOST_EBI
-static struct msm_bus_paths lge_mme_usecases[]  =
-{
-	{
-		.vectors = (struct msm_bus_vectors[])
-		{
-			{
-				.src = 1,
-				.dst = 512,
-				.ab = 0,
-				.ib = 0,
-			},
-		},
-		.num_paths = 1,
-	},
-	{
-		.vectors = (struct msm_bus_vectors[])
-		{
-			{
-				.src = 1,
-				.dst = 512,
-				.ab = 28864000000,
-				.ib = 28864000000,
-			},
-		},
-		.num_paths = 1,
-	},
-};
-
-static struct msm_bus_scale_pdata lge_mme_bus_client_pdata = {
-	.usecase = lge_mme_usecases,
-	.num_usecases = ARRAY_SIZE(lge_mme_usecases),
-	.name = "lge_mme_bus",
-};
-#endif
-
-/**
- * lge_mme_bus_ebi_boost - boost ebi ddr clock
- * @enable : 1 - boost enable, 0 - disable
- *
- * A return value is error if fail to boost, otherwise 0.
- */
-#ifdef CONFIG_LGE_MME_BOOST_EBI
-static int lge_mme_bus_ebi_boost(int enable)
-{
-	int ret = 0;
-
-	if (!lge_mme_bus_dev.msm_bus_handle) {
-		pr_err("%s: invalid bus scale handle %d - "
-				"maybe by probing failure." , __func__,
-				lge_mme_bus_dev.msm_bus_handle);
-		return -EINVAL;
-	}
-
-	ret = msm_bus_scale_client_update_request(
-			lge_mme_bus_dev.msm_bus_handle, enable);
-
-	if (ret)
-		WARN_ON(1);
-
-	return 0;
-}
-#endif
 
 #ifdef CONFIG_LGE_MME_PM_QOS_DMA_LATENCY
 static void lge_mme_check_wake_up(void* info)
@@ -183,10 +114,6 @@ int lge_mme_bus_boost(int enable) {
 
 #ifdef CONFIG_LGE_MME_PM_QOS_DMA_LATENCY
 	lge_mme_idle_pc_disable(enable);
-#endif
-
-#ifdef CONFIG_LGE_MME_BOOST_EBI
-	ret = lge_mme_bus_ebi_boost(enable);
 #endif
 
 	return ret;
@@ -327,9 +254,6 @@ static int lge_mme_bus_probe(struct platform_device *pdev)
 #ifdef CONFIG_LGE_MME_PM_QOS_DMA_LATENCY
 	strlcat(which_boost, "PM_QOS_DMA_LATENCY ", BUS_BOOST_STR_MAX);
 #endif
-#ifdef CONFIG_LGE_MME_BOOST_EBI
-	strlcat(which_boost, "EBI_BOOST ", BUS_BOOST_STR_MAX);
-#endif
 #endif
 
 #ifdef CONFIG_LGE_MME_BOOST_LONG_TERM
@@ -362,15 +286,6 @@ static int lge_mme_bus_probe(struct platform_device *pdev)
 		}
 	}
 
-#ifdef CONFIG_LGE_MME_BOOST_EBI
-	lge_mme_bus_dev.msm_bus_handle = msm_bus_scale_register_client(
-			&lge_mme_bus_client_pdata);
-	if (!lge_mme_bus_dev.msm_bus_handle) {
-		pr_err("fail to register with bus mgr!\n");
-		return -EINVAL;
-	}
-#endif
-
 	pr_debug("%s: probe done\n", __func__);
 	return 0;
 
@@ -381,14 +296,6 @@ exit:
 
 static int lge_mme_bus_remove(struct platform_device *pdev)
 {
-#ifdef CONFIG_LGE_MME_BOOST_EBI
-	if (lge_mme_bus_dev.msm_bus_handle) {
-		if(msm_bus_scale_client_update_request(
-				lge_mme_bus_dev.msm_bus_handle, 0))
-			WARN_ON(1);
-		msm_bus_scale_unregister_client(lge_mme_bus_dev.msm_bus_handle);
-	}
-#endif
 	return 0;
 }
 
