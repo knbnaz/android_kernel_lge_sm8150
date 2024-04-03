@@ -252,8 +252,6 @@ void lge_gen_key_panic(int key, int status)
 	}
 
 	if (key_crash_cnt >= 7) {
-		if (debug_accessory_status)
-			lge_set_download_mode(1);
 		gen_key_panic = 1;
 		panic("%s: Generate panic by key!\n", __func__);
 	}
