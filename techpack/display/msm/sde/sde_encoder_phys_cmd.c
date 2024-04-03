@@ -512,42 +512,6 @@ static void sde_encoder_phys_cmd_mode_set(
 	_sde_encoder_phys_cmd_setup_irq_hw_idx(phys_enc);
 }
 
-#if IS_ENABLED(CONFIG_LGE_DISPLAY_COMMON)
-static u32 sde_encoder_phys_cmd_te_monitor(struct sde_connector *sde_conn)
-{
-	struct dsi_display *display;
-	int timeout = 10000;
-	int gpio_value = 0;
-	int gpio_num = 0;
-	u32 ret;
-
-	if (!sde_conn || !sde_conn->display) {
-		pr_err("[Display] sde_conn or display is null \n");
-		return -EINVAL;
-	} else {
-		display = (struct dsi_display *) sde_conn->display;
-		gpio_num = display->disp_te_gpio;
-	}
-
-	pr_info("start\n");
-	while (timeout > 0 && gpio_value != 1) {
-		gpio_value = gpio_get_value(gpio_num);
-		usleep_range(500, 500);
-		timeout--;
-	}
-
-	if (gpio_value == 1) {
-		pr_info("[Display] TE GPIO value is 1\n");
-	} else {
-		pr_info("[Display] Could not catch TE GPIO value\n");
-	}
-	ret = gpio_value;
-	pr_info("end\n");
-
-	return ret;
-}
-#endif
-
 static int _sde_encoder_phys_cmd_handle_ppdone_timeout(
 		struct sde_encoder_phys *phys_enc)
 {
@@ -576,12 +540,7 @@ static int _sde_encoder_phys_cmd_handle_ppdone_timeout(
 	SDE_EVT32(DRMID(phys_enc->parent), phys_enc->hw_pp->idx - PINGPONG_0,
 			cmd_enc->pp_timeout_report_cnt,
 			pending_kickoff_cnt,
-#if IS_ENABLED(CONFIG_LGE_DISPLAY_COMMON)
-			frame_event,
-			sde_encoder_phys_cmd_te_monitor(sde_conn));
-#else
 			frame_event);
-#endif
 
 	/* check if panel is still sending TE signal or not */
 	if (sde_connector_esd_status(phys_enc->connector))

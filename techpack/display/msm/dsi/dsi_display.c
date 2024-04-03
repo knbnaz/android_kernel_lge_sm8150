@@ -20,7 +20,7 @@
 #include "dsi_clk.h"
 #include "dsi_pwr.h"
 #include "../sde_dbg.h"
-#include "../dsi_parser.h"
+#include "dsi_parser.h"
 
 #ifdef CONFIG_LGE_PM_PRM
 #include "../../../../drivers/soc/qcom/lge/power/main/lge_prm.h"

@@ -3397,7 +3397,7 @@ int dsi_ctrl_cmd_transfer(struct dsi_ctrl *dsi_ctrl,
 	if (((msg->flags) & MIPI_DSI_MSG_REQ_ACK) &&
 			(msg->rx_buf && (msg->rx_len > 0)))
 	{
-		flags |= DSI_CTRL_CMD_READ;
+		*flags |= DSI_CTRL_CMD_READ;
 	}
 #endif
 

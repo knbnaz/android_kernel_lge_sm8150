@@ -324,7 +324,7 @@ exit:
 int dsi_panel_set_pinctrl_state(struct dsi_panel *panel, bool enable)
 #else
 static int dsi_panel_set_pinctrl_state(struct dsi_panel *panel, bool enable)
-#enduf
+#endif
 {
 	int rc = 0;
 	struct pinctrl_state *state;
