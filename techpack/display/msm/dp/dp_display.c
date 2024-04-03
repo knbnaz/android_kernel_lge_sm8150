@@ -4277,12 +4277,12 @@ bail:
 #if IS_ENABLED(CONFIG_LGE_COVER_DISPLAY) || IS_ENABLED(CONFIG_LGE_DUAL_SCREEN)
 bool is_dp_connected()
 {
-	struct dp_display* dp_display;
+	struct dp_display* dp_display = NULL;
 	struct dp_display_private *dp;
 	int i;
 
 	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++)
-		dp_display[i] = g_dp_display[i];
+		dp_display[i] = *g_dp_display[i];
 
 	dp = container_of(dp_display, struct dp_display_private, dp_display);
 	return dp->hpd->hpd_high;
@@ -4293,13 +4293,13 @@ EXPORT_SYMBOL(is_dp_connected);
 #if IS_ENABLED(CONFIG_LGE_COVER_DISPLAY)
 bool is_dd_connected()
 {
-	struct dp_display* dp_display;
+	struct dp_display* dp_display = NULL;
 	struct dp_display_private *dp;
 	bool ret;
 	int i;
 
 	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++)
-		dp_display[i] = g_dp_display[i];
+		dp_display[i] = *g_dp_display[i];
 
 	dp = container_of(dp_display, struct dp_display_private, dp_display);
 	if (IS_ERR_OR_NULL(dp) || IS_ERR_OR_NULL(dp->dd_hpd)) {
@@ -4315,13 +4315,13 @@ EXPORT_SYMBOL(is_dd_connected);
 
 bool is_dd_display_recovery_working()
 {
-	struct dp_display* dp_display;
+	struct dp_display* dp_display = NULL;
 	struct dp_display_private *dp;
 	bool ret;
 	int i;
 
 	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++)
-		dp_display[i] = g_dp_display[i];
+		dp_display[i] = *g_dp_display[i];
 
 	dp = container_of(dp_display, struct dp_display_private, dp_display);
 	if (IS_ERR_OR_NULL(dp) || IS_ERR_OR_NULL(dp->dd_hpd)) {
@@ -4337,13 +4337,13 @@ EXPORT_SYMBOL(is_dd_display_recovery_working);
 
 bool is_dd_powermode()
 {
-	struct dp_display* dp_display;
+	struct dp_display* dp_display = NULL;
 	struct dp_display_private *dp;
 	bool ret;
 	int i;
 
 	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++)
-		dp_display[i] = g_dp_display[i];
+		dp_display[i] = *g_dp_display[i];
 
 	dp = container_of(dp_display, struct dp_display_private, dp_display);
 	if (IS_ERR_OR_NULL(dp)) {
@@ -4381,14 +4381,14 @@ EXPORT_SYMBOL(is_dd_working);
 #ifdef CONFIG_LGE_DISPLAY_COMMON
 struct lge_dp_display *get_lge_dp(void)
 {
-	struct dp_display* dp_display;
+	struct dp_display* dp_display = NULL;
 	int i;
 
 	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++) {
 		if (!g_dp_display[i])
 			return ERR_PTR(-EINVAL);
 
-		dp_display[i] = g_dp_display[i];
+		dp_display[i] = *g_dp_display[i];
 	}
 	
 	return &dp_display->lge_dp;
@@ -4483,7 +4483,7 @@ int dp_display_external_block(struct lge_dp_display *lge_dp, int block)
 	int i;
 
 	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++)
-		if (!g_dp_display[i] || !lge_dp[i]) {
+		if (!g_dp_display[i] || !lge_dp) {
 			pr_debug("dp display not initialized\n");
 			return -EINVAL;
 		}
@@ -4514,7 +4514,7 @@ int dp_display_send_id_event(struct lge_dp_display *lge_dp)
 	int i;
 
 	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++)
-		if (!g_dp_display[i] || !lge_dp[i]) {
+		if (!g_dp_display[i] || !lge_dp) {
 			pr_debug("invalid value\n");
 			return -EINVAL;
 		}
@@ -4675,7 +4675,7 @@ void send_hpd_event(void)
 	int i;
 
 	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++) {
-		dp_display[i] = g_dp_display[i];
+		dp_display[i] = *g_dp_display[i];
 		if (dp_display[i] == NULL)
 			return;
 	}
