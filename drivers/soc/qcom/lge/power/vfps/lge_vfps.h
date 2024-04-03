@@ -15,8 +15,8 @@
 #define _LGE_VFPS_H_
 
 #include <linux/err.h>
-#include "main/lge_prm.h"
-#include "sde/sde_crtc.h"
+#include "../main/lge_prm.h"
+#include "../sde/sde_crtc.h"
 
 bool lge_vfps_check_internal(void);
 void lge_vfps_set_encoder(struct drm_encoder *encoder);

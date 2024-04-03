@@ -28,7 +28,7 @@
 #include <linux/reboot.h>
 #include <linux/workqueue.h>
 #include <asm/setup.h>
-#include <soc/qcom/scm.h>
+#include <soc/qcom/qseecom_scm.h>
 #include <soc/qcom/subsystem_restart.h>
 
 #include <soc/qcom/lge/lge_handle_panic.h>

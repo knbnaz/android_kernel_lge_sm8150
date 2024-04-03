@@ -14,7 +14,7 @@
 
 #include <linux/device.h>
 #include <linux/mutex.h>
-#include <uapi/drm/sde_drm.h>
+#include "../../../../../../techpack/display/include/uapi/display/drm/sde_drm.h"
 
 #include "lge_sben.h"
 

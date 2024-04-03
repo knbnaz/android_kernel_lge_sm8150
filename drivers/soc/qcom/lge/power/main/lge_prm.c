@@ -18,12 +18,12 @@
 #include <linux/of.h>
 
 #include "lge_prm.h"
-#include "fbcn/lge_fbcn.h"
-#include "fbcn/lge_intm.h"
-#include "vfps/lge_vfps.h"
-#include "sben/lge_sben.h"
-#include "dd/lge_dd.h"
-#include "triton/lge_triton.h"
+#include "../fbcn/lge_fbcn.h"
+#include "../fbcn/lge_intm.h"
+#include "../vfps/lge_vfps.h"
+#include "../sben/lge_sben.h"
+#include "../dd/lge_dd.h"
+#include "../triton/lge_triton.h"
 
 static struct lge_prm prm = {
 	.init_done_flag    = false,
