@@ -28,6 +28,7 @@
 #include <linux/reset.h>
 
 #include <linux/usb/ch9.h>
+#include <linux/usb/dwc3-msm.h>
 #include <linux/usb/gadget.h>
 #include <linux/usb/of.h>
 #include <linux/usb/otg.h>
@@ -355,8 +356,8 @@ done:
 	 * 4.7.5 Try. SNK DRP Connect Sink Test" of "USB-C Functional Tests".
 	 */
 	if (!(dwc->usb_compliance_mode &&
-	      *dwc->usb_compliance_mode &&
-	      (dwc->usb2_phy->flags & PHY_HOST_MODE)))
+		*dwc->usb_compliance_mode &&
+		(dwc->usb2_phy[0]->flags & PHY_HOST_MODE)))
 #endif
 	if (dwc3_is_usb31(dwc) && dwc->revision <= DWC3_USB31_REVISION_180A)
 		msleep(50);

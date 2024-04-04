@@ -23,6 +23,7 @@
 #include <linux/extcon-provider.h>
 #include <linux/usb/typec.h>
 #include <linux/usb/usbpd.h>
+#include <linux/usb/redriver.h>
 #include "usbpd.h"
 
 #ifdef CONFIG_LGE_USB
@@ -740,7 +741,7 @@ int usbpd_set_psy_iio_property(struct usbpd *pd,
 	return 0;
 }
 
-enum plug_orientation usbpd_get_plug_orientation(struct usbpd *pd)
+int usbpd_get_plug_orientation(struct usbpd *pd)
 {
 	int ret;
 	union power_supply_propval val;
@@ -748,7 +749,7 @@ enum plug_orientation usbpd_get_plug_orientation(struct usbpd *pd)
 	ret = usbpd_get_psy_iio_property(pd,
 		POWER_SUPPLY_PROP_TYPEC_CC_ORIENTATION, &val);
 	if (ret)
-		return ORIENTATION_NONE;
+		return TYPEC_ORIENTATION_NONE;
 
 	return val.intval;
 }
@@ -781,7 +782,7 @@ static inline void stop_usb_host(struct usbpd *pd)
 
 static inline void start_usb_host(struct usbpd *pd, bool ss)
 {
-	enum plug_orientation cc = usbpd_get_plug_orientation(pd);
+	int cc = usbpd_get_plug_orientation(pd);
 	union extcon_property_value val;
 
 #ifdef CONFIG_LGE_USB
@@ -813,7 +814,7 @@ static inline void stop_usb_peripheral(struct usbpd *pd)
 
 static inline void start_usb_peripheral(struct usbpd *pd)
 {
-	enum plug_orientation cc = usbpd_get_plug_orientation(pd);
+	int cc = usbpd_get_plug_orientation(pd);
 	union extcon_property_value val;
 
 #ifdef CONFIG_LGE_USB
@@ -898,7 +899,7 @@ static void start_usb_peripheral_work(struct work_struct *w)
 
 static void start_usb_dp(struct usbpd *pd, bool ss)
 {
-	enum plug_orientation cc = usbpd_get_plug_orientation(pd);
+	int cc = usbpd_get_plug_orientation(pd);
 	union extcon_property_value val;
 
 	/* set state to enable to allow client can get polarity */

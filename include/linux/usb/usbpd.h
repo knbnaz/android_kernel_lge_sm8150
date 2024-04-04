@@ -14,6 +14,7 @@
 #define __LINUX_USB_USBPD_H
 
 #include <linux/list.h>
+#include <linux/usb/typec.h>
 
 struct usbpd;
 struct device;
@@ -76,12 +77,6 @@ struct usbpd_svid_handler {
 	/* client should leave these blank; private members used by PD driver */
 	struct list_head entry;
 	bool discovered;
-};
-
-enum plug_orientation {
-	ORIENTATION_NONE,
-	ORIENTATION_CC1,
-	ORIENTATION_CC2,
 };
 
 #if IS_ENABLED(CONFIG_USB_PD_POLICY)
@@ -152,9 +147,9 @@ static inline int usbpd_send_svdm(struct usbpd *pd, u16 svid, u8 cmd,
 	return -EINVAL;
 }
 
-static inline enum plug_orientation usbpd_get_plug_orientation(struct usbpd *pd)
+static inline int usbpd_get_plug_orientation(struct usbpd *pd)
 {
-	return ORIENTATION_NONE;
+	return TYPEC_ORIENTATION_NONE;
 }
 
 static inline void usbpd_vdm_in_suspend(struct usbpd *pd, bool in_suspend) { }

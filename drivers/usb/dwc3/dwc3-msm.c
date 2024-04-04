@@ -563,6 +563,9 @@ struct dwc3_msm {
 	struct pm_qos_request pm_qos_req_dma;
 	struct delayed_work perf_vote_work;
 	struct delayed_work sdp_check;
+#ifdef CONFIG_LGE_USB
+	bool usb_compliance_mode;
+#endif
 	struct mutex suspend_resume_mutex;
 
 	enum usb_device_speed override_usb_speed;
@@ -3491,7 +3494,7 @@ static int dwc3_msm_update_bus_bw(struct dwc3_msm *mdwc, enum bus_vote bv)
 #ifdef CONFIG_LGE_USB
 	if (dwc->usb_compliance_mode &&
 	    *dwc->usb_compliance_mode &&
-	    (mdwc->hs_phy->flags & PHY_HOST_MODE))
+	    (mdwc->hs_phy[0]->flags & PHY_HOST_MODE))
 		return 0;
 #endif
 
@@ -4974,7 +4977,7 @@ static char * dwc3_revision(struct dwc3 *dwc)
 	case DWC3_REVISION_290A: return "DWC3_REVISION_290A";
 	case DWC3_REVISION_300A: return "DWC3_REVISION_300A";
 	case DWC3_REVISION_310A: return "DWC3_REVISION_310A";
-	case DWC3_REVISION_320A: return "DWC3_REVISION_320A";
+	case DWC3_REVISION_330A: return "DWC3_REVISION_330A";
 	case DWC3_REVISION_IS_DWC31:   return "DWC3_REVISION_IS_DWC31";
 	case DWC3_USB31_REVISION_110A: return "DWC3_USB31_REVISION_110A";
 	case DWC3_USB31_REVISION_120A: return "DWC3_USB31_REVISION_120A";
@@ -4992,8 +4995,8 @@ static ssize_t usb_controller_show(struct device *dev,
 	return snprintf(buf, PAGE_SIZE, "%s\n",
 			dwc3_revision(dwc));
 }
-+static DEVICE_ATTR_RO(usb_controller);
-+#endif
+static DEVICE_ATTR_RO(usb_controller);
+#endif
 
 static int dwc3_msm_interconnect_vote_populate(struct dwc3_msm *mdwc)
 {
@@ -5882,7 +5885,6 @@ static int dwc3_msm_probe(struct platform_device *pdev)
 	device_create_file(&pdev->dev, &dev_attr_bus_vote);
 #ifdef CONFIG_LGE_USB
 	device_create_file(&pdev->dev, &dev_attr_usb_controller);
-	dwc->usb_compliance_mode = &mdwc->usb_compliance_mode;
 #endif
 
 	return 0;

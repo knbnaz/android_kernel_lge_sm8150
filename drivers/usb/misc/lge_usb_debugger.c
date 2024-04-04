@@ -23,6 +23,7 @@
 #include <linux/gpio/consumer.h>
 #include <linux/platform_device.h>
 #include <linux/power_supply.h>
+#include <linux/qti_power_supply.h>
 #include <linux/workqueue.h>
 
 #ifdef CONFIG_LGE_USB_SBU_SWITCH
@@ -60,12 +61,12 @@ static void lge_usb_debugger_work(struct work_struct *w)
 #endif
 
 	switch (dbg->typec_mode) {
-	case POWER_SUPPLY_TYPEC_SINK_DEBUG_ACCESSORY:
+	case QTI_POWER_SUPPLY_TYPEC_SINK_DEBUG_ACCESSORY:
 #if defined(CONFIG_LGE_USB_FACTORY) && defined(CONFIG_LGE_PM_VENEER_PSY)
 		if(!power_supply_set_property(dbg->usb_psy,
-			POWER_SUPPLY_PROP_RESISTANCE, &val)
+			POWER_SUPPLY_PROP_EXT_RESISTANCE, &val)
 		  &&! power_supply_get_property(dbg->usb_psy,
-			POWER_SUPPLY_PROP_RESISTANCE_ID, &val)){
+			POWER_SUPPLY_PROP_EXT_RESISTANCE_ID, &val)){
 			switch (val.intval / 1000) {
 			case 56:
 			case 130:
@@ -88,7 +89,7 @@ static void lge_usb_debugger_work(struct work_struct *w)
 		dev_info(dbg->dev, "UART ON\n");
 		break;
 
-	case POWER_SUPPLY_TYPEC_NONE:
+	case QTI_POWER_SUPPLY_TYPEC_NONE:
 	default:
 		msm_geni_serial_set_uart_console(0);
 		msm_geni_serial_set_uart_console_status(0);
@@ -115,7 +116,7 @@ static int psy_changed(struct notifier_block *nb, unsigned long evt, void *ptr)
 		return 0;
 
 	ret = power_supply_get_property(dbg->usb_psy,
-					POWER_SUPPLY_PROP_TYPEC_MODE, &val);
+					POWER_SUPPLY_PROP_EXT_TYPEC_MODE, &val);
 	if (ret) {
 		dev_err(dbg->dev, "Unable to read USB TYPEC_MODE: %d\n", ret);
 		return ret;
@@ -131,11 +132,11 @@ static int psy_changed(struct notifier_block *nb, unsigned long evt, void *ptr)
 	dbg->typec_mode = typec_mode;
 
 	switch (typec_mode) {
-	case POWER_SUPPLY_TYPEC_SINK_DEBUG_ACCESSORY:
+	case QTI_POWER_SUPPLY_TYPEC_SINK_DEBUG_ACCESSORY:
 		schedule_work(&dbg->work);
 		break;
 
-	case POWER_SUPPLY_TYPEC_NONE:
+	case QTI_POWER_SUPPLY_TYPEC_NONE:
 	default:
 		if (debug_accessory_status)
 			schedule_work(&dbg->work);
@@ -195,7 +196,7 @@ static int lge_usb_debugger_probe(struct platform_device *pdev)
 	/* force read initial power_supply values */
 	psy_changed(&dbg->psy_nb, PSY_EVENT_PROP_CHANGED, dbg->usb_psy);
 
-	if (dbg->typec_mode != POWER_SUPPLY_TYPEC_SINK_DEBUG_ACCESSORY) {
+	if (dbg->typec_mode != QTI_POWER_SUPPLY_TYPEC_SINK_DEBUG_ACCESSORY) {
 		msm_geni_serial_set_uart_console(0);
 		msm_geni_serial_set_uart_console_status(0);
 	}

@@ -23,6 +23,7 @@
 #include <linux/kernel.h>
 #include <linux/interrupt.h>
 #include <linux/gpio/consumer.h>
+#include <linux/pinctrl/consumer.h>
 #include <linux/platform_device.h>
 
 #include <linux/usb/lge_sbu_switch.h>

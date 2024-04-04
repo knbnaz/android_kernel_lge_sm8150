@@ -20,6 +20,7 @@
 #include <soc/qcom/restart.h>
 #include <linux/delay.h>
 #include <linux/power_supply.h>
+#include <linux/qti_power_supply.h>
 #endif
 
 #ifdef CONFIG_USB_CONFIGFS_UEVENT
@@ -1592,7 +1593,7 @@ static int lge_get_cable_type(void)
 	}
 
 	ret = power_supply_get_property(psy,
-			POWER_SUPPLY_PROP_RESISTANCE_ID, &val);
+			POWER_SUPPLY_PROP_EXT_RESISTANCE_ID, &val);
 	if (ret) {
 		pr_err("%s: Unable to read USB RESISTANCE ID: %d\n", __func__, ret);
 		return ret;
@@ -1627,7 +1628,7 @@ static bool lge_get_cc_type_debug_accessory(void)
 	}
 
 	ret = power_supply_get_property(psy,
-			POWER_SUPPLY_PROP_TYPEC_MODE, &val);
+			POWER_SUPPLY_PROP_EXT_TYPEC_MODE, &val);
 	if (ret) {
 		pr_err("%s: Unable to read USB TYPEC_MODE: %d\n", __func__, ret);
 		return true;
@@ -1638,7 +1639,7 @@ static bool lge_get_cc_type_debug_accessory(void)
 	if (psy)
 		power_supply_put(psy);
 
-	if (val.intval == POWER_SUPPLY_TYPEC_SINK_DEBUG_ACCESSORY)
+	if (val.intval == QTI_POWER_SUPPLY_TYPEC_SINK_DEBUG_ACCESSORY)
 		return true;
 
 	return false;
