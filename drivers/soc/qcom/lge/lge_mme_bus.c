@@ -34,6 +34,7 @@
 #include <soc/qcom/socinfo.h>
 #include <linux/delay.h>
 #include <linux/compat.h>
+#include <linux/of.h>
 
 #include <linux/sched/core_ctl.h>
 #include <linux/pm_qos.h>
