@@ -136,6 +136,7 @@ typedef enum eMgmtFrmDropReason {
 	eMGMT_DROP_EXCESSIVE_MGMT_FRAME,
 } tMgmtFrmDropReason;
 
+#ifdef WLAN_FEATURE_11W
 /**
  * is_mgmt_protected  -  check RMF enabled for the peer
  * @vdev_id: vdev id
@@ -144,6 +145,7 @@ typedef enum eMgmtFrmDropReason {
  * Return: True if RMF enabled and key is installed
  */
 bool is_mgmt_protected(uint32_t vdev_id, const uint8_t *peer_mac_addr);
+#endif
 
 /**
  * Function to initialize LIM state machines.

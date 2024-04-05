@@ -4993,6 +4993,7 @@ returnAfterError:
 	return status_code;
 }
 
+#ifdef WLAN_FEATURE_11W
 static bool
 lim_is_self_and_peer_ocv_capable(struct mac_context *mac,
 				 uint8_t *peer,
@@ -5046,7 +5047,6 @@ lim_fill_oci_params(struct mac_context *mac, struct pe_session *session,
 	oci->present = 1;
 }
 
-#ifdef WLAN_FEATURE_11W
 /**
  * \brief Send SA query request action frame to peer
  *

@@ -353,7 +353,7 @@ wma_roam_pmkid_request_event_handler(void *handle,
 	return 0;
 }
 
-static void
+static inline void
 wma_report_real_time_roam_stats(struct wlan_objmgr_psoc *psoc,
 				uint8_t vdev_id,
 				enum roam_rt_stats_type events,

@@ -690,7 +690,11 @@ struct pe_session *pe_create_session(struct mac_context *mac,
 		session_ptr->is_session_obss_color_collision_det_enabled =
 			mac->mlme_cfg->obss_ht40.bss_color_collision_det_sta;
 	pe_init_fils_info(session_ptr);
+#ifdef WLAN_FEATURE_11W
 	pe_init_pmf_comeback_timer(mac, session_ptr);
+#else
+	pe_init_pmf_comeback_timer(mac, session_ptr, vdev_id);
+#endif
 	session_ptr->ht_client_cnt = 0;
 	/* following is invalid value since seq number is 12 bit */
 	session_ptr->prev_auth_seq_num = 0xFFFF;

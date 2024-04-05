@@ -1423,6 +1423,7 @@ static void lim_update_sta_ds_op_classes(tpSirAssocReq assoc_req,
 		     sizeof(tDot11fIESuppOperatingClasses));
 }
 
+#ifdef WLAN_FEATURE_11W
 static bool lim_is_ocv_enable_in_assoc_req(struct mac_context *mac_ctx,
 					   struct sSirAssocReq *assoc_req)
 {
@@ -1445,6 +1446,7 @@ static bool lim_is_ocv_enable_in_assoc_req(struct mac_context *mac_ctx,
 
 	return false;
 }
+#endif
 
 /**
  * lim_update_sta_ds() - updates ds dph entry

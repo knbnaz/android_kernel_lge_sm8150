@@ -2486,6 +2486,7 @@ uint8_t csr_construct_rsn_ie(struct mac_context *mac, uint32_t sessionId,
 	}
 	self_rsn_cap = (uint16_t)rsn_val;
 
+#ifdef WLAN_FEATURE_11W
 	/* If AP is capable then use self capability else set PMF as 0 */
 	if (rsn_cap & WLAN_CRYPTO_RSN_CAP_MFP_ENABLED &&
 	    pProfile->MFPCapable) {
@@ -2494,10 +2495,13 @@ uint8_t csr_construct_rsn_ie(struct mac_context *mac, uint32_t sessionId,
 			self_rsn_cap |= WLAN_CRYPTO_RSN_CAP_MFP_REQUIRED;
 
 	} else {
+#endif
 		self_rsn_cap &= ~WLAN_CRYPTO_RSN_CAP_MFP_ENABLED;
 		self_rsn_cap &= ~WLAN_CRYPTO_RSN_CAP_MFP_REQUIRED;
 		self_rsn_cap &= ~WLAN_CRYPTO_RSN_CAP_OCV_SUPPORTED;
+#ifdef WLAN_FEATURE_11W
 	}
+#endif
 	wlan_crypto_set_vdev_param(vdev, WLAN_CRYPTO_PARAM_RSN_CAP,
 				   self_rsn_cap);
 	qdf_mem_zero(&pmksa, sizeof(pmksa));
