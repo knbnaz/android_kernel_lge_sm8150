@@ -92,23 +92,7 @@ ifeq ($(CONFIG_QCA_WIFI_SDIO), y)
 	CONFIG_ROME_IF = sdio
 endif
 
-ifeq ($(CONFIG_ICNSS), m)
-	CONFIG_ICNSS_MODULE := y
-endif
-ifeq ($(CONFIG_CNSS), m)
-	CONFIG_CNSS_MODULE := y
-endif
-ifeq ($(CONFIG_CNSS2), m)
-	CONFIG_CNSS2_MODULE := y
-endif
-ifeq ($(CONFIG_ICNSS2), m)
-	CONFIG_ICNSS2_MODULE := y
-endif
-ifeq ($(CONFIG_CNSS_GENL), m)
-	CONFIG_CNSS_GENL_MODULE := y
-endif
-
-ifeq (y,$(findstring y,$(CONFIG_ICNSS) $(CONFIG_ICNSS_MODULE)))
+ifdef CONFIG_ICNSS
 	CONFIG_ROME_IF = snoc
 	CONFIG_QCA_WIFI_SDIO := n
 	CONFIG_PLD_SNOC_ICNSS_FLAG := y
@@ -119,7 +103,7 @@ ifeq ($(CONFIG_CNSS_QCA6750), y)
 	CONFIG_ROME_IF = ipci
 	CONFIG_PLD_IPCI_ICNSS_FLAG := y
 endif
-else ifeq (y,$(findstring y,$(CONFIG_ICNSS2) $(CONFIG_ICNSS2_MODULE)))
+ifdef CONFIG_ICNSS2
 	CONFIG_ROME_IF = snoc
 	CONFIG_QCA_WIFI_SDIO := n
 	CONFIG_ICNSS2_HELIUM := y
@@ -131,7 +115,7 @@ ifdef CONFIG_IPCIE_FW_SIM
 	CONFIG_PLD_IPCI_ICNSS_FLAG := n
 endif
 
-ifeq (y,$(findstring y,$(CONFIG_CNSS) $(CONFIG_CNSS_MODULE) $(CONFIG_CNSS2) $(CONFIG_CNSS2_MODULE)))
+ifeq (y,$(findstring y,$(CONFIG_CNSS) $(CONFIG_CNSS2)))
 ifndef CONFIG_ROME_IF
 	#use pci as default interface
 ifndef CONFIG_IPCIE_FW_SIM
@@ -143,7 +127,7 @@ endif
 # Make WLAN as open-source driver by default
 WLAN_OPEN_SOURCE := y
 
-ifeq (y,$(findstring y,$(CONFIG_ICNSS) $(CONFIG_ICNSS_MODULE) $(CONFIG_ICNSS2_HELIUM)))
+ifeq ($(CONFIG_ICNSS), y)
 	CONFIG_HELIUMPLUS := y
 	CONFIG_64BIT_PADDR := y
 	CONFIG_FEATURE_TSO := y
@@ -333,9 +317,8 @@ CONFIG_FEATURE_MSCS := y
 #Flag to enable FILS Feature (11ai)
 CONFIG_WLAN_FEATURE_FILS := y
 ifneq ($(CONFIG_QCA_CLD_WLAN),)
-	ifeq (y,$(findstring y,$(CONFIG_CNSS) $(CONFIG_CNSS_MODULE) $(CONFIG_CNSS2) \
-			$(CONFIG_CNSS2_MODULE) $(CONFIG_ICNSS) $(CONFIG_ICNSS_MODULE) \
-			$(CONFIG_ICNSS2) $(CONFIG_ICNSS2_MODULE)))
+	ifeq (y,$(findstring y,$(CONFIG_CNSS) $(CONFIG_CNSS2) \
+			$(CONFIG_ICNSS) $(CONFIG_ICNSS2)))
 	#Flag to enable Protected Management Frames (11w) feature
 	CONFIG_WLAN_FEATURE_11W := y
 	#Flag to enable LTE CoEx feature
@@ -464,7 +447,7 @@ endif
 #Whether have QMI support
 CONFIG_QMI_SUPPORT := y
 
-ifeq (y,$(findstring y,$(CONFIG_ICNSS) $(CONFIG_ICNSS_MODULE) $(CONFIG_ICNSS2_HELIUM)))
+ifeq ($(CONFIG_ICNSS), y)
 CONFIG_WIFI_3_0_ADRASTEA := y
 CONFIG_ADRASTEA_RRI_ON_DDR := y
 # Enable athdiag procfs debug support for adrastea
@@ -1011,7 +994,7 @@ CONFIG_WLAN_FEATURE_BIG_DATA_STATS := y
 CONFIG_WLAN_FEATURE_IGMP_OFFLOAD := y
 CONFIG_WLAN_FEATURE_GET_USABLE_CHAN_LIST := y
 
-ifeq (y,$(findstring y,$(CONFIG_LITHIUM) $(CONFIG_ICNSS) $(CONFIG_ICNSS_MODULE) $(CONFIG_ICNSS2_HELIUM)))
+ifeq (y,$(findstring y,$(CONFIG_LITHIUM) $(CONFIG_ICNSS)))
 CONFIG_WLAN_FEATURE_BMI := n
 else
 CONFIG_WLAN_FEATURE_BMI := y
@@ -1128,7 +1111,7 @@ ifneq ($(TARGET_BUILD_VARIANT),user)
 CONFIG_DESC_DUP_DETECT_DEBUG := y
 endif
 
-ifeq (y,$(findstring y,$(CONFIG_CNSS) $(CONFIG_CNSS_MODULE)))
+ifeq ($(CONFIG_CNSS), y)
 ifeq ($(CONFIG_CNSS_SDIO), y)
 CONFIG_PLD_SDIO_CNSS_FLAG := y
 endif
@@ -1137,7 +1120,7 @@ CONFIG_PLD_PCIE_CNSS_FLAG := y
 endif
 endif
 
-ifeq (y,$(findstring y,$(CONFIG_CNSS2) $(CONFIG_CNSS2_MODULE)))
+ifeq ($(CONFIG_CNSS2), y)
 ifeq ($(CONFIG_HIF_PCI), y)
 CONFIG_PLD_PCIE_CNSS_FLAG := y
 CONFIG_PLD_PCIE_INIT_FLAG := y
