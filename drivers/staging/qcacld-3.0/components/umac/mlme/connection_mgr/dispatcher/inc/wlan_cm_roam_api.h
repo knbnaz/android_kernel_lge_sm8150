@@ -853,6 +853,7 @@ wlan_cm_roam_get_ho_delay_config(struct wlan_objmgr_psoc *psoc)
 	return 0;
 }
 
+#if !defined(WLAN_FEATURE_HOST_ROAM)
 static inline uint8_t
 wlan_cm_get_exclude_rm_partial_scan_freq(struct wlan_objmgr_psoc *psoc)
 {
@@ -864,6 +865,7 @@ wlan_cm_roam_get_full_scan_6ghz_on_disc(struct wlan_objmgr_psoc *psoc)
 {
 	return 0;
 }
+#endif
 
 static inline uint8_t
 wlan_cm_get_roam_scan_high_rssi_offset(struct wlan_objmgr_psoc *psoc)

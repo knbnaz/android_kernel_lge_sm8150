@@ -425,7 +425,7 @@ csr_roam_pmkid_req_callback(uint8_t vdev_id,
 	return QDF_STATUS_E_NOSUPPORT;
 }
 
-QDF_STATUS
+static inline QDF_STATUS
 csr_roam_candidate_event_handle_callback(struct mac_context *mac_ctx,
 					 uint8_t *frame, uint32_t len)
 {
