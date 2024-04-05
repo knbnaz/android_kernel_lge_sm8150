@@ -279,6 +279,25 @@ void cld80211_oem_send_reply(struct sk_buff *msg, void *hdr,
 				CLD80211_MCGRP_OEM_MSGS, flags);
 }
 
+/**
+ * nl80211hdr_put() - API to allocate skb for cld80211 msg
+ * @hdr: nl80211hdr pointer
+ * @portid: Port ID
+ * @nest: pointer of vendor nested attribute
+ * @flags: Flags
+ *
+ * API to allocate skb for cld80211 msg
+ *
+ * Return: Pointer to skbuff
+ */
+static inline void *nl80211hdr_put(struct sk_buff *skb, uint32_t portid,
+		     uint32_t seq, int flags, uint8_t cmd)
+{
+	struct genl_family *cld80211_fam = cld80211_get_genl_family();
+
+	return genlmsg_put(skb, portid, seq, cld80211_fam, flags, cmd);
+}
+
 struct sk_buff *
 cld80211_oem_rsp_alloc_skb(uint32_t portid, void **hdr, struct nlattr **nest,
 			   int *flags)
@@ -341,13 +360,7 @@ int nl_srv_unregister(tWlanNlModTypes msg_type, nl_srv_msg_callback msg_handler)
 	return 0;
 }
 
-void *nl80211hdr_put(struct sk_buff *skb, uint32_t portid,
-		     uint32_t seq, int flags, uint8_t cmd)
-{
-	struct genl_family *cld80211_fam = cld80211_get_genl_family();
 
-	return genlmsg_put(skb, portid, seq, cld80211_fam, flags, cmd);
-}
 
 /**
  * cld80211_fill_data() - API to fill payload to nl message
