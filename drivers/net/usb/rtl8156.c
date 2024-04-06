@@ -12082,14 +12082,6 @@ static struct attribute_group rtk_attr_grp = {
 
 #endif
 
-#ifdef CONFIG_LGE_USB
-extern void otg_vbus_off(void);
-#endif
-#ifdef CONFIG_LGE_PM
-extern bool wa_connected_port_forwarding(void);
-extern void wa_update_port_forwarding(bool connected);
-#endif
-
 static int rtl8152_probe(struct usb_interface *intf,
 			 const struct usb_device_id *id)
 {
@@ -12235,20 +12227,6 @@ static int rtl8152_probe(struct usb_interface *intf,
 #ifdef RTL8152_DEBUG
 	if (sysfs_create_group(&intf->dev.kobj, &rtk_attr_grp) < 0)
 		netif_err(tp, probe, netdev, "creat rtk_attr_grp fail\n");
-#endif
-
-#ifdef CONFIG_LGE_PM
-	wa_update_port_forwarding(TRUE);
-#endif
-
-#ifdef CONFIG_LGE_USB
-	if (wa_connected_port_forwarding()) {
-		otg_vbus_off();
-		printk("LGE_USB : otg_vbus_off.\n");
-	}
-	else {
-		printk("LGE_USB : otg_vbus_off is not executed.\n");
-	}
 #endif
 
 	return 0;
