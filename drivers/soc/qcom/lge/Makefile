@@ -1,7 +1,6 @@
 ccflags-y := -Iinclude/drm -Idrivers/gpu/drm/msm -Idrivers/soc/qcom/lge/power
 
 obj-$(CONFIG_MACH_LGE) += devices_lge.o
-obj-$(CONFIG_LGE_PM) += lge_gpio_debug.o
 obj-$(CONFIG_LGE_BOOTLOADER_LOG) += lge_bootloader_log.o
 obj-$(CONFIG_LGE_BOOTLOADER_TIME_CHECKER) += lge_bootloader_time_checker.o
 obj-$(CONFIG_LGE_HANDLE_PANIC) += lge_handle_panic.o

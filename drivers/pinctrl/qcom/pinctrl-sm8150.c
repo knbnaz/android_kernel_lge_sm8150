@@ -1603,17 +1603,6 @@ static int sm8150_pinctrl_gpio_irq_map_probe(struct platform_device *pdev)
 #ifdef CONFIG_LGE_PM
 static int *access_denied_list;
 static int access_denied_cnt;
-
-static bool msm_gpio_check_access(int gpio)
-{
-	int i = 0;
-
-	for (i = 0; i < access_denied_cnt; i++) {
-		if (access_denied_list[i] == gpio)
-			return false;
-	}
-	return true;
-}
 #endif
 
 static int sm8150_pinctrl_dirconn_list_probe(struct platform_device *pdev)
