@@ -766,7 +766,7 @@ VibeStatus I2CWriteData(unsigned char address, VibeUInt16 nBufferSizeInBytes, Vi
 {
     unsigned char buf1[I2C_BUF_MAX];
     int buf_remain_size = nBufferSizeInBytes % I2C_BUF_MAX + 2;
-    unsigned char *buf2 = NULL;
+    unsigned char buf2[I2C_BUF_MAX];
 
     if (!dw7800.i2c)
         return VIBE_E_FAIL;
