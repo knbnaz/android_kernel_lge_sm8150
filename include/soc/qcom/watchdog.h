@@ -151,6 +151,9 @@ struct msm_watchdog_data {
 	atomic_t irq_counts_running;
 	struct timer_list user_pet_timer;
 	unsigned int cpu_scandump_sizes[NR_CPUS];
+#ifdef CONFIG_LGE_HANDLE_PANIC
+	unsigned long long alive_time[NR_CPUS];
+#endif
 };
 
 extern void qcom_wdt_trigger_bite(void);
