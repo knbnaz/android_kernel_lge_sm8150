@@ -397,7 +397,7 @@ static void lge_pon_backup_func(struct work_struct *w)
 	}
 	rtc_read_time(rtc, &rtc_tm);
 	now_time = rtc_tm_to_time64(&rtc_tm);
-	time = timespec_to_timespec64(__current_kernel_time());
+	ktime_get_coarse_real_ts64(&time);
 
 	for (i = 0; i < count; i++) {
 		now_data = &now_pon->data[i];
