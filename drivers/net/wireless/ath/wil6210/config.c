@@ -128,7 +128,9 @@ struct wil_config_file_entry {
 
 #define WIL_CONFIG_TT_NAME "thermal_throttling"
 
+#if defined(CONFIG_WIL6210_DEBUGFS)
 #define WIL_CONFIG_LED_BLINK_NAME "led_blink"
+#endif
 
 #define WIL_CONFIG_VR_PROFILE_NAME "vr_profile"
 
@@ -150,8 +152,10 @@ static int wil_ftm_offset_handler(struct wil6210_priv *wil, const char *buf,
 				  size_t count);
 static int wil_tt_handler(struct wil6210_priv *wil, const char *buf,
 			  size_t count);
+#if defined(CONFIG_WIL6210_DEBUGFS)
 static int wil_led_blink_handler(struct wil6210_priv *wil, const char *buf,
 				 size_t count);
+#endif
 
 static struct wil_config_entry config_table[] = {
 	WIL_CONFIG_INI_PARAM(WIL_CONFIG_COUNTRY_BOARD_FILE_NAME,
@@ -292,8 +296,10 @@ static struct wil_config_entry config_table[] = {
 					  wil_ftm_offset_handler),
 	WIL_CONFIG_INI_PARAM_WITH_HANDLER(WIL_CONFIG_TT_NAME,
 					  wil_tt_handler),
+#if defined(CONFIG_WIL6210_DEBUGFS)
 	WIL_CONFIG_INI_PARAM_WITH_HANDLER(WIL_CONFIG_LED_BLINK_NAME,
 					  wil_led_blink_handler),
+#endif
 	WIL_CONFIG_INI_PARAM(WIL_CONFIG_LED_ID_NAME,
 			     wil_ini_param_type_unsigned, &led_id, 0,
 			     sizeof(led_id), WIL_CONFIG_LED_ID_MIN,
@@ -733,9 +739,11 @@ static int wil_tt_handler(struct wil6210_priv *wil, const char *buf,
 	return wil_tt_set(wil, buf, count);
 }
 
+#if defined(CONFIG_WIL6210_DEBUGFS)
 static int wil_led_blink_handler(struct wil6210_priv *wil, const char *buf,
 				 size_t count)
 {
 	return wil_led_blink_set(wil, buf);
 }
+#endif
 

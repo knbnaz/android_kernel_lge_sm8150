@@ -1419,7 +1419,9 @@ int wil_tt_set(struct wil6210_priv *wil, const char *buf,
 	       size_t count);
 int wil_qos_weights_set(struct wil6210_priv *wil, const char *buf,
 			size_t count);
+#if defined(CONFIG_WIL6210_DEBUGFS)
 int wil_led_blink_set(struct wil6210_priv *wil, const char *buf);
+#endif
 
 int wil_cid_fill_sinfo(struct wil6210_vif *vif, int cid,
 		       struct station_info *sinfo);
