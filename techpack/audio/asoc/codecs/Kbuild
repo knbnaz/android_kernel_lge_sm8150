@@ -311,6 +311,9 @@ wcd_cpe_dlkm-y := $(WCD_CPE_OBJS)
 obj-$(CONFIG_SND_SOC_WCD_SPI) += wcd_spi_dlkm.o
 wcd_spi_dlkm-y := $(SPI_OBJS)
 
+obj-$(CONFIG_SND_SOC_ES9218P) += es9218_dlkm.o
+es9218_dlkm-y := $(ES9218_OBJS)
+
 obj-$(CONFIG_SND_SOC_WCD_MBHC) += mbhc_dlkm.o
 mbhc_dlkm-y := $(MBHC_OBJS)
 
