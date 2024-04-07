@@ -1534,7 +1534,15 @@ void mmc_set_data_timeout(struct mmc_data *data, const struct mmc_card *card)
 			 */
 			limit_us = 3000000;
 		else
+#ifdef CONFIG_MACH_LGE
+			/* LGE_CHANGE, 2015-09-23, Although we already applied enough time,
+			 * timeout-error occurs until now with several-ultimate-crappy-memory.
+			 * So, we give more time than before.
+			 */
+			limit_us = 300000;
+#else
 			limit_us = 100000;
+#endif
 
 		/*
 		 * SDHC cards always use these fixed values.
@@ -2230,7 +2238,13 @@ void mmc_power_up(struct mmc_host *host, u32 ocr)
 	 * This delay must be at least 74 clock sizes, or 1 ms, or the
 	 * time required to reach a stable voltage.
 	 */
+#ifdef CONFIG_MACH_LGE
+	/* LGE_CHANGE, 2015-09-23, Augmenting delay-time for some crappy card.
+	 */
+	mmc_delay(20);
+#else
 	mmc_delay(host->ios.power_delay_ms);
+#endif
 }
 
 void mmc_power_off(struct mmc_host *host)
@@ -2341,6 +2355,9 @@ void mmc_detach_bus(struct mmc_host *host)
 	mmc_bus_put(host);
 }
 
+#ifdef CONFIG_MACH_LGE
+unsigned int is_damaged_sd = 0;
+#endif
 void _mmc_detect_change(struct mmc_host *host, unsigned long delay, bool cd_irq)
 {
 	/*
@@ -2351,8 +2368,18 @@ void _mmc_detect_change(struct mmc_host *host, unsigned long delay, bool cd_irq)
 		device_can_wakeup(mmc_dev(host)))
 		pm_wakeup_event(mmc_dev(host), 5000);
 
+#ifdef CONFIG_MACH_LGE
+	if ( !(host->caps & MMC_CAP_NONREMOVABLE) && is_damaged_sd)
+		goto skip_detect;
+#endif
+
 	host->detect_change = 1;
 	mmc_schedule_delayed_work(&host->detect, delay);
+
+#ifdef CONFIG_MACH_LGE
+skip_detect:
+	return;
+#endif
 }
 
 /**
@@ -3158,6 +3185,9 @@ void mmc_rescan(struct work_struct *work)
 	struct mmc_host *host =
 		container_of(work, struct mmc_host, detect.work);
 	int i;
+#ifdef CONFIG_MACH_LGE
+	int err = 0;
+#endif
 
 	if (host->rescan_disable)
 		return;
@@ -3215,7 +3245,12 @@ void mmc_rescan(struct work_struct *work)
 	}
 
 	for (i = 0; i < ARRAY_SIZE(freqs); i++) {
+#ifdef CONFIG_MACH_LGE
+		/* keep last error */
+		if (!(err = mmc_rescan_try_freq(host, max(freqs[i], host->f_min))))
+#else
 		if (!mmc_rescan_try_freq(host, max(freqs[i], host->f_min)))
+#endif
 			break;
 		if (freqs[i] <= host->f_min)
 			break;
@@ -3225,7 +3260,14 @@ void mmc_rescan(struct work_struct *work)
 #endif
 	mmc_release_host(host);
 
- out:
+#ifdef CONFIG_MACH_LGE
+	if (err == -EIO && !(host->caps & MMC_CAP_NONREMOVABLE))
+	{
+		printk(KERN_INFO "[LGE][MMC][%-18s( )] mmc%d: SDcard is damaged or not exists\n", __func__, host->index);
+		is_damaged_sd = 1;
+	}
+#endif
+out:
 	if (host->caps & MMC_CAP_NEEDS_POLL)
 		mmc_schedule_delayed_work(&host->detect, HZ);
 }
