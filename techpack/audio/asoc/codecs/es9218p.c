@@ -3446,19 +3446,19 @@ static  int es9218_codec_probe(struct snd_soc_component *component)
     else
         pr_err("%s(): fail !!!!!!!!!!\n", __func__);
 
-    component->control_data = snd_soc_component_get_drvdata(component);
-	wakeup_source_init(&wl_sleep, "sleep_lock");
-	wakeup_source_init(&wl_shutdown, "shutdown_lock");
-    es9218_set_bias_level(codec, SND_SOC_BIAS_STANDBY);
+	wakeup_source_create("sleep_lock");
+	wakeup_source_add(&wl_sleep);
+	wakeup_source_create("shutdown_lock");
+	wakeup_source_add(&wl_shutdown);
+    es9218_set_bias_level(component, SND_SOC_BIAS_STANDBY);
 
     pr_notice("%s(): exit \n", __func__);
     return 0;
 }
 
-static int  es9218_codec_remove(struct snd_soc_component *component)
+static void  es9218_codec_remove(struct snd_soc_component *component)
 {
-    es9218_set_bias_level(codec, SND_SOC_BIAS_OFF);
-    return 0;
+    es9218_set_bias_level(component, SND_SOC_BIAS_OFF);
 }
 
 static struct snd_soc_component_driver soc_codec_dev_es9218 = {
