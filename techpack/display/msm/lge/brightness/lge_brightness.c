@@ -341,6 +341,20 @@ static int lge_mipi_dsi_dcs_set_display_brightness_extension_short(struct dsi_pa
 	return rc;
 }
 
+static int mipi_dsi_dcs_set_display_brightness_short(struct mipi_dsi_device *dsi,
+					u16 brightness)
+{
+	u8 payload[1] = { brightness & 0xff };
+	ssize_t err;
+
+	err = mipi_dsi_dcs_write(dsi, MIPI_DCS_SET_DISPLAY_BRIGHTNESS,
+				 payload, sizeof(payload));
+	if (err < 0)
+		return err;
+
+	return 0;
+}
+
 /* @Override */
 int dsi_panel_update_backlight(struct dsi_panel *panel,
 	u32 bl_lvl)
