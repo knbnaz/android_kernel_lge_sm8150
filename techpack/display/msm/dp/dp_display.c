@@ -4281,10 +4281,12 @@ bool is_dp_connected()
 	struct dp_display_private *dp;
 	int i;
 
-	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++)
+	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++) {
 		dp_display[i] = *g_dp_display[i];
 
-	dp = container_of(dp_display, struct dp_display_private, dp_display);
+		dp[i] = container_of(dp_display[i], struct dp_display_private, dp_display);
+	}
+
 	return dp->hpd->hpd_high;
 }
 EXPORT_SYMBOL(is_dp_connected);
@@ -4298,10 +4300,12 @@ bool is_dd_connected()
 	bool ret;
 	int i;
 
-	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++)
+	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++) {
 		dp_display[i] = *g_dp_display[i];
 
-	dp = container_of(dp_display, struct dp_display_private, dp_display);
+		dp[i] = container_of(dp_display[i], struct dp_display_private, dp_display);
+	}
+
 	if (IS_ERR_OR_NULL(dp) || IS_ERR_OR_NULL(dp->dd_hpd)) {
 		pr_err("DD hpd is not initialized yet\n");
 		ret = false;
@@ -4320,10 +4324,12 @@ bool is_dd_display_recovery_working()
 	bool ret;
 	int i;
 
-	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++)
+	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++) {
 		dp_display[i] = *g_dp_display[i];
 
-	dp = container_of(dp_display, struct dp_display_private, dp_display);
+		dp[i] = container_of(dp_display[i], struct dp_display_private, dp_display);
+	}
+
 	if (IS_ERR_OR_NULL(dp) || IS_ERR_OR_NULL(dp->dd_hpd)) {
 		pr_err("not init. yet\n");
 		ret = false;
@@ -4342,10 +4348,12 @@ bool is_dd_powermode()
 	bool ret;
 	int i;
 
-	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++)
+	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++) {
 		dp_display[i] = *g_dp_display[i];
 
-	dp = container_of(dp_display, struct dp_display_private, dp_display);
+		dp[i] = container_of(dp_display[i], struct dp_display_private, dp_display);
+	}
+
 	if (IS_ERR_OR_NULL(dp)) {
 		pr_err("DD not init. yet\n");
 		ret = false;
@@ -4482,13 +4490,15 @@ int dp_display_external_block(struct lge_dp_display *lge_dp, int block)
 	struct dp_display_private *dp = NULL;
 	int i;
 
-	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++)
+	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++) {
 		if (!g_dp_display[i] || !lge_dp) {
 			pr_debug("dp display not initialized\n");
 			return -EINVAL;
 		}
 
-	dp = container_of(g_dp_display, struct dp_display_private, dp_display);
+		dp[i] = *container_of(g_dp_display[i], struct dp_display_private, dp_display);
+	}
+
 	if (!dp || !dp_display_is_ready(dp)) {
 		pr_err("dp display not ready\n");
 		return -EINVAL;
@@ -4513,13 +4523,15 @@ int dp_display_send_id_event(struct lge_dp_display *lge_dp)
 	char *envp[2];
 	int i;
 
-	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++)
+	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++) {
 		if (!g_dp_display[i] || !lge_dp) {
-			pr_debug("invalid value\n");
+			pr_debug("dp display not initialized\n");
 			return -EINVAL;
 		}
 
-	dp = container_of(g_dp_display, struct dp_display_private, dp_display);
+		dp[i] = *container_of(g_dp_display[i], struct dp_display_private, dp_display);
+	}
+
 	if (!dp) {
 		pr_err("dp is nullptr\n");
 		return -EINVAL;
@@ -4678,9 +4690,10 @@ void send_hpd_event(void)
 		dp_display[i] = *g_dp_display[i];
 		if (dp_display[i] == NULL)
 			return;
+
+		dp[i] = container_of(dp_display[i], struct dp_display_private, dp_display);
 	}
 
-	dp = container_of(dp_display, struct dp_display_private, dp_display);
 	if (dp == NULL)
 		return;
 
