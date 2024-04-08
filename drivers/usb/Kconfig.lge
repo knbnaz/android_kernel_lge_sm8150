@@ -133,45 +133,6 @@ config LGE_USB_SBU_SWITCH
 	help
 	  Say y if this must be needed.
 
-config LGE_USB_MOISTURE_DETECTION
-	bool "Support moisture detection"
-	help
-	  Say y if this must be needed.
-
-if LGE_USB_MOISTURE_DETECTION
-
-choice
-	prompt "LGE USB Moisture Detector Version"
-	default LGE_USB_LGMD_LEGACY
-
-config LGE_USB_LGMD_LEGACY
-	bool "LGE USB Legacy Moisture Detector"
-	help
-	  Support legacy moisture deteator.
-endchoice
-
-config LGE_USB_MOISTURE_DETECTION_NO_UX
-	bool "Do not support UX when detecting moisture"
-	help
-	  Say y if this must be needed.
-
-config LGE_USB_MOISTURE_DETECTION_CHG
-	bool "Allows charging when moisture is detected"
-	help
-	  Say y if this must be needed.
-
-config LGE_USB_MOISTURE_DETECTION_USB_EN
-	bool "Allows USB when moisture is detected"
-	help
-	  Say y if this must be needed.
-
-config LGE_USB_MOISTURE_DETECTION_DEBUG
-	bool "Support debugging moisture detection"
-	help
-	  Say y if this must be needed.
-
-endif # LGE_USB_MOISTURE_DETECTION
-
 config LGE_USB_COMPLIANCE_TEST
 	bool "USB Compliance test"
 	help

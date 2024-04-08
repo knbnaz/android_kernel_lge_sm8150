@@ -7,6 +7,8 @@
 #include <linux/pmic-voter.h>
 #include <linux/power_supply.h>
 #include <linux/regulator/consumer.h>
+#include <linux/qti_power_supply.h>
+#include <dt-bindings/iio/qti_power_supply_iio.h>
 
 #include "../qcom/smb5-reg.h"
 #include "../qcom/smb5-lib.h"
@@ -71,7 +73,7 @@ static void wa_get_pmic_dump_func(struct work_struct *unused) {
 	}
 
 	power_supply_set_property(chg->batt_psy,
-			POWER_SUPPLY_PROP_DEBUG_BATTERY, &debug);
+			POWER_SUPPLY_PROP_EXT_DEBUG_BATTERY, &debug);
 }
 static DECLARE_WORK(wa_get_pmic_dump_work, wa_get_pmic_dump_func);
 
@@ -166,7 +168,7 @@ static void wa_detect_standard_hvdcp_main(struct work_struct *unused) {
 		return;
 	}
 
-	rc = smblib_dp_dm(chg, POWER_SUPPLY_DP_DM_FORCE_9V);
+	rc = smblib_dp_dm(chg, QTI_POWER_SUPPLY_DP_DM_FORCE_9V);
 	if (rc < 0) {
 		pr_wa("Couldn't force 9V rc=%d\n", rc);
 		return;
@@ -180,7 +182,7 @@ static void wa_detect_standard_hvdcp_main(struct work_struct *unused) {
 	}
 
 	pr_wa("Check standard hvdcp. %d mV\n", usb_vnow);
-	rc = smblib_dp_dm(chg, POWER_SUPPLY_DP_DM_FORCE_5V);
+	rc = smblib_dp_dm(chg, QTI_POWER_SUPPLY_DP_DM_FORCE_5V);
 	if (rc < 0) {
 		pr_wa("Couldn't force 5v rc=%d\n", rc);
 		return;
@@ -292,7 +294,7 @@ static bool wa_charging_without_cc_required(struct smb_charger *chg) {
 	pd_hard_reset = chg->pd_hard_reset;
 	usb_vbus_high = !power_supply_get_property(chg->usb_psy, POWER_SUPPLY_PROP_PRESENT, &val)
 		? !!val.intval : false;
-	typec_mode_none = chg->typec_mode == POWER_SUPPLY_TYPEC_NONE;
+	typec_mode_none = chg->typec_mode == QTI_POWER_SUPPLY_TYPEC_NONE;
 
 	wa_required = !pd_hard_reset && usb_vbus_high && typec_mode_none;
 	if (!wa_required)
@@ -338,8 +340,8 @@ void wa_charging_without_cc_trigger(struct smb_charger* chg, bool vbus) {
 		pr_wa("Call typec_removal by force\n");
 		extension_typec_src_removal(chg);
 
-		pval.intval = POWER_SUPPLY_TYPEC_PR_DUAL;
-		smblib_set_prop_typec_power_role(chg, &pval);
+		pval.intval = QTI_POWER_SUPPLY_TYPEC_PR_DUAL;
+		smblib_set_prop_typec_power_role(chg, pval.intval);
 	}
 }
 
@@ -379,16 +381,6 @@ static void wa_charging_for_unknown_cable_main(struct work_struct *unused) {
 	}
 	apsd_done = (stat & APSD_DTC_STATUS_DONE_BIT);
 
-	if (!(*chg->lpd_ux)) {
-		if (chg->lpd_reason == LPD_MOISTURE_DETECTED) {
-			if (*chg->lpd_dpdm_disable) {
-				floated.intval = POWER_SUPPLY_TYPE_USB_DCP;
-			} else {
-				floated.intval = POWER_SUPPLY_TYPE_USB;
-			}
-		}
-	}
-
 	rc = smblib_read(chg, TYPE_C_MISC_STATUS_REG, &stat);
 	if (rc < 0) {
 		pr_wa("Couldn't read TYPE_C_MISC_STATUS_REG rc=%d\n", rc);
@@ -399,8 +391,8 @@ static void wa_charging_for_unknown_cable_main(struct work_struct *unused) {
 	pd_hard_reset = chg->pd_hard_reset;
 	usb_type_unknown = chg->real_charger_type == POWER_SUPPLY_TYPE_UNKNOWN;
 	moisture_detected
-		= !power_supply_get_property(chg->usb_psy, POWER_SUPPLY_PROP_MOISTURE_DETECTED, &val)
-		? (val.intval == POWER_SUPPLY_MOISTURE_DETECTED): false;
+		= !power_supply_get_property(chg->usb_psy, PSY_IIO_MOISTURE_DETECTED, &val)
+		? (val.intval == PSY_IIO_MOISTURE_DETECTED): false;
 	usb_vbus_high
 		= !power_supply_get_property(chg->usb_psy, POWER_SUPPLY_PROP_PRESENT, &val)
 		? true : false;
@@ -411,9 +403,6 @@ static void wa_charging_for_unknown_cable_main(struct work_struct *unused) {
 				&& usb_type_unknown
 				&& usb_vbus_high
 				&& !ok_to_pd;
-
-	if (*chg->lpd_ux)
-		workaround_required = workaround_required && !moisture_detected;
 
 	if (!workaround_required) {
 		pr_dbg_wa("check(!(pd_hard_reset:%d, MD:%d, typec_mode_sink:%d)"
@@ -442,7 +431,7 @@ static void wa_charging_for_unknown_cable_main(struct work_struct *unused) {
 		if (vbus_valid) {
 			pr_wa("Force setting cable as FLOAT if it is UNKNOWN after APSD\n");
 			power_supply_set_property(veneer,
-					POWER_SUPPLY_PROP_REAL_TYPE, &floated);
+					PSY_IIO_USB_REAL_TYPE, &floated);
 			power_supply_changed(veneer);
 		}
 		else {
@@ -736,7 +725,7 @@ void wa_charging_with_rd_trigger(struct smb_charger *chg) {
 	union power_supply_propval val = { 0, };
 	bool vbus = !power_supply_get_property(chg->usb_psy, POWER_SUPPLY_PROP_PRESENT, &val) ? !!val.intval : false;
 	bool non_src = (chg->sink_src_mode != SRC_MODE);
-	bool cc_sink = (chg->typec_mode == POWER_SUPPLY_TYPEC_SINK);
+	bool cc_sink = (chg->typec_mode == QTI_POWER_SUPPLY_TYPEC_SINK);
 
 	if (vbus && non_src && cc_sink) {
 		wa_charging_with_rd_running = true;
@@ -749,11 +738,11 @@ void wa_charging_with_rd_clear(struct smb_charger* chg) {
 	union power_supply_propval pval;
 
 	wa_charging_with_rd_running = false;
-	if (chg->typec_mode == POWER_SUPPLY_TYPEC_SINK ) {
+	if (chg->typec_mode == QTI_POWER_SUPPLY_TYPEC_SINK ) {
 		pr_wa("Set TYPEC_PR_DUAL for rd open charger \n");
-		pval.intval = POWER_SUPPLY_TYPEC_PR_DUAL;
+		pval.intval = QTI_POWER_SUPPLY_TYPEC_PR_DUAL;
 		// Clear cc status with Rd-open charger.
-		smblib_set_prop_typec_power_role(chg, &pval);
+		smblib_set_prop_typec_power_role(chg, pval.intval);
 	}
 }
 
@@ -925,7 +914,7 @@ static void wa_dcin_uv_aicl_func(struct work_struct *unused) {
 			pr_wa("'wireless_psy' is not ready\n");
 		} else {
 			power_supply_set_property(wireless_psy,
-				POWER_SUPPLY_PROP_INPUT_SUSPEND, &value);
+				POWER_SUPPLY_PROP_EXT_INPUT_SUSPEND, &value);
 			power_supply_put(wireless_psy);
 
 			schedule_delayed_work(&wa_clear_status_boot_dwork,
@@ -997,7 +986,7 @@ static void wa_recovery_vashdn_wireless_func(struct work_struct *unused) {
 			pr_wa("detection Vashdn wireless charging stop!\n");
 			val.intval = 2;
 			power_supply_set_property(wireless_psy,
-				POWER_SUPPLY_PROP_DEBUG_BATTERY, &val);
+				POWER_SUPPLY_PROP_EXT_DEBUG_BATTERY, &val);
 		}
 	}
 	power_supply_put(wireless_psy);
@@ -1099,7 +1088,7 @@ void wa_retry_vconn_enable_on_vconn_oc_clear(struct smb_charger* chg) {
 		return;
 
 	if(smblib_vconn_regulator_is_enabled(chg->vconn_vreg->rdev)
-			&& chg->typec_mode == POWER_SUPPLY_TYPEC_NONE
+			&& chg->typec_mode == QTI_POWER_SUPPLY_TYPEC_NONE
 			&& wa_vconn_attempts != 0) {
 		rc = override_vconn_regulator_disable(chg->vconn_vreg->rdev);
 		if (rc < 0) {
@@ -1119,10 +1108,10 @@ static bool wa_retry_ok_to_pd = false;
 void wa_retry_ok_to_pd_trigger(struct smb_charger* chg) {
 	bool is_usb = chg->real_charger_type == POWER_SUPPLY_TYPE_USB
 		|| chg->real_charger_type == POWER_SUPPLY_TYPE_USB_FLOAT;
-	bool is_high = chg->typec_mode == POWER_SUPPLY_TYPEC_SOURCE_HIGH;
+	bool is_high = chg->typec_mode == QTI_POWER_SUPPLY_TYPEC_SOURCE_HIGH;
 
 	if (!wa_retry_ok_to_pd && is_usb && is_high) {
-		chg->ok_to_pd = !(*chg->pd_disabled) && !chg->pd_not_supported;
+		chg->ok_to_pd = !chg->pd_disabled && !chg->pd_not_supported;
 		wa_retry_ok_to_pd = true;
 		pr_wa("retry ok_to_pd = %d\n", chg->ok_to_pd);
 		power_supply_changed(chg->usb_psy);
@@ -1193,7 +1182,7 @@ int wa_protect_overcharging(struct smb_charger* chg, int input_present)
 	stat = stat & BATTERY_CHARGER_STATUS_MASK;
 
 	if (!smblib_get_prop_from_bms(chg,
-			POWER_SUPPLY_PROP_VOLTAGE_MAX_DESIGN, &val)) {
+			POWER_SUPPLY_PROP_VOLTAGE_MAX_DESIGN, &val.intval)) {
 		upper_border = val.intval + chg->ext_chg.prot_overchg_ent_dischg_off;
 		lower_border = val.intval - chg->ext_chg.prot_overchg_rel_off;
 		if (stat == FULLON_CHARGE || stat == TAPER_CHARGE)
@@ -1201,7 +1190,7 @@ int wa_protect_overcharging(struct smb_charger* chg, int input_present)
 	}
 
 	if (!smblib_get_prop_from_bms(chg,
-			POWER_SUPPLY_PROP_VOLTAGE_NOW, &val))
+			POWER_SUPPLY_PROP_VOLTAGE_NOW, &val.intval))
 		batt_vol = val.intval;
 
 	if (batt_vol < lower_border) {
@@ -1236,21 +1225,17 @@ static bool wa_drop_vbus_on_eoc_running = false;
 void wa_drop_vbus_on_eoc_trigger(struct smb_charger* chg) {
 	union power_supply_propval val = { 0, };
 
-	smblib_get_prop_batt_charge_done(chg, &val);
+	smblib_get_prop_batt_charge_done(chg, &val.intval);
 	if (val.intval) {
 		if (chg->real_charger_type == POWER_SUPPLY_TYPE_USB_HVDCP) {
 			wa_drop_vbus_on_eoc_running = true;
 			pr_wa("Vbus is set to 5V on HVDCP2\n");
-			val.intval = POWER_SUPPLY_DP_DM_FORCE_5V;
-			power_supply_set_property(chg->batt_psy,
-				POWER_SUPPLY_PROP_DP_DM, &val);
+			val.intval = QTI_POWER_SUPPLY_DP_DM_FORCE_5V;
 		} else if (chg->real_charger_type == POWER_SUPPLY_TYPE_USB_HVDCP_3
 				&& chg->pulse_cnt) {
 			wa_drop_vbus_on_eoc_running = true;
 			pr_wa("Vbus is dropped on HVDCP3 (%d)\n", chg->pulse_cnt);
-			val.intval = POWER_SUPPLY_DP_DM_DM_PULSE;
-			power_supply_set_property(chg->batt_psy,
-				POWER_SUPPLY_PROP_DP_DM, &val);
+			val.intval = QTI_POWER_SUPPLY_DP_DM_DM_PULSE;
 		} else {
 			wa_drop_vbus_on_eoc_running = false;
 		}
@@ -1266,9 +1251,7 @@ void wa_drop_vbus_on_eoc_required(struct smb_charger* chg) {
 			&& chg->real_charger_type == POWER_SUPPLY_TYPE_USB_HVDCP_3
 			&& chg->pulse_cnt) {
 		pr_wa("Vbus is dropped on HVDCP3 (%d)\n", chg->pulse_cnt);
-		val.intval = POWER_SUPPLY_DP_DM_DM_PULSE;
-		power_supply_set_property(chg->batt_psy,
-			POWER_SUPPLY_PROP_DP_DM, &val);
+		val.intval = QTI_POWER_SUPPLY_DP_DM_DM_PULSE;
 	}
 }
 
@@ -1297,7 +1280,7 @@ void wa_disable_hvdcp_with_factory_trigger(struct smb_charger *chg) {
 
 	if (is_usb_configured && !disabled_hvdcp
 			&& chg->real_charger_type == POWER_SUPPLY_TYPE_USB_DCP
-			&& chg->typec_mode == POWER_SUPPLY_TYPEC_SINK_DEBUG_ACCESSORY) {
+			&& chg->typec_mode == QTI_POWER_SUPPLY_TYPEC_SINK_DEBUG_ACCESSORY) {
 		disabled_hvdcp = true;
 		smblib_hvdcp_detect_enable(chg, false);
 		pr_wa("APSD rerun\n");
@@ -1319,7 +1302,7 @@ void wa_disable_hvdcp_with_factory_clear(struct smb_charger *chg) {
 static bool wa_avoid_src_dbg_cable_running = false;
 void wa_avoid_src_dbg_cable_trigger(struct smb_charger* chg) {
 	int rc = 0;
-	if (chg->typec_mode == POWER_SUPPLY_TYPEC_SOURCE_DEBUG_ACCESSORY_DEFAULT) {
+	if (chg->typec_mode == QTI_POWER_SUPPLY_TYPEC_SOURCE_DEBUG_ACCESSORY_DEFAULT) {
 		rc = smblib_masked_write(chg, TYPE_C_DEBUG_ACCESS_SNK_CFG_REG, DAM_DIS_AICL_BIT, 0);
 		if (rc < 0) {
 			pr_wa("Couldn't write to TYPE_C_DEBUG_ACCESS_SNK_CFG_REG rc=%d\n", rc);
@@ -1363,21 +1346,21 @@ static void wa_recover_cc_status_func(struct work_struct *unused) {
 		return;
 	}
 
-	if (chg->typec_mode != POWER_SUPPLY_TYPEC_SINK) {
+	if (chg->typec_mode != QTI_POWER_SUPPLY_TYPEC_SINK) {
 		pr_wa("Stop to recover cc status, because it isn't rd-open\n");
 		wa_recover_cc_attempts = 0;
 		return;
 	}
 
 	pr_wa("Recover CC status by factory cable's error\n");
-	pval.intval = POWER_SUPPLY_TYPEC_PR_NONE;
+	pval.intval = QTI_POWER_SUPPLY_TYPEC_PR_NONE;
 	// Clear cc status with Rd-open charger.
-	smblib_set_prop_typec_power_role(chg, &pval);
+	smblib_set_prop_typec_power_role(chg, pval.intval);
 	msleep(10);
 
-	pval.intval = POWER_SUPPLY_TYPEC_PR_DUAL;
+	pval.intval = QTI_POWER_SUPPLY_TYPEC_PR_DUAL;
 	// Clear cc status with Rd-open charger.
-	smblib_set_prop_typec_power_role(chg, &pval);
+	smblib_set_prop_typec_power_role(chg, pval.intval);
 
 	if (wa_recover_cc_attempts < MAX_RECOVER_CC_ATTEMPTS) {
 		schedule_delayed_work(&wa_recover_cc_status_dwork, msecs_to_jiffies(RECOVER_CC_DELAY_MS));
@@ -1396,7 +1379,7 @@ bool wa_fake_cc_status_is_runnging(struct smb_charger *chg) {
 	bool ret = false;
 	union power_supply_propval	val = {0, };
 
-	if (unified_bootmode_usermode() || chg->typec_mode != POWER_SUPPLY_TYPEC_SINK)
+	if (unified_bootmode_usermode() || chg->typec_mode != QTI_POWER_SUPPLY_TYPEC_SINK)
 		return ret;
 
 	if (!smblib_get_prop_usb_present(chg, &val) && val.intval)
@@ -1424,9 +1407,9 @@ bool wa_need_to_load_sw_on(struct smb_charger *chg) {
 		return rc;
 	}
 
-	if (((chg->typec_mode == POWER_SUPPLY_TYPEC_SINK_POWERED_CABLE && (stat & CC_ORIENTATION_BIT))
-			|| chg->typec_mode == POWER_SUPPLY_TYPEC_SINK
-			|| chg->typec_mode == POWER_SUPPLY_TYPEC_SINK_DEBUG_ACCESSORY)
+	if (((chg->typec_mode == QTI_POWER_SUPPLY_TYPEC_SINK_POWERED_CABLE && (stat & CC_ORIENTATION_BIT))
+			|| chg->typec_mode == QTI_POWER_SUPPLY_TYPEC_SINK
+			|| chg->typec_mode == QTI_POWER_SUPPLY_TYPEC_SINK_DEBUG_ACCESSORY)
 			&& wa_connected_dual_display(chg))
 		return true;
 	return false;
@@ -1458,10 +1441,6 @@ void wa_support_dual_display_trigger(struct smb_charger *chg) {
 
 	if (now_ds_state != ds_state) {
 		ds_state = now_ds_state;
-#ifdef CONFIG_LGE_USB_MOISTURE_DETECTION
-		if (chg->lpd_reason == LPD_MOISTURE_DETECTED)
-			schedule_work(&chg->lpd_recheck_work);
-#endif
 	}
 
 	if (wa_need_to_load_sw_on(chg)) {
@@ -1502,23 +1481,23 @@ void wa_support_dual_display_trigger(struct smb_charger *chg) {
 	}
 
 	if (!recheck_sink && chg->early_usb_attach
-			&& chg->typec_mode == POWER_SUPPLY_TYPEC_SINK) {
+			&& chg->typec_mode == QTI_POWER_SUPPLY_TYPEC_SINK) {
 		pr_wa("re-check cc pin of sink for DS2.\n");
 		recheck_sink = true;
-		val.intval = POWER_SUPPLY_TYPEC_PR_NONE;
-		smblib_set_prop_typec_power_role(chg, &val);
-		val.intval = POWER_SUPPLY_TYPEC_PR_DUAL;
-		smblib_set_prop_typec_power_role(chg, &val);
+		val.intval = QTI_POWER_SUPPLY_TYPEC_PR_NONE;
+		smblib_set_prop_typec_power_role(chg, val.intval);
+		val.intval = QTI_POWER_SUPPLY_TYPEC_PR_DUAL;
+		smblib_set_prop_typec_power_role(chg, val.intval);
 	}
 
 	if (!recheck_source && ds_state == LGE_PRM_HALLIC_CONNECTION_ON
-			&& chg->typec_mode == POWER_SUPPLY_TYPEC_SOURCE_DEFAULT) {
+			&& chg->typec_mode == QTI_POWER_SUPPLY_TYPEC_SOURCE_DEFAULT) {
 		pr_wa("re-check cc pin of source for DS2.\n");
 		recheck_source = true;
-		val.intval = POWER_SUPPLY_TYPEC_PR_SOURCE;
-		smblib_set_prop_typec_power_role(chg, &val);
-		val.intval = POWER_SUPPLY_TYPEC_PR_DUAL;
-		smblib_set_prop_typec_power_role(chg, &val);
+		val.intval = QTI_POWER_SUPPLY_TYPEC_PR_SOURCE;
+		smblib_set_prop_typec_power_role(chg, val.intval);
+		val.intval = QTI_POWER_SUPPLY_TYPEC_PR_DUAL;
+		smblib_set_prop_typec_power_role(chg, val.intval);
 	} else if (!smblib_get_prop_usb_present(chg, &val) && !val.intval){
 		recheck_source = false;
 	}
@@ -1574,7 +1553,7 @@ void wa_charging_for_mcdodo_trigger(struct smb_charger *chg) {
 
 	if (pre_floating != is_floating) {
 		vbus = !smblib_get_prop_usb_present(chg, &val) ? !!val.intval : false;
-		if (is_floating && !vbus && chg->typec_mode == POWER_SUPPLY_TYPEC_NONE) {
+		if (is_floating && !vbus && chg->typec_mode == QTI_POWER_SUPPLY_TYPEC_NONE) {
 			vote(chg->usb_icl_votable, WA_MCDODO_VOTER, true, 0);
 		} else {
 			wa_charging_for_mcdodo_clear(chg);

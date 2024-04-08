@@ -24,6 +24,7 @@
 #include <linux/usb/typec.h>
 #include <linux/usb/usbpd.h>
 #include <linux/usb/redriver.h>
+#include <dt-bindings/iio/qti_power_supply_iio.h>
 #include "usbpd.h"
 
 #ifdef CONFIG_LGE_USB
@@ -826,13 +827,13 @@ static inline void start_usb_peripheral(struct usbpd *pd)
 #ifdef CONFIG_LGE_USB_FACTORY
 #if defined(CONFIG_MACH_SM8150_ALPHA) || defined(CONFIG_MACH_SM8150_MH2LM)
 	switch (pd->typec_mode) {
-	case POWER_SUPPLY_TYPEC_SINK_DEBUG_ACCESSORY:
-	case POWER_SUPPLY_TYPEC_SOURCE_DEBUG_ACCESSORY_DEFAULT:
-	case POWER_SUPPLY_TYPEC_SOURCE_DEBUG_ACCESSORY_DEFAULT_MEDIUM:
-	case POWER_SUPPLY_TYPEC_SOURCE_DEBUG_ACCESSORY_DEFAULT_HIGH:
-	case POWER_SUPPLY_TYPEC_SOURCE_DEBUG_ACCESSORY_MEDIUM:
-	case POWER_SUPPLY_TYPEC_SOURCE_DEBUG_ACCESSORY_MEDIUM_HIGH:
-	case POWER_SUPPLY_TYPEC_SOURCE_DEBUG_ACCESSORY_HIGH:
+	case QTI_POWER_SUPPLY_TYPEC_SINK_DEBUG_ACCESSORY:
+	case QTI_POWER_SUPPLY_TYPEC_SOURCE_DEBUG_ACCESSORY_DEFAULT:
+	case QTI_POWER_SUPPLY_TYPEC_SOURCE_DEBUG_ACCESSORY_DEFAULT_MEDIUM:
+	case QTI_POWER_SUPPLY_TYPEC_SOURCE_DEBUG_ACCESSORY_DEFAULT_HIGH:
+	case QTI_POWER_SUPPLY_TYPEC_SOURCE_DEBUG_ACCESSORY_MEDIUM:
+	case QTI_POWER_SUPPLY_TYPEC_SOURCE_DEBUG_ACCESSORY_MEDIUM_HIGH:
+	case QTI_POWER_SUPPLY_TYPEC_SOURCE_DEBUG_ACCESSORY_HIGH:
 		cc = ORIENTATION_CC2;
 		break;
 
@@ -961,6 +962,10 @@ static int usbpd_release_ss_lane(struct usbpd *pd,
 
 	start_usb_dp(pd, false);
 
+err_exit:
+	return ret;
+}
+
 #if IS_ENABLED(CONFIG_LGE_COVER_DISPLAY)
 bool usb_super_speed = false;
 void is_dd_usb_restart(void)
@@ -968,32 +973,32 @@ void is_dd_usb_restart(void)
 	struct usbpd *pd = __pd;
 
 	switch (pd->typec_mode) {
-	case POWER_SUPPLY_TYPEC_SINK:                 /* Rd only */
+	case QTI_POWER_SUPPLY_TYPEC_SINK:                 /* Rd only */
 		if(usb_super_speed) {
 			stop_usb_host(pd);
 			start_usb_host(pd, 0);
 		}
 		break;
-	case POWER_SUPPLY_TYPEC_SOURCE_DEFAULT:	      /* Rp default */
-	case POWER_SUPPLY_TYPEC_SOURCE_MEDIUM:  	  /* Rp 1.5A */
-	case POWER_SUPPLY_TYPEC_SOURCE_HIGH:          /* Rp 3A */
+	case QTI_POWER_SUPPLY_TYPEC_SOURCE_DEFAULT:	      /* Rp default */
+	case QTI_POWER_SUPPLY_TYPEC_SOURCE_MEDIUM:  	  /* Rp 1.5A */
+	case QTI_POWER_SUPPLY_TYPEC_SOURCE_HIGH:          /* Rp 3A */
 		if(usb_super_speed) {
 			stop_usb_peripheral(pd);
 			start_usb_peripheral(pd);
 		}
 		break;
 #ifdef CONFIG_LGE_USB
-	case POWER_SUPPLY_TYPEC_SOURCE_DEBUG_ACCESSORY_DEFAULT:
-	case POWER_SUPPLY_TYPEC_SOURCE_DEBUG_ACCESSORY_DEFAULT_MEDIUM:
-	case POWER_SUPPLY_TYPEC_SOURCE_DEBUG_ACCESSORY_DEFAULT_HIGH:
-	case POWER_SUPPLY_TYPEC_SOURCE_DEBUG_ACCESSORY_MEDIUM:
-	case POWER_SUPPLY_TYPEC_SOURCE_DEBUG_ACCESSORY_MEDIUM_HIGH:
-	case POWER_SUPPLY_TYPEC_SOURCE_DEBUG_ACCESSORY_HIGH:
+	case QTI_POWER_SUPPLY_TYPEC_SOURCE_DEBUG_ACCESSORY_DEFAULT:
+	case QTI_POWER_SUPPLY_TYPEC_SOURCE_DEBUG_ACCESSORY_DEFAULT_MEDIUM:
+	case QTI_POWER_SUPPLY_TYPEC_SOURCE_DEBUG_ACCESSORY_DEFAULT_HIGH:
+	case QTI_POWER_SUPPLY_TYPEC_SOURCE_DEBUG_ACCESSORY_MEDIUM:
+	case QTI_POWER_SUPPLY_TYPEC_SOURCE_DEBUG_ACCESSORY_MEDIUM_HIGH:
+	case QTI_POWER_SUPPLY_TYPEC_SOURCE_DEBUG_ACCESSORY_HIGH:
 #endif
-	case POWER_SUPPLY_TYPEC_SINK_POWERED_CABLE:	  /* Rd/Ra */
-	case POWER_SUPPLY_TYPEC_SINK_DEBUG_ACCESSORY: /* Rd/Rd */
-	case POWER_SUPPLY_TYPEC_SINK_AUDIO_ADAPTER:	  /* Ra/Ra */
-	case POWER_SUPPLY_TYPEC_POWERED_CABLE_ONLY:	  /* Ra only */
+	case QTI_POWER_SUPPLY_TYPEC_SINK_POWERED_CABLE:	  /* Rd/Ra */
+	case QTI_POWER_SUPPLY_TYPEC_SINK_DEBUG_ACCESSORY: /* Rd/Rd */
+	case QTI_POWER_SUPPLY_TYPEC_SINK_AUDIO_ADAPTER:	  /* Ra/Ra */
+	case QTI_POWER_SUPPLY_TYPEC_POWERED_CABLE_ONLY:	  /* Ra only */
 	default:
 		break;
 	}
@@ -1047,7 +1052,7 @@ static int usbpd_usb_suspend(struct usbpd *pd, struct usbpd_svid_handler *hdlr,
 	pd->in_suspend = suspend;
 
 	val.intval = suspend ? 0 : (pd->requested_current * 1000);
-	ret = power_supply_set_property(pd->usb_psy,
+	ret = usbpd_set_psy_iio_property(pd,
 			POWER_SUPPLY_PROP_PD_CURRENT_MAX, &val);
 
 	usbpd_info(&pd->dev, "usbpd_usb_suspend: %s\n", suspend ? "suspend" : "reusme");
@@ -1960,15 +1965,15 @@ static void handle_vdm_resp_ack(struct usbpd *pd, u32 *vdos, u8 num_vdos,
 			/* VPD Charge Through Support */
 			{
 				union power_supply_propval val;
-				val.intval = POWER_SUPPLY_PD_INACTIVE;
-				power_supply_set_property(pd->usb_psy,
+				val.intval = QTI_POWER_SUPPLY_PD_INACTIVE;
+				usbpd_set_psy_iio_property(pd,
 						POWER_SUPPLY_PROP_PD_ACTIVE,
 						&val);
 
 				pd->is_vpd = true;
 				if (!pd->peer_usb_comm)
 					pd->current_dr = DR_UFP;
-				dual_role_instance_changed(pd->dual_role);
+				typec_set_pwr_opmode(pd->typec_port, TYPEC_PWR_MODE_PD);
 			}
 
 #ifdef CONFIG_LGE_DUAL_SCREEN
@@ -2239,7 +2244,6 @@ static void handle_vdm_rx(struct usbpd *pd, struct rx_msg *rx_msg)
 			break;
 		}
 		break;
-	}
 #ifdef CONFIG_LGE_USB
 	default:
 		if (pd->spec_rev == USBPD_REV_30) {
@@ -2252,6 +2256,7 @@ static void handle_vdm_rx(struct usbpd *pd, struct rx_msg *rx_msg)
 		}
 		break;
 #endif
+	}
 }
 
 static void handle_vdm_tx(struct usbpd *pd, enum pd_sop_type sop_type)
@@ -2575,7 +2580,7 @@ static int enable_vbus(struct usbpd *pd)
 	int ret;
 
 #ifdef CONFIG_LGE_USB
-	ret = power_supply_get_property(pd->usb_psy,
+	ret = usbpd_get_psy_iio_property(pd,
 			POWER_SUPPLY_PROP_PD_ACTIVE, &val);
 	if (ret) {
 		usbpd_err(&pd->dev, "Unable to read PD_ACTIVE: %d\n",
@@ -2583,11 +2588,8 @@ static int enable_vbus(struct usbpd *pd)
 		return ret;
 	}
 
-	if (val.intval == POWER_SUPPLY_PD_VPD_ACTIVE)
+	if (val.intval == QTI_POWER_SUPPLY_PD_VPD_ACTIVE)
 		return 0;
-
-	if (!pd->in_pr_swap)
-		goto enable_reg;
 #endif
 
 	/*
@@ -2729,7 +2731,6 @@ static void enter_state_forced_prs(struct usbpd *pd)
 		set_power_role(pd, PR_NONE);
 		kick_sm(pd, 0);
 	}
-	break;
 }
 
 static void handle_state_forced_prs(struct usbpd *pd, struct rx_msg *rx_msg)
@@ -2742,9 +2743,9 @@ static void handle_state_forced_prs(struct usbpd *pd, struct rx_msg *rx_msg)
 	power_supply_set_property(pd->usb_psy,
 			POWER_SUPPLY_PROP_PR_SWAP, &val);
 	*/
-	pd->forced_pr = POWER_SUPPLY_TYPEC_PR_NONE;
+	pd->forced_pr = QTI_POWER_SUPPLY_TYPEC_PR_NONE;
 
-	if (pd->typec_mode == POWER_SUPPLY_TYPEC_NONE ||
+	if (pd->typec_mode == QTI_POWER_SUPPLY_TYPEC_NONE ||
 	    pd->current_pr == PR_NONE) {
 		usbpd_set_state(pd, PE_ERROR_RECOVERY);
 	} else {
@@ -3276,7 +3277,7 @@ static void enter_state_snk_startup(struct usbpd *pd)
 		pd->current_dr = DR_UFP;
 
 		ret = usbpd_get_psy_iio_property(pd,
-				POWER_SUPPLY_PROP_REAL_TYPE, &val);
+				PSY_IIO_USB_REAL_TYPE, &val);
 		if (!ret) {
 			usbpd_dbg(&pd->dev, "type:%d\n", val.intval);
 #ifdef CONFIG_LGE_USB
@@ -3380,7 +3381,7 @@ static void handle_state_snk_wait_for_capabilities(struct usbpd *pd,
 	if (IS_DATA(rx_msg, MSG_SOURCE_CAPABILITIES)) {
 #ifdef CONFIG_LGE_USB
 		if (rx_msg->sop == SOP_MSG)
-			pd_phy_update_frame_filter(FRAME_FILTER_EN_SOP |
+			pd->pdphy_ops->update_frame_filter(FRAME_FILTER_EN_SOP |
 					FRAME_FILTER_EN_HARD_RESET);
 #endif
 
@@ -4050,7 +4051,6 @@ static void handle_state_send_soft_reset(struct usbpd *pd,
 			usbpd_set_state(pd, pd->current_pr == PR_SRC ?
 					PE_SRC_HARD_RESET :
 					PE_SNK_HARD_RESET);
-			break;
 		}
 #endif
 		usbpd_set_state(pd, pd->current_pr == PR_SRC ?
@@ -4189,7 +4189,7 @@ static void handle_disconnect(struct usbpd *pd)
 
 #ifdef CONFIG_LGE_USB
 		if (!(pd->current_state == PE_FORCED_PRS &&
-		      pd->forced_pr != POWER_SUPPLY_TYPEC_PR_NONE))
+		      pd->forced_pr != QTI_POWER_SUPPLY_TYPEC_PR_NONE))
 			pd->in_pr_swap = false;
 #else
 	pd->in_pr_swap = false;
@@ -4246,7 +4246,7 @@ static void handle_disconnect(struct usbpd *pd)
 #ifdef CONFIG_LGE_USB
 		if (pd->current_state != PE_FORCED_PRS) {
 			val.intval = 0;
-			power_supply_set_property(pd->usb_psy,
+			usbpd_set_psy_iio_property(pd,
 					POWER_SUPPLY_PROP_PR_SWAP, &val);
 		}
 #else
@@ -4541,8 +4541,8 @@ static void psy_changed_notifier_work(struct work_struct *w)
 	int pd_vpd_active;
 #endif
 
-	ret = usbpd_get_psy_iio_property(pd,
-			POWER_SUPPLY_PROP_TYPEC_MODE, &val);
+	ret = power_supply_get_property(pd->usb_psy,
+			POWER_SUPPLY_PROP_EXT_TYPEC_MODE, &val);
 	if (ret) {
 		usbpd_err(&pd->dev, "Unable to read USB TYPEC_MODE: %d\n", ret);
 		return;
@@ -4566,7 +4566,7 @@ static void psy_changed_notifier_work(struct work_struct *w)
 	if (!val.intval && !pd->pd_connected &&
 			typec_mode >= QTI_POWER_SUPPLY_TYPEC_SOURCE_DEFAULT) {
 		ret = usbpd_get_psy_iio_property(pd,
-				POWER_SUPPLY_PROP_REAL_TYPE, &val);
+				PSY_IIO_USB_REAL_TYPE, &val);
 		if (ret) {
 			usbpd_err(&pd->dev, "Unable to read USB TYPE: %d\n",
 					ret);
@@ -4590,7 +4590,7 @@ static void psy_changed_notifier_work(struct work_struct *w)
 				pd->current_state = PE_SNK_STARTUP;
 				pd->current_pr = PR_SINK;
 				pd->current_dr = DR_UFP;
-				dual_role_instance_changed(pd->dual_role);
+				typec_set_pwr_opmode(pd->typec_port, TYPEC_PWR_MODE_PD);
 			}
 		}
 
@@ -4609,8 +4609,8 @@ static void psy_changed_notifier_work(struct work_struct *w)
 	pd->vbus_present = val.intval;
 
 #ifdef CONFIG_LGE_USB
-	ret = power_supply_get_property(pd->usb_psy,
-			POWER_SUPPLY_PROP_REAL_TYPE, &val);
+	ret = usbpd_get_psy_iio_property(pd,
+			PSY_IIO_USB_REAL_TYPE, &val);
 	if (ret) {
 		usbpd_err(&pd->dev, "Unable to read USB TYPE: %d\n",
 			  ret);
@@ -4619,7 +4619,7 @@ static void psy_changed_notifier_work(struct work_struct *w)
 
 	pd->psy_type = val.intval;
 
-	ret = power_supply_get_property(pd->usb_psy,
+	ret = usbpd_get_psy_iio_property(pd,
 			POWER_SUPPLY_PROP_PD_ACTIVE, &val);
 	if (ret) {
 		usbpd_err(&pd->dev, "Unable to read PD_ACTIVE: %d\n",
@@ -4627,7 +4627,7 @@ static void psy_changed_notifier_work(struct work_struct *w)
 		return;
 	}
 
-	pd_vpd_active = (val.intval == POWER_SUPPLY_PD_VPD_ACTIVE) ? 1 : 0;
+	pd_vpd_active = (val.intval == QTI_POWER_SUPPLY_PD_VPD_ACTIVE) ? 1 : 0;
 	usbpd_dbg(&pd->dev, "vpd_active:%d vpd:%d\n", pd_vpd_active, pd->is_vpd);
 #endif
 
@@ -5581,7 +5581,8 @@ struct usbpd *usbpd_create(struct device *parent,
 	mutex_init(&pd->swap_lock);
 	mutex_init(&pd->svid_handler_lock);
 #ifdef CONFIG_LGE_USB
-	wakeup_source_init(&pd->wake_lock, "usb_compliance_mode");
+	wakeup_source_create("usb_compliance_mode");
+	wakeup_source_add(&pd->wake_lock);
 #endif
 
 	pd->usb_psy = power_supply_get_by_name("usb");
@@ -5779,7 +5780,8 @@ put_psy:
 	power_supply_put(pd->usb_psy);
 destroy_wq:
 #ifdef CONFIG_LGE_USB
-	wakeup_source_trash(&pd->wake_lock);
+	wakeup_source_remove(&pd->wake_lock);
+	wakeup_source_destroy(&pd->wake_lock);
 #endif
 	destroy_workqueue(pd->wq);
 del_pd:
@@ -5807,7 +5809,8 @@ void usbpd_destroy(struct usbpd *pd)
 		power_supply_put(pd->bat_psy);
 	destroy_workqueue(pd->wq);
 #ifdef CONFIG_LGE_USB
-	wakeup_source_trash(&pd->wake_lock);
+	wakeup_source_remove(&pd->wake_lock);
+	wakeup_source_destroy(&pd->wake_lock);
 #endif
 	device_unregister(&pd->dev);
 }

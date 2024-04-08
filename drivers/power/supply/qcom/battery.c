@@ -1824,14 +1824,6 @@ static bool is_parallel_available(struct pl_data *chip)
 static bool is_parallel_pct_changed(struct pl_data *chip)
 {
 	union power_supply_propval pval = {0, };
-	int rc;
-
-	rc = power_supply_get_property(chip->batt_psy,
-					POWER_SUPPLY_PROP_PARALLEL_MODE, &pval);
-	if (rc < 0) {
-		pr_err("Couldn't get parallel pct value rc=%d\n", rc);
-		return false;
-	}
 
 	if (pval.intval != chip->slave_pct) {
 		pr_info("Parallel split pct is changed to %d", pval.intval);

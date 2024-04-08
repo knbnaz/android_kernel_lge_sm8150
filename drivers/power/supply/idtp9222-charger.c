@@ -59,6 +59,7 @@ do {								\
 #include <linux/interrupt.h>
 #include <linux/pmic-voter.h>
 #include <linux/power_supply.h>
+#include <dt-bindings/iio/qti_power_supply_iio.h>
 #include "qcom/smb5-lib.h"
 #include "../../soc/qcom/lge/power/main/lge_prm.h"
 #ifdef CONFIG_LGE_PM_VENEER_PSY
@@ -553,10 +554,10 @@ static enum power_supply_property psy_property_list[] = {
 	POWER_SUPPLY_PROP_ONLINE,
 	POWER_SUPPLY_PROP_PRESENT,
 	POWER_SUPPLY_PROP_POWER_NOW,
-	POWER_SUPPLY_PROP_CHARGE_DONE,
-	POWER_SUPPLY_PROP_CHARGING_ENABLED,
-	POWER_SUPPLY_PROP_INPUT_SUSPEND,
-	POWER_SUPPLY_PROP_DEBUG_BATTERY,
+	PSY_IIO_CHARGE_DONE,
+	POWER_SUPPLY_PROP_EXT_CHARGING_ENABLED,
+	POWER_SUPPLY_PROP_EXT_INPUT_SUSPEND,
+	POWER_SUPPLY_PROP_EXT_DEBUG_BATTERY,
 };
 
 static bool psy_set_charge_done(struct idtp9222_struct* idtp9222, bool done) {
@@ -627,13 +628,13 @@ static int psy_property_set(struct power_supply* psy,
 	struct idtp9222_struct* idtp9222 = power_supply_get_drvdata(psy);
 
 	switch (prop) {
-	case POWER_SUPPLY_PROP_CHARGE_DONE:
+	case PSY_IIO_CHARGE_DONE:
 		psy_set_charge_done(idtp9222, !!val->intval);
 		break;
-	case POWER_SUPPLY_PROP_CHARGING_ENABLED:
+	case POWER_SUPPLY_PROP_EXT_CHARGING_ENABLED:
 		psy_set_enabled(idtp9222, !!val->intval);
 		break;
-	case POWER_SUPPLY_PROP_INPUT_SUSPEND:
+	case POWER_SUPPLY_PROP_EXT_INPUT_SUSPEND:
 		psy_set_suspend(idtp9222, !!val->intval);
 		break;
 	case POWER_SUPPLY_PROP_VOLTAGE_MAX: /* mV */
@@ -645,7 +646,7 @@ static int psy_property_set(struct power_supply* psy,
 	case POWER_SUPPLY_PROP_CURRENT_MAX:
 		vote(idtp9222->dc_icl_votable, USER_VOTER, true, val->intval);
 		break;
-	case POWER_SUPPLY_PROP_DEBUG_BATTERY:
+	case POWER_SUPPLY_PROP_EXT_DEBUG_BATTERY:
 		psy_set_debug_battery(idtp9222, val->intval);
 		break;
 	default:
@@ -756,16 +757,16 @@ static int psy_property_get(struct power_supply* psy,
 	case POWER_SUPPLY_PROP_VOLTAGE_NOW:
 		val->intval = psy_get_voltage_now(idtp9222);
 		break;
-	case POWER_SUPPLY_PROP_CHARGE_DONE:
+	case PSY_IIO_CHARGE_DONE:
 		val->intval = idtp9222_is_full(idtp9222);
 		break;
-	case POWER_SUPPLY_PROP_CHARGING_ENABLED:
+	case POWER_SUPPLY_PROP_EXT_CHARGING_ENABLED:
 		val->intval = idtp9222_is_enabled(idtp9222);
 		break;
-	case POWER_SUPPLY_PROP_INPUT_SUSPEND:
+	case POWER_SUPPLY_PROP_EXT_INPUT_SUSPEND:
 		val->intval = !idtp9222_is_enabled(idtp9222);
 		break;
-	case POWER_SUPPLY_PROP_DEBUG_BATTERY:
+	case POWER_SUPPLY_PROP_EXT_DEBUG_BATTERY:
 		/* Do nothing and just consume getting */
 		val->intval = -1;
 		break;
@@ -782,7 +783,7 @@ static int psy_property_writeable(struct power_supply* psy,
 	int rc;
 
 	switch (prop) {
-	case POWER_SUPPLY_PROP_CHARGING_ENABLED:
+	case POWER_SUPPLY_PROP_EXT_CHARGING_ENABLED:
 	case POWER_SUPPLY_PROP_VOLTAGE_MAX:
 		rc = 1;
 		break;
@@ -1214,7 +1215,7 @@ static int idtp9222_suspend_callback(struct votable *votable, void *data,
 
 	if (psy_dc) {
 		power_supply_set_property(psy_dc,
-			POWER_SUPPLY_PROP_INPUT_SUSPEND, &value);
+			POWER_SUPPLY_PROP_EXT_INPUT_SUSPEND, &value);
 		power_supply_put(psy_dc);
 	}
 	else
@@ -1616,7 +1617,8 @@ static int idtp9222_probe(struct i2c_client* client, const struct i2c_device_id*
 		goto error;
 	}
 
-	wakeup_source_init(&idtp9222->wlc_wakelock, "IDTP9222: wakelock");
+	wakeup_source_create("IDTP9222: wakelock");
+	wakeup_source_add(&idtp9222->wlc_wakelock);
 
 	// For work structs
 	INIT_DELAYED_WORK(&idtp9222->worker_onpad, idtp9222_worker_onpad);

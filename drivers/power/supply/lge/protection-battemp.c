@@ -482,8 +482,8 @@ static bool battemp_create_preset(bool (*feed_protection_battemp)(bool* charging
 		return false;
 	}
 
-	wakeup_source_init(&battemp_me.battemp_wakelock,
-		BATTEMP_WAKELOCK);
+	wakeup_source_create(BATTEMP_WAKELOCK);
+	wakeup_source_add(&battemp_me.battemp_wakelock);
 
 	INIT_DELAYED_WORK(&battemp_me.battemp_dwork,
 		polling_status_work);
@@ -526,7 +526,8 @@ destroy:
 }
 
 void protection_battemp_destroy(void) {
-	wakeup_source_trash(&battemp_me.battemp_wakelock);
+	wakeup_source_remove(&battemp_me.battemp_wakelock);
+	wakeup_source_destroy(&battemp_me.battemp_wakelock);
 	cancel_delayed_work_sync(&battemp_me.battemp_dwork);
 
 	veneer_voter_unregister(&battemp_me.voter_ichilly);

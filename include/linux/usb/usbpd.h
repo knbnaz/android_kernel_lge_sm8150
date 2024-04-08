@@ -113,7 +113,7 @@ int usbpd_send_svdm(struct usbpd *pd, u16 svid, u8 cmd,
  * Return: ORIENTATION_CC1 or ORIENTATION_CC2 if attached,
  *         otherwise ORIENTATION_NONE if not attached
  */
-enum plug_orientation usbpd_get_plug_orientation(struct usbpd *pd);
+int usbpd_get_plug_orientation(struct usbpd *pd);
 
 void usbpd_vdm_in_suspend(struct usbpd *pd, bool in_suspend);
 #else

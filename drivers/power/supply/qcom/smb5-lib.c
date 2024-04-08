@@ -45,11 +45,6 @@
 static void update_sw_icl_max(struct smb_charger *chg, int val);
 static int smblib_get_prop_typec_mode(struct smb_charger *chg);
 
-#ifdef CONFIG_LGE_USB_MOISTURE_DETECTION
-#define LPD_RECHECK_TIME	30000
-#define LPD_RESUME_TIME		2000
-#endif
-
 int smblib_read(struct smb_charger *chg, u16 addr, u8 *val)
 {
 	unsigned int value;
@@ -578,7 +573,7 @@ static const struct apsd_result *smblib_get_apsd_result(struct smb_charger *chg)
 	}
 #ifdef CONFIG_LGE_PM
 	if (wa_connected_port_forwarding()) {
-		if (chg->typec_mode == POWER_SUPPLY_TYPEC_SINK && result != &smblib_apsd_results[UNKNOWN]) {
+		if (chg->typec_mode == QTI_POWER_SUPPLY_TYPEC_SINK && result != &smblib_apsd_results[UNKNOWN]) {
 				result = &smblib_apsd_results[DCP];
 		}
 	}
@@ -1166,16 +1161,6 @@ static int smblib_request_dpdm(struct smb_charger *chg, bool enable)
 
 	mutex_lock(&chg->dpdm_lock);
 	if (enable) {
-#ifdef CONFIG_LGE_PM
-		if (*chg->lpd_dpdm_disable) {
-			if (is_client_vote_enabled(chg->usb_icl_votable,
-						"MOISTURE_VOTER")) {
-				smblib_dbg(chg, PR_MISC,
-						"skip enable DPDM regulator on moisture\n");
-				return rc;
-			}
-		}
-#endif
 		if (chg->dpdm_reg && !chg->dpdm_enabled) {
 			smblib_dbg(chg, PR_MISC, "enabling DPDM regulator\n");
 			rc = regulator_enable(chg->dpdm_reg);
@@ -4056,7 +4041,7 @@ static int smblib_get_prop_dfp_mode(struct smb_charger *chg)
 	smblib_dbg(chg, PR_REGISTER, "TYPE_C_CC_STATUS_REG = 0x%02x\n", stat);
 
 	if (stat == 0x08 || stat == 0x80)
-		return POWER_SUPPLY_TYPEC_SINK;
+		return QTI_POWER_SUPPLY_TYPEC_SINK;
 #endif
 
 	return QTI_POWER_SUPPLY_TYPEC_NONE;
@@ -6327,17 +6312,8 @@ static bool smblib_src_lpd(struct smb_charger *chg)
 
 	switch (stat & DETECTED_SNK_TYPE_MASK) {
 	case SRC_DEBUG_ACCESS_BIT:
-#if defined(CONFIG_LGE_USB_FACTORY) || defined(CONFIG_LGE_USB_DEBUGGER)
-		/*
-		 * If you connect Factory USB or USB UART Debugger, LPD is
-		 * recognized.
-		 */
-		if (smblib_rsbux_low(chg, RSBU_K_50K_UV))
-			lpd_flag = true;
-#else
 		if (smblib_rsbux_low(chg, RSBU_K_300K_UV))
 			lpd_flag = true;
-#endif
 		break;
 	case SRC_RD_RA_VCONN_BIT:
 	case SRC_RD_OPEN_BIT:
@@ -6839,8 +6815,8 @@ static void smblib_lpd_launch_ra_open_work(struct smb_charger *chg)
 			!(stat & TYPEC_TCCDEBOUNCE_DONE_STATUS_BIT)) {
 		union power_supply_propval pval;
 
-		pval.intval = POWER_SUPPLY_TYPEC_PR_SOURCE;
-		rc = smblib_set_prop_typec_power_role(chg, &pval);
+		pval.intval = QTI_POWER_SUPPLY_TYPEC_PR_SOURCE;
+		rc = smblib_set_prop_typec_power_role(chg, pval.intval);
 		if (rc < 0) {
 			smblib_err(chg, "Couldn't set typec source only rc=%d\n",
 					rc);
@@ -7607,7 +7583,7 @@ int smblib_set_prop_pr_swap_in_progress(struct smb_charger *chg,
 			val ? BYPASS_VSAFE0V_DURING_ROLE_SWAP_BIT : 0);
 	if (rc < 0)
 		smblib_err(chg, "Couldn't set exit state cfg rc=%d\n", rc);
-#enif
+#endif
 
 	if (chg->pr_swap_in_progress) {
 #ifdef CONFIG_LGE_USB
@@ -7880,7 +7856,7 @@ static void smblib_icl_change_work(struct work_struct *work)
 	union power_supply_propval aicl = { .intval = settled_ua, };
 
 	if (veneer) {
-		power_supply_set_property(veneer, POWER_SUPPLY_PROP_INPUT_CURRENT_SETTLED, &aicl);
+		power_supply_set_property(veneer, POWER_SUPPLY_PROP_EXT_INPUT_CURRENT_SETTLED, &aicl);
 		power_supply_put(veneer);
 	}
 }
@@ -8950,14 +8926,11 @@ irqreturn_t override_usb_plugin_irq_handler(int irq, void *data) {
 	mutex_lock(&lock);
 
 	// Call original here
-	usb_plugin_irq_handler(irq, data);
+	smb5_usb_plugin_irq_handler(irq, data);
 	vbus = !smblib_get_prop_usb_present(chg, &val) ? !!val.intval : false;
 	smblib_dbg(chg, PR_INTERRUPT, "VBUS : %s\n", vbus ? "risen" :"lowered");
 	wa_charging_without_cc_trigger(chg, vbus);
 	wa_charging_for_mcdodo_clear(chg);
-	if ((*chg->lpd_ux) && unified_bootmode_chargerlogo()) {
-		schedule_delayed_work(&chg->sbu_ovp_work, msecs_to_jiffies(100));
-	}
 	if (!vbus) {
 		wa_rerun_apsd_for_dcp_clear();
 		wa_detect_standard_hvdcp_clear();
@@ -9006,7 +8979,7 @@ irqreturn_t override_chg_state_change_irq_handler(int irq, void *data)
 	wa_drop_vbus_on_eoc_trigger(chg);
 
 	// Call original here
-	return chg_state_change_irq_handler(irq, data);
+	return smb5_chg_state_change_irq_handler(irq, data);
 }
 
 irqreturn_t override_typec_attach_detach_irq_handler(int irq, void *data) {
@@ -9017,7 +8990,7 @@ irqreturn_t override_typec_attach_detach_irq_handler(int irq, void *data) {
 	u8 legacy, misc;
 
 	// Call and return original here
-	rc = typec_attach_detach_irq_handler(irq, data);
+	rc = smb5_typec_attach_detach_irq_handler(irq, data);
 
 	if (chg->early_usb_attach && chg->typec_legacy && chg->ok_to_pd && unified_bootmode_fabproc()) {
 		chg->ok_to_pd = false;
@@ -9037,9 +9010,9 @@ irqreturn_t override_typec_attach_detach_irq_handler(int irq, void *data) {
 	if (!delayed_work_pending(&chg->pl_enable_work) &&
 			get_client_vote(chg->pl_disable_votable, PL_DELAY_VOTER)) {
 		switch(chg->typec_mode) {
-			case POWER_SUPPLY_TYPEC_SOURCE_DEFAULT:
-			case POWER_SUPPLY_TYPEC_SOURCE_MEDIUM:
-			case POWER_SUPPLY_TYPEC_SOURCE_HIGH:
+			case QTI_POWER_SUPPLY_TYPEC_SOURCE_DEFAULT:
+			case QTI_POWER_SUPPLY_TYPEC_SOURCE_MEDIUM:
+			case QTI_POWER_SUPPLY_TYPEC_SOURCE_HIGH:
 				smblib_dbg(chg, PR_PARALLEL, "typec : %s, schedule pl_enable_work after %dms\n",
 							smblib_typec_mode_name[chg->typec_mode], PL_DELAY_MS);
 				schedule_delayed_work(&chg->pl_enable_work, msecs_to_jiffies(PL_DELAY_MS));
@@ -9060,7 +9033,7 @@ irqreturn_t override_usbin_uv_irq_handler(int irq, void *data) {
 	irqreturn_t rc = IRQ_NONE;
 
 	// Call and return original here
-	rc = usbin_uv_irq_handler(irq, data);
+	rc = smb5_usbin_uv_irq_handler(irq, data);
 
 	if (chg->qc2_unsupported_voltage)
 		smblib_dbg(chg, PR_INTERRUPT, "Disable QC 2.0 at %d\n", chg->qc2_unsupported_voltage);
@@ -9082,7 +9055,7 @@ irqreturn_t override_switcher_power_ok_irq_handler(int irq, void *data)
 		POWER_SUPPLY_PROP_VOLTAGE_NOW, &buf) ? buf.intval/1000 : -1;
 
 	// Call and return original here
-	rc = switcher_power_ok_irq_handler(irq, data);
+	rc = smb5_switcher_power_ok_irq_handler(irq, data);
 
 	ret = smblib_read(chg, POWER_PATH_STATUS_REG, &stat);
 	if (ret < 0) {
@@ -9103,7 +9076,7 @@ irqreturn_t override_usb_source_change_irq_handler(int irq, void *data) {
 	irqreturn_t rc = IRQ_NONE;
 
 	// Call and return original here
-	rc = usb_source_change_irq_handler(irq, data);
+	rc = smb5_usb_source_change_irq_handler(irq, data);
 	wa_rerun_apsd_for_dcp_triger(chg);
 	wa_detect_standard_hvdcp_trigger(chg);
 	wa_drop_vbus_on_eoc_required(chg);
@@ -9112,7 +9085,7 @@ irqreturn_t override_usb_source_change_irq_handler(int irq, void *data) {
 	wa_retry_ok_to_pd_trigger(chg);
 	wa_support_dual_display_trigger(chg);
 
-	if (apsd->pst == POWER_SUPPLY_TYPE_USB_FLOAT && !chg->pd_active) {
+	if (apsd->val == POWER_SUPPLY_TYPE_USB_FLOAT && !chg->pd_active) {
 		vote(chg->usb_icl_votable, SW_ICL_MAX_VOTER, true, USBIN_500MA);
 		vote(chg->usb_icl_votable, USB_PSY_VOTER, false, 0);
 	}
@@ -9142,7 +9115,7 @@ irqreturn_t override_dcin_irq_handler(int irq, void *data) {
 			wa_dcin_start_aicl_trigger();
 		else
 			vote(chg->dc_icl_votable, DC_AICL_VOTER, false, 0);
-		return dc_plugin_irq_handler(irq, data);
+		return smb5_dc_plugin_irq_handler(irq, data);
 	}
 
 	if (!strcmp(irq_data->name, "dcin-vashdn"))
@@ -9171,13 +9144,13 @@ irqreturn_t override_typec_state_change_irq_handler(int irq, void *data) {
 	irqreturn_t rc = IRQ_NONE;
 
 	// Call and return original here
-	rc = typec_state_change_irq_handler(irq, data);
-	if (chg->typec_mode == POWER_SUPPLY_TYPEC_NONE
+	rc = smb5_typec_state_change_irq_handler(irq, data);
+	if (chg->typec_mode == QTI_POWER_SUPPLY_TYPEC_NONE
 			&& chg->sink_src_mode != SRC_MODE) {
 		wa_charging_without_cc_trigger(chg, true);
 	}
 
-	if (chg->typec_mode != POWER_SUPPLY_TYPEC_NONE
+	if (chg->typec_mode != QTI_POWER_SUPPLY_TYPEC_NONE
 			&& chg->real_charger_type != POWER_SUPPLY_TYPE_UNKNOWN
 			&& get_client_vote(chg->usb_icl_votable, SW_ICL_MAX_VOTER) <= USBIN_100MA) {
 		if (chg->real_charger_type == POWER_SUPPLY_TYPE_USB_HVDCP
@@ -9190,7 +9163,7 @@ irqreturn_t override_typec_state_change_irq_handler(int irq, void *data) {
 	wa_charging_with_rd_trigger(chg);
 	wa_avoid_src_dbg_cable_trigger(chg);
 	wa_support_dual_display_trigger(chg);
-	if (chg->typec_mode == POWER_SUPPLY_TYPEC_NONE)
+	if (chg->typec_mode == QTI_POWER_SUPPLY_TYPEC_NONE)
 		wa_update_port_forwarding(false);
 
 	return rc;
@@ -9204,7 +9177,7 @@ irqreturn_t override_typec_or_rid_detection_change_irq_handler(int irq, void *da
 	u8 machine, misc, snk_debug, src_status, legacy;
 
 	// Call and return original here
-	rc = typec_or_rid_detection_change_irq_handler(irq, data);
+	rc = smb5_typec_or_rid_detection_change_irq_handler(irq, data);
 
 	ret = smblib_read(chg, TYPE_C_MISC_STATUS_REG, &misc);
 	if (ret < 0)
@@ -9241,7 +9214,7 @@ irqreturn_t override_aicl_fail_irq_handler(int irq, void *data) {
 	struct smb_charger *chg = irq_data->parent_data;
 
 	wa_resuming_suspended_usbin_trigger(chg);
-	return default_irq_handler(irq, data);
+	return smb5_default_irq_handler(irq, data);
 }
 
 irqreturn_t override_typec_vconn_oc_irq_handler(int irq, void *data) {
@@ -9250,7 +9223,7 @@ irqreturn_t override_typec_vconn_oc_irq_handler(int irq, void *data) {
 
 	wa_retry_vconn_enable_on_vconn_oc_trigger(chg);
 
-	return default_irq_handler(irq, data);
+	return smb5_default_irq_handler(irq, data);
 }
 
 void extension_typec_src_removal(struct smb_charger *chg) {
@@ -9260,6 +9233,6 @@ void extension_typec_src_removal(struct smb_charger *chg) {
 int extension_get_apsd_result(struct smb_charger *chg) {
 	const struct apsd_result *apsd_result = smblib_get_apsd_result(chg);
 
-	return apsd_result->pst;
+	return apsd_result->val;
 }
 #endif

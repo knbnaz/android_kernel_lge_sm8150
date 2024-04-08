@@ -1919,9 +1919,9 @@ static void smb1355_retry_charging_func(struct work_struct *unused) {
 	}
 
 	prll_chgen = !power_supply_get_property(chip->parallel_psy,
-		POWER_SUPPLY_PROP_CHARGING_ENABLED, &val) ? !!val.intval : -1;
+		POWER_SUPPLY_PROP_EXT_CHARGING_ENABLED, &val) ? !!val.intval : -1;
 	prll_suspd = !power_supply_get_property(chip->parallel_psy,
-		POWER_SUPPLY_PROP_INPUT_SUSPEND, &val) ? !!val.intval : -1;
+		POWER_SUPPLY_PROP_EXT_INPUT_SUSPEND, &val) ? !!val.intval : -1;
 
 	if (!prll_chgen && !prll_suspd && retry_count <= 3) {
 		pr_debug("Fail to enable smb135 charger. retry count = %d\n", retry_count);
@@ -1937,11 +1937,11 @@ static void smb1355_retry_charging_func(struct work_struct *unused) {
 
 		val.intval = 1;
 		power_supply_set_property(chip->parallel_psy,
-			POWER_SUPPLY_PROP_INPUT_SUSPEND, &val);
+			POWER_SUPPLY_PROP_EXT_INPUT_SUSPEND, &val);
 
 		val.intval = 0;
 		power_supply_set_property(chip->parallel_psy,
-			POWER_SUPPLY_PROP_INPUT_SUSPEND, &val);
+			POWER_SUPPLY_PROP_EXT_INPUT_SUSPEND, &val);
 		retry_count = 0;
 	} else {
 		pr_debug("Success to enable smb135 charger. chgen(%d), suspd(%d)\n", prll_chgen, prll_suspd);

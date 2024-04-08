@@ -20,8 +20,9 @@
 #include <linux/device.h>
 #include <linux/pm_wakeup.h>
 #include <linux/power_supply.h>
-#include <linux/of_batterydata.h>
 #include <linux/platform_device.h>
+#include <linux/qti_power_supply.h>
+#include <dt-bindings/iio/qti_power_supply_iio.h>
 
 #include "veneer-primitives.h"
 
@@ -167,7 +168,7 @@ static enum charging_supplier supplier_sdp(
 	enum charging_supplier ret = CHARGING_SUPPLY_USB_2P0;
 
 	if (!power_supply_get_property(
-			usb, POWER_SUPPLY_PROP_RESISTANCE_ID, buf)) {
+			usb, POWER_SUPPLY_PROP_EXT_RESISTANCE_ID, buf)) {
 		switch (buf->intval) {
 		case CHARGER_USBID_56KOHM :
 			ret = CHARGING_SUPPLY_FACTORY_56K;
@@ -183,7 +184,7 @@ static enum charging_supplier supplier_sdp(
 		}
 	}
 	else
-		pr_veneer("USB-ID: unable to get POWER_SUPPLY_PROP_RESISTANCE_ID\n");
+		pr_veneer("USB-ID: unable to get POWER_SUPPLY_PROP_EXT_RESISTANCE_ID\n");
 
 	return ret;
 }
@@ -196,20 +197,20 @@ static enum charging_supplier supplier_typec(
 	enum power_supply_type real = buf->intval;
 	enum charging_supplier ret = CHARGING_SUPPLY_TYPE_UNKNOWN;
 
-	if (!power_supply_get_property(usb, POWER_SUPPLY_PROP_TYPEC_MODE, buf)) {
+	if (!power_supply_get_property(usb, POWER_SUPPLY_PROP_EXT_TYPEC_MODE, buf)) {
 		switch (buf->intval) {
-		case POWER_SUPPLY_TYPEC_NONE :
+		case QTI_POWER_SUPPLY_TYPEC_NONE :
 			ret = (real == POWER_SUPPLY_TYPE_USB_FLOAT)
 				? CHARGING_SUPPLY_TYPE_FLOAT
 				: CHARGING_SUPPLY_DCP_DEFAULT;
 			break;
-		case POWER_SUPPLY_TYPEC_SOURCE_DEFAULT :
+		case QTI_POWER_SUPPLY_TYPEC_SOURCE_DEFAULT :
 			ret = CHARGING_SUPPLY_DCP_DEFAULT;
 			break;
-		case POWER_SUPPLY_TYPEC_SOURCE_MEDIUM :
+		case QTI_POWER_SUPPLY_TYPEC_SOURCE_MEDIUM :
 			ret = CHARGING_SUPPLY_DCP_22K;
 			break;
-		case POWER_SUPPLY_TYPEC_SOURCE_HIGH :
+		case QTI_POWER_SUPPLY_TYPEC_SOURCE_HIGH :
 			ret = CHARGING_SUPPLY_DCP_10K;
 			break;
 		default :
@@ -218,7 +219,7 @@ static enum charging_supplier supplier_typec(
 		}
 	}
 	else
-		pr_veneer("Failed to get POWER_SUPPLY_PROP_TYPEC_MODE\n");
+		pr_veneer("Failed to get POWER_SUPPLY_PROP_EXT_TYPEC_MODE\n");
 
 	return ret;
 }
@@ -284,7 +285,7 @@ static void update_veneer_supplier(struct veneer* veneer_me)
 		psy = get_psy_usb(veneer_me);
 		if (psy) {
 			val.intval = veneer_me->usbin_realtype;
-			pr_dbg_veneer("POWER_SUPPLY_PROP_REAL_TYPE = %d\n", val.intval);
+			pr_dbg_veneer("PSY_IIO_USB_REAL_TYPE = %d\n", val.intval);
 
 			switch (val.intval) {
 			case POWER_SUPPLY_TYPE_USB_FLOAT :
@@ -325,8 +326,8 @@ static void update_veneer_supplier(struct veneer* veneer_me)
 		/* Overriding on fake hvdcp */
 		val.intval = 1;
 		if (psy && new != CHARGING_SUPPLY_DCP_QC2
-			&& !power_supply_set_property(psy, POWER_SUPPLY_PROP_USB_HC, &val)
-			&& !power_supply_get_property(psy, POWER_SUPPLY_PROP_USB_HC, &val)
+			&& !power_supply_set_property(psy, POWER_SUPPLY_PROP_EXT_FAKE_HVDCP, &val)
+			&& !power_supply_get_property(psy, POWER_SUPPLY_PROP_EXT_FAKE_HVDCP, &val)
 			&& !!val.intval) {
 			new = CHARGING_SUPPLY_DCP_QC2;
 			pr_veneer("Fake HVDCP is enabled, set supplier to QC2\n");
@@ -472,26 +473,6 @@ static void notify_siblings(struct veneer* veneer_me)
 	protection_usbio_update(veneer_me->presence_usb);
 }
 
-static void notify_fabproc(struct veneer* veneer_me)
-{
-	struct power_supply* psy;
-
-	// Enabling parallel charger here if it is required
-	char buf [16] = { 0, };
-	int fastparallel;
-	union power_supply_propval enable = { .intval = 0, };
-	psy = get_psy_battery(veneer_me);
-
-	if (psy && unified_nodes_show("support_fastpl", buf)
-		&& sscanf(buf, "%d", &fastparallel) && !!fastparallel) {
-		// Protocol : Enabling parallel charging by force
-		if (power_supply_set_property(
-			psy, POWER_SUPPLY_PROP_PARALLEL_DISABLE, &enable))
-			pr_veneer("psy should provide POWER_SUPPLY_PROP_PARALLEL_DISABLE"
-				"for the factory fast parallel charging.\n");
-	}
-}
-
 static void notify_touch(struct veneer* veneer_me)
 {
 #ifdef CONFIG_LGE_TOUCH_CORE
@@ -545,7 +526,6 @@ static void veneer_data_update(struct veneer* veneer_me)
 	// After update veneer structures,
 	// do update sibling data, factory process and touch device finally.
 	notify_siblings(veneer_me);
-	notify_fabproc(veneer_me);
 	notify_touch(veneer_me);
 }
 
@@ -612,12 +592,12 @@ static const char* psy_property_name(enum power_supply_property prop)
 		return "POWER_SUPPLY_PROP_STATUS";
 	case POWER_SUPPLY_PROP_HEALTH :
 		return "POWER_SUPPLY_PROP_HEALTH";
-	case POWER_SUPPLY_PROP_REAL_TYPE :
-		return "POWER_SUPPLY_PROP_REAL_TYPE";
+	case PSY_IIO_USB_REAL_TYPE :
+		return "PSY_IIO_USB_REAL_TYPE";
 	case POWER_SUPPLY_PROP_TIME_TO_FULL_NOW:
 		return "POWER_SUPPLY_PROP_TIME_TO_FULL_NOW";
-	case POWER_SUPPLY_PROP_INPUT_CURRENT_SETTLED:
-		return "POWER_SUPPLY_PROP_INPUT_CURRENT_SETTLED";
+	case POWER_SUPPLY_PROP_EXT_INPUT_CURRENT_SETTLED:
+		return "POWER_SUPPLY_PROP_EXT_INPUT_CURRENT_SETTLED";
 	default:
 		return "NOT_SUPPORTED_PROP";
 	}
@@ -641,13 +621,13 @@ psy_property_set_input_current_settled(
 					SLOW_CHARGING_TIMEOUT_MS)));
 			pr_veneer("%s: SLOWCHG: Start timer to check slow charger, "
 				"Initaial AICL = %d\n",
-				psy_property_name(POWER_SUPPLY_PROP_INPUT_CURRENT_SETTLED),
+				psy_property_name(POWER_SUPPLY_PROP_EXT_INPUT_CURRENT_SETTLED),
 				veneer_me->usbin_aicl);
 		} else if (!is_slowchg && running_slowchg) {
 			cancel_delayed_work(&veneer_me->dwork_slowchg);
 			pr_veneer("%s: SLOWCHG: Stop timer to check slow charger, "
 				"AICL = %d\n",
-				psy_property_name(POWER_SUPPLY_PROP_INPUT_CURRENT_SETTLED),
+				psy_property_name(POWER_SUPPLY_PROP_EXT_INPUT_CURRENT_SETTLED),
 				veneer_me->usbin_aicl);
 		}
 	}
@@ -679,7 +659,7 @@ static int psy_property_get(
 		}
 	}	break;
 
-	case POWER_SUPPLY_PROP_SDP_CURRENT_MAX :
+	case POWER_SUPPLY_PROP_INPUT_CURRENT_LIMIT :
 		if (unified_nodes_show("fake_sdpmax", buff) && !strncmp(buff, "1", 1)
 				&& veneer_me->usbin_realtype == POWER_SUPPLY_TYPE_USB) {
 			val->intval = veneer_me->limited_iusb * 1000;
@@ -692,7 +672,7 @@ static int psy_property_get(
 		}
 		break;
 
-	case POWER_SUPPLY_PROP_REAL_TYPE :
+	case PSY_IIO_USB_REAL_TYPE :
 		val->intval = veneer_me->presence_wireless
 			? POWER_SUPPLY_TYPE_WIRELESS : veneer_me->usbin_realtype;
 		break;
@@ -727,11 +707,11 @@ static int psy_property_set(
  */
 	switch (prop) {
 
-/* 'veneer_me->set_property(POWER_SUPPLY_PROP_REAL_TYPE, real_type)'
+/* 'veneer_me->set_property(PSY_IIO_USB_REAL_TYPE, real_type)'
  *   is designed veneer to accept the real charger type enumerated
  *   from charger driver.
  */
-	case POWER_SUPPLY_PROP_REAL_TYPE :
+	case PSY_IIO_USB_REAL_TYPE :
 		switch (val->intval) {
 		case POWER_SUPPLY_TYPE_USB_FLOAT :
 			if (veneer_me->veneer_supplier != CHARGING_SUPPLY_TYPE_FLOAT)
@@ -770,19 +750,12 @@ static int psy_property_set(
 
 out:		break;
 
-/* 'veneer_me->set_property(POWER_SUPPLY_PROP_INPUT_CURRENT_SETTLED, aicl)'
+/* 'veneer_me->set_property(POWER_SUPPLY_PROP_EXT_INPUT_CURRENT_SETTLED, aicl)'
  *   is designed veneer to receive AICL measured in ISR of charger driver.
  *   Reuse it to detect slow charger for VZW.
  */
-	case POWER_SUPPLY_PROP_INPUT_CURRENT_SETTLED :
+	case POWER_SUPPLY_PROP_EXT_INPUT_CURRENT_SETTLED :
 		psy_property_set_input_current_settled(veneer_me, val->intval);
-		break;
-
-	case POWER_SUPPLY_PROP_CHARGE_NOW_ERROR :
-		pr_veneer("veneer exception %04x detected\n", val->intval);
-		veneer_me->veneer_exception |= val->intval;
-		if (val->intval == EXCEPTION_WIRED_VCCOVER)
-			protection_usbio_trigger();
 		break;
 
 	default:
@@ -809,7 +782,7 @@ static int psy_property_writeable(
 /* VENEER delegates logging to an external psy who can access all the states of battery.
  * Consider that accessing PMIC regs in the VENEER, for example, would be impractical.
  * And the external psy should be able to process logging command,
- * by providing a dedicated logging PROP, POWER_SUPPLY_PROP_DEBUG_BATTERY
+ * by providing a dedicated logging PROP, POWER_SUPPLY_PROP_EXT_DEBUG_BATTERY
  */
 static void psy_external_logging(struct work_struct* work)
 {
@@ -820,7 +793,7 @@ static void psy_external_logging(struct work_struct* work)
 
 	if (psy_logger)
 		power_supply_set_property(
-			psy_logger, POWER_SUPPLY_PROP_DEBUG_BATTERY, &prp_command);
+			psy_logger, POWER_SUPPLY_PROP_EXT_DEBUG_BATTERY, &prp_command);
 
 	schedule_delayed_work(
 		to_delayed_work(work), msecs_to_jiffies(debug_polling_time));
@@ -850,7 +823,7 @@ static void psy_external_changed(struct power_supply* psy_me)
 	if (psy_batt) {
 		/* Update eoc */
 		if (!power_supply_get_property(
-				psy_batt, POWER_SUPPLY_PROP_CHARGE_DONE, &buffer))
+				psy_batt, PSY_IIO_CHARGE_DONE, &buffer))
 		{
 			/* 'terminated' is true only when
 			 *    1. CHARGE_DONE and
@@ -902,7 +875,7 @@ static void psy_external_changed(struct power_supply* psy_me)
 				veneer_me->usbin_typefix = false;
 				veneer_me->usbin_aicl = 0;
 				power_supply_set_property(
-					psy_usb, POWER_SUPPLY_PROP_RESISTANCE, &buffer);
+					psy_usb, POWER_SUPPLY_PROP_EXT_RESISTANCE, &buffer);
 				cancel_delayed_work(&veneer_me->dwork_slowchg);
 			} else {
 				schedule_delayed_work(&veneer_me->dwork_slowchg,
@@ -917,20 +890,20 @@ static void psy_external_changed(struct power_supply* psy_me)
 		if (veneer_me->presence_usb
 			&& !veneer_me->usbin_typefix
 			&& !power_supply_get_property(
-				psy_usb, POWER_SUPPLY_PROP_REAL_TYPE, &buffer)
+				psy_usb, PSY_IIO_USB_REAL_TYPE, &buffer)
 			&& buffer.intval != veneer_me->usbin_realtype
 			&& buffer.intval != POWER_SUPPLY_TYPE_UNKNOWN) {
 			// Changing wired status to UNKNOWN is skipped
 			veneer_me->usbin_realtype = buffer.intval;
 			power_supply_set_property(
-				psy_usb, POWER_SUPPLY_PROP_RESISTANCE, &buffer);
+				psy_usb, POWER_SUPPLY_PROP_EXT_RESISTANCE, &buffer);
 			strcat(hit, "U:REAL_TYPE ");
 		}
 		/* Update otg presence */
 		if (!power_supply_get_property(
-				psy_usb, POWER_SUPPLY_PROP_TYPEC_MODE, &buffer)) {
-			bool presence_otg = (buffer.intval==POWER_SUPPLY_TYPEC_SINK)
-				|| (buffer.intval==POWER_SUPPLY_TYPEC_SINK_POWERED_CABLE);
+				psy_usb, POWER_SUPPLY_PROP_EXT_TYPEC_MODE, &buffer)) {
+			bool presence_otg = (buffer.intval==QTI_POWER_SUPPLY_TYPEC_SINK)
+				|| (buffer.intval==QTI_POWER_SUPPLY_TYPEC_SINK_POWERED_CABLE);
 			if (veneer_me->presence_otg != presence_otg) {
 				veneer_me->presence_otg = presence_otg;
 				strcat(hit, "U:OTG ");
@@ -959,7 +932,7 @@ static void psy_external_changed(struct power_supply* psy_me)
 			buffer.intval = 1;
 		}
 		if (power_supply_set_property(psy_wireless,
-			POWER_SUPPLY_PROP_CHARGING_ENABLED, &buffer)) {
+			POWER_SUPPLY_PROP_EXT_CHARGING_ENABLED, &buffer)) {
 			pr_veneer("Error to enable wireless : %d\n", buffer.intval);
 		}
 		/* Then update wireless present */
@@ -974,7 +947,7 @@ static void psy_external_changed(struct power_supply* psy_me)
 		if (veneer_me->presence_wireless
 			&& veneer_me->battery_eoc
 			&& power_supply_set_property(psy_wireless,
-			POWER_SUPPLY_PROP_CHARGE_DONE, &buffer)) {
+			PSY_IIO_CHARGE_DONE, &buffer)) {
 			pr_veneer("Error to set full wireless : %d\n", buffer.intval);
 		}
 	}
@@ -1239,16 +1212,6 @@ static void back_veneer_voter(enum voter_type type, int limit)
 
 		// Update the battery status considering fake UI
 		update_veneer_status(veneer_me);
-
-/* At this time, "POWER_SUPPLY_PROP_RESTRICTED_CHARGING" is adopted to vote
- * restriction value to the battery psy.
- * So be sure that set_property(POWER_SUPPLY_PROP_RESTRICTED_CHARGING)
- * should be defined in the psy for the charger driver,
- *   which is supporting limited charging.
- */
-		if (!psy_batt || power_supply_set_property(psy_batt,
-			POWER_SUPPLY_PROP_RESTRICTED_CHARGING, &psy_prop))
-			pr_veneer("Error on voting to real world\n");
 	}
 	else
 		pr_veneer("veneer is NULL\n");
@@ -1303,7 +1266,8 @@ static bool probe_preset(struct device* veneer_dev, struct veneer* veneer_me)
 	veneer_me->veneer_dev = veneer_dev;
 	veneer_me->veneer_supplier = CHARGING_SUPPLY_TYPE_UNKNOWN;
 	mutex_init(&veneer_me->veneer_lock);
-	wakeup_source_init(&veneer_me->veneer_wakelock, VENEER_WAKELOCK);
+	wakeup_source_create(VENEER_WAKELOCK);
+	wakeup_source_add(&veneer_me->veneer_wakelock);
 	INIT_DELAYED_WORK(&veneer_me->dwork_logger, psy_external_logging);
 	INIT_DELAYED_WORK(&veneer_me->dwork_slowchg, detect_slowchg_timer);
 	if (of_property_read_u32(veneer_supp, "capacity-mah-min",
@@ -1397,7 +1361,8 @@ static void veneer_clear(struct veneer* veneer_me)
 
 	veneer_voter_destroy();
 	if (veneer_me) {
-		wakeup_source_trash(&veneer_me->veneer_wakelock);
+		wakeup_source_remove(&veneer_me->veneer_wakelock);
+		wakeup_source_destroy(&veneer_me->veneer_wakelock);
 		cancel_delayed_work(&veneer_me->dwork_logger);
 		cancel_delayed_work(&veneer_me->dwork_slowchg);
 		if(veneer_me->veneer_psy)

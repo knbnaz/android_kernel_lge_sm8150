@@ -390,7 +390,7 @@ static ssize_t status_boot_store(struct device* dev, struct device_attribute* at
 				wireless_psy = power_supply_get_by_name("wireless");
 				if (wireless_psy) {
 					power_supply_set_property(wireless_psy,
-						POWER_SUPPLY_PROP_INPUT_SUSPEND, &value);
+						POWER_SUPPLY_PROP_EXT_INPUT_SUSPEND, &value);
 					power_supply_changed(wireless_psy);
 					power_supply_put(wireless_psy);
 				}
@@ -785,7 +785,7 @@ static ssize_t fake_hvdcp_store(struct device* dev, struct device_attribute* att
 			if (psy) {
 				*ori = new;
 				cmd.intval = new;
-				power_supply_set_property(psy, POWER_SUPPLY_PROP_USB_HC, &cmd);
+				power_supply_set_property(psy, POWER_SUPPLY_PROP_EXT_FAKE_HVDCP, &cmd);
 				power_supply_put(psy);
 			}
 		}
@@ -1006,7 +1006,7 @@ static ssize_t charger_usbid_show(struct device* dev, struct device_attribute* a
 
 	if (dev && dev->platform_data) {
 		if (usb) {
-			power_supply_get_property(usb, POWER_SUPPLY_PROP_RESISTANCE, &prp);
+			power_supply_get_property(usb, POWER_SUPPLY_PROP_EXT_RESISTANCE, &prp);
 			power_supply_put(usb);
 		}
 	}
