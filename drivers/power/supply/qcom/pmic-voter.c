@@ -73,10 +73,19 @@ static void vote_set_any(struct votable *votable, int client_id,
 
 	*eff_res = 0;
 
+#ifdef CONFIG_LGE_PM
+	*eff_id = -EINVAL;
+	for (i = 0; i < votable->num_clients && votable->client_strs[i]; i++) {
+		*eff_res |= votable->votes[i].enabled;
+		if (votable->votes[i].enabled)
+			*eff_id = i;
+	}
+#else
 	for (i = 0; i < votable->num_clients && votable->client_strs[i]; i++)
 		*eff_res |= votable->votes[i].enabled;
 
 	*eff_id = client_id;
+#endif
 }
 
 /**
@@ -482,6 +491,10 @@ int vote(struct votable *votable, const char *client_str, bool enabled, int val)
 			|| (effective_result != votable->effective_result)) {
 		votable->effective_client_id = effective_id;
 		votable->effective_result = effective_result;
+#if defined(CONFIG_LGE_PM_DEBUG) && !defined(DEBUG)
+	/* Releasing logs for the effective voter except on "FG_WS" */
+	if (strcmp(votable->name, "FG_WS"))
+#endif
 		pr_debug("%s: effective vote is now %d voted by %s,%d\n",
 			votable->name, effective_result,
 			get_client_str(votable, effective_id),
@@ -492,6 +505,11 @@ int vote(struct votable *votable, const char *client_str, bool enabled, int val)
 					effective_result,
 					get_client_str(votable, effective_id));
 	}
+#ifdef CONFIG_LGE_PM
+	else if (effective_id != votable->effective_client_id) {
+		votable->effective_client_id = effective_id;
+	}
+#endif
 
 	votable->voted_on = true;
 out:

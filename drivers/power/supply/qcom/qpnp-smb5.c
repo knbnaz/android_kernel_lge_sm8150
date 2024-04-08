@@ -232,7 +232,11 @@ struct smb5 {
 	struct work_struct	smb5_init_work;
 };
 
+#ifdef CONFIG_LGE_PM
+static int __debug_mask = PR_INTERRUPT | PR_PARALLEL | PR_MISC | PR_OTG;
+#else
 static int __debug_mask;
+#endif
 
 static ssize_t pd_disabled_show(struct device *dev, struct device_attribute
 				*attr, char *buf)
@@ -967,9 +971,23 @@ static int smb5_init_usb_psy(struct smb5 *chip)
 
 	usb_cfg.drv_data = chip;
 	usb_cfg.of_node = chg->dev->of_node;
+#ifdef CONFIG_LGE_PM_VENEER_PSY
+	usb_psy_desc_extension.name = usb_psy_desc.name;
+	usb_psy_desc_extension.type = usb_psy_desc.type;
+	usb_psy_desc_extension.properties		= extension_usb_properties();
+	usb_psy_desc_extension.num_properties	= extension_usb_num_properties();
+	usb_psy_desc_extension.get_property		= extension_usb_get_property;
+	usb_psy_desc_extension.set_property		= extension_usb_set_property;
+	usb_psy_desc_extension.property_is_writeable	= extension_usb_property_is_writeable;
+
+	chg->usb_psy = devm_power_supply_register(chg->dev,
+						  &usb_psy_desc_extension,
+						  &usb_cfg);
+#else
 	chg->usb_psy = devm_power_supply_register(chg->dev,
 						  &usb_psy_desc,
 						  &usb_cfg);
+#endif
 	if (IS_ERR(chg->usb_psy)) {
 		pr_err("Couldn't register USB power supply\n");
 		return PTR_ERR(chg->usb_psy);
@@ -1067,9 +1085,23 @@ static int smb5_init_usb_port_psy(struct smb5 *chip)
 
 	usb_port_cfg.drv_data = chip;
 	usb_port_cfg.of_node = chg->dev->of_node;
+#ifdef CONFIG_LGE_PM_VENEER_PSY
+	usb_port_psy_desc_extension.name = usb_port_psy_desc.name;
+	usb_port_psy_desc_extension.type = usb_port_psy_desc.type;
+	usb_port_psy_desc_extension.properties = extension_usb_port_properties();
+	usb_port_psy_desc_extension.num_properties = extension_usb_port_num_properties();
+	usb_port_psy_desc_extension.get_property = extension_usb_port_get_property;
+	usb_port_psy_desc_extension.set_property = usb_port_psy_desc.set_property;
+	usb_port_psy_desc_extension.property_is_writeable = usb_port_psy_desc.property_is_writeable;
+
+	chg->usb_port_psy = devm_power_supply_register(chg->dev,
+						  &usb_port_psy_desc_extension,
+						  &usb_port_cfg);
+#else
 	chg->usb_port_psy = devm_power_supply_register(chg->dev,
 						  &usb_port_psy_desc,
 						  &usb_port_cfg);
+#endif
 	if (IS_ERR(chg->usb_port_psy)) {
 		pr_err("Couldn't register USB pc_port power supply\n");
 		return PTR_ERR(chg->usb_port_psy);
@@ -1182,9 +1214,23 @@ static int smb5_init_dc_psy(struct smb5 *chip)
 
 	dc_cfg.drv_data = chip;
 	dc_cfg.of_node = chg->dev->of_node;
+#ifdef CONFIG_LGE_PM_VENEER_PSY
+	dc_psy_desc_extension.name = dc_psy_desc.name;
+	dc_psy_desc_extension.type = dc_psy_desc.type;
+	dc_psy_desc_extension.properties = extension_dc_properties();
+	dc_psy_desc_extension.num_properties = extension_dc_num_properties();
+	dc_psy_desc_extension.get_property = extension_dc_get_property;
+	dc_psy_desc_extension.set_property = extension_dc_set_property;
+	dc_psy_desc_extension.property_is_writeable = dc_psy_desc.property_is_writeable;
+
+	chg->dc_psy = devm_power_supply_register(chg->dev,
+						  &dc_psy_desc_extension,
+						  &dc_cfg);
+#else
 	chg->dc_psy = devm_power_supply_register(chg->dev,
 						  &dc_psy_desc,
 						  &dc_cfg);
+#endif
 	if (IS_ERR(chg->dc_psy)) {
 		pr_err("Couldn't register USB power supply\n");
 		return PTR_ERR(chg->dc_psy);
@@ -1386,12 +1432,33 @@ static int smb5_init_batt_psy(struct smb5 *chip)
 	struct power_supply_config batt_cfg = {};
 	struct smb_charger *chg = &chip->chg;
 	int rc = 0;
+#ifdef CONFIG_LGE_PM_VENEER_PSY
+	static char *from[] = { "battery", "usb"};
+#endif
 
 	batt_cfg.drv_data = chg;
 	batt_cfg.of_node = chg->dev->of_node;
+#ifdef CONFIG_LGE_PM_VENEER_PSY
+	batt_psy_desc_extension.name = batt_psy_desc.name;
+	batt_psy_desc_extension.type = batt_psy_desc.type;
+
+	batt_psy_desc_extension.properties = extension_battery_properties();
+	batt_psy_desc_extension.num_properties = extension_battery_num_properties();
+	batt_psy_desc_extension.get_property = extension_battery_get_property;
+	batt_psy_desc_extension.set_property = extension_battery_set_property;
+	batt_psy_desc_extension.external_power_changed = extension_battery_external_power_changed;
+	batt_psy_desc_extension.property_is_writeable = extension_battery_property_is_writeable;
+
+	chg->batt_psy = devm_power_supply_register(chg->dev,
+						   &batt_psy_desc_extension,
+						   &batt_cfg);
+	chg->batt_psy->supplied_from = from;
+	chg->batt_psy->num_supplies = ARRAY_SIZE(from);
+#else
 	chg->batt_psy = devm_power_supply_register(chg->dev,
 					   &batt_psy_desc,
 					   &batt_cfg);
+#endif
 	if (IS_ERR(chg->batt_psy)) {
 		pr_err("Couldn't register battery power supply\n");
 		return PTR_ERR(chg->batt_psy);
@@ -1447,8 +1514,13 @@ static int smb5_init_vbus_regulator(struct smb5 *chip)
  ******************************/
 
 static struct regulator_ops smb5_vconn_reg_ops = {
+#ifdef CONFIG_LGE_PM
+	.enable = override_vconn_regulator_enable,
+	.disable = override_vconn_regulator_disable,
+#else
 	.enable = smblib_vconn_regulator_enable,
 	.disable = smblib_vconn_regulator_disable,
+#endif
 	.is_enabled = smblib_vconn_regulator_is_enabled,
 };
 
@@ -1624,6 +1696,30 @@ static int smb5_configure_typec(struct smb_charger *chg)
 	if (rc < 0)
 		dev_err(chg->dev,
 			"Couldn't configure CC threshold voltage rc=%d\n", rc);
+
+#ifdef CONFIG_LGE_USB
+#define TYPE_C_CFG (USBIN_BASE + 0x58)
+#define BC1P2_START_ON_CC_BIT BIT(7)
+	/* BC1P2 starts after vbus deglitch */
+	rc = smblib_masked_write(chg, TYPE_C_CFG, BC1P2_START_ON_CC_BIT, 0);
+	if (rc < 0) {
+		dev_err(chg->dev,
+			"Couldn't configure BC1P2_START_ON_CC rc=%d\n", rc);
+		return rc;
+	}
+
+	/*
+	 * Do not check for VBUS at vSAFE0V before transitioning into
+	 * ATTACHED.SRC state
+	 */
+	rc = smblib_masked_write(chg, TYPE_C_EXIT_STATE_CFG_REG,
+		BYPASS_VSAFE0V_DURING_ROLE_SWAP_BIT,
+		BYPASS_VSAFE0V_DURING_ROLE_SWAP_BIT);
+	if (rc < 0) {
+		dev_err(chg->dev, "Couldn't set EXIT_STATE cfg rc=%d\n", rc);
+		return rc;
+	}
+#endif
 
 	return rc;
 }
@@ -1830,12 +1926,14 @@ static int smb5_init_dc_peripheral(struct smb_charger *chg)
 	if (chg->chg_param.smb_version == PMI632)
 		return 0;
 
+#ifndef CONFIG_LGE_PM
 	/* Set DCIN ICL to 100 mA */
 	rc = smblib_set_charge_param(chg, &chg->param.dc_icl, DCIN_ICL_MIN_UA);
 	if (rc < 0) {
 		dev_err(chg->dev, "Couldn't set dc_icl rc=%d\n", rc);
 		return rc;
 	}
+#endif
 
 	/* Disable DC Input missing poller function */
 	rc = smblib_masked_write(chg, DCIN_LOAD_CFG_REG,
@@ -2111,7 +2209,16 @@ static int smb5_init_hw(struct smb5 *chip)
 	}
 
 	/* Use ICL results from HW */
+#ifdef CONFIG_LGE_PM_VENEER_PSY
+	if(unified_bootmode_fabproc()) {
+		rc = smblib_icl_override(chg, SW_FACTORY_MODE);
+		pr_info("Set icl override config to factory mode");
+	} else {
+		rc = smblib_icl_override(chg, HW_AUTO_MODE);
+	}
+#else
 	rc = smblib_icl_override(chg, HW_AUTO_MODE);
+#endif
 	if (rc < 0) {
 		pr_err("Couldn't disable ICL override rc=%d\n", rc);
 		return rc;
@@ -2335,17 +2442,25 @@ static int smb5_determine_initial_status(struct smb5 *chip)
 
 	if (chg->iio_chan_list_qg)
 		smblib_config_charger_on_debug_battery(chg);
-
+#ifdef CONFIG_LGE_PM
+	override_usb_plugin_irq_handler(0, &irq_data);
+	override_typec_attach_detach_irq_handler(0, &irq_data);
+	override_chg_state_change_irq_handler(0, &irq_data);
+	override_usb_source_change_irq_handler(0, &irq_data);
+	override_typec_state_change_irq_handler(0, &irq_data);
+	override_typec_or_rid_detection_change_irq_handler(0, &irq_data);
+#else
 	smb5_usb_plugin_irq_handler(0, &irq_data);
-	smb5_dc_plugin_irq_handler(0, &irq_data);
 	smb5_typec_attach_detach_irq_handler(0, &irq_data);
 	smb5_typec_state_change_irq_handler(0, &irq_data);
 	smb5_usb_source_change_irq_handler(0, &irq_data);
 	smb5_chg_state_change_irq_handler(0, &irq_data);
+	smb5_typec_or_rid_detection_change_irq_handler(0, &irq_data);
+#endif
+	smb5_dc_plugin_irq_handler(0, &irq_data);
 	smb5_icl_change_irq_handler(0, &irq_data);
 	smb5_batt_temp_changed_irq_handler(0, &irq_data);
 	smb5_wdog_bark_irq_handler(0, &irq_data);
-	smb5_typec_or_rid_detection_change_irq_handler(0, &irq_data);
 	smb5_wdog_snarl_irq_handler(0, &irq_data);
 
 	return 0;
@@ -2363,7 +2478,11 @@ static struct smb_irq_info smb5_irqs[] = {
 	},
 	[CHG_STATE_CHANGE_IRQ] = {
 		.name		= "chg-state-change",
+#ifdef CONFIG_LGE_PM
+		.handler	= override_chg_state_change_irq_handler,
+#else
 		.handler	= smb5_chg_state_change_irq_handler,
+#endif
 		.wake		= true,
 	},
 	[STEP_CHG_STATE_CHANGE_IRQ] = {
@@ -2391,9 +2510,15 @@ static struct smb_irq_info smb5_irqs[] = {
 	},
 	[OTG_OC_DISABLE_SW_IRQ] = {
 		.name		= "otg-oc-disable-sw",
+#ifdef CONFIG_LGE_PM
+		.handler	= smb5_default_irq_handler,
+#endif
 	},
 	[OTG_OC_HICCUP_IRQ] = {
 		.name		= "otg-oc-hiccup",
+#ifdef CONFIG_LGE_PM
+		.handler	= smb5_default_irq_handler,
+#endif
 	},
 	[BSM_ACTIVE_IRQ] = {
 		.name		= "bsm-active",
@@ -2412,7 +2537,12 @@ static struct smb_irq_info smb5_irqs[] = {
 	},
 	[SWITCHER_POWER_OK_IRQ] = {
 		.name		= "switcher-power-ok",
+#ifdef CONFIG_LGE_PM
+		.handler	= override_switcher_power_ok_irq_handler,
+		.wake		= true,
+#else
 		.handler	= smb5_switcher_power_ok_irq_handler,
+#endif
 	},
 	/* BATTERY IRQs */
 	[BAT_TEMP_IRQ] = {
@@ -2456,7 +2586,11 @@ static struct smb_irq_info smb5_irqs[] = {
 	},
 	[USBIN_UV_IRQ] = {
 		.name		= "usbin-uv",
+#ifdef CONFIG_LGE_PM
+		.handler	= override_usbin_uv_irq_handler,
+#else
 		.handler	= smb5_usbin_uv_irq_handler,
+#endif
 		.wake		= true,
 		.storm_data	= {true, 3000, 5},
 	},
@@ -2466,7 +2600,11 @@ static struct smb_irq_info smb5_irqs[] = {
 	},
 	[USBIN_PLUGIN_IRQ] = {
 		.name		= "usbin-plugin",
+#ifdef CONFIG_LGE_PM
+		.handler	= override_usb_plugin_irq_handler,
+#else
 		.handler	= smb5_usb_plugin_irq_handler,
+#endif
 		.wake           = true,
 	},
 	[USBIN_REVI_CHANGE_IRQ] = {
@@ -2474,7 +2612,11 @@ static struct smb_irq_info smb5_irqs[] = {
 	},
 	[USBIN_SRC_CHANGE_IRQ] = {
 		.name		= "usbin-src-change",
+#ifdef CONFIG_LGE_PM
+		.handler	= override_usb_source_change_irq_handler,
+#else
 		.handler	= smb5_usb_source_change_irq_handler,
+#endif
 		.wake           = true,
 	},
 	[USBIN_ICL_CHANGE_IRQ] = {
@@ -2485,10 +2627,18 @@ static struct smb_irq_info smb5_irqs[] = {
 	/* DC INPUT IRQs */
 	[DCIN_VASHDN_IRQ] = {
 		.name		= "dcin-vashdn",
+#ifdef CONFIG_LGE_PM
+		.handler	= override_dcin_irq_handler,
+#endif
 	},
 	[DCIN_UV_IRQ] = {
 		.name		= "dcin-uv",
+#ifdef CONFIG_LGE_PM
+		.handler	= override_dc_uv_irq_handler,
+		.storm_data	= {true, 500, 8},
+#else
 		.handler	= smb5_dcin_uv_irq_handler,
+#endif
 		.wake		= true,
 	},
 	[DCIN_OV_IRQ] = {
@@ -2497,7 +2647,11 @@ static struct smb_irq_info smb5_irqs[] = {
 	},
 	[DCIN_PLUGIN_IRQ] = {
 		.name		= "dcin-plugin",
+#ifdef CONFIG_LGE_PM
+		.handler	= override_dcin_irq_handler,
+#else
 		.handler	= smb5_dc_plugin_irq_handler,
+#endif
 		.wake           = true,
 	},
 	[DCIN_REVI_IRQ] = {
@@ -2505,16 +2659,28 @@ static struct smb_irq_info smb5_irqs[] = {
 	},
 	[DCIN_PON_IRQ] = {
 		.name		= "dcin-pon",
+#ifdef CONFIG_LGE_PM
+		.handler	= override_dcin_irq_handler,
+#else
 		.handler	= smb5_default_irq_handler,
+#endif
 	},
 	[DCIN_EN_IRQ] = {
 		.name		= "dcin-en",
+#ifdef CONFIG_LGE_PM
+		.handler	= override_dcin_irq_handler,
+#else
 		.handler	= smb5_default_irq_handler,
+#endif
 	},
 	/* TYPEC IRQs */
 	[TYPEC_OR_RID_DETECTION_CHANGE_IRQ] = {
 		.name		= "typec-or-rid-detect-change",
+#ifdef CONFIG_LGE_PM
+		.handler	= override_typec_or_rid_detection_change_irq_handler,
+#else
 		.handler	= smb5_typec_or_rid_detection_change_irq_handler,
+#endif
 		.wake           = true,
 	},
 	[TYPEC_VPD_DETECT_IRQ] = {
@@ -2522,19 +2688,31 @@ static struct smb_irq_info smb5_irqs[] = {
 	},
 	[TYPEC_CC_STATE_CHANGE_IRQ] = {
 		.name		= "typec-cc-state-change",
+#ifdef CONFIG_LGE_PM
+		.handler	= override_typec_state_change_irq_handler,
+#else
 		.handler	= smb5_typec_state_change_irq_handler,
+#endif
 		.wake           = true,
 	},
 	[TYPEC_VCONN_OC_IRQ] = {
 		.name		= "typec-vconn-oc",
+#ifdef CONFIG_LGE_PM
+		.handler	= override_typec_vconn_oc_irq_handler,
+#else
 		.handler	= smb5_default_irq_handler,
+#endif
 	},
 	[TYPEC_VBUS_CHANGE_IRQ] = {
 		.name		= "typec-vbus-change",
 	},
 	[TYPEC_ATTACH_DETACH_IRQ] = {
 		.name		= "typec-attach-detach",
+#ifdef CONFIG_LGE_PM
+		.handler	= override_typec_attach_detach_irq_handler,
+#else
 		.handler	= smb5_typec_attach_detach_irq_handler,
+#endif
 		.wake		= true,
 	},
 	[TYPEC_LEGACY_CABLE_DETECT_IRQ] = {
@@ -2557,6 +2735,9 @@ static struct smb_irq_info smb5_irqs[] = {
 	},
 	[AICL_FAIL_IRQ] = {
 		.name		= "aicl-fail",
+#ifdef CONFIG_LGE_PM
+		.handler	= override_aicl_fail_irq_handler,
+#endif
 	},
 	[AICL_DONE_IRQ] = {
 		.name		= "aicl-done",
@@ -2668,6 +2849,10 @@ static int smb5_request_interrupt(struct smb5 *chip,
 	}
 
 	smb5_irqs[irq_index].irq = irq;
+#ifdef CONFIG_LGE_PM
+	if (irq_index == USBIN_ICL_CHANGE_IRQ)
+		chg->usb_icl_change_irq_enabled = true;
+#endif
 	smb5_irqs[irq_index].irq_data = irq_data;
 	if (smb5_irqs[irq_index].wake)
 		enable_irq_wake(irq);
@@ -3283,6 +3468,10 @@ static int smb5_probe(struct platform_device *pdev)
 
 	device_init_wakeup(chg->dev, true);
 
+#ifdef CONFIG_LGE_PM
+	extension_smb5_probe(chg);
+#endif
+
 	pr_info("QPNP SMB5 probed successfully\n");
 
 	return rc;
@@ -3429,6 +3618,10 @@ static struct platform_driver smb5_driver = {
 	.shutdown	= smb5_shutdown,
 };
 module_platform_driver(smb5_driver);
+
+#ifdef CONFIG_LGE_PM_VENEER_PSY
+#include "../lge/extension-smb5.c"
+#endif
 
 MODULE_DESCRIPTION("QPNP SMB5 Charger Driver");
 MODULE_LICENSE("GPL v2");
