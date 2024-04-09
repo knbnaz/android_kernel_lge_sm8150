@@ -1963,7 +1963,7 @@ static struct snd_soc_component_driver soc_codec_dev_cs35l41 = {
 	.num_controls = ARRAY_SIZE(cs35l41_aud_controls),
 
 	.set_sysclk = cs35l41_codec_set_sysclk,
-	.ignore_pmdown_time = true,
+	.use_pmdown_time = 0,
 };
 
 
