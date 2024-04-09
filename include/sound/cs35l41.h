@@ -53,7 +53,7 @@ struct cs35l41_platform_data {
 
 struct cs35l41_private {
 	struct wm_adsp dsp; /* needs to be first member */
-	struct snd_soc_codec *codec;
+	struct snd_soc_component *component;
 	struct cs35l41_platform_data pdata;
 	struct device *dev;
 	struct regmap *regmap;
