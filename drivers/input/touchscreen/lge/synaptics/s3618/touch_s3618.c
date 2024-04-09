@@ -3218,13 +3218,6 @@ static int s3618_fb_notifier_callback(struct notifier_block *self,
 		d->blank_status.curr = *blank;
 		TOUCH_I("%s: blank_status - prev[%d] curr[%d]\n",
 				__func__, d->blank_status.prev, d->blank_status.curr);
-
-		if (d->blank_status.curr == FB_BLANK_UNBLANK) {
-			touch_resume(ts->dev);
-		} else {
-			if (d->blank_status.prev == FB_BLANK_UNBLANK)
-				touch_suspend(ts->dev);
-		}
 	}
 	return 0;
 }
