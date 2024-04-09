@@ -610,10 +610,6 @@ static int dwc3_msm_gadget_vbus_draw(struct dwc3_msm *mdwc, unsigned int mA);
 static void dwc3_msm_notify_event(struct dwc3 *dwc,
 		enum dwc3_notify_event event, unsigned int value);
 
-#ifdef CONFIG_LGE_USB
-static int get_psy_type(struct dwc3_msm *mdwc);
-#endif
-
 #if IS_ENABLED(CONFIG_LGE_COVER_DISPLAY)
 extern bool usb_super_speed;
 extern bool is_dd_working(void);
@@ -2870,11 +2866,6 @@ static void dwc3_msm_notify_event(struct dwc3 *dwc,
 			mdwc->suspend = dwc->b_suspend;
 			queue_work(mdwc->dwc3_wq, &mdwc->resume_work);
 		}
-
-#ifdef CONFIG_LGE_USB
-		if (get_psy_type(mdwc) == POWER_SUPPLY_TYPE_USB_PD)
-			dwc->gadget.is_selfpowered = 1;
-#endif
 		break;
 	case DWC3_CONTROLLER_SET_CURRENT_DRAW_EVENT:
 		dev_dbg(mdwc->dev, "DWC3_CONTROLLER_SET_CURRENT_DRAW_EVENT received\n");
@@ -2932,18 +2923,6 @@ static void dwc3_msm_notify_event(struct dwc3 *dwc,
 
 		handle_gsi_clear_db(mdwc);
 		break;
-#ifdef CONFIG_LGE_USB
-	case DWC3_CONTROLLER_WAKEUP_EVENT:
-		dev_dbg(mdwc->dev, "DWC3_CONTROLLER_WAKEUP_EVENT received\n");
-		if (get_psy_type(mdwc) == POWER_SUPPLY_TYPE_USB_PD)
-			schedule_work(&mdwc->pd_resume_work);
-		break;
-	case DWC3_CONTROLLER_SUSPEND_EVENT:
-		dev_dbg(mdwc->dev, "DWC3_CONTROLLER_SUSPEND_EVENT received\n");
-		if (get_psy_type(mdwc) == POWER_SUPPLY_TYPE_USB_PD)
-			schedule_work(&mdwc->pd_suspend_work);
-		break;
-#endif
 	default:
 		dev_dbg(mdwc->dev, "unknown dwc3 event\n");
 		break;
