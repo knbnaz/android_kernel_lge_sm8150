@@ -111,8 +111,8 @@ struct rmidev_handle {
 	struct device *ts_dev;
 	struct s3706_data *d;
 	struct kobject *sysfs_dir;
-	struct siginfo interrupt_signal;
-	struct siginfo terminate_signal;
+	struct kernel_siginfo interrupt_signal;
+	struct kernel_siginfo terminate_signal;
 	struct task_struct *task;
 	void *data;
 	bool irq_enabled;
