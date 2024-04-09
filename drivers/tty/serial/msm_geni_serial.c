@@ -1316,8 +1316,6 @@ static void msm_geni_serial_console_write(struct console *co, const char *s,
 	int irq_en;
 
 #ifdef CONFIG_LGE_USB_DEBUGGER
-	if(console_uart_status() <= 0)
-		return;
 	if(msm_geni_serial_get_uart_console_status() != UART_CONSOLE_ENABLED)
 		return;
 #endif
