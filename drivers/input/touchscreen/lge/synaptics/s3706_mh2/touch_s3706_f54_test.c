@@ -369,7 +369,7 @@ static uint8_t RxPhysical[TRX_MAPPING_MAX];
 static uint8_t ExtendRT26_pin[4] = {0, 1, 32, 33};
 static int16_t TransRxShortData[TRX_MAX];
 
-struct timeval t_interval[TIME_PROFILE_MAX];
+struct timespec64 t_interval[TIME_PROFILE_MAX];
 static int f54len;
 static char f54buf[BUF_SIZE] = {0};
 
@@ -1379,7 +1379,7 @@ static int ReadReport(struct device *dev, u16 input, int mode, char *buf)
 		goto error;
 	}
 
-	do_gettimeofday(&t_interval[ENDTIME]);
+	ktime_get_real_ts64(&t_interval[ENDTIME]);
 
 	TOUCH_I("Takes %lu ticks\n",
 			get_time_interval(t_interval[ENDTIME].tv_sec,
