@@ -41,7 +41,6 @@
 #include <linux/of.h>
 #include <linux/of_gpio.h>
 #include <linux/regulator/consumer.h>
-#include <soc/qcom/scm.h>
 
 #include <linux/pm_wakeup.h>
 
@@ -72,7 +71,7 @@ struct vreg_config {
 	int ua_load;
 };
 
-static const struct vreg_config const vreg_conf[] = {
+static const struct vreg_config vreg_conf[] = {
 	{ "vcc_spi", 3300000UL, 3300000UL, 10, },
 };
 
@@ -206,9 +205,9 @@ static DECLARE_WAIT_QUEUE_HEAD(interrupt_waitq);
  *		Function Return
  */
 
-void interrupt_timer_routine(unsigned long _data)
+void interrupt_timer_routine(struct timer_list *t)
 {
-	struct interrupt_desc *bdata = (struct interrupt_desc *)_data;
+	struct interrupt_desc *bdata = from_timer(bdata, t, timer);
 
 	DEBUG_PRINT("[egis] FPS interrupt count = %d detect_threshold = %d\n", bdata->int_count, bdata->detect_threshold);
 	if (bdata->int_count >= bdata->detect_threshold) {
@@ -711,7 +710,8 @@ static int egis_remove(struct platform_device *pdev)
 	DEBUG_PRINT("[egis] %s (#%d)\n", __func__, __LINE__);
 	free_irq(gpio_irq, g_data);
 	del_timer_sync(&fps_ints.timer);
-	wakeup_source_trash(&wakeup_source_fp);
+	wakeup_source_remove(&wakeup_source_fp);
+	wakeup_source_destroy(&wakeup_source_fp);
 	request_irq_done = 0;
 	return 0;
 }
@@ -800,10 +800,11 @@ static int egis_probe(struct platform_device *pdev)
 	fps_ints.drdy_irq_flag = DRDY_IRQ_DISABLE;
 
 	/* the timer is for ET310 */
-	setup_timer(&fps_ints.timer, interrupt_timer_routine, (unsigned long)&fps_ints);
+	timer_setup(&fps_ints.timer, interrupt_timer_routine, 0);
 	add_timer(&fps_ints.timer);
 
-	wakeup_source_init(&wakeup_source_fp, "et713_wakeup");
+	wakeup_source_create("et713_wakeup");
+	wakeup_source_add(&wakeup_source_fp);
 
 	DEBUG_PRINT("[egis] %s: initialize success %d\n", __func__, status);
 //	vreg_setup(egis, "vcc_spi", 1);
