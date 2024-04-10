@@ -84,4 +84,11 @@ static inline struct usbpd *usbpd_create(struct device *parent,
 static inline void usbpd_destroy(struct usbpd *pd) { }
 #endif
 
+#ifdef CONFIG_LGE_USB
+int pd_phy_register_emul(const void *emul, struct pd_phy_emul_params *params);
+int pd_phy_emul_signal(const void *emul, enum pd_sig_type sig);
+int pd_phy_emul_write(const void *emul, u16 hdr, const u8 *data,
+		size_t data_len, enum pd_sop_type sop);
+#endif
+
 #endif /* _USBPD_H */

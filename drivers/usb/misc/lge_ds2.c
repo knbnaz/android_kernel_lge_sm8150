@@ -22,9 +22,10 @@
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/platform_device.h>
-#include <linux/extcon.h>
+#include <linux/extcon-provider.h>
 #include <linux/gpio/consumer.h>
 #include <linux/power_supply.h>
+#include <linux/qti_power_supply.h>
 #include <linux/workqueue.h>
 #include <linux/usb.h>
 #include <linux/usb/usbpd.h>
@@ -282,9 +283,9 @@ void set_hallic_status(bool enable)
 		if (!ds2->is_ds2_connected &&
 		    !ds2->is_usb_connected &&
 		    !ds2->is_usb_recovery &&
-		    ds2->pd_active == POWER_SUPPLY_PD_INACTIVE &&
-		    (ds2->typec_mode == POWER_SUPPLY_TYPEC_SINK ||
-		     ds2->typec_mode == POWER_SUPPLY_TYPEC_SINK_POWERED_CABLE))
+		    ds2->pd_active == QTI_POWER_SUPPLY_PD_INACTIVE &&
+		    (ds2->typec_mode == QTI_POWER_SUPPLY_TYPEC_SINK ||
+		     ds2->typec_mode == QTI_POWER_SUPPLY_TYPEC_SINK_POWERED_CABLE))
 			ds2_set_state(ds2, STATE_DS2_STARTUP);
 	} else {
 		/* ... */
@@ -860,7 +861,7 @@ static int ds2_usb_notify(struct notifier_block *nb, unsigned long action,
 		// DS2 USB Disconnected
 		if (IS_DS2_USB(udev)) {
 			BUG_ON(usb_sudden_disconnect_check &&
-			       ds2->typec_mode != POWER_SUPPLY_TYPEC_NONE);
+			       ds2->typec_mode != QTI_POWER_SUPPLY_TYPEC_NONE);
 
 			if (ds2->is_ds2_connected && ds2->is_ds2_recovery <= 0) {
 				ds2->is_ds2_recovery = ds2_vconn_recovery_count;
@@ -895,7 +896,7 @@ static void ds2_sm(struct work_struct *w)
 
 #ifdef USE_2ND_USB
 	if (usb_2nd_host_test) {
-		if (ds2->typec_mode == POWER_SUPPLY_TYPEC_NONE) {
+		if (ds2->typec_mode == QTI_POWER_SUPPLY_TYPEC_NONE) {
 			stop_2nd_usb_host(ds2);
 			gpiod_direction_output(ds2->dd_sw_sel, 0);
 		} else {
@@ -910,7 +911,7 @@ static void ds2_sm(struct work_struct *w)
 		ds2_state_strings[ds2->current_state]);
 
 	// disconnect
-	if (ds2->typec_mode == POWER_SUPPLY_TYPEC_NONE) {
+	if (ds2->typec_mode == QTI_POWER_SUPPLY_TYPEC_NONE) {
 		if (!ds2->is_ds2_connected) {
 			dev_dbg(dev, "%s: DS2 is already disconnected\n",
 				__func__);
@@ -920,11 +921,6 @@ static void ds2_sm(struct work_struct *w)
 		dev_info(dev, "%s: DS2 disconnect\n", __func__);
 
 		ds2->is_ds2_connected = false;
-		val.intval = POWER_SUPPLY_PD_INACTIVE;
-                        power_supply_set_property(ds2->usb_psy,
-                                                  POWER_SUPPLY_PROP_PD_ACTIVE,
-                                                  &val);
-
 #ifdef USE_2ND_USB
 		// Secondary USB
 		stop_2nd_usb_host(ds2);
@@ -980,10 +976,7 @@ static void ds2_sm(struct work_struct *w)
 
 		// Activate PowerDelivery
 		if (hallic_status || hallic_test) {
-			val.intval = POWER_SUPPLY_PD_VPD_ACTIVE;
-			power_supply_set_property(ds2->usb_psy,
-						  POWER_SUPPLY_PROP_PD_ACTIVE,
-						  &val);
+			val.intval = QTI_POWER_SUPPLY_PD_VPD_ACTIVE;
 		}
 
 		ds2->spec_rev = USBPD_REV_30;
@@ -1131,11 +1124,8 @@ static void ds2_sm(struct work_struct *w)
 		break;
 
 	case STATE_NONE_DS2_RECOVERY:
-		if (ds2->typec_mode == POWER_SUPPLY_TYPEC_NONE) {
-			val.intval = POWER_SUPPLY_TYPEC_PR_DUAL;
-			power_supply_set_property(ds2->usb_psy,
-					POWER_SUPPLY_PROP_TYPEC_POWER_ROLE,
-					&val);
+		if (ds2->typec_mode == QTI_POWER_SUPPLY_TYPEC_NONE) {
+			val.intval = QTI_POWER_SUPPLY_TYPEC_PR_DUAL;
 		}
 		mutex_lock(&lge_dp->cd_state_lock);
 		set_cover_display_state(COVER_DISPLAY_STATE_CONNECTED_CHECKING);
@@ -1206,9 +1196,7 @@ static void ds2_set_state(struct ds2 *ds2, enum ds2_state next_state)
 	case STATE_NONE_DS2_RECOVERY:
 		ds2->is_usb_recovery = true;
 
-		val.intval = POWER_SUPPLY_TYPEC_PR_NONE;
-		power_supply_set_property(ds2->usb_psy,
-				POWER_SUPPLY_PROP_TYPEC_POWER_ROLE, &val);
+		val.intval = QTI_POWER_SUPPLY_TYPEC_PR_NONE;
 
 		dev_err(dev, "%s: Recover because DS2 is not connected\n",
 			__func__);
@@ -1254,12 +1242,6 @@ static int psy_changed(struct notifier_block *nb, unsigned long evt, void *ptr)
 	if (ptr != ds2->usb_psy || evt != PSY_EVENT_PROP_CHANGED)
 		return 0;
 
-	ret = power_supply_get_property(ds2->usb_psy,
-			POWER_SUPPLY_PROP_PD_ACTIVE, &val);
-	if (ret) {
-		dev_err(dev, "Unable to read PD_ACTIVE: %d\n", ret);
-		return ret;
-	}
 	ds2->pd_active = val.intval;
 
 	ret = power_supply_get_property(ds2->usb_psy,
@@ -1271,7 +1253,7 @@ static int psy_changed(struct notifier_block *nb, unsigned long evt, void *ptr)
 	ds2->vbus_present = val.intval;
 
 	ret = power_supply_get_property(ds2->usb_psy,
-			POWER_SUPPLY_PROP_TYPEC_MODE, &val);
+			POWER_SUPPLY_PROP_EXT_TYPEC_MODE, &val);
 	if (ret < 0) {
 		dev_err(dev, "Unable to read USB TYPEC_MODE: %d\n", __func__);
 		return ret;
@@ -1296,7 +1278,7 @@ static int psy_changed(struct notifier_block *nb, unsigned long evt, void *ptr)
 	ds2->typec_mode = typec_mode;
 
 	switch (typec_mode) {
-	case POWER_SUPPLY_TYPEC_NONE:
+	case QTI_POWER_SUPPLY_TYPEC_NONE:
 #ifdef USE_2ND_USB
 		if (usb_2nd_host_test) {
 			kick_sm(ds2, 0);
@@ -1312,8 +1294,8 @@ static int psy_changed(struct notifier_block *nb, unsigned long evt, void *ptr)
 			kick_sm(ds2, 0);
 		break;
 
-	case POWER_SUPPLY_TYPEC_SINK:
-	case POWER_SUPPLY_TYPEC_SINK_POWERED_CABLE:
+	case QTI_POWER_SUPPLY_TYPEC_SINK:
+	case QTI_POWER_SUPPLY_TYPEC_SINK_POWERED_CABLE:
 #ifdef USE_2ND_USB
 		if (usb_2nd_host_test) {
 			ds2_set_state(ds2, STATE_DS2_STARTUP);
@@ -1329,7 +1311,7 @@ static int psy_changed(struct notifier_block *nb, unsigned long evt, void *ptr)
 		if ((hallic_status || hallic_test) &&
 		    !ds2->is_ds2_connected &&
 		    !ds2->is_usb_connected &&
-		    ds2->pd_active == POWER_SUPPLY_PD_INACTIVE)
+		    ds2->pd_active == QTI_POWER_SUPPLY_PD_INACTIVE)
 			ds2_set_state(ds2, STATE_DS2_STARTUP);
 		break;
 
