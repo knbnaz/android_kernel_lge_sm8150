@@ -1559,7 +1559,7 @@ static int wm_adsp_create_control(struct wm_adsp *dsp,
 	}
 
 	if (subname) {
-		struct snd_soc_component *component = &dsp->component;
+		struct snd_soc_component *component = dsp->component;
 		int avail = SNDRV_CTL_ELEM_ID_NAME_MAXLEN - ret - 2;
 		int skip = 0;
 
@@ -2794,7 +2794,7 @@ static int wm_adsp_load_coeff(struct wm_adsp *dsp)
 	const struct firmware *firmware;
 	const struct wm_adsp_region *mem;
 	struct wm_adsp_alg_region *alg_region;
-	struct snd_soc_component *component = &dsp->component;
+	struct snd_soc_component *component = dsp->component;
 	const char *region_name;
 	int ret, pos, blocks, type, offset, reg;
 	char *file;

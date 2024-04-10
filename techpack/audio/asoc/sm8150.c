@@ -7022,8 +7022,8 @@ static struct snd_soc_dapm_route cs35l41_audio_paths[] = {
 static int cs35l41_codec_init(struct snd_soc_pcm_runtime *rtd)
 {
 	int ret = 0;
-	struct snd_soc_component *component = rtd->component;
-	struct snd_soc_dapm_context *dapm = snd_soc_codec_get_dapm(component);
+	struct snd_soc_component *component = rtd->codec_dai->component;
+	struct snd_soc_dapm_context *dapm = snd_soc_component_get_dapm(component);
 	struct snd_soc_card *card = rtd->card;
 	char *dapm_widget_str = NULL;
 	int prefix_len = 0;
@@ -7655,7 +7655,7 @@ static struct snd_soc_card *populate_snd_card_dailinks(struct device *dev)
 			__func__);
 		return NULL;
 	}
-#if defined(CONFIG_SND_SOC_SMA6101) || defined(CONFIG_SND_SOC_TFA9872_STEREO)
+#if defined(CONFIG_SND_SOC_SMA6101) || defined(CONFIG_SND_SOC_TFA9872_STEREO) || defined(CONFIG_SND_SOC_CS35L41)
 	memcpy(multi_codecs_rx, multi_codecs, sizeof(multi_codecs));
 	memcpy(multi_codecs_tx, multi_codecs, sizeof(multi_codecs));
 #endif
