@@ -136,7 +136,9 @@ static int ice40_write_firmware(struct device *dev, const char *img)
 
 	mgr = fpga_mgr_get(dev);
 
-	ret = fpga_mgr_firmware_load(mgr, &info, img);
+	info.firmware_name = (char *)img;
+
+	ret = fpga_mgr_load(mgr, &info);
 	if (ret)
 		LOGE("Failed to load fpga image: %d\n", ret);
 	fpga_mgr_put(mgr);
