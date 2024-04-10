@@ -14,7 +14,6 @@
 #include <linux/of_gpio.h>
 #include <linux/syscalls.h>
 #include <linux/fs.h>
-#include <asm/segment.h>
 #include <asm/uaccess.h>
 #include <linux/firmware.h>
 #include <linux/buffer_head.h>
