@@ -9,6 +9,7 @@
 #include <linux/types.h>
 #include "dp_hpd.h"
 #ifdef CONFIG_LGE_COVER_DISPLAY
+#include <linux/usb/usbpd.h>
 #include "../lge/dp/lge_dp_def.h"
 #endif
 

@@ -307,7 +307,7 @@ static bool dp_display_is_ds_bridge(struct dp_panel *panel)
 static bool dp_display_is_sink_count_zero(struct dp_display_private *dp)
 {
 #if IS_ENABLED(CONFIG_LGE_COVER_DISPLAY)
-	return (dp->is_connected && !dp_display_is_sink_count_zero(dp) &&
+	return (!!dp_display_state_is(DP_STATE_CONNECTED) && !dp_display_is_sink_count_zero(dp) &&
 		((dp->hpd->hpd_high && dp->hpd->alt_mode_cfg_done) || dp->dd_hpd->hpd_high));
 #else
 	return dp_display_is_ds_bridge(dp->panel) &&
@@ -630,7 +630,7 @@ static void dp_display_hdcp_cb_work(struct work_struct *work)
 #endif
 
 #if IS_ENABLED(CONFIG_LGE_COVER_DISPLAY)
-	else if (dp->is_connected) {
+	else if (!!dp_display_state_is(DP_STATE_CONNECTED)) {
 		struct lge_cover_ops *ops = get_lge_cover_ops();
 
 		if (ops && ops->get_stream_preoff_state) {
@@ -1837,7 +1837,7 @@ static int dp_display_handle_disconnect(struct dp_display_private *dp)
 		if (COVER_DISPLAY_STATE_CONNECTED_ON == get_cover_display_state()) {
 			pr_info("abort as cover display recovered\n");
 			return 0;
-+		} else {
+		} else {
 			pr_info("turn DD power off\n");
 			// get back to ON state to proceed OFF sequence normally
 			set_cover_display_state(COVER_DISPLAY_STATE_CONNECTED_ON);
@@ -1851,7 +1851,7 @@ static int dp_display_handle_disconnect(struct dp_display_private *dp)
 	 * if it doesn't come in 1 sec, DD should go to OFF state instead of SUSPEND state
 	 * for that, make 'skip_uevent' 0
 	 */
-	if (dp->dp_display.lge_dp.skip_uevent && dp->power_on && !dp->hpd->hpd_high) {
+	if (dp->dp_display.lge_dp.skip_uevent && !!dp_display_state_is(DP_STATE_ENABLED) && !dp->hpd->hpd_high) {
 		int retry_count = 500;
 		pr_info("%s : waiting for powermode malfunction\n", __func__);
 
@@ -1861,7 +1861,7 @@ static int dp_display_handle_disconnect(struct dp_display_private *dp)
 				dp->dp_display.lge_dp.skip_uevent = 0;
 				break;
 			}
-		} while(dp->power_on);
+		} while(!!dp_display_state_is(DP_STATE_ENABLED));
 		pr_info("%s : powermode waiting finished\n", __func__);
 	}
 #endif
@@ -2161,14 +2161,6 @@ static int dp_display_usbpd_attention_cb(struct device *dev)
        }
 #endif
 
-#ifdef CONFIG_LGE_COVER_DISPLAY
-	DP_DEBUG("hpd_irq:%d, hpd_high:%d, power_on:%d, is_connected:%d, core_initialized:%d, process_hpd_connect:%d\n",
-			dp->hpd->hpd_irq, dp->hpd->hpd_high,
-			dp->power_on, dp->is_connected,
-			dp->core_initialized?1:0, dp->process_hpd_connect?1:0);
-
-	if (!dp->hpd->hpd_high && !dp->dd_hpd->hpd_high)
-#else
 	DP_DEBUG("hpd_irq:%d, hpd_high:%d, power_on:%d, is_connected:%d\n",
 			dp->hpd->hpd_irq, dp->hpd->hpd_high,
 			!!dp_display_state_is(DP_STATE_ENABLED),
@@ -2176,7 +2168,9 @@ static int dp_display_usbpd_attention_cb(struct device *dev)
 	SDE_EVT32_EXTERNAL(dp->state, dp->hpd->hpd_irq, dp->hpd->hpd_high,
 			!!dp_display_state_is(DP_STATE_ENABLED),
 			!!dp_display_state_is(DP_STATE_CONNECTED));
-
+#ifdef CONFIG_LGE_COVER_DISPLAY
+	if (!dp->hpd->hpd_high && !dp->dd_hpd->hpd_high) {
+#else
 	if (!dp->hpd->hpd_high) {
 #endif
 		dp_display_disconnect_sync(dp);
@@ -4322,7 +4316,7 @@ EXPORT_SYMBOL(is_dp_connected);
 bool is_dd_display_recovery_working(void)
 {
 	struct dp_display* dp_display = NULL;
-	struct dp_display_private *dp;
+	struct dp_display_private *dp = NULL;
 	bool ret;
 	int i;
 
@@ -4346,7 +4340,7 @@ EXPORT_SYMBOL(is_dd_display_recovery_working);
 bool is_dd_powermode(void)
 {
 	struct dp_display* dp_display = NULL;
-	struct dp_display_private *dp;
+	struct dp_display_private *dp = NULL;
 	bool ret;
 	int i;
 
@@ -4360,7 +4354,7 @@ bool is_dd_powermode(void)
 		pr_err("DD not init. yet\n");
 		ret = false;
 	} else {
-		ret = dp->power_on;
+		ret = !!dp_display_state_is(DP_STATE_ENABLED);
 	}
 	return ret;
 }
@@ -4374,7 +4368,7 @@ struct extcon_dev *dd_extcon_get(int id)
 		if (!g_dp_display[i])
 			return ERR_PTR(1);
 
-	return g_dp_display->dd_extcon_sdev[id];
+	return (*g_dp_display)->dd_extcon_sdev[id];
 }
 EXPORT_SYMBOL(dd_extcon_get);
 
