@@ -33,7 +33,7 @@
 #include "../sde_dbg.h"
 
 #if IS_ENABLED(CONFIG_LGE_COVER_DISPLAY) || IS_ENABLED(CONFIG_LGE_DUAL_SCREEN)
-#include <linux/extcon.h>
+#include <linux/extcon-provider.h>
 #include <linux/lge_cover_display.h>
 #include "../lge/cover/lge_cover_ctrl.h"
 #endif
@@ -203,7 +203,7 @@ struct dp_display_private {
 	struct completion attention_comp;
 
 	struct dp_hpd     *hpd;
-#if IS_ENABLED(CONFIG_LGE_COVER_DISPLAY)
+#if IS_ENABLED(CONFIG_LGE_COVER_DISPLAY) || IS_ENABLED(CONFIG_LGE_DUAL_SCREEN)
 	struct dp_hpd     *dd_hpd;
 #endif
 	struct dp_parser  *parser;
@@ -1001,6 +1001,32 @@ static bool dp_display_send_hpd_event(struct dp_display_private *dp)
 	drm_client_dev_hotplug(dev);
 	return true;
 }
+
+#if defined(CONFIG_LGE_DUAL_SCREEN) || defined(CONFIG_LGE_COVER_DISPLAY)
+bool is_dd_connected(void)
+{
+	struct dp_display* dp_display = NULL;
+	struct dp_display_private *dp = NULL;
+	bool ret;
+	int i;
+
+	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++) {
+		dp_display[i] = *g_dp_display[i];
+
+		dp[i] = *container_of(&dp_display[i], struct dp_display_private, dp_display);
+	}
+
+	if (IS_ERR_OR_NULL(dp) || IS_ERR_OR_NULL(dp->dd_hpd)) {
+		pr_err("DD hpd is not initialized yet\n");
+		ret = false;
+	} else {
+		ret = dp->dd_hpd->hpd_high;
+	}
+
+	return ret;
+}
+EXPORT_SYMBOL(is_dd_connected);
+#endif
 
 #if defined(CONFIG_LGE_DUAL_SCREEN)
 void lge_dp_display_send_hpd_event(struct dp_display_private *dp, bool hpd)
@@ -4275,16 +4301,16 @@ bail:
 	return rc;
 }
 #if IS_ENABLED(CONFIG_LGE_COVER_DISPLAY) || IS_ENABLED(CONFIG_LGE_DUAL_SCREEN)
-bool is_dp_connected()
+bool is_dp_connected(void)
 {
 	struct dp_display* dp_display = NULL;
-	struct dp_display_private *dp;
+	struct dp_display_private *dp = NULL;
 	int i;
 
 	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++) {
 		dp_display[i] = *g_dp_display[i];
 
-		dp[i] = container_of(dp_display[i], struct dp_display_private, dp_display);
+		dp[i] = *container_of(&dp_display[i], struct dp_display_private, dp_display);
 	}
 
 	return dp->hpd->hpd_high;
@@ -4293,7 +4319,7 @@ EXPORT_SYMBOL(is_dp_connected);
 #endif
 
 #if IS_ENABLED(CONFIG_LGE_COVER_DISPLAY)
-bool is_dd_connected()
+bool is_dd_display_recovery_working(void)
 {
 	struct dp_display* dp_display = NULL;
 	struct dp_display_private *dp;
@@ -4303,31 +4329,7 @@ bool is_dd_connected()
 	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++) {
 		dp_display[i] = *g_dp_display[i];
 
-		dp[i] = container_of(dp_display[i], struct dp_display_private, dp_display);
-	}
-
-	if (IS_ERR_OR_NULL(dp) || IS_ERR_OR_NULL(dp->dd_hpd)) {
-		pr_err("DD hpd is not initialized yet\n");
-		ret = false;
-	} else {
-		ret = dp->dd_hpd->hpd_high;
-	}
-
-	return ret;
-}
-EXPORT_SYMBOL(is_dd_connected);
-
-bool is_dd_display_recovery_working()
-{
-	struct dp_display* dp_display = NULL;
-	struct dp_display_private *dp;
-	bool ret;
-	int i;
-
-	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++) {
-		dp_display[i] = *g_dp_display[i];
-
-		dp[i] = container_of(dp_display[i], struct dp_display_private, dp_display);
+		dp[i] = *container_of(&dp_display[i], struct dp_display_private, dp_display);
 	}
 
 	if (IS_ERR_OR_NULL(dp) || IS_ERR_OR_NULL(dp->dd_hpd)) {
@@ -4341,7 +4343,7 @@ bool is_dd_display_recovery_working()
 }
 EXPORT_SYMBOL(is_dd_display_recovery_working);
 
-bool is_dd_powermode()
+bool is_dd_powermode(void)
 {
 	struct dp_display* dp_display = NULL;
 	struct dp_display_private *dp;
@@ -4351,7 +4353,7 @@ bool is_dd_powermode()
 	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++) {
 		dp_display[i] = *g_dp_display[i];
 
-		dp[i] = container_of(dp_display[i], struct dp_display_private, dp_display);
+		dp[i] = *container_of(&dp_display[i], struct dp_display_private, dp_display);
 	}
 
 	if (IS_ERR_OR_NULL(dp)) {
@@ -4688,10 +4690,10 @@ void send_hpd_event(void)
 
 	for (i = 0; i < MAX_DP_ACTIVE_DISPLAY; i++) {
 		dp_display[i] = *g_dp_display[i];
-		if (dp_display[i] == NULL)
+		if (&dp_display[i] == NULL)
 			return;
 
-		dp[i] = container_of(dp_display[i], struct dp_display_private, dp_display);
+		dp[i] = *container_of(&dp_display[i], struct dp_display_private, dp_display);
 	}
 
 	if (dp == NULL)

@@ -9,6 +9,11 @@
 #include "dp_reg.h"
 #include "dp_debug.h"
 
+#if IS_ENABLED(CONFIG_LGE_DUAL_SCREEN)
+#include <soc/qcom/lge/board_lge.h>
+#include <linux/lge_ds2.h>
+#endif
+
 #define dp_catalog_get_priv_v420(x) ({ \
 	struct dp_catalog *catalog; \
 	catalog = container_of(x, struct dp_catalog, x); \
@@ -335,8 +340,7 @@ static void dp_catalog_ctrl_update_vx_px_v420(struct dp_catalog_ctrl *ctrl,
 
 #if IS_ENABLED(CONFIG_LGE_DUAL_SCREEN)
 		if (is_ds2_connected() && (hw_sub_revid >= HW_SUB_REV_1))
-			dp_write(catalog->exe_mode, io_data, 0x108,
-					value2);
+			dp_write(0x108, value2);
 #endif
 
 		io_data = catalog->io->dp_ln_tx1;
@@ -345,8 +349,7 @@ static void dp_catalog_ctrl_update_vx_px_v420(struct dp_catalog_ctrl *ctrl,
 
 #if IS_ENABLED(CONFIG_LGE_DUAL_SCREEN)
 		if (is_ds2_connected() && (hw_sub_revid >= HW_SUB_REV_1))
-			dp_write(catalog->exe_mode, io_data, 0x108,
-					value2);
+			dp_write(0x108, value2);
 #endif
 		DP_DEBUG("hw: vx_value=0x%x px_value=0x%x\n",
 			value0, value1);

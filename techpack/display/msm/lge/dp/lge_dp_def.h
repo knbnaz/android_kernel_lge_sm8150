@@ -20,9 +20,11 @@ struct lge_dp_display {
 	int led_status;
 	atomic_t pending;
 	int pending_status;
+	atomic_t dd_uevent_switch;
 	atomic_t dd_5v_power_state;
 	int block_state;
 	unsigned int vid_pid;
+	int real_disconnection;
 #if defined(CONFIG_LGE_COVER_DISPLAY) || defined(CONFIG_LGE_DUAL_SCREEN)
 	struct lge_cover_ops *cover_ops;
 	struct mutex cover_lock;

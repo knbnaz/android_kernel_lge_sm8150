@@ -5,7 +5,7 @@
 #include <linux/init.h>
 #include <linux/device.h>
 #include <linux/err.h>
-#include <linux/extcon.h>
+#include <linux/extcon-provider.h>
 #include <asm/atomic.h>
 #include <linux/hall_ic.h>
 #include "lge_cover_ctrl.h"
