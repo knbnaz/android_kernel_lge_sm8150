@@ -37,7 +37,7 @@
 
 #include "usbpd.h"
 #include <linux/extcon.h>
-#include "../../gpu/drm/msm/lge/dp/lge_dp_def.h"
+#include "../../../techpack/display/msm/lge/dp/lge_dp_def.h"
 #include <soc/qcom/lge/board_lge.h>
 #include <linux/lge_cover_display.h>
 extern bool lge_get_mfts_mode(void);
