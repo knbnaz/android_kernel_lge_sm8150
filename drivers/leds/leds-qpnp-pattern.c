@@ -1,4 +1,5 @@
 #include "leds-qpnp-pattern.h"
+#include "../pwm/pwm-qti-lpg.c"
 
 /* Valueless constants just for indication
  */
@@ -41,7 +42,6 @@ extern struct qpnp_led_dev*  qpnp_led_blue;
 extern struct qpnp_tri_led_chip* qpnp_rgb_chip;
 
 extern struct list_head pwm_chips;
-struct	pwm_output_pattern*	duty_pattern;
 u64 parameter_scaled[PATTERN_SIZE_LUT] = {0, };
 int led_completed;
 
@@ -287,11 +287,6 @@ static void qpnp_set_ramp_config(struct pwm_device *pwm,
 		lpg->ramp_config.toggle = !!(flags & PM_PWM_LUT_REVERSE);
 		lpg->lut_written = false;
 
-		duty_pattern->num_entries = pattern_red_length;
-		duty_pattern->duty_pattern = &parameter_scaled[pattern_red_start];
-		duty_pattern->cycles_per_duty = parameter_pattern[PATTERN_INDEX_PAUSE_STEP];
-		qpnp_led_red->pwm_dev->state.output_pattern = duty_pattern;
-
 		for (i = 0; i < pattern_red_length; i++)
 			lpg->ramp_config.pattern[i] = (u32)parameter_scaled[pattern_red_start + i];
 	} else if (!strncmp(pwm->label, "green", strlen("green"))) {
@@ -310,11 +305,6 @@ static void qpnp_set_ramp_config(struct pwm_device *pwm,
 		lpg->ramp_config.toggle = !!(flags & PM_PWM_LUT_REVERSE);
 		lpg->lut_written = false;
 
-		duty_pattern->num_entries = pattern_green_length;
-		duty_pattern->duty_pattern = &parameter_scaled[pattern_green_start];
-		duty_pattern->cycles_per_duty = parameter_pattern[PATTERN_INDEX_PAUSE_STEP];
-		qpnp_led_green->pwm_dev->state.output_pattern = duty_pattern;
-
 		for (i = 0; i < pattern_green_length; i++)
 			lpg->ramp_config.pattern[i] = (u32)parameter_scaled[pattern_green_start + i];
 	} else if (!strncmp(pwm->label, "blue", strlen("blue"))) {
@@ -332,11 +322,6 @@ static void qpnp_set_ramp_config(struct pwm_device *pwm,
 		lpg->ramp_config.pattern_repeat = !!(flags & PM_PWM_LUT_LOOP);
 		lpg->ramp_config.toggle = !!(flags & PM_PWM_LUT_REVERSE);
 		lpg->lut_written = false;
-
-		duty_pattern->num_entries = pattern_blue_length;
-		duty_pattern->duty_pattern = &parameter_scaled[pattern_blue_start];
-		duty_pattern->cycles_per_duty = parameter_pattern[PATTERN_INDEX_PAUSE_STEP];
-		qpnp_led_blue->pwm_dev->state.output_pattern = duty_pattern;
 
 		for (i = 0; i < pattern_blue_length; i++)
 			lpg->ramp_config.pattern[i] = (u32)parameter_scaled[pattern_blue_start + i];
@@ -673,7 +658,6 @@ static void qpnp_pattern_resister(void)
 	enum lge_sku_carrier_type carrier = HW_SKU_MAX;
 	lge_boot_mode_t boot_mode = LGE_BOOT_MODE_NORMAL;
 
-	duty_pattern = kzalloc(sizeof(*duty_pattern), GFP_KERNEL);
 	led_pattern_register(&qpnp_pattern_ops);
 
 	boot_mode = lge_get_boot_mode();

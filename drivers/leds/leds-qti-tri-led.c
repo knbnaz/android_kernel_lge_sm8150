@@ -133,9 +133,6 @@ static int __tri_led_config_pwm(struct qpnp_led_dev *led,
 	pstate.duty_cycle = pwm->duty_ns;
 	pstate.output_type = led->led_setting.breath ?
 		PWM_OUTPUT_MODULATED : PWM_OUTPUT_FIXED;
-#ifdef CONFIG_LEDS_LGE_EMOTIONAL
-	pstate.output_pattern = led->pwm_dev->state.output_pattern;
-#endif
 
 	rc = pwm_apply_state(led->pwm_dev, &pstate);
 
