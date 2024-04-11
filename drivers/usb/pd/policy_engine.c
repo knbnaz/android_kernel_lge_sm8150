@@ -41,7 +41,7 @@
 #endif
 
 #if defined(CONFIG_LGE_DISPLAY_COMMON)
-#include "../../gpu/drm/msm/lge/dp/lge_dp.h"
+#include "../../../techpack/display/msm/lge/dp/lge_dp.h"
 #endif
 
 /* To start USB stack for USB3.1 complaince testing */

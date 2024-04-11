@@ -1040,7 +1040,7 @@ static int msm_ssphy_qmp_notify_disconnect(struct usb_phy *uphy,
 	readl_relaxed(phy->base + phy->phy_reg[USB3_PHY_POWER_DOWN_CONTROL]);
 
 #if IS_ENABLED(CONFIG_LGE_COVER_DISPLAY)
-	dev_[dbg(uphy->dev, "QMP phy disconnect notification(is_dd_working=%d)\n", is_dd_working());
+	dev_dbg(uphy->dev, "QMP phy disconnect notification(is_dd_working=%d)\n", is_dd_working());
 #else
 	dev_dbg(uphy->dev, "QMP phy disconnect notification\n");
 #endif
