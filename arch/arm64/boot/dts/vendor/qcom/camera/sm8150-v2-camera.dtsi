@@ -1,5 +1,15 @@
-#include <dt-bindings/regulator/qcom,rpmh-regulator-levels.h>
-#include <dt-bindings/msm/msm-camera.h>
+/*
+ * Copyright (c) 2018-2019, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
 
 &soc {
 	cam_vfe0: qcom,vfe0@acaf000 {
@@ -10,7 +20,7 @@
 			<0xac42000 0x5000>;
 		reg-cam-base = <0xaf000 0x42000>;
 		interrupt-names = "ife";
-		interrupts = <GIC_SPI 465 IRQ_TYPE_EDGE_RISING>;
+		interrupts = <0 465 0>;
 		regulator-names = "camss", "ife0";
 		camss-supply = <&titan_top_gdsc>;
 		ife0-supply = <&ife_0_gdsc>;
@@ -19,9 +29,9 @@
 			"ife_clk",
 			"ife_axi_clk";
 		clocks =
-			<&camcc CAM_CC_IFE_0_CLK_SRC>,
-			<&camcc CAM_CC_IFE_0_CLK>,
-			<&camcc CAM_CC_IFE_0_AXI_CLK>;
+			<&clock_camcc CAM_CC_IFE_0_CLK_SRC>,
+			<&clock_camcc CAM_CC_IFE_0_CLK>,
+			<&clock_camcc CAM_CC_IFE_0_AXI_CLK>;
 		clock-rates =
 			<400000000 0 0>,
 			<558000000 0 0>,
@@ -33,7 +43,7 @@
 		src-clock-name = "ife_clk_src";
 		clock-control-debugfs = "true";
 		clock-names-option =  "ife_dsp_clk";
-		clocks-option = <&camcc CAM_CC_IFE_0_DSP_CLK>;
+		clocks-option = <&clock_camcc CAM_CC_IFE_0_DSP_CLK>;
 		clock-rates-option = <760000000>;
 		status = "ok";
 	};
@@ -45,7 +55,7 @@
 		reg = <0xacb3000 0x1000>;
 		reg-cam-base = <0xb3000>;
 		interrupt-names = "csid";
-		interrupts = <GIC_SPI 464 IRQ_TYPE_EDGE_RISING>;
+		interrupts = <0 464 0>;
 		regulator-names = "camss", "ife0";
 		camss-supply = <&titan_top_gdsc>;
 		ife0-supply = <&ife_0_gdsc>;
@@ -58,13 +68,13 @@
 			"ife_clk",
 			"ife_axi_clk";
 		clocks =
-			<&camcc CAM_CC_IFE_0_CSID_CLK_SRC>,
-			<&camcc CAM_CC_IFE_0_CSID_CLK>,
-			<&camcc CAM_CC_CPHY_RX_CLK_SRC>,
-			<&camcc CAM_CC_IFE_0_CPHY_RX_CLK>,
-			<&camcc CAM_CC_IFE_0_CLK_SRC>,
-			<&camcc CAM_CC_IFE_0_CLK>,
-			<&camcc CAM_CC_IFE_0_AXI_CLK>;
+			<&clock_camcc CAM_CC_IFE_0_CSID_CLK_SRC>,
+			<&clock_camcc CAM_CC_IFE_0_CSID_CLK>,
+			<&clock_camcc CAM_CC_CPHY_RX_CLK_SRC>,
+			<&clock_camcc CAM_CC_IFE_0_CPHY_RX_CLK>,
+			<&clock_camcc CAM_CC_IFE_0_CLK_SRC>,
+			<&clock_camcc CAM_CC_IFE_0_CLK>,
+			<&clock_camcc CAM_CC_IFE_0_AXI_CLK>;
 		clock-rates =
 			<400000000 0 0 0 400000000 0 0>,
 			<400000000 0 0 0 558000000 0 0>,
@@ -86,7 +96,7 @@
 			<0xac42000 0x5000>;
 		reg-cam-base = <0xb6000 0x42000>;
 		interrupt-names = "ife";
-		interrupts = <GIC_SPI 467 IRQ_TYPE_EDGE_RISING>;
+		interrupts = <0 467 0>;
 		regulator-names = "camss", "ife1";
 		camss-supply = <&titan_top_gdsc>;
 		ife1-supply = <&ife_1_gdsc>;
@@ -95,9 +105,9 @@
 			"ife_clk",
 			"ife_axi_clk";
 		clocks =
-			<&camcc CAM_CC_IFE_1_CLK_SRC>,
-			<&camcc CAM_CC_IFE_1_CLK>,
-			<&camcc CAM_CC_IFE_1_AXI_CLK>;
+			<&clock_camcc CAM_CC_IFE_1_CLK_SRC>,
+			<&clock_camcc CAM_CC_IFE_1_CLK>,
+			<&clock_camcc CAM_CC_IFE_1_AXI_CLK>;
 		clock-rates =
 			<400000000 0 0>,
 			<558000000 0 0>,
@@ -109,7 +119,7 @@
 		src-clock-name = "ife_clk_src";
 		clock-control-debugfs = "true";
 		clock-names-option =  "ife_dsp_clk";
-		clocks-option = <&camcc CAM_CC_IFE_1_DSP_CLK>;
+		clocks-option = <&clock_camcc CAM_CC_IFE_1_DSP_CLK>;
 		clock-rates-option = <760000000>;
 		status = "ok";
 	};
@@ -121,7 +131,7 @@
 		reg = <0xacba000 0x1000>;
 		reg-cam-base = <0xba000>;
 		interrupt-names = "csid";
-		interrupts = <GIC_SPI 466 IRQ_TYPE_EDGE_RISING>;
+		interrupts = <0 466 0>;
 		regulator-names = "camss", "ife1";
 		camss-supply = <&titan_top_gdsc>;
 		ife1-supply = <&ife_1_gdsc>;
@@ -134,13 +144,13 @@
 			"ife_clk",
 			"ife_axi_clk";
 		clocks =
-			<&camcc CAM_CC_IFE_1_CSID_CLK_SRC>,
-			<&camcc CAM_CC_IFE_1_CSID_CLK>,
-			<&camcc CAM_CC_CPHY_RX_CLK_SRC>,
-			<&camcc CAM_CC_IFE_1_CPHY_RX_CLK>,
-			<&camcc CAM_CC_IFE_1_CLK_SRC>,
-			<&camcc CAM_CC_IFE_1_CLK>,
-			<&camcc CAM_CC_IFE_1_AXI_CLK>;
+			<&clock_camcc CAM_CC_IFE_1_CSID_CLK_SRC>,
+			<&clock_camcc CAM_CC_IFE_1_CSID_CLK>,
+			<&clock_camcc CAM_CC_CPHY_RX_CLK_SRC>,
+			<&clock_camcc CAM_CC_IFE_1_CPHY_RX_CLK>,
+			<&clock_camcc CAM_CC_IFE_1_CLK_SRC>,
+			<&clock_camcc CAM_CC_IFE_1_CLK>,
+			<&clock_camcc CAM_CC_IFE_1_AXI_CLK>;
 		clock-rates =
 			<400000000 0 0 0 400000000 0 0>,
 			<400000000 0 0 0 558000000 0 0>,
