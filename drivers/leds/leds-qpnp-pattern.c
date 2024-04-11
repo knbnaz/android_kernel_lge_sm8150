@@ -1,5 +1,4 @@
 #include "leds-qpnp-pattern.h"
-#include "../pwm/pwm-qti-lpg.c"
 
 /* Valueless constants just for indication
  */

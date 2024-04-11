@@ -25,7 +25,11 @@
 static DEFINE_MUTEX(pwm_lookup_lock);
 static LIST_HEAD(pwm_lookup_list);
 static DEFINE_MUTEX(pwm_lock);
+#ifdef CONFIG_LEDS_LGE_EMOTIONAL
+LIST_HEAD(pwm_chips);
+#else
 static LIST_HEAD(pwm_chips);
+#endif
 static DECLARE_BITMAP(allocated_pwms, MAX_PWMS);
 static RADIX_TREE(pwm_tree, GFP_KERNEL);
 
@@ -500,6 +504,16 @@ int pwm_apply_state(struct pwm_device *pwm, const struct pwm_state *state)
 			pwm->state.polarity = state->polarity;
 		}
 
+#ifdef CONFIG_LEDS_LGE_EMOTIONAL
+		err = pwm->chip->ops->config(pwm->chip, pwm, 
+				state->duty_cycle,
+				state->period);
+		if (err)
+			return err;
+
+		pwm->state.duty_cycle = state->duty_cycle;
+		pwm->state.period = state->period;
+#else
 		if (state->period != pwm->state.period ||
 		    state->duty_cycle != pwm->state.duty_cycle) {
 			err = chip->ops->config(pwm->chip, pwm,
@@ -511,8 +525,14 @@ int pwm_apply_state(struct pwm_device *pwm, const struct pwm_state *state)
 			pwm->state.duty_cycle = state->duty_cycle;
 			pwm->state.period = state->period;
 		}
+#endif
 
+#ifdef CONFIG_LEDS_LGE_EMOTIONAL
+		if ((state->output_type != PWM_OUTPUT_MODULATED) &&
+				(state->enabled != pwm->state.enabled)) {
+#else
 		if (state->enabled != pwm->state.enabled) {
+#endif
 			if (state->enabled) {
 				err = chip->ops->enable(chip, pwm);
 				if (err)
