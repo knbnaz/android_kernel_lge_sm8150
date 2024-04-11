@@ -20,7 +20,7 @@
 		      <0xae94400 0x800>,
 		      <0xaf03000 0x8>;
 		reg-names = "pll_base", "phy_base", "gdsc_base";
-		clocks = <&dispcc DISP_CC_MDSS_AHB_CLK>;
+		clocks = <&clock_dispcc DISP_CC_MDSS_AHB_CLK>;
 		clock-names = "iface_clk";
 		clock-rate = <0>;
 		gdsc-supply = <&mdss_core_gdsc>;
@@ -49,7 +49,7 @@
 		      <0xae96400 0x800>,
 		      <0xaf03000 0x8>;
 		reg-names = "pll_base", "phy_base", "gdsc_base";
-		clocks = <&dispcc DISP_CC_MDSS_AHB_CLK>;
+		clocks = <&clock_dispcc DISP_CC_MDSS_AHB_CLK>;
 		clock-names = "iface_clk";
 		clock-rate = <0>;
 		gdsc-supply = <&mdss_core_gdsc>;
@@ -83,11 +83,11 @@
 		reg-names = "pll_base", "phy_base", "ln_tx0_base",
 			"ln_tx1_base", "gdsc_base";
 
-		clocks = <&dispcc DISP_CC_MDSS_AHB_CLK>,
-			 <&rpmhcc RPMH_CXO_CLK>,
-			 <&gcc GCC_DISP_AHB_CLK>,
-			 <&gcc GCC_USB3_PRIM_CLKREF_CLK>,
-			 <&gcc GCC_USB3_PRIM_PHY_PIPE_CLK>;
+		clocks = <&clock_dispcc DISP_CC_MDSS_AHB_CLK>,
+			 <&clock_rpmh RPMH_CXO_CLK>,
+			 <&clock_gcc GCC_DISP_AHB_CLK>,
+			 <&clock_gcc GCC_USB3_PRIM_CLKREF_CLK>,
+			 <&clock_gcc GCC_USB3_PRIM_PHY_PIPE_CLK>;
 		clock-names = "iface_clk", "ref_clk_src", "gcc_iface",
 			"ref_clk", "pipe_clk";
 		clock-rate = <0>;
