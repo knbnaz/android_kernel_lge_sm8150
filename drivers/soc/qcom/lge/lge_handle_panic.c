@@ -142,16 +142,6 @@ void lge_set_restart_reason(unsigned int reason)
 
 void lge_set_panic_reason(void)
 {
-	if (lge_get_download_mode() && gen_key_panic) {
-		lge_set_restart_reason(LGE_RB_MAGIC | LGE_ERR_KERN | LGE_ERR_KERN_KEY);
-		return;
-	}
-
-	if (lge_get_download_mode() && rphm_timeout_panic) {
-		lge_set_restart_reason(LGE_RB_MAGIC | LGE_ERR_KERN | LGE_ERR_KERN_RPMH_TIMEOUT);
-		return;
-	}
-
 	if (subsys_crash_magic == 0)
 		lge_set_restart_reason(LGE_RB_MAGIC | LGE_ERR_KERN);
 	else
@@ -214,8 +204,7 @@ void lge_gen_key_panic(int key, int status)
 		}
 	}
 
-	if(!lge_get_download_mode()
-		&& !(debug_accessory_status && !power_supply_present))
+	if(!(debug_accessory_status && !power_supply_present))
 		return;
 
 #ifdef CONFIG_LGE_USB_DEBUGGER

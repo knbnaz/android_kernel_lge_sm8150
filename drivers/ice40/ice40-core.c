@@ -56,7 +56,6 @@
 
 #define DEBUG_GET_MCU_LOG
 
-extern int lge_get_download_mode(void);
 extern void request_cover_recovery(int num);
 bool is_cover_connection_state_connected(void);
 struct ice40 *global_ice40;
@@ -174,10 +173,6 @@ static void ice40_mcu_recovery(void)
         request_cover_recovery(1);
         global_ice40->recovery_count++;
     }
-#ifdef CONFIG_LGE_HANDLE_PANIC
-    if(global_ice40->recovery_count >= ICE40_RECOVREY_MAX_COUNT && !lge_get_factory_boot() && lge_get_download_mode())
-        panic("ICE40_RECOVREY_MAX_COUNT EXCEEDED");
-#endif
     printk(KERN_ERR "%s %d\n",__func__, global_ice40->recovery_count);
 }
 

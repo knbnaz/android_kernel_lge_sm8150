@@ -69,13 +69,5 @@ struct panic_handler_data {
 };
 
 void lge_gen_key_panic(int key, int status);
-#ifdef CONFIG_QCOM_DLOAD_MODE
-extern int lge_get_download_mode(void);
-extern int lge_set_download_mode(int val);
-#else
-static int lge_get_download_mode(void) {
-	return 0;
-}
-#endif
 extern int qct_wcnss_crash;
 #endif
