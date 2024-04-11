@@ -122,8 +122,8 @@ static int ice40_write_firmware(struct device *dev, const char *img)
 {
 	int ret = 0;
 	struct fpga_manager *mgr;
-	struct fpga_image_info *info;
-	info.flags = 0;
+	struct fpga_image_info *info = NULL;
+	info->flags = 0;
 
 	mgr = fpga_mgr_get(dev);
 	info->firmware_name = (char *)img;
@@ -523,6 +523,7 @@ static int ice40_fpga_probe(struct spi_device *spi)
 {
 	struct device *dev = &spi->dev;
 	struct ice40_fpga_priv *priv;
+	struct fpga_manager *mgr;
 	int ret;
 	struct device_node *np = dev->of_node;
 
@@ -612,7 +613,14 @@ static int ice40_fpga_probe(struct spi_device *spi)
 	}
 
 	/* Register with the FPGA manager */
-	if((ret = fpga_mgr_register(dev, "Lattice iCE40 FPGA Manager", &ice40_fpga_ops, priv)) != 0) {
+	mgr = fpga_mgr_create(dev, "Lattice iCE40 FPGA Manager", &ice40_fpga_ops, priv);
+	if (!mgr)
+		return ret;
+
+	spi_set_drvdata(spi, mgr);
+
+	ret = fpga_mgr_register(mgr);
+	if (ret) {
 		return ret;
 	}
 
@@ -631,7 +639,10 @@ static int ice40_fpga_probe(struct spi_device *spi)
 
 static int ice40_fpga_remove(struct spi_device *spi)
 {
-	fpga_mgr_unregister(&spi->dev);
+	struct fpga_manager *mgr = spi_get_drvdata(spi);
+
+	fpga_mgr_unregister(mgr);
+
 	return 0;
 }
 
