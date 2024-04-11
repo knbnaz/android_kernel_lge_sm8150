@@ -73,4 +73,4 @@ $(addprefix $(obj)/, $(obj-y)): $(obj)/%.gen.o: $(fwdir)/%
 targets := $(patsubst $(obj)/%,%, \
                                 $(shell find $(obj) -name \*.gen.S 2>/dev/null))
 
-obj-$(CONFIG_FIRMWARE_IN_KERNEL) += $(patsubst %,%.gen.o, $(fw-shipped-y))
+obj-y += $(patsubst %,%.gen.o, $(fw-shipped-y))
