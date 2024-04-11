@@ -62,9 +62,9 @@ extern int lge_get_dual_display_support(void);
 #include <linux/jiffies.h>
 #include <linux/pm_wakeup.h>
 #include <asm/atomic.h>
-#include "../../gpu/drm/msm/lge/dp/lge_dp_def.h"
+#include "../../../techpack/display/msm/lge/dp/lge_dp_def.h"
 #include <linux/fpga/ice40-spi.h>
-#include "../../gpu/drm/msm/lge/cover/lge_cover_ctrl_ops.h"
+#include "../../../techpack/display/msm/lge/cover/lge_cover_ctrl_ops.h"
 
 extern int lp5521_cover_connect(void);
 extern int global_luke_status;
@@ -238,7 +238,7 @@ struct usbpd_svid_handler *find_hallic_svid_handler(int svid) {
    return NULL;
 }
 
-int get_global_luke_status()
+int get_global_luke_status(void)
 {
 	return global_luke_status;
 }
@@ -253,7 +253,7 @@ void set_mcu_fw_status(int status)
 		cancel_delayed_work_sync(&cover_fw_update_timeout_work);
 }
 
-int get_mcu_fw_status() {
+int get_mcu_fw_status(void) {
 	return mcu_fw_update_status;
 }
 
@@ -487,7 +487,8 @@ static int cover_connection_data_initialize(void)
 	data->luke_state = LUKE_DISCONNECTED;
 	INIT_DELAYED_WORK(&data->luke_work, cover_connection_work_func);
 	init_completion(&data->luke_done);
-	wakeup_source_init(&data->wakelock, "luke_wakelock");
+	wakeup_source_create("luke_wakelock");
+	wakeup_source_add(&data->wakelock);
 
 	h->initialized = true;
 	h->cover_data = data;
