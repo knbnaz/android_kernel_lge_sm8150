@@ -24,10 +24,11 @@
  */
 
 
-#ifndef ICE40_H
-#define ICE40_H
 
-#define ICE40_REG_START 0x00
-#define ICE40_REG_END 0x03
+#ifndef MCU_I2C_H
+#define MCU_I2C_H
+
+#define MCU_REG_START 0x0000
+#define MCU_REG_END 0x00ff
 
 #endif /* ICE40_H */
