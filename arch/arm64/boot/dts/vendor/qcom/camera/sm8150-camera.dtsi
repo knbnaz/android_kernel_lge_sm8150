@@ -23,10 +23,10 @@
 		regulator-names = "gdscr";
 		csi-vdd-voltage = <1200000>;
 		mipi-csi-vdd-supply = <&pm8150l_l3>;
-		clocks = <&clock_camcc CAM_CC_CPHY_RX_CLK_SRC>,
-			<&clock_camcc CAM_CC_CSIPHY0_CLK>,
-			<&clock_camcc CAM_CC_CSI0PHYTIMER_CLK_SRC>,
-			<&clock_camcc CAM_CC_CSI0PHYTIMER_CLK>;
+		clocks = <&camcc CAM_CC_CPHY_RX_CLK_SRC>,
+			<&camcc CAM_CC_CSIPHY0_CLK>,
+			<&camcc CAM_CC_CSI0PHYTIMER_CLK_SRC>,
+			<&camcc CAM_CC_CSI0PHYTIMER_CLK>;
 		clock-names = "cphy_rx_clk_src",
 			"csiphy0_clk",
 			"csi0phytimer_clk_src",
@@ -50,10 +50,10 @@
 		regulator-names = "gdscr";
 		csi-vdd-voltage = <1200000>;
 		mipi-csi-vdd-supply = <&pm8150l_l3>;
-		clocks = <&clock_camcc CAM_CC_CPHY_RX_CLK_SRC>,
-			<&clock_camcc CAM_CC_CSIPHY1_CLK>,
-			<&clock_camcc CAM_CC_CSI1PHYTIMER_CLK_SRC>,
-			<&clock_camcc CAM_CC_CSI1PHYTIMER_CLK>;
+		clocks = <&camcc CAM_CC_CPHY_RX_CLK_SRC>,
+			<&camcc CAM_CC_CSIPHY1_CLK>,
+			<&camcc CAM_CC_CSI1PHYTIMER_CLK_SRC>,
+			<&camcc CAM_CC_CSI1PHYTIMER_CLK>;
 		clock-names = "cphy_rx_clk_src",
 			"csiphy1_clk",
 			"csi1phytimer_clk_src",
@@ -78,10 +78,10 @@
 		regulator-names = "gdscr";
 		csi-vdd-voltage = <1200000>;
 		mipi-csi-vdd-supply = <&pm8150l_l3>;
-		clocks = <&clock_camcc CAM_CC_CPHY_RX_CLK_SRC>,
-			<&clock_camcc CAM_CC_CSIPHY2_CLK>,
-			<&clock_camcc CAM_CC_CSI2PHYTIMER_CLK_SRC>,
-			<&clock_camcc CAM_CC_CSI2PHYTIMER_CLK>;
+		clocks = <&camcc CAM_CC_CPHY_RX_CLK_SRC>,
+			<&camcc CAM_CC_CSIPHY2_CLK>,
+			<&camcc CAM_CC_CSI2PHYTIMER_CLK_SRC>,
+			<&camcc CAM_CC_CSI2PHYTIMER_CLK>;
 		clock-names = "cphy_rx_clk_src",
 			"csiphy2_clk",
 			"csi2phytimer_clk_src",
@@ -105,10 +105,10 @@
 		regulator-names = "gdscr";
 		csi-vdd-voltage = <1200000>;
 		mipi-csi-vdd-supply = <&pm8150l_l3>;
-		clocks = <&clock_camcc CAM_CC_CPHY_RX_CLK_SRC>,
-			<&clock_camcc CAM_CC_CSIPHY3_CLK>,
-			<&clock_camcc CAM_CC_CSI3PHYTIMER_CLK_SRC>,
-			<&clock_camcc CAM_CC_CSI3PHYTIMER_CLK>;
+		clocks = <&camcc CAM_CC_CPHY_RX_CLK_SRC>,
+			<&camcc CAM_CC_CSIPHY3_CLK>,
+			<&camcc CAM_CC_CSI3PHYTIMER_CLK_SRC>,
+			<&camcc CAM_CC_CSI3PHYTIMER_CLK>;
 		clock-names = "cphy_rx_clk_src",
 			"csiphy3_clk",
 			"csi3phytimer_clk_src",
@@ -133,8 +133,8 @@
 		status = "ok";
 		gdscr-supply = <&titan_top_gdsc>;
 		regulator-names = "gdscr";
-		clocks = <&clock_camcc CAM_CC_CCI_0_CLK_SRC>,
-			<&clock_camcc CAM_CC_CCI_0_CLK>;
+		clocks = <&camcc CAM_CC_CCI_0_CLK_SRC>,
+			<&camcc CAM_CC_CCI_0_CLK>;
 		clock-names = "cci_0_clk_src",
 			"cci_0_clk";
 		src-clock-name = "cci_0_clk_src";
@@ -228,8 +228,8 @@
 		status = "ok";
 		gdscr-supply = <&titan_top_gdsc>;
 		regulator-names = "gdscr";
-		clocks = <&clock_camcc CAM_CC_CCI_1_CLK_SRC>,
-			<&clock_camcc CAM_CC_CCI_1_CLK>;
+		clocks = <&camcc CAM_CC_CCI_1_CLK_SRC>,
+			<&camcc CAM_CC_CCI_1_CLK>;
 		clock-names = "cci_1_clk_src",
 			"cci_1_clk";
 		src-clock-name = "cci_1_clk_src";
@@ -508,13 +508,13 @@
 			"camnoc_axi_clk_src",
 			"camnoc_axi_clk";
 		clocks =
-			<&clock_gcc GCC_CAMERA_AHB_CLK>,
-			<&clock_gcc GCC_CAMERA_HF_AXI_CLK>,
-			<&clock_gcc GCC_CAMERA_SF_AXI_CLK>,
-			<&clock_camcc CAM_CC_SLOW_AHB_CLK_SRC>,
-			<&clock_camcc CAM_CC_CPAS_AHB_CLK>,
-			<&clock_camcc CAM_CC_CAMNOC_AXI_CLK_SRC>,
-			<&clock_camcc CAM_CC_CAMNOC_AXI_CLK>;
+			<&gcc GCC_CAMERA_AHB_CLK>,
+			<&gcc GCC_CAMERA_HF_AXI_CLK>,
+			<&gcc GCC_CAMERA_SF_AXI_CLK>,
+			<&camcc CAM_CC_SLOW_AHB_CLK_SRC>,
+			<&camcc CAM_CC_CPAS_AHB_CLK>,
+			<&camcc CAM_CC_CAMNOC_AXI_CLK_SRC>,
+			<&camcc CAM_CC_CAMNOC_AXI_CLK>;
 		src-clock-name = "camnoc_axi_clk_src";
 		clock-rates =
 			<0 0 0 0 0 0 0>,
@@ -953,8 +953,8 @@
 		camss-supply = <&titan_top_gdsc>;
 		clock-names = "cam_cc_cpas_slow_ahb_clk",
 			"cam_cc_cpas_ahb_clk";
-		clocks = <&clock_camcc CAM_CC_SLOW_AHB_CLK_SRC>,
-			<&clock_camcc CAM_CC_CPAS_AHB_CLK>;
+		clocks = <&camcc CAM_CC_SLOW_AHB_CLK_SRC>,
+			<&camcc CAM_CC_CPAS_AHB_CLK>;
 		clock-rates = <0 0>;
 		clock-cntl-level = "svs";
 		cdm-client-names = "ife";
@@ -987,13 +987,13 @@
 			"ife_clk",
 			"ife_axi_clk";
 		clocks =
-			<&clock_camcc CAM_CC_IFE_0_CSID_CLK_SRC>,
-			<&clock_camcc CAM_CC_IFE_0_CSID_CLK>,
-			<&clock_camcc CAM_CC_CPHY_RX_CLK_SRC>,
-			<&clock_camcc CAM_CC_IFE_0_CPHY_RX_CLK>,
-			<&clock_camcc CAM_CC_IFE_0_CLK_SRC>,
-			<&clock_camcc CAM_CC_IFE_0_CLK>,
-			<&clock_camcc CAM_CC_IFE_0_AXI_CLK>;
+			<&camcc CAM_CC_IFE_0_CSID_CLK_SRC>,
+			<&camcc CAM_CC_IFE_0_CSID_CLK>,
+			<&camcc CAM_CC_CPHY_RX_CLK_SRC>,
+			<&camcc CAM_CC_IFE_0_CPHY_RX_CLK>,
+			<&camcc CAM_CC_IFE_0_CLK_SRC>,
+			<&camcc CAM_CC_IFE_0_CLK>,
+			<&camcc CAM_CC_IFE_0_AXI_CLK>;
 		clock-rates =
 			<400000000 0 0 0 400000000 0 0>,
 			<400000000 0 0 0 558000000 0 0>,
@@ -1022,9 +1022,9 @@
 			"ife_clk",
 			"ife_axi_clk";
 		clocks =
-			<&clock_camcc CAM_CC_IFE_0_CLK_SRC>,
-			<&clock_camcc CAM_CC_IFE_0_CLK>,
-			<&clock_camcc CAM_CC_IFE_0_AXI_CLK>;
+			<&camcc CAM_CC_IFE_0_CLK_SRC>,
+			<&camcc CAM_CC_IFE_0_CLK>,
+			<&camcc CAM_CC_IFE_0_AXI_CLK>;
 		clock-rates =
 			<400000000 0 0>,
 			<558000000 0 0>,
@@ -1034,7 +1034,7 @@
 		src-clock-name = "ife_clk_src";
 		clock-control-debugfs = "true";
 		clock-names-option =  "ife_dsp_clk";
-		clocks-option = <&clock_camcc CAM_CC_IFE_0_DSP_CLK>;
+		clocks-option = <&camcc CAM_CC_IFE_0_DSP_CLK>;
 		clock-rates-option = <760000000>;
 		status = "ok";
 	};
@@ -1059,13 +1059,13 @@
 			"ife_clk",
 			"ife_axi_clk";
 		clocks =
-			<&clock_camcc CAM_CC_IFE_1_CSID_CLK_SRC>,
-			<&clock_camcc CAM_CC_IFE_1_CSID_CLK>,
-			<&clock_camcc CAM_CC_CPHY_RX_CLK_SRC>,
-			<&clock_camcc CAM_CC_IFE_1_CPHY_RX_CLK>,
-			<&clock_camcc CAM_CC_IFE_1_CLK_SRC>,
-			<&clock_camcc CAM_CC_IFE_1_CLK>,
-			<&clock_camcc CAM_CC_IFE_1_AXI_CLK>;
+			<&camcc CAM_CC_IFE_1_CSID_CLK_SRC>,
+			<&camcc CAM_CC_IFE_1_CSID_CLK>,
+			<&camcc CAM_CC_CPHY_RX_CLK_SRC>,
+			<&camcc CAM_CC_IFE_1_CPHY_RX_CLK>,
+			<&camcc CAM_CC_IFE_1_CLK_SRC>,
+			<&camcc CAM_CC_IFE_1_CLK>,
+			<&camcc CAM_CC_IFE_1_AXI_CLK>;
 		clock-rates =
 			<400000000 0 0 0 400000000 0 0>,
 			<400000000 0 0 0 558000000 0 0>,
@@ -1094,9 +1094,9 @@
 			"ife_clk",
 			"ife_axi_clk";
 		clocks =
-			<&clock_camcc CAM_CC_IFE_1_CLK_SRC>,
-			<&clock_camcc CAM_CC_IFE_1_CLK>,
-			<&clock_camcc CAM_CC_IFE_1_AXI_CLK>;
+			<&camcc CAM_CC_IFE_1_CLK_SRC>,
+			<&camcc CAM_CC_IFE_1_CLK>,
+			<&camcc CAM_CC_IFE_1_AXI_CLK>;
 		clock-rates =
 			<400000000 0 0>,
 			<558000000 0 0>,
@@ -1106,7 +1106,7 @@
 		src-clock-name = "ife_clk_src";
 		clock-control-debugfs = "true";
 		clock-names-option =  "ife_dsp_clk";
-		clocks-option = <&clock_camcc CAM_CC_IFE_1_DSP_CLK>;
+		clocks-option = <&camcc CAM_CC_IFE_1_DSP_CLK>;
 		clock-rates-option = <760000000>;
 		status = "ok";
 	};
@@ -1129,12 +1129,12 @@
 			"ife_clk_src",
 			"ife_clk";
 		clocks =
-			<&clock_camcc CAM_CC_IFE_LITE_0_CSID_CLK_SRC>,
-			<&clock_camcc CAM_CC_IFE_LITE_0_CSID_CLK>,
-			<&clock_camcc CAM_CC_CPHY_RX_CLK_SRC>,
-			<&clock_camcc CAM_CC_IFE_LITE_0_CPHY_RX_CLK>,
-			<&clock_camcc CAM_CC_IFE_LITE_0_CLK_SRC>,
-			<&clock_camcc CAM_CC_IFE_LITE_0_CLK>;
+			<&camcc CAM_CC_IFE_LITE_0_CSID_CLK_SRC>,
+			<&camcc CAM_CC_IFE_LITE_0_CSID_CLK>,
+			<&camcc CAM_CC_CPHY_RX_CLK_SRC>,
+			<&camcc CAM_CC_IFE_LITE_0_CPHY_RX_CLK>,
+			<&camcc CAM_CC_IFE_LITE_0_CLK_SRC>,
+			<&camcc CAM_CC_IFE_LITE_0_CLK>;
 		clock-rates =
 			<400000000 0 0 0 320000000 0>,
 			<400000000 0 0 0 400000000 0>,
@@ -1160,8 +1160,8 @@
 			"ife_clk_src",
 			"ife_clk";
 		clocks =
-			<&clock_camcc CAM_CC_IFE_LITE_0_CLK_SRC>,
-			<&clock_camcc CAM_CC_IFE_LITE_0_CLK>;
+			<&camcc CAM_CC_IFE_LITE_0_CLK_SRC>,
+			<&camcc CAM_CC_IFE_LITE_0_CLK>;
 		clock-rates =
 			<320000000 0>,
 			<400000000 0>,
@@ -1191,12 +1191,12 @@
 			"ife_clk_src",
 			"ife_clk";
 		clocks =
-			<&clock_camcc CAM_CC_IFE_LITE_1_CSID_CLK_SRC>,
-			<&clock_camcc CAM_CC_IFE_LITE_1_CSID_CLK>,
-			<&clock_camcc CAM_CC_CPHY_RX_CLK_SRC>,
-			<&clock_camcc CAM_CC_IFE_LITE_1_CPHY_RX_CLK>,
-			<&clock_camcc CAM_CC_IFE_LITE_1_CLK_SRC>,
-			<&clock_camcc CAM_CC_IFE_LITE_1_CLK>;
+			<&camcc CAM_CC_IFE_LITE_1_CSID_CLK_SRC>,
+			<&camcc CAM_CC_IFE_LITE_1_CSID_CLK>,
+			<&camcc CAM_CC_CPHY_RX_CLK_SRC>,
+			<&camcc CAM_CC_IFE_LITE_1_CPHY_RX_CLK>,
+			<&camcc CAM_CC_IFE_LITE_1_CLK_SRC>,
+			<&camcc CAM_CC_IFE_LITE_1_CLK>;
 		clock-rates =
 			<400000000 0 0 0 320000000 0>,
 			<400000000 0 0 0 400000000 0>,
@@ -1222,8 +1222,8 @@
 			"ife_clk_src",
 			"ife_clk";
 		clocks =
-			<&clock_camcc CAM_CC_IFE_LITE_1_CLK_SRC>,
-			<&clock_camcc CAM_CC_IFE_LITE_1_CLK>;
+			<&camcc CAM_CC_IFE_LITE_1_CLK_SRC>,
+			<&camcc CAM_CC_IFE_LITE_1_CLK>;
 		clock-rates =
 			<320000000 0>,
 			<400000000 0>,
@@ -1266,10 +1266,10 @@
 			"icp_clk_src",
 			"icp_clk";
 		clocks =
-			<&clock_camcc CAM_CC_FAST_AHB_CLK_SRC>,
-			<&clock_camcc CAM_CC_ICP_AHB_CLK>,
-			<&clock_camcc CAM_CC_ICP_CLK_SRC>,
-			<&clock_camcc CAM_CC_ICP_CLK>;
+			<&camcc CAM_CC_FAST_AHB_CLK_SRC>,
+			<&camcc CAM_CC_ICP_AHB_CLK>,
+			<&camcc CAM_CC_ICP_CLK_SRC>,
+			<&camcc CAM_CC_ICP_CLK>;
 
 		clock-rates =
 			<200000000 0 400000000 0>,
@@ -1297,11 +1297,11 @@
 		src-clock-name = "ipe_0_clk_src";
 		clock-control-debugfs = "true";
 		clocks =
-			<&clock_camcc CAM_CC_IPE_0_AHB_CLK>,
-			<&clock_camcc CAM_CC_IPE_0_AREG_CLK>,
-			<&clock_camcc CAM_CC_IPE_0_AXI_CLK>,
-			<&clock_camcc CAM_CC_IPE_0_CLK_SRC>,
-			<&clock_camcc CAM_CC_IPE_0_CLK>;
+			<&camcc CAM_CC_IPE_0_AHB_CLK>,
+			<&camcc CAM_CC_IPE_0_AREG_CLK>,
+			<&camcc CAM_CC_IPE_0_AXI_CLK>,
+			<&camcc CAM_CC_IPE_0_CLK_SRC>,
+			<&camcc CAM_CC_IPE_0_CLK>;
 
 		clock-rates =
 			<0 0 0 300000000 0>,
@@ -1331,11 +1331,11 @@
 		src-clock-name = "ipe_1_clk_src";
 		clock-control-debugfs = "true";
 		clocks =
-			<&clock_camcc CAM_CC_IPE_1_AHB_CLK>,
-			<&clock_camcc CAM_CC_IPE_1_AREG_CLK>,
-			<&clock_camcc CAM_CC_IPE_1_AXI_CLK>,
-			<&clock_camcc CAM_CC_IPE_0_CLK_SRC>,
-			<&clock_camcc CAM_CC_IPE_1_CLK>;
+			<&camcc CAM_CC_IPE_1_AHB_CLK>,
+			<&camcc CAM_CC_IPE_1_AREG_CLK>,
+			<&camcc CAM_CC_IPE_1_AXI_CLK>,
+			<&camcc CAM_CC_IPE_0_CLK_SRC>,
+			<&camcc CAM_CC_IPE_1_CLK>;
 
 		clock-rates =
 			<0 0 0 300000000 0>,
@@ -1365,11 +1365,11 @@
 		src-clock-name = "bps_clk_src";
 		clock-control-debugfs = "true";
 		clocks =
-			<&clock_camcc CAM_CC_BPS_AHB_CLK>,
-			<&clock_camcc CAM_CC_BPS_AREG_CLK>,
-			<&clock_camcc CAM_CC_BPS_AXI_CLK>,
-			<&clock_camcc CAM_CC_BPS_CLK_SRC>,
-			<&clock_camcc CAM_CC_BPS_CLK>;
+			<&camcc CAM_CC_BPS_AHB_CLK>,
+			<&camcc CAM_CC_BPS_AREG_CLK>,
+			<&camcc CAM_CC_BPS_AXI_CLK>,
+			<&camcc CAM_CC_BPS_CLK_SRC>,
+			<&camcc CAM_CC_BPS_CLK>;
 
 		clock-rates =
 			<0 0 0 200000000 0>,
@@ -1405,8 +1405,8 @@
 			"jpegenc_clk_src",
 			"jpegenc_clk";
 		clocks =
-			<&clock_camcc CAM_CC_JPEG_CLK_SRC>,
-			<&clock_camcc CAM_CC_JPEG_CLK>;
+			<&camcc CAM_CC_JPEG_CLK_SRC>,
+			<&camcc CAM_CC_JPEG_CLK>;
 
 		clock-rates = <600000000 0>;
 		src-clock-name = "jpegenc_clk_src";
@@ -1428,8 +1428,8 @@
 			"jpegdma_clk_src",
 			"jpegdma_clk";
 		clocks =
-			<&clock_camcc CAM_CC_JPEG_CLK_SRC>,
-			<&clock_camcc CAM_CC_JPEG_CLK>;
+			<&camcc CAM_CC_JPEG_CLK_SRC>,
+			<&camcc CAM_CC_JPEG_CLK>;
 
 		clock-rates = <600000000 0>;
 		src-clock-name = "jpegdma_clk_src";
@@ -1460,9 +1460,9 @@
 			"fd_core_clk",
 			"fd_core_uar_clk";
 		clocks =
-			<&clock_camcc CAM_CC_FD_CORE_CLK_SRC>,
-			<&clock_camcc CAM_CC_FD_CORE_CLK>,
-			<&clock_camcc CAM_CC_FD_CORE_UAR_CLK>;
+			<&camcc CAM_CC_FD_CORE_CLK_SRC>,
+			<&camcc CAM_CC_FD_CORE_CLK>,
+			<&camcc CAM_CC_FD_CORE_UAR_CLK>;
 		src-clock-name = "fd_core_clk_src";
 		clock-control-debugfs = "true";
 		clock-cntl-level = "svs", "svs_l1", "turbo";
@@ -1493,8 +1493,8 @@
 			"lrme_clk_src",
 			"lrme_clk";
 		clocks =
-			<&clock_camcc CAM_CC_LRME_CLK_SRC>,
-			<&clock_camcc CAM_CC_LRME_CLK>;
+			<&camcc CAM_CC_LRME_CLK_SRC>,
+			<&camcc CAM_CC_LRME_CLK>;
 		clock-rates =
 			<240000000 0>,
 			<300000000 0>,
