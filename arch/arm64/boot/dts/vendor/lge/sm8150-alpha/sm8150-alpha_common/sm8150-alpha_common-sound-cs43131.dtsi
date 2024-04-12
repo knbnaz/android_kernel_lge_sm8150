@@ -140,7 +140,7 @@ Optional properties:
 		status = "ok";
 
 		clock-names = "ln_bb_clk3";
-		clocks = <&clock_rpmh RPMH_LN_BB_CLK3>;
+		clocks = <&rpmhcc RPMH_LN_BB_CLK3>;
 
 		dac,vdd-supply = <&pm8150_s5>;
 		dac,comparator-supply = <&pm8150l_l7>;

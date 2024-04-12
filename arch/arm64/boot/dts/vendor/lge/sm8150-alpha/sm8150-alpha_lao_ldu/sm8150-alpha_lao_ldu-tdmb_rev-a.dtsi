@@ -75,7 +75,7 @@
 		/* [Modified] when using clock buffer,
 			 you should check which clock buffer used for dmb device */
 		clock-names = "tdmb_xo";
-		clocks = <&clock_rpmh RPMH_RF_CLK3>;
+		clocks = <&rpmhcc RPMH_RF_CLK3>;
 
 		/* [Modified] Set DMB-EN, DMB-INT GPIO
 			tlmm is the parent, second # is gpio #, third flag keep it 0. */
