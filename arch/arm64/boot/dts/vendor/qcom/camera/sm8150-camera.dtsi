@@ -72,7 +72,7 @@
 		reg = <0xac67000 0x1000>;
 		reg-names = "csiphy";
 		reg-cam-base = <0x67000>;
-		interrupts =  <GIC_SPI 479 IRQ_TYPE_EDGE_RISING>;
+		interrupts = <GIC_SPI 479 IRQ_TYPE_EDGE_RISING>;
 		interrupt-names = "csiphy";
 		gdscr-supply = <&titan_top_gdsc>;
 		regulator-names = "gdscr";
@@ -224,7 +224,7 @@
 		reg-names = "cci";
 		reg-cam-base = <0x4b000>;
 		interrupt-names = "cci";
-		interrupts = <0 271 0>;
+		interrupts = <GIC_SPI 271 IRQ_TYPE_EDGE_RISING>;
 		status = "ok";
 		gdscr-supply = <&titan_top_gdsc>;
 		regulator-names = "gdscr";
@@ -495,7 +495,7 @@
 			<0xac42000 0x5000>;
 		reg-cam-base = <0x40000 0x42000>;
 		interrupt-names = "cpas_camnoc";
-		interrupts = <GIC_SPI 459 GIC_SPI>;
+		interrupts = <GIC_SPI 459 IRQ_TYPE_EDGE_RISING>;
 		camnoc-axi-min-ib-bw = <3000000000>;
 		regulator-names = "camss-vdd";
 		camss-vdd-supply = <&titan_top_gdsc>;
