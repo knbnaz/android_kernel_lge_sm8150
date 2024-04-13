@@ -3481,6 +3481,8 @@
 #include "msm-arm-smmu-sm8150.dtsi"
 #include "sm8150-vidc.dtsi"
 #include "camera/sm8150-camera.dtsi"
+#include "msm-rdbg.dtsi"
+#include "msm-qvr-external.dtsi"
 
 &emac_gdsc {
 	status = "ok";
@@ -3648,6 +3650,7 @@
 	clocks = <&gcc GCC_NPU_CFG_AHB_CLK>;
 	status = "ok";
 };
+#include "sm8150-audio.dtsi"
 #include "sm8150-pcie.dtsi"
 #include "sm8150-usb.dtsi"
 #include "sm8150-gpu.dtsi"
