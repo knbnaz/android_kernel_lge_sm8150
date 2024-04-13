@@ -343,6 +343,8 @@
 	};
 };
 
+#include "sm8150-gpu-v2.dtsi"
+
 /* GPU overrides */
 &msm_gpu {
 	/* Updated chip ID */
