@@ -516,7 +516,7 @@
 		reg = <0x7040000 0x1000>;
 		reg-names = "etm-base";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "core_clk";
 
 		qcom,coresight-jtagmm-cpu = <&CPU0>;
@@ -528,7 +528,7 @@
 		reg = <0x7140000 0x1000>;
 		reg-names = "etm-base";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "core_clk";
 
 		qcom,coresight-jtagmm-cpu = <&CPU1>;
@@ -540,7 +540,7 @@
 		reg = <0x7240000 0x1000>;
 		reg-names = "etm-base";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "core_clk";
 
 		qcom,coresight-jtagmm-cpu = <&CPU2>;
@@ -552,7 +552,7 @@
 		reg = <0x7340000 0x1000>;
 		reg-names = "etm-base";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "core_clk";
 
 		qcom,coresight-jtagmm-cpu = <&CPU3>;
@@ -564,7 +564,7 @@
 		reg = <0x7440000 0x1000>;
 		reg-names = "etm-base";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "core_clk";
 
 		qcom,coresight-jtagmm-cpu = <&CPU4>;
@@ -576,7 +576,7 @@
 		reg = <0x7540000 0x1000>;
 		reg-names = "etm-base";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "core_clk";
 
 		qcom,coresight-jtagmm-cpu = <&CPU5>;
@@ -588,7 +588,7 @@
 		reg = <0x7640000 0x1000>;
 		reg-names = "etm-base";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "core_clk";
 
 		qcom,coresight-jtagmm-cpu = <&CPU6>;
@@ -600,7 +600,7 @@
 		reg = <0x7740000 0x1000>;
 		reg-names = "etm-base";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "core_clk";
 
 		qcom,coresight-jtagmm-cpu = <&CPU7>;

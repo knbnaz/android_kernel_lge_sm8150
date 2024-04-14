@@ -21,7 +21,7 @@
 
 		coresight-name = "coresight-replicator-qdss";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -64,7 +64,7 @@
 
 		coresight-name = "coresight-replicator-qdss1";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -99,7 +99,7 @@
 
 		coresight-name = "coresight-replicator-swao";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -147,7 +147,7 @@
 
 		coresight-name = "coresight-tmc-etf-swao";
 		coresight-csr = <&csr>;
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -183,7 +183,7 @@
 
 		coresight-name = "coresight-funnel-swao";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -236,7 +236,7 @@
 		qcom,dsb-elem-size = <1 32>;
 		qcom,cmb-elem-size = <0 64>;
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -282,7 +282,7 @@
 
 		coresight-name = "coresight-tpdm-swao-0";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		port {
@@ -300,7 +300,7 @@
 
 		coresight-name="coresight-tpdm-swao-1";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		qcom,msr-fix-req;
@@ -333,7 +333,7 @@
 		coresight-ctis = <&cti0 &cti0>;
 		coresight-csr = <&csr>;
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		interrupts = <GIC_SPI 270 IRQ_TYPE_EDGE_RISING>;
@@ -359,7 +359,7 @@
 		coresight-csr = <&csr>;
 		arm,default-sink;
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -395,7 +395,7 @@
 
 		coresight-name = "coresight-funnel-merg";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -450,7 +450,7 @@
 
 		coresight-name = "coresight-stm";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		port {
@@ -479,7 +479,7 @@
 
 		coresight-name = "coresight-hwevent";
 		coresight-csr = <&csr>;
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 	};
 
@@ -504,7 +504,7 @@
 		coresight-name = "coresight-swao-csr";
 		qcom,timestamp-support;
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		qcom,blk-size = <1>;
@@ -519,7 +519,7 @@
 
 		coresight-name = "coresight-funnel-in0";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -571,7 +571,7 @@
 
 		coresight-name = "coresight-funnel-in1";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -629,7 +629,7 @@
 
 		coresight-name = "coresight-funnel-in2";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -678,7 +678,7 @@
 
 		coresight-name = "coresight-funnel-gfx";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -736,7 +736,7 @@
 				     <10 64>,
 				     <13 64>;
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -855,7 +855,7 @@
 		qcom,dsb-elem-size = <0 32>;
 		qcom,cmb-elem-size = <0 64>;
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -888,7 +888,7 @@
 
 		coresight-name = "coresight-tpdm-modem";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		port {
@@ -907,7 +907,7 @@
 
 		coresight-name = "coresight-funnel-lpass";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -943,7 +943,7 @@
 
 		coresight-name = "coresight-funnel-lpass-1";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		qcom,duplicate-funnel;
@@ -979,7 +979,7 @@
 
 		coresight-name = "coresight-tpdm-lpass";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		qcom,msr-fix-req;
@@ -999,7 +999,7 @@
 
 		coresight-name = "coresight-tpdm-center";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		qcom,msr-fix-req;
@@ -1019,7 +1019,7 @@
 
 		coresight-name = "coresight-tpdm-dl-north";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		qcom,msr-fix-req;
@@ -1043,7 +1043,7 @@
 
 		qcom,cmb-elem-size = <0 32>;
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -1076,7 +1076,7 @@
 
 		coresight-name = "coresight-funnel-dl-south";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -1109,7 +1109,7 @@
 
 		coresight-name = "coresight-tpdm-dl-south";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		port {
@@ -1129,7 +1129,7 @@
 
 		coresight-name = "coresight-funnel-dl-north";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -1185,7 +1185,7 @@
 
 		coresight-name = "coresight-tpdm-prng";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		port {
@@ -1204,7 +1204,7 @@
 
 		coresight-name = "coresight-funnel-spss";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -1250,7 +1250,7 @@
 		qcom,tpda-atid = <70>;
 		qcom,cmb-elem-size = <0 32>;
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -1283,7 +1283,7 @@
 
 		coresight-name = "coresight-tpdm-spss";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		port {
@@ -1314,7 +1314,7 @@
 
 		coresight-name = "coresight-tpdm-qm";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		port {
@@ -1335,7 +1335,7 @@
 		qcom,tpda-atid = <66>;
 		qcom,dsb-elem-size = <0 32>;
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -1368,7 +1368,7 @@
 
 		coresight-name = "coresight-tpdm-apss";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		port {
@@ -1389,7 +1389,7 @@
 		qcom,tpda-atid = <72>;
 		qcom,cmb-elem-size = <0 32>;
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -1422,7 +1422,7 @@
 
 		coresight-name = "coresight-tpdm-llm-silver";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		port {
@@ -1444,7 +1444,7 @@
 		qcom,tpda-atid = <73>;
 		qcom,cmb-elem-size = <0 32>;
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -1477,7 +1477,7 @@
 
 		coresight-name = "coresight-tpdm-llm-gold";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		port {
@@ -1497,7 +1497,7 @@
 
 		coresight-name = "coresight-funnel-dl-mm";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -1533,7 +1533,7 @@
 
 		coresight-name = "coresight-funnel-dl-mm1";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		qcom,duplicate-funnel;
@@ -1569,7 +1569,7 @@
 
 		coresight-name = "coresight-tpdm-mm";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		qcom,msr-fix-req;
@@ -1590,7 +1590,7 @@
 
 		coresight-name = "coresight-funnel-turing";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -1626,7 +1626,7 @@
 
 		coresight-name = "coresight-funnel-turing-1";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		qcom,duplicate-funnel;
@@ -1662,7 +1662,7 @@
 
 		coresight-name = "coresight-tpdm-turing";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		qcom,msr-fix-req;
@@ -1684,7 +1684,7 @@
 
 		coresight-name = "coresight-funnel-ddr-0";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -1718,7 +1718,7 @@
 
 		coresight-name = "coresight-tpdm-ddr";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		qcom,msr-fix-req;
@@ -1738,7 +1738,7 @@
 
 		coresight-name = "coresight-tpdm-pimem";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		port {
@@ -1756,7 +1756,7 @@
 
 		coresight-name = "coresight-tpdm-vsense";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		port{
@@ -1777,7 +1777,7 @@
 		qcom,tpda-atid = <69>;
 		qcom,cmb-elem-size = <0 64>;
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -1809,7 +1809,7 @@
 
 		coresight-name = "coresight-tpdm-olc";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		port{
@@ -1827,14 +1827,14 @@
 
 		coresight-name = "coresight-tpdm-npu";
 
-		clocks = <&clock_aop QDSS_CLK>,
-			<&clock_gcc GCC_NPU_TRIG_CLK>,
-			<&clock_gcc GCC_NPU_AT_CLK>,
-			<&clock_npucc NPU_CC_NPU_CORE_APB_CLK>,
-			<&clock_npucc NPU_CC_NPU_CORE_ATB_CLK>,
-			<&clock_npucc NPU_CC_NPU_CORE_CLK>,
-			<&clock_npucc NPU_CC_NPU_CORE_CLK_SRC>,
-			<&clock_npucc NPU_CC_NPU_CORE_CTI_CLK>;
+		clocks = <&aopcc QDSS_CLK>,
+			<&gcc GCC_NPU_TRIG_CLK>,
+			<&gcc GCC_NPU_AT_CLK>,
+			<&npucc NPU_CC_NPU_CORE_APB_CLK>,
+			<&npucc NPU_CC_NPU_CORE_ATB_CLK>,
+			<&npucc NPU_CC_NPU_CORE_CLK>,
+			<&npucc NPU_CC_NPU_CORE_CLK_SRC>,
+			<&npucc NPU_CC_NPU_CORE_CTI_CLK>;
 
 		clock-names = "apb_pclk",
 			"gcc_npu_trig_clk",
@@ -1873,7 +1873,7 @@
 
 		coresight-name = "coresight-funnel-qatb";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -1925,7 +1925,7 @@
 
 		coresight-name = "coresight-cti-apss_cti0";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 	};
 
@@ -1937,7 +1937,7 @@
 
 		coresight-name = "coresight-cti-apss_cti1";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 	};
 
@@ -1949,7 +1949,7 @@
 
 		coresight-name = "coresight-cti-apss_cti2";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 	};
 
@@ -1961,7 +1961,7 @@
 
 		coresight-name = "coresight-cti-ddr_dl_0_cti_0";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 	};
 
@@ -1973,7 +1973,7 @@
 
 		coresight-name = "coresight-cti-ddr_dl_0_cti_1";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 	};
 
@@ -1985,7 +1985,7 @@
 
 		coresight-name = "coresight-cti-ddr_dl_1_cti_0";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 	};
 
@@ -1997,7 +1997,7 @@
 
 		coresight-name = "coresight-cti-ddr_dl_1_cti_1";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 	};
 
@@ -2009,7 +2009,7 @@
 
 		coresight-name = "coresight-cti-dlmm_cti0";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 	};
 
@@ -2021,7 +2021,7 @@
 
 		coresight-name = "coresight-cti-dlmm_cti1";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 	};
 
@@ -2033,7 +2033,7 @@
 
 		coresight-name = "coresight-cti-dlct_cti0";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 	};
 
@@ -2045,7 +2045,7 @@
 
 		coresight-name = "coresight-cti-dlct_cti1";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 	};
 
@@ -2057,7 +2057,7 @@
 
 		coresight-name = "coresight-cti0";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 	};
@@ -2070,7 +2070,7 @@
 
 		coresight-name = "coresight-cti1";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 	};
@@ -2083,7 +2083,7 @@
 
 		coresight-name = "coresight-cti2";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		qcom,cti-gpio-trigout = <4>;
@@ -2099,7 +2099,7 @@
 
 		coresight-name = "coresight-cti3";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 	};
@@ -2112,7 +2112,7 @@
 
 		coresight-name = "coresight-cti4";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 	};
@@ -2125,7 +2125,7 @@
 
 		coresight-name = "coresight-cti5";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 	};
@@ -2138,7 +2138,7 @@
 
 		coresight-name = "coresight-cti6";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 	};
@@ -2151,7 +2151,7 @@
 
 		coresight-name = "coresight-cti7";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 	};
@@ -2164,7 +2164,7 @@
 
 		coresight-name = "coresight-cti8";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 	};
@@ -2177,7 +2177,7 @@
 
 		coresight-name = "coresight-cti9";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 	};
@@ -2190,7 +2190,7 @@
 
 		coresight-name = "coresight-cti10";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 	};
@@ -2203,7 +2203,7 @@
 
 		coresight-name = "coresight-cti11";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 	};
@@ -2216,7 +2216,7 @@
 
 		coresight-name = "coresight-cti12";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 	};
@@ -2229,7 +2229,7 @@
 
 		coresight-name = "coresight-cti13";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 	};
@@ -2242,7 +2242,7 @@
 
 		coresight-name = "coresight-cti14";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 	};
@@ -2255,7 +2255,7 @@
 
 		coresight-name = "coresight-cti15";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 	};
@@ -2269,7 +2269,7 @@
 		coresight-name = "coresight-cti-cpu0";
 		cpu = <&CPU0>;
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 	};
@@ -2283,7 +2283,7 @@
 		coresight-name = "coresight-cti-cpu1";
 		cpu = <&CPU1>;
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 	};
 
@@ -2296,7 +2296,7 @@
 		coresight-name = "coresight-cti-cpu2";
 		cpu = <&CPU2>;
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 	};
 
@@ -2309,7 +2309,7 @@
 		coresight-name = "coresight-cti-cpu3";
 		cpu = <&CPU3>;
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 	};
 
@@ -2322,7 +2322,7 @@
 		coresight-name = "coresight-cti-cpu4";
 		cpu = <&CPU4>;
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 	};
 
@@ -2335,7 +2335,7 @@
 		coresight-name = "coresight-cti-cpu5";
 		cpu = <&CPU5>;
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 	};
 
@@ -2348,7 +2348,7 @@
 		coresight-name = "coresight-cti-cpu6";
 		cpu = <&CPU6>;
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 	};
 
@@ -2361,7 +2361,7 @@
 		coresight-name = "coresight-cti-cpu7";
 		cpu = <&CPU7>;
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 	};
 
@@ -2373,7 +2373,7 @@
 
 		coresight-name = "coresight-cti-swao_cti0";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 	};
 
@@ -2389,7 +2389,7 @@
 
 		coresight-name = "coresight-tgu-ipcb";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 	};
 
@@ -2473,7 +2473,7 @@
 
 		coresight-name = "coresight-funnel-apss-merg";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
@@ -2546,7 +2546,7 @@
 		qcom,tupwr-disable;
 		coresight-name = "coresight-etm0";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		port {
@@ -2566,7 +2566,7 @@
 		qcom,tupwr-disable;
 		coresight-name = "coresight-etm1";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		port {
@@ -2586,7 +2586,7 @@
 		qcom,tupwr-disable;
 		coresight-name = "coresight-etm2";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		port {
@@ -2606,7 +2606,7 @@
 		qcom,tupwr-disable;
 		coresight-name = "coresight-etm3";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		port {
@@ -2626,7 +2626,7 @@
 		qcom,tupwr-disable;
 		coresight-name = "coresight-etm4";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		port {
@@ -2646,7 +2646,7 @@
 		qcom,tupwr-disable;
 		coresight-name = "coresight-etm5";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		port {
@@ -2666,7 +2666,7 @@
 		qcom,tupwr-disable;
 		coresight-name = "coresight-etm6";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		port {
@@ -2686,7 +2686,7 @@
 		qcom,tupwr-disable;
 		coresight-name = "coresight-etm7";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		port {
@@ -2705,7 +2705,7 @@
 
 		coresight-name = "coresight-funnel-apss";
 
-		clocks = <&clock_aop QDSS_CLK>;
+		clocks = <&aopcc QDSS_CLK>;
 		clock-names = "apb_pclk";
 
 		ports {
