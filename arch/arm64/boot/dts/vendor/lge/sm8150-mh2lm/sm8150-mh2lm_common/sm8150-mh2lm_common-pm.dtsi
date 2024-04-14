@@ -188,7 +188,3 @@
 		qcom,ramp-high-index = <47>;
 	};
 };
-
-&pm8150b_qnovo {
-	lge,enable-compensate-qni-fcc;
-};
