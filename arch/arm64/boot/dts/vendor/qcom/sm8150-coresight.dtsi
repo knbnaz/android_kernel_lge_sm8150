@@ -45,7 +45,7 @@
 			};
 
 			port@2 {
-				reg = <0>;
+				reg = <2>;
 				replicator0_in_tmc_etf: endpoint {
 					slave-mode;
 					remote-endpoint=
@@ -72,7 +72,7 @@
 			#size-cells = <0>;
 
 			port@0 {
-				reg = <1>;
+				reg = <0>;
 				replicator1_out_funnel_swao: endpoint {
 					remote-endpoint=
 					<&funnel_swao_in_replicator1_out>;
@@ -111,7 +111,7 @@
 			 * over ETR
 			 */
 			port@0 {
-				reg = <1>;
+				reg = <0>;
 				replicator_swao_out_eud: endpoint {
 					remote-endpoint =
 					  <&eud_in_replicator_swao>;
@@ -119,7 +119,7 @@
 			};
 
 			port@1 {
-				reg = <0>;
+				reg = <1>;
 				replicator_swao_out_funnel_in1: endpoint {
 					remote-endpoint =
 					<&funnel_in1_in_replicator_swao>;
@@ -127,7 +127,7 @@
 			};
 
 			port@2 {
-				reg = <0>;
+				reg = <2>;
 				replicator_swao_in_tmc_etf_swao: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -163,7 +163,7 @@
 			};
 
 			port@1 {
-				reg = <0>;
+				reg = <1>;
 				tmc_etf_swao_in_funnel_swao: endpoint {
 					slave-mode;
 					remote-endpoint=
@@ -198,7 +198,7 @@
 				};
 			};
 			port@1 {
-				reg = <5>;
+				reg = <1>;
 				funnel_swao_in_ssc_etm0: endpoint {
 					slave-mode;
 					remote-endpoint=
@@ -206,7 +206,7 @@
 				};
 			};
 			port@2 {
-				reg = <6>;
+				reg = <2>;
 				funnel_swao_in_replicator1_out: endpoint {
 					slave-mode;
 					remote-endpoint=
@@ -214,7 +214,7 @@
 				};
 			};
 			port@3 {
-				reg = <7>;
+				reg = <3>;
 				funnel_swao_in_tpda_swao: endpoint {
 					slave-mode;
 					remote-endpoint=
@@ -253,7 +253,7 @@
 			};
 
 			port@1 {
-				reg = <0>;
+				reg = <1>;
 				tpda_swao_in_tpdm_swao0: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -262,7 +262,7 @@
 			};
 
 			port@2 {
-				reg = <1>;
+				reg = <2>;
 				tpda_swao_in_tpdm_swao1: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -375,7 +375,7 @@
 			};
 
 			port@1 {
-				reg = <0>;
+				reg = <1>;
 				tmc_etf_in_funnel_merg: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -411,7 +411,7 @@
 			};
 
 			port@1 {
-				reg = <0>;
+				reg = <1>;
 				funnel_merg_in_funnel_in0: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -420,7 +420,7 @@
 			};
 
 			port@2 {
-				reg = <1>;
+				reg = <2>;
 				funnel_merg_in_funnel_in1: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -429,7 +429,7 @@
 			};
 
 			port@3 {
-				reg = <2>;
+				reg = <3>;
 				funnel_merg_in_funnel_in2: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -544,7 +544,7 @@
 			};
 
 			port@2 {
-				reg = <6>;
+				reg = <2>;
 				funnel_in0_in_funnel_qatb: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -553,7 +553,7 @@
 			};
 
 			port@3 {
-				reg = <7>;
+				reg = <3>;
 				funnel_in0_in_stm: endpoint {
 					slave-mode;
 					remote-endpoint = <&stm_out_funnel_in0>;
@@ -586,7 +586,7 @@
 				};
 			};
 			port@1 {
-				reg = <2>;
+				reg = <1>;
 				funnel_in1_in_funnel_dl_south: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -594,7 +594,7 @@
 				};
 			};
 			port@2 {
-				reg = <3>;
+				reg = <2>;
 				funnel_in1_in_modem_etm0: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -602,7 +602,7 @@
 				};
 			};
 			port@3 {
-				reg = <4>;
+				reg = <3>;
 				funnel_in1_in_replicator_swao: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -610,7 +610,7 @@
 				};
 			};
 			port@4 {
-				reg = <6>;
+				reg = <4>;
 				funnel_in1_in_funnel_dl_north: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -643,7 +643,7 @@
 				};
 			};
 			port@1 {
-				reg = <2>;
+				reg = <1>;
 				funnel_in2_in_funnel_apss_merg: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -651,7 +651,7 @@
 				};
 			};
 			port@2 {
-				reg = <3>;
+				reg = <2>;
 				funnel_in2_in_funnel_gfx: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -659,7 +659,7 @@
 				};
 			};
 			port@3 {
-				reg = <4>;
+				reg = <3>;
 				funnel_in2_in_tpda_modem: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -752,7 +752,7 @@
 			};
 
 			port@1 {
-				reg = <0>;
+				reg = <1>;
 				tpda_in_funnel_dl_mm: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -760,7 +760,7 @@
 				};
 			};
 			port@2 {
-				reg = <1>;
+				reg = <2>;
 				tpda_in_funnel_dl_mm1: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -769,7 +769,7 @@
 			};
 
 			port@3 {
-				reg = <2>;
+				reg = <3>;
 				tpda_in_tpdm_center: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -806,7 +806,7 @@
 			};
 
 			port@7 {
-				reg = <8>;
+				reg = <7>;
 				tpda_in_tpdm_vsense: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -815,7 +815,7 @@
 			};
 
 			port@8 {
-				reg = <10>;
+				reg = <8>;
 				tpda_in_tpdm_prng: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -824,7 +824,7 @@
 			};
 
 			port@9 {
-				reg = <13>;
+				reg = <9>;
 				tpda_in_tpdm_pimem: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -832,8 +832,8 @@
 				};
 			};
 
-			port@10 {
-				reg = <14>;
+			port@a {
+				reg = <10>;
 				tpda_in_tpdm_npu: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -870,7 +870,7 @@
 			};
 
 			port@1 {
-				reg = <0>;
+				reg = <1>;
 				tpda_modem_in_tpdm_modem: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -923,7 +923,7 @@
 			};
 
 			port@1 {
-				reg = <0>;
+				reg = <1>;
 				funnel_lpass_in_tpdm_lpass: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -961,7 +961,7 @@
 			};
 
 			port@1 {
-				reg = <2>;
+				reg = <1>;
 				funnel_lpass_1_in_audio_etm0: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -1058,7 +1058,7 @@
 			};
 
 			port@1 {
-				reg = <0>;
+				reg = <1>;
 				tpda_dl_north_in_tpdm_dl_north: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -1091,7 +1091,7 @@
 			};
 
 			port@1 {
-				reg = <0>;
+				reg = <1>;
 				funnel_dl_south_in_tpdm_dl_south: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -1145,7 +1145,7 @@
 			};
 
 			port@1 {
-				reg = <0>;
+				reg = <1>;
 				funnel_dl_north_in_tpda_dl_north: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -1154,7 +1154,7 @@
 			};
 
 			port@2 {
-				reg = <1>;
+				reg = <2>;
 				funnel_dl_north_in_tpdm_wcss: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -1220,7 +1220,7 @@
 			};
 
 			port@1 {
-				reg = <0>;
+				reg = <1>;
 				funnel_spss_in_tpda_spss: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -1229,7 +1229,7 @@
 			};
 
 			port@2 {
-				reg = <1>;
+				reg = <2>;
 				funnel_spss_in_spss_etm0: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -1265,7 +1265,7 @@
 			};
 
 			port@1 {
-				reg = <0>;
+				reg = <1>;
 				tpda_spss_in_tpdm_spss: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -1350,7 +1350,7 @@
 			};
 
 			port@1 {
-				reg = <0>;
+				reg = <1>;
 				tpda_apss_in_tpdm_apss: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -1404,7 +1404,7 @@
 			};
 
 			port@1 {
-				reg = <0>;
+				reg = <1>;
 				tpda_llm_silver_in_tpdm_llm_silver: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -1459,7 +1459,7 @@
 			};
 
 			port@1 {
-				reg = <0>;
+				reg = <1>;
 				tpda_llm_gold_in_tpdm_llm_gold: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -1513,7 +1513,7 @@
 			};
 
 			port@1 {
-				reg = <0>;
+				reg = <1>;
 				funnel_dl_mm_in_tpdm_qm: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -1606,7 +1606,7 @@
 			};
 
 			port@1 {
-				reg = <0>;
+				reg = <1>;
 				funnel_turing_in_tpdm_turing: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -1700,7 +1700,7 @@
 			};
 
 			port@1 {
-				reg = <0>;
+				reg = <1>;
 				funnel_ddr_0_in_tpdm_ddr: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -1791,7 +1791,7 @@
 				};
 			};
 			port@1 {
-				reg = <0>;
+				reg = <1>;
 				tpda_olc_in_tpdm_olc: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -1889,7 +1889,7 @@
 			};
 
 			port@1 {
-				reg = <0>;
+				reg = <1>;
 				funnel_qatb_in_tpda: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -1898,7 +1898,7 @@
 			};
 
 			port@2 {
-				reg = <4>;
+				reg = <2>;
 				funnel_qatb_in_funnel_lpass_1: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -1907,7 +1907,7 @@
 			};
 
 			port@3 {
-				reg = <5>;
+				reg = <3>;
 				funnel_qatb_in_funnel_turing_1: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -2489,7 +2489,7 @@
 			};
 
 			port@1 {
-				reg = <0>;
+				reg = <1>;
 				funnel_apss_merg_in_funnel_apss: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -2720,7 +2720,7 @@
 				};
 			};
 			port@1 {
-				reg = <0>;
+				reg = <1>;
 				funnel_apss_in_etm0: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -2729,7 +2729,7 @@
 			};
 
 			port@2 {
-				reg = <1>;
+				reg = <2>;
 				funnel_apss_in_etm1: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -2738,7 +2738,7 @@
 			};
 
 			port@3 {
-				reg = <2>;
+				reg = <3>;
 				funnel_apss_in_etm2: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -2747,7 +2747,7 @@
 			};
 
 			port@4 {
-				reg = <3>;
+				reg = <4>;
 				funnel_apss_in_etm3: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -2756,7 +2756,7 @@
 			};
 
 			port@5 {
-				reg = <4>;
+				reg = <5>;
 				funnel_apss_in_etm4: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -2765,7 +2765,7 @@
 			};
 
 			port@6 {
-				reg = <5>;
+				reg = <6>;
 				funnel_apss_in_etm5: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -2774,7 +2774,7 @@
 			};
 
 			port@7 {
-				reg = <6>;
+				reg = <7>;
 				funnel_apss_in_etm6: endpoint {
 					slave-mode;
 					remote-endpoint =
@@ -2783,7 +2783,7 @@
 			};
 
 			port@8 {
-				reg = <7>;
+				reg = <8>;
 				funnel_apss_in_etm7: endpoint {
 					slave-mode;
 					remote-endpoint =
