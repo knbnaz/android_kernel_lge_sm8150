@@ -1100,6 +1100,7 @@
 		label = "disp_rsc";
 		compatible = "qcom,rpmh-rsc";
 		reg = <0xaf20000 0x10000>;
+		#mbox-cells = <1>;
 		reg-names = "drv-0";
 		interrupts = <GIC_SPI 129 IRQ_TYPE_LEVEL_HIGH>;
 		qcom,tcs-offset = <0x1c00>;
@@ -1904,6 +1905,8 @@
 			label = "adsp";
 			qcom,glink-label = "lpass";
 			cpu-affinity = <1 2>;
+			#address-cells = <1>;
+			#size-cells = <0>;
 
 			qcom,adsp_qrtr {
 				qcom,glink-channels = "IPCRTR";
@@ -1917,6 +1920,8 @@
 				qcom,glink-channels = "adsp_apps";
 				qcom,intents = <0x200 20>;
 				reg = <GPR_DOMAIN_ADSP>;
+				#address-cells = <1>;
+				#size-cells = <0>;
 				spf_core {
 					compatible = "qcom,spf_core";
 					reg = <GPR_SVC_ADSP_CORE>;

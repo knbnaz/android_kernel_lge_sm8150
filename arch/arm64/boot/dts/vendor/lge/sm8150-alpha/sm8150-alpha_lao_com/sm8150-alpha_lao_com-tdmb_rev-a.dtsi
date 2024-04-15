@@ -31,6 +31,8 @@
 
 	status = "ok";
 
+	#address-cells = <1>;
+	#size-cells = <0>;
 	tdmb: tdmb@0 {
 		compatible = "lge,tdmb"; // [Fixed] Should be "lge,tdmb".
 		reg = <0>;
