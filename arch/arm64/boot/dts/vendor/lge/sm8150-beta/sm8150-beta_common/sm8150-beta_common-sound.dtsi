@@ -163,7 +163,7 @@
 };
 
 &qupv3_se4_i2c{ /* QUPV3 SE4  */
-	#address-size = <1>;
+	#address-cells = <1>;
 	#size-cells = <0>;
 	fsa4480: fsa4480@43 {
 		status = "disabled";

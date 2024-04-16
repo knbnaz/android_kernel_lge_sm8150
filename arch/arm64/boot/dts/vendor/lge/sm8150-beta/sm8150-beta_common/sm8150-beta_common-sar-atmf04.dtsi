@@ -15,6 +15,8 @@
 	status = "ok";
 	qcom,clk-freq-out = <100000>;
 	qcom,clk-freq-in  = <19200000>;
+	#address-cells = <1>;
+	#size-cells = <0>;
 	adsemicon_atmf04@5a {
 		compatible = "adsemicon,atmf04";
 		status = "ok";

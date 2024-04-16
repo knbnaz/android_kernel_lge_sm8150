@@ -14,7 +14,7 @@
 	tavil_codec {
 		tavil_wcd: wcd_pinctrl@5 {
 			compatible = "qcom,wcd-pinctrl";
-			qcom,num-gpios = <5>;
+			qcom,gpios-count = <5>;
 			gpio-controller;
 			#gpio-cells = <2>;
 
@@ -152,6 +152,7 @@
 
 		tavil_hph_en0: msm_cdc_pinctrl_hph_en0 {
 		      compatible = "qcom,msm-cdc-pinctrl";
+		      #gpio-cells = <0>;
 		      pinctrl-names = "aud_active", "aud_sleep";
 		      pinctrl-0 = <&hph_en0_wcd_active>;
 		      pinctrl-1 = <&hph_en0_wcd_sleep>;
@@ -159,6 +160,7 @@
 
 		tavil_hph_en1: msm_cdc_pinctrl_hph_en1 {
 		      compatible = "qcom,msm-cdc-pinctrl";
+		      #gpio-cells = <0>;
 		      pinctrl-names = "aud_active", "aud_sleep";
 		      pinctrl-0 = <&hph_en1_wcd_active>;
 		      pinctrl-1 = <&hph_en1_wcd_sleep>;

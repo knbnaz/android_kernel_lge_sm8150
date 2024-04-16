@@ -30,6 +30,7 @@
 	/* PIN CONTROL for gf3208 */
 	#address-cells = <1>;
 	#size-cells = <1>;
+	interrupt-parent = <&tlmm>;
 	qupv3_se7_spi: spi@89c000 { /* QUP7 */
 		compatible = "qcom,spi-geni";
 		#address-cells = <1>;

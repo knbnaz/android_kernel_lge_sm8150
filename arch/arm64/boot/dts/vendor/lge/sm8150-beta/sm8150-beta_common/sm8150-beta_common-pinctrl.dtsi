@@ -28,7 +28,7 @@
 };
 
 &tlmm {
-	lge,access-denied-gpios = <92 93 94 95 98 99 100 101>;
+	lge,access-denied-gpios = <&tlmm 92 93 94 95 98 99 100 101>;
 
 	pmx_sde: pmx_sde {
 		sde_dsi_active: sde_dsi_active {

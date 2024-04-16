@@ -27,6 +27,9 @@
 		reg = <0x86600000 0x1A00000>;
 	};
 */
+	#address-cells = <1>;
+	#size-cells = <1>;
+	interrupt-parent = <&tlmm>;
 	/* PIN CONTROL for gf3208 */
 
 	qupv3_se7_spi: spi@89c000 { /* QUP7 */
@@ -48,6 +51,8 @@
 	};
 };
 &soc{
+	#address-cells = <1>;
+	#size-cells = <1>;
 	fingerprint@0 {
 		compatible = "egistec,et713";
 

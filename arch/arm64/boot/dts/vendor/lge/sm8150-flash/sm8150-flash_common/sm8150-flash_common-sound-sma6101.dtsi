@@ -45,6 +45,8 @@
 
 /* for HDK */
 &qupv3_se0_i2c{ /* QUPV3 SE0  */
+	#address-cells = <1>;
+	#size-cells = <0>;
 	status = "ok";
 	sma6101_se0@1e {
 		compatible = "siliconmitus,sma6101";
@@ -78,6 +80,8 @@
 };
 /* for Rev0.1 */
 &qupv3_se4_i2c{ /* QUPV3 SE4  */
+	#address-cells = <1>;
+	#size-cells = <0>;
 	sma6101_se4@1e {
 		compatible = "siliconmitus,sma6101";
 		reg = <0x1e>;

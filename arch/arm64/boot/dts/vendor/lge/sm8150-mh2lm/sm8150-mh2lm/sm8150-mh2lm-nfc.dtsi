@@ -16,6 +16,8 @@
 
 &qupv3_se9_i2c { /* QUP_9 (NFC) */
 	qcom,clk-freq-out = <1000000>;
+	#address-cells = <1>;
+	#size-cells = <0>;
 	status = "ok";
 	nq@28 {
 		status = "disabled";

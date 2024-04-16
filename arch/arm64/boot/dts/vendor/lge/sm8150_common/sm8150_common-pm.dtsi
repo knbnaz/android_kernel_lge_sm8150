@@ -24,13 +24,6 @@
 &soc {
 	#address-cells = <1>;
 	#size-cells = <1>;
-	lge,gpio-debug {
-		compatible = "lge,gpio-debug";
-		reg = <0x03100000 0x900000>;
-		reg-names = "tlmm-base";
-		lge,n-msm-gpio = <0xAF>;  /* SM8150 0 to 174 */
-	};
-
 	lge,monitor-thermal {
 		compatible = "lge,monitor-thermal";
 		lge,hot-poll-time = <10000>;

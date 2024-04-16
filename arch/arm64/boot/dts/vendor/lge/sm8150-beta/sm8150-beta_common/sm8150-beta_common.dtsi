@@ -57,69 +57,70 @@
 };
 
 &reserved_memory {
+		#address-cells = <1>;
+		#size-cells = <1>;
 		ramoops_mem: ramoops_region@b0000000 {
-			compatible = "removed-dma-pool";
 			no-map;
 			reg = <0 0xb0000000 0 0x300000>;
 		};
+		qseecom_mem {
+			reg = <0 0x9e400000 0 0x1c00000>;
+		};
 
+		cont_splash_memory {
+			reg = <0x0 0x9D200000 0x0 0x01200000>;
+		};
+
+		disp_rdump_memory {
+				reg = <0x0 0x9D200000 0x0 0x01200000>;
+		};
+
+		pil_adsp_mem {
+			reg = <0 0x8be00000 0 0x2200000>;
+		};
+
+		pil_modem_mem {
+			reg = <0 0x8e000000 0 0xA000000>;
+		};
+
+		pil_video_mem {
+			reg = <0 0x98000000 0 0x500000>;
+		};
+
+		pil_slpi_mem {
+			reg = <0 0x98500000 0 0x1400000>;
+		};
+
+		pil_ipa_fw_mem {
+			reg = <0x0 0x99900000 0x0 0x10000>;
+		};
+
+		pil_ipa_gsi_mem {
+			reg = <0x0 0x99910000 0x0 0x5000>;
+		};
+
+		pil_gpu_mem {
+			reg = <0x0 0x99915000 0x0 0x2000>;
+		};
+
+		pil_spss_mem {
+			reg = <0x0 0x99a00000 0x0 0x100000>;
+		};
+
+		pil_cdsp_mem {
+			reg = <0x0 0x99b00000 0x0 0x3700000>;
+		};
+
+		cdsp_sec_mem {
+			reg = <0x0 0xa4c00000 0x0 0x4000000>;
+		};
+
+		mhi_0 {
+			mhi,fw-name = "debug.mbn";
+		};
 };
 
-&qseecom_mem {
-	reg = <0 0x9e400000 0 0x1c00000>;
-};
 
-&cont_splash_memory {
-	reg = <0x0 0x9D200000 0x0 0x01200000>;
-};
-
-&disp_rdump_memory {
-        reg = <0x0 0x9D200000 0x0 0x01200000>;
-};
-
-&pil_adsp_mem {
-	reg = <0 0x8be00000 0 0x2200000>;
-};
-
-&pil_modem_mem {
-	reg = <0 0x8e000000 0 0xA000000>;
-};
-
-&pil_video_mem {
-	reg = <0 0x98000000 0 0x500000>;
-};
-
-&pil_slpi_mem {
-	reg = <0 0x98500000 0 0x1400000>;
-};
-
-&pil_ipa_fw_mem {
-	reg = <0x0 0x99900000 0x0 0x10000>;
-};
-
-&pil_ipa_gsi_mem {
-	reg = <0x0 0x99910000 0x0 0x5000>;
-};
-
-&pil_gpu_mem {
-	reg = <0x0 0x99915000 0x0 0x2000>;
-};
-
-&pil_spss_mem {
-	reg = <0x0 0x99a00000 0x0 0x100000>;
-};
-
-&pil_cdsp_mem {
-	reg = <0x0 0x99b00000 0x0 0x3700000>;
-};
-
-&cdsp_sec_mem {
-	reg = <0x0 0xa4c00000 0x0 0x4000000>;
-};
-
-&mhi_0 {
-	mhi,fw-name = "debug.mbn";
-};
 
 &usb1 {
         status = "disabled";

@@ -23,6 +23,8 @@
 };
 
 &qupv3_se8_spi {
+	#address-cells = <1>;
+	#size-cells = <0>;
 	lattice@2 {
 		compatible = "lattice,ice40-fpga-mgr";
 		reg = <2>;
@@ -36,6 +38,8 @@
 };
 
 &qupv3_se10_i2c {
+	#address-cells = <1>;
+	#size-cells = <0>;
 	latticei2c@58 {
 		compatible = "lattice,ice40-i2c";
 		reg = <0x58>;
