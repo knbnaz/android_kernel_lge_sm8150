@@ -10,7 +10,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
-#include <dt-bindings/thermal/thermal_qti.h>
+#include <dt-bindings/thermal/thermal.h>
 
 &thermal_zones {
 	pm8150b_tz {
