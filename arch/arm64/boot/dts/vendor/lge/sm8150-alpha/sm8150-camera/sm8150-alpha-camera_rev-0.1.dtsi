@@ -577,7 +577,7 @@
 		cci-device = <0>;
 		cci-master = <0>;
 		status = "ok";
-		clocks = <&camcc CAM_CC_MCLK0_CLK>;
+		clocks = <&clock_camcc CAM_CC_MCLK0_CLK>;
 		clock-names = "cam_clk";
 		clock-cntl-level = "turbo";
 		clock-rates = <24000000>;
@@ -621,7 +621,7 @@
 		cci-device = <0>;
 		cci-master = <0>;
 		status = "ok";
-		clocks = <&camcc CAM_CC_MCLK0_CLK>;
+		clocks = <&clock_camcc CAM_CC_MCLK0_CLK>;
 		clock-names = "cam_clk";
 		clock-cntl-level = "turbo";
 		clock-rates = <24000000>;
@@ -658,7 +658,7 @@
 		cci-device = <0>;
 		cci-master = <1>;
 		status = "ok";
-		clocks = <&camcc CAM_CC_MCLK1_CLK>;
+		clocks = <&clock_camcc CAM_CC_MCLK1_CLK>;
 		clock-names = "cam_clk";
 		clock-cntl-level = "turbo";
 		clock-rates = <24000000>;
@@ -701,7 +701,7 @@
 		cci-device = <0>;
 		cci-master = <1>;
 		status = "ok";
-		clocks = <&camcc CAM_CC_MCLK1_CLK>;
+		clocks = <&clock_camcc CAM_CC_MCLK1_CLK>;
 		clock-names = "cam_clk";
 		clock-cntl-level = "turbo";
 		clock-rates = <24000000>;
@@ -739,7 +739,7 @@
 		cci-device = <1>;
 		cci-master = <0>;
 		status = "ok";
-		clocks = <&camcc CAM_CC_MCLK2_CLK>;
+		clocks = <&clock_camcc CAM_CC_MCLK2_CLK>;
 		clock-names = "cam_clk";
 		clock-cntl-level = "turbo";
 		clock-rates = <24000000>;
@@ -781,7 +781,7 @@
 		cci-device = <1>;
 		cci-master = <0>;
 		status = "ok";
-		clocks = <&camcc CAM_CC_MCLK2_CLK>;
+		clocks = <&clock_camcc CAM_CC_MCLK2_CLK>;
 		clock-names = "cam_clk";
 		clock-cntl-level = "turbo";
 		clock-rates = <24000000>;
@@ -819,7 +819,7 @@
 		cci-device = <1>;
         cci-master = <1>;
         status = "ok";
-		clocks = <&camcc CAM_CC_MCLK3_CLK>;
+		clocks = <&clock_camcc CAM_CC_MCLK3_CLK>;
 		clock-names = "cam_clk";
 		clock-cntl-level = "turbo";
 		clock-rates = <24000000>;
@@ -861,7 +861,7 @@
 		cci-device = <1>;
 		cci-master = <1>;
 		status = "ok";
-		clocks = <&camcc CAM_CC_MCLK3_CLK>;
+		clocks = <&clock_camcc CAM_CC_MCLK3_CLK>;
 		clock-names = "cam_clk";
 		clock-cntl-level = "turbo";
 		clock-rates = <24000000>;

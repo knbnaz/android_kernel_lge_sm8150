@@ -98,7 +98,7 @@
 
 	/* [Modified] when using clock buffer, you should check which clock buffer used for dmb device */
 		clock-names = "tdmb_xo";
-		clocks = <&rpmhcc RPMH_LN_BB_CLK3>;
+		clocks = <&clock_rpmh RPMH_LN_BB_CLK3>;
 
 
 	/* [Power Supply Description Information]

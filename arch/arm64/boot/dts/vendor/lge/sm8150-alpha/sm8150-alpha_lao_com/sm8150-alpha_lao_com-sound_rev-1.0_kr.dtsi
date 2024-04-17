@@ -68,7 +68,7 @@
 		/* sys-clk-id = <0x2> */
 		/* enable SMA6101_MCLK in pm_pvc_config.c */
 		clock-names = "ln_bb_clk3";
-		clocks = <&rpmhcc RPMH_LN_BB_CLK3>;
+		clocks = <&clock_rpmh RPMH_LN_BB_CLK3>;
 
 		status = "ok";
 	};
