@@ -12,32 +12,6 @@
 
 #include <dt-bindings/thermal/thermal.h>
 
-&clock_cpucc {
-	#address-cells = <1>;
-	#size-cells = <1>;
-	lmh_dcvs0: qcom,limits-dcvs@18358800 {
-		compatible = "qcom,msm-hw-limits";
-		interrupts = <GIC_SPI 32 IRQ_TYPE_LEVEL_HIGH>;
-		qcom,affinity = <0>;
-		reg = <0x18358800 0x1000>,
-			<0x18323000 0x1000>;
-		#thermal-sensor-cells = <0>;
-	};
-
-	lmh_dcvs1: qcom,limits-dcvs@18350800 {
-		compatible = "qcom,msm-hw-limits";
-		interrupts = <GIC_SPI 33 IRQ_TYPE_LEVEL_HIGH>;
-		qcom,affinity = <1>;
-		reg = <0x18350800 0x1000>,
-			<0x18325800 0x1000>;
-		#thermal-sensor-cells = <0>;
-		isens_vref_0p8-supply = <&pm8150_l5_ao>;
-		isens-vref-0p8-settings = <880000 880000 20000>;
-		isens_vref_1p8-supply = <&pm8150_l12_ao>;
-		isens-vref-1p8-settings = <1800000 1800000 20000>;
-	};
-};
-
 &soc {
 	qmi-tmd-devices {
 		compatible = "qcom,qmi-cooling-devices";

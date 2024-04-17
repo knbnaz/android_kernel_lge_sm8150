@@ -17,7 +17,6 @@
 #include <dt-bindings/clock/qcom,gpucc-sm8150.h>
 #include <dt-bindings/clock/qcom,scc-sm8150.h>
 #include <dt-bindings/clock/qcom,videocc-sm8150.h>
-#include <dt-bindings/clock/qcom,cpucc-sm8150.h>
 #include <dt-bindings/clock/qcom,npucc-sm8150.h>
 #include <dt-bindings/clock/qcom,rpmh.h>
 #include <dt-bindings/sound/qcom,gpr.h>
@@ -1105,20 +1104,6 @@
 		qcom,count-unit = <0x10000>;
 	};
 
-	cdsp_cdsp_l3_lat: qcom,cdsp-cdsp-l3-lat {
-		compatible = "devfreq-simple-dev";
-		clock-names = "devfreq_clk";
-		clocks = <&clock_cpucc L3_MISC_VOTE_CLK>;
-		governor = "powersave";
-	};
-
-	cpu0_cpu_l3_lat: qcom,cpu0-cpu-l3-lat {
-		compatible = "devfreq-simple-dev";
-		clock-names = "devfreq_clk";
-		clocks = <&clock_cpucc L3_CLUSTER0_VOTE_CLK>;
-		governor = "performance";
-	};
-
 	cpu0_cpu_l3_latmon: qcom,cpu0-cpu-l3-latmon {
 		compatible = "qcom,arm-memlat-mon";
 		qcom,cpulist = <&CPU0 &CPU1 &CPU2 &CPU3>;
@@ -1135,13 +1120,6 @@
 			< 1267200  960000000 >;
 	};
 
-	cpu4_cpu_l3_lat: qcom,cpu4-cpu-l3-lat {
-		compatible = "devfreq-simple-dev";
-		clock-names = "devfreq_clk";
-		clocks = <&clock_cpucc L3_CLUSTER1_VOTE_CLK>;
-		governor = "performance";
-	};
-
 	cpu4_cpu_l3_latmon: qcom,cpu4-cpu-l3-latmon {
 		compatible = "qcom,arm-memlat-mon";
 		qcom,cpulist = <&CPU4 &CPU5 &CPU6>;
@@ -1154,13 +1132,6 @@
 			< 1344000  960000000 >,
 			< 1689600 1228800000 >,
 			< 2016000 1344000000 >;
-	};
-
-	cpu7_cpu_l3_lat: qcom,cpu7-cpu-l3-lat {
-		compatible = "devfreq-simple-dev";
-		clock-names = "devfreq_clk";
-		clocks = <&clock_cpucc L3_CLUSTER2_VOTE_CLK>;
-		governor = "performance";
 	};
 
 	cpu7_cpu_l3_latmon: qcom,cpu7-cpu-l3-latmon {
@@ -1528,20 +1499,6 @@
 	mccc_debug: syscon@90b0000 {
 		compatible = "syscon";
 		reg = <0x90b0000 0x1000>;
-	};
-
-	clock_cpucc: qcom,cpucc {
-		compatible = "qcom,clk-cpu-osm";
-		reg = <0x18321000 0x1400>,
-			<0x18323000 0x1400>,
-			<0x18325800 0x1400>,
-			<0x18327800 0x1400>;
-		reg-names = "osm_l3_base", "osm_pwrcl_base",
-			"osm_perfcl_base", "osm_perfpcl_base";
-		l3-devs = <&cpu0_cpu_l3_lat &cpu4_cpu_l3_lat &cdsp_cdsp_l3_lat
-			&cpu7_cpu_l3_lat>;
-
-		#clock-cells = <1>;
 	};
 
 	clock_debugcc: qcom,cc-debug {
