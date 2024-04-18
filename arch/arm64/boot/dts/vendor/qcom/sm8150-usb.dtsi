@@ -11,7 +11,6 @@
  */
 
 #include <dt-bindings/clock/qcom,gcc-sm8150.h>
-#include <dt-bindings/msm/msm-bus-ids.h>
 #include <dt-bindings/phy/qcom,sm8150-qmp-usb3.h>
 
 &soc {
@@ -22,9 +21,12 @@
 		reg-names = "core_base";
 
 		iommus = <&apps_smmu 0x140 0x0>;
+		qcom,iommu-dma = "atomic";
+		qcom,iommu-dma-addr-pool = <0x90000000 0x60000000>;
 		#address-cells = <1>;
 		#size-cells = <1>;
 		ranges;
+		dma-ranges;
 
 		interrupts = <0 489 0>, <0 130 0>, <0 486 0>, <0 488 0>;
 		interrupt-names = "dp_hs_phy_irq", "pwr_event_irq",
@@ -61,32 +63,15 @@
 			 0x144 /* GSI_RING_BASE_ADDR_H */
 			 0x1a4>; /* GSI_IF_STS */
 		qcom,dwc-usb3-msm-tx-fifo-size = <27696>;
+		usb-role-switch;
+		extcon = <&eud>;
 
-		qcom,msm-bus,name = "usb0";
-		qcom,msm-bus,num-cases = <4>;
-		qcom,msm-bus,num-paths = <3>;
-		qcom,msm-bus,vectors-KBps =
-			/*  suspend vote */
-			<MSM_BUS_MASTER_USB3 MSM_BUS_SLAVE_EBI_CH0 0 0>,
-			<MSM_BUS_MASTER_USB3 MSM_BUS_SLAVE_IPA_CFG 0 0>,
-			<MSM_BUS_MASTER_AMPSS_M0 MSM_BUS_SLAVE_USB3 0 0>,
+		interconnect-names = "usb-ddr", "usb-ipa", "ddr-usb";
+		interconnects = <&aggre1_noc MASTER_USB3_0 &mc_virt SLAVE_EBI1>,
+				<&aggre1_noc MASTER_USB3_0 &config_noc SLAVE_IPA_CFG>,
+				<&gem_noc MASTER_APPSS_PROC &config_noc SLAVE_USB3_0>;
 
-			/*  nominal vote */
-			<MSM_BUS_MASTER_USB3
-				MSM_BUS_SLAVE_EBI_CH0 1000000 2500000>,
-			<MSM_BUS_MASTER_USB3 MSM_BUS_SLAVE_IPA_CFG 0 2400>,
-			<MSM_BUS_MASTER_AMPSS_M0 MSM_BUS_SLAVE_USB3 0 40000>,
-
-			/*  svs vote */
-			<MSM_BUS_MASTER_USB3
-				MSM_BUS_SLAVE_EBI_CH0 240000 700000>,
-			<MSM_BUS_MASTER_USB3 MSM_BUS_SLAVE_IPA_CFG 0 2400>,
-			<MSM_BUS_MASTER_AMPSS_M0 MSM_BUS_SLAVE_USB3 0 40000>,
-
-			/*  min vote */
-			<MSM_BUS_MASTER_USB3 MSM_BUS_SLAVE_EBI_CH0 1 1>,
-			<MSM_BUS_MASTER_USB3 MSM_BUS_SLAVE_IPA_CFG 1 1>,
-			<MSM_BUS_MASTER_AMPSS_M0 MSM_BUS_SLAVE_USB3 1 1>;
+		qcom,usb-charger = <&battery_charger>;
 
 		dwc3@a600000 {
 			compatible = "snps,dwc3";
@@ -351,9 +336,13 @@
 		reg-names = "core_base";
 
 		iommus = <&apps_smmu 0x160 0x0>;
+		qcom,iommu-dma = "atomic";
+		qcom,iommu-dma-addr-pool = <0x90000000 0x60000000>;
+		dma-coherent;
 		#address-cells = <1>;
 		#size-cells = <1>;
 		ranges;
+		dma-ranges;
 
 		interrupts = <0 491 0>, <0 135 0>, <0 487 0>, <0 490 0>;
 		interrupt-names = "dp_hs_phy_irq", "pwr_event_irq",
@@ -386,26 +375,10 @@
 		qcom,dwc-usb3-msm-tx-fifo-size = <27696>;
 		qcom,charging-disabled;
 
-		qcom,msm-bus,name = "usb1";
-		qcom,msm-bus,num-cases = <3>;
-		qcom,msm-bus,num-paths = <3>;
-		qcom,msm-bus,vectors-KBps =
-			/*  suspend vote */
-			<MSM_BUS_MASTER_USB3_1 MSM_BUS_SLAVE_EBI_CH0 0 0>,
-			<MSM_BUS_MASTER_USB3_1 MSM_BUS_SLAVE_IPA_CFG 0 0>,
-			<MSM_BUS_MASTER_AMPSS_M0 MSM_BUS_SLAVE_USB3_1 0 0>,
-
-			/*  nominal vote */
-			<MSM_BUS_MASTER_USB3_1
-				MSM_BUS_SLAVE_EBI_CH0 1000000 2500000>,
-			<MSM_BUS_MASTER_USB3_1 MSM_BUS_SLAVE_IPA_CFG 0 2400>,
-			<MSM_BUS_MASTER_AMPSS_M0 MSM_BUS_SLAVE_USB3_1 0 40000>,
-
-			/*  svs vote */
-			<MSM_BUS_MASTER_USB3_1
-				MSM_BUS_SLAVE_EBI_CH0 240000 700000>,
-			<MSM_BUS_MASTER_USB3_1 MSM_BUS_SLAVE_IPA_CFG 0 2400>,
-			<MSM_BUS_MASTER_AMPSS_M0 MSM_BUS_SLAVE_USB3_1 0 40000>;
+		interconnect-names = "usb-ddr", "usb-ipa", "ddr-usb";
+		interconnects = <&aggre1_noc MASTER_USB3_1 &mc_virt SLAVE_EBI1>,
+				<&aggre1_noc MASTER_USB3_1 &config_noc SLAVE_IPA_CFG>,
+				<&gem_noc MASTER_APPSS_PROC &config_noc SLAVE_USB3_1>;
 
 		status = "disabled";
 
