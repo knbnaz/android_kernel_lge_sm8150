@@ -353,6 +353,28 @@
 	status = "disabled";
 };
 
+&pm8150b_fg {
+	qcom,battery-data = <&lge_batterydata>;
+	qcom,hold-soc-while-full;
+	qcom,linearize-soc;
+	qcom,fg-force-load-profile;
+	/* learned capacity */
+	qcom,cl-min-temp = <150>;
+	qcom,cl-max-temp = <445>;
+	qcom,cl-max-decrement = <10>;
+	/* ESR fast calibration */
+	qcom,fg-esr-timer-chg-fast = <0 10>;
+	qcom,fg-esr-timer-dischg-fast = <0 10>;
+	qcom,fg-esr-timer-chg-slow = <0 96>;
+	qcom,fg-esr-timer-dischg-slow = <0 96>;
+	qcom,fg-esr-cal-soc-thresh = <26 230>;
+	qcom,fg-esr-cal-temp-thresh = <10 40>;
+	qcom,fg-batt-therm-freq = <8>;
+	qcom,fg-delta-soc-thr = <3>;
+	io-channels = <&pm8150b_vadc ADC5_BAT_ID_100K_PU>;
+	io-channel-names = "bat_id";
+};
+
 &pm8150b_charger {
 	qcom,sec-charger-config = <2>;
 	qcom,auto-recharge-soc = <98>;
@@ -809,4 +831,20 @@
 		idt,configure-dualdisplay;
 		idt,configure-charge-done;
 	};
+};
+
+&pm8150b_qnovo {
+	//lge,enable-for-dc;
+	lge,enable-qni-probation;
+	lge,qni-step-min-fcc = <600000>;
+	lge,qni-probation-min-fv = <4430000>;
+	lge,qni-probation-max-fcc = <1000000>;
+	lge,qni-probation-enter-fcc = <1000000>;
+
+	// lge,enable-qna-unsafety-protection;
+	lge,qna-unsafety-fv = <4300000>;
+	lge,qna-unsafety-fcc = <1000000>;
+
+	lge,qni-skew-comp-pct = <100>;
+	lge,qni-pt-time-max-sec = <512>;
 };

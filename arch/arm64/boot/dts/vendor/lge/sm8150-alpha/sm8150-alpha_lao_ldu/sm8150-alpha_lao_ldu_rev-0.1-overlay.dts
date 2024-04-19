@@ -26,6 +26,11 @@
 	qcom,board-id = <0x01040008 0>;
 };
 
+&pm8150b_fg {
+	qcom,fg-cutoff-voltage = <3300>;
+	qcom,fg-empty-voltage = <3000>;
+};
+
 &sde_dp {
 	vdda-0p9-supply = <&pm8150_l5>;
 	qcom,phy-supply-entries {

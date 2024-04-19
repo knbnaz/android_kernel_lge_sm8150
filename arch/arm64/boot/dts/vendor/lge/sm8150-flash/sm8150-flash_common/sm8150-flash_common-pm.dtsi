@@ -384,3 +384,7 @@
 		idt,fod-epp    = [FF FF 88 44 86 46 96 19 97 0A 9C E7];
 	};
 };
+
+&pm8150b_qnovo {
+	lge,enable-compensate-qni-fcc;
+};
