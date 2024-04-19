@@ -11,7 +11,7 @@
  * GNU General Public License for more details.
  */
 #include <dt-bindings/input/qcom,qpnp-power-on.h>
-#include <dt-bindings/regulator/qcom,rpmh-regulator.h>
+#include <dt-bindings/regulator/qcom,rpmh-regulator-levels.h>
 #include <dt-bindings/iio/qcom,spmi-vadc.h>
 
 #include "../../qcom/sm8150-pmic-overlay.dtsi"

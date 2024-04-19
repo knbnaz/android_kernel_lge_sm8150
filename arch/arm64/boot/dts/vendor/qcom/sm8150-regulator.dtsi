@@ -10,7 +10,7 @@
  * GNU General Public License for more details.
  */
 
-#include <dt-bindings/regulator/qcom,rpmh-regulator.h>
+#include <dt-bindings/regulator/qcom,rpmh-regulator-levels.h>
 
 
 &soc {
@@ -569,8 +569,7 @@
 		mx_cdev: mx-cdev-lvl {
 			compatible = "qcom,regulator-cooling-device";
 			regulator-cdev-supply = <&VDD_MX_LEVEL>;
-			regulator-levels = <RPMH_REGULATOR_LEVEL_NOM
-					RPMH_REGULATOR_LEVEL_OFF>;
+			regulator-levels = <RPMH_REGULATOR_LEVEL_NOM>;
 			#cooling-cells = <2>;
 		};
 	};
@@ -626,8 +625,7 @@
 		mm_cx_cdev: mm-cx-cdev-lvl {
 			compatible = "qcom,regulator-cooling-device";
 			regulator-cdev-supply = <&VDD_MMCX_LEVEL_AO>;
-			regulator-levels = <RPMH_REGULATOR_LEVEL_NOM
-					RPMH_REGULATOR_LEVEL_OFF>;
+			regulator-levels = <RPMH_REGULATOR_LEVEL_NOM>;
 			#cooling-cells = <2>;
 		};
 	};
