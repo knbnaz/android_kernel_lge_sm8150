@@ -6,8 +6,10 @@
 #include <linux/of.h>
 #include <linux/of_irq.h>
 #include <linux/sort.h>
+#include <linux/iio/consumer.h>
 #include "fg-core.h"
 #include "fg-reg.h"
+#include "fg-iio.h"
 
 /* 3 byte address + 1 space character */
 #define ADDR_LEN			4
@@ -430,18 +432,19 @@ bool batt_psy_initialized(struct fg_dev *fg)
 
 bool is_qnovo_en(struct fg_dev *fg)
 {
-	union power_supply_propval pval = {0, };
-	int rc;
+	struct fg_gen3_chip *chip = container_of(fg, struct fg_gen3_chip, fg);
+	int rc, val;
 
 	if (!batt_psy_initialized(fg))
 		return false;
 
-	rc = power_supply_get_property(fg->batt_psy,
-			POWER_SUPPLY_PROP_CHARGE_QNOVO_ENABLE, &pval);
-	if (rc < 0)
+	rc = fg_gen3_read_iio_chan(chip, QNOVO_ENABLE, &val);
+	if (rc < 0) {
+		pr_debug("Failed to get QNOVO_ENABLE value\n");
 		return false;
-
-	return pval.intval != 0;
+	} else {
+		return val != 0;
+	}
 }
 
 bool pc_port_psy_initialized(struct fg_dev *fg)
@@ -458,13 +461,11 @@ bool pc_port_psy_initialized(struct fg_dev *fg)
 
 bool is_parallel_charger_available(struct fg_dev *fg)
 {
-	if (!fg->parallel_psy)
-		fg->parallel_psy = power_supply_get_by_name("parallel");
+	struct fg_gen3_chip *chip = container_of(fg, struct fg_gen3_chip, fg);
+	if (is_chan_valid(chip, PARALLEL_CHARGING_ENABLED))
+		return true;
 
-	if (!fg->parallel_psy)
-		return false;
-
-	return true;
+	return false;
 }
 
 #define EXPONENT_SHIFT		11
@@ -938,7 +939,7 @@ const char *fg_get_battery_type(struct fg_dev *fg)
 		return MISSING_BATT_TYPE;
 	default:
 		break;
-	};
+	}
 
 	if (fg->battery_missing)
 		return MISSING_BATT_TYPE;
@@ -1258,9 +1259,6 @@ static int fg_sram_dfs_close(struct inode *inode, struct file *file)
 	if (trans && trans->log && trans->data) {
 		file->private_data = NULL;
 		mutex_destroy(&trans->fg_dfs_lock);
-		devm_kfree(trans->fg->dev, trans->log);
-		devm_kfree(trans->fg->dev, trans->data);
-		devm_kfree(trans->fg->dev, trans);
 	}
 
 	return 0;
@@ -1425,7 +1423,7 @@ static ssize_t fg_sram_dfs_reg_read(struct file *file, char __user *buf,
 	size_t len;
 
 	mutex_lock(&trans->fg_dfs_lock);
-	/* Is the the log buffer empty */
+	/* Is the log buffer empty */
 	if (log->rpos >= log->wpos) {
 		if (get_log_data(trans) <= 0) {
 			len = 0;
@@ -1566,19 +1564,10 @@ static int fg_sram_debugfs_create(struct fg_dev *fg)
 
 	dbgfs_data.fg = fg;
 
-	file = debugfs_create_u32("count", dfs_mode, dfs_sram,
+	debugfs_create_u32("count", dfs_mode, dfs_sram,
 					&(dbgfs_data.cnt));
-	if (!file) {
-		pr_err("error creating 'count' entry\n");
-		goto err_remove_fs;
-	}
-
-	file = debugfs_create_x32("address", dfs_mode, dfs_sram,
+	debugfs_create_x32("address", dfs_mode, dfs_sram,
 					&(dbgfs_data.addr));
-	if (!file) {
-		pr_err("error creating 'address' entry\n");
-		goto err_remove_fs;
-	}
 
 	file = debugfs_create_file("data", dfs_mode, dfs_sram, &dbgfs_data,
 					&fg_sram_dfs_reg_fops);
@@ -1643,7 +1632,6 @@ static const struct file_operations fg_alg_flags_fops = {
 int fg_debugfs_create(struct fg_dev *fg)
 {
 	int rc;
-	struct dentry *file;
 
 	pr_debug("Creating debugfs file-system\n");
 	fg->dfs_root = debugfs_create_dir("fg", NULL);
@@ -1656,12 +1644,8 @@ int fg_debugfs_create(struct fg_dev *fg)
 		return -ENODEV;
 	}
 
-	file = debugfs_create_u32("debug_mask", 0600, fg->dfs_root,
+	debugfs_create_u32("debug_mask", 0600, fg->dfs_root,
 			fg->debug_mask);
-	if (IS_ERR_OR_NULL(file)) {
-		pr_err("failed to create debug_mask\n");
-		goto err_remove_fs;
-	}
 
 	rc = fg_sram_debugfs_create(fg);
 	if (rc < 0) {
@@ -1682,4 +1666,69 @@ int fg_debugfs_create(struct fg_dev *fg)
 err_remove_fs:
 	debugfs_remove_recursive(fg->dfs_root);
 	return -ENOMEM;
+}
+
+bool is_chan_valid(struct fg_gen3_chip *chip,
+		enum fg_gen3_ext_iio_channels chan)
+{
+	int rc;
+
+	if (IS_ERR(chip->ext_iio_chans[chan]))
+		return false;
+
+	if (!chip->ext_iio_chans[chan]) {
+		chip->ext_iio_chans[chan] = iio_channel_get(chip->fg.dev,
+					fg_gen3_ext_iio_chan_name[chan]);
+		if (IS_ERR(chip->ext_iio_chans[chan])) {
+			rc = PTR_ERR(chip->ext_iio_chans[chan]);
+			if (rc == -EPROBE_DEFER)
+				chip->ext_iio_chans[chan] = NULL;
+
+			pr_err("Failed to get IIO channel %s, rc=%d\n",
+				fg_gen3_ext_iio_chan_name[chan], rc);
+			return false;
+		}
+	}
+
+	return true;
+}
+
+int fg_gen4_read_iio_chan(struct fg_gen4_chip *chip,
+	enum fg_gen4_ext_iio_channels chan, int *val)
+{
+	int rc;
+
+	if (is_chan_valid(chip, chan)) {
+		rc = iio_read_channel_processed(
+				chip->ext_iio_chans[chan], val);
+		return (rc < 0) ? rc : 0;
+	}
+
+	return -EINVAL;
+}
+
+int fg_gen4_write_iio_chan(struct fg_gen4_chip *chip,
+	enum fg_gen4_ext_iio_channels chan, int val)
+{
+	if (is_chan_valid(chip, chan))
+		return iio_write_channel_raw(chip->ext_iio_chans[chan],
+						val);
+
+	return -EINVAL;
+}
+
+int fg_gen4_read_int_iio_chan(struct iio_channel *iio_chan_list, int chan_id,
+			int *val)
+{
+	int rc;
+
+	do {
+		if (iio_chan_list->channel->channel == chan_id) {
+			rc = iio_read_channel_processed(iio_chan_list,
+							val);
+			return (rc < 0) ? rc : 0;
+		}
+	} while (iio_chan_list++);
+
+	return -ENOENT;
 }

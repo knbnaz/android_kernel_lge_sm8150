@@ -126,6 +126,7 @@ config QTI_QBG
 config QPNP_FG_GEN4
 	tristate "QPNP GEN4 fuel gauge driver"
 	depends on MFD_SPMI_PMIC
+	depends on IIO
 	help
 	  Say Y here to enable the GEN4 Fuel Gauge driver. This adds support
 	  for battery fuel gauging and state of charge of battery connected to

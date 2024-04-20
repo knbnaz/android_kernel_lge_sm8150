@@ -12,12 +12,13 @@
 #include <linux/nvmem-consumer.h>
 #include <linux/of.h>
 #include <linux/of_platform.h>
-#include <linux/of_batterydata.h>
 #include <linux/platform_device.h>
 #include <linux/iio/consumer.h>
 #include <linux/qpnp/qpnp-pbs.h>
 #include <linux/qpnp/qpnp-revid.h>
 #include <linux/thermal.h>
+#include <dt-bindings/iio/qti_power_supply_iio.h>
+#include "battery-profile-loader.h"
 #include "fg-core.h"
 #include "fg-reg.h"
 #include "fg-alg.h"
@@ -37,17 +38,6 @@
 
 #define SDAM_COOKIE_OFFSET_4BYTE	0x95
 #define SDAM_COOKIE_4BYTE		0x12345678
-
-#define FG_SRAM_LEN			972
-#define PROFILE_LEN			416
-#define PROFILE_COMP_LEN		24
-#define KI_COEFF_SOC_LEVELS		3
-#define ESR_CAL_LEVELS			2
-#define KI_COEFF_MAX			15564
-#define SLOPE_LIMIT_NUM_COEFFS		4
-#define SLOPE_LIMIT_COEFF_MAX		31128
-#define BATT_THERM_NUM_COEFFS		5
-#define RSLOW_NUM_COEFFS		4
 
 /* SRAM address/offset definitions in ascending order */
 #define BATT_THERM_CONFIG_WORD		3
@@ -206,124 +196,6 @@
 #define FIRST_LOG_CURRENT_v2_OFFSET	0
 
 static struct fg_irq_info fg_irqs[FG_GEN4_IRQ_MAX];
-
-/* DT parameters for FG device */
-struct fg_dt_props {
-	bool	force_load_profile;
-	bool	hold_soc_while_full;
-	bool	linearize_soc;
-	bool	rapid_soc_dec_en;
-	bool	five_pin_battery;
-	bool	multi_profile_load;
-	bool	esr_calib_dischg;
-	bool	soc_hi_res;
-	bool	soc_scale_mode;
-	int	cutoff_volt_mv;
-	int	empty_volt_mv;
-	int	sys_min_volt_mv;
-	int	cutoff_curr_ma;
-	int	sys_term_curr_ma;
-	int	delta_soc_thr;
-	int	vbatt_scale_thr_mv;
-	int	scale_timer_ms;
-	int	force_calib_level;
-	int	esr_timer_chg_fast[NUM_ESR_TIMERS];
-	int	esr_timer_chg_slow[NUM_ESR_TIMERS];
-	int	esr_timer_dischg_fast[NUM_ESR_TIMERS];
-	int	esr_timer_dischg_slow[NUM_ESR_TIMERS];
-	u32	esr_cal_soc_thresh[ESR_CAL_LEVELS];
-	int	esr_cal_temp_thresh[ESR_CAL_LEVELS];
-	int	esr_filter_factor;
-	int	delta_esr_disable_count;
-	int	delta_esr_thr_uohms;
-	int	rconn_uohms;
-	int	batt_id_pullup_kohms;
-	int	batt_temp_cold_thresh;
-	int	batt_temp_hot_thresh;
-	int	batt_temp_hyst;
-	int	batt_temp_delta;
-	u32	batt_therm_freq;
-	int	esr_pulse_thresh_ma;
-	int	esr_meas_curr_ma;
-	int	slope_limit_temp;
-	int	ki_coeff_low_chg;
-	int	ki_coeff_med_chg;
-	int	ki_coeff_hi_chg;
-	int	ki_coeff_lo_med_chg_thr_ma;
-	int	ki_coeff_med_hi_chg_thr_ma;
-	int	ki_coeff_cutoff_gain;
-	int	ki_coeff_full_soc_dischg[2];
-	int	ki_coeff_soc[KI_COEFF_SOC_LEVELS];
-	int	ki_coeff_low_dischg[KI_COEFF_SOC_LEVELS];
-	int	ki_coeff_med_dischg[KI_COEFF_SOC_LEVELS];
-	int	ki_coeff_hi_dischg[KI_COEFF_SOC_LEVELS];
-	int	ki_coeff_lo_med_dchg_thr_ma;
-	int	ki_coeff_med_hi_dchg_thr_ma;
-	int	slope_limit_coeffs[SLOPE_LIMIT_NUM_COEFFS];
-};
-
-struct fg_gen4_chip {
-	struct fg_dev		fg;
-	struct fg_dt_props	dt;
-	struct iio_channel	*batt_id_chan;
-	struct cycle_counter	*counter;
-	struct cap_learning	*cl;
-	struct ttf		*ttf;
-	struct soh_profile	*sp;
-	struct device_node	*pbs_dev;
-	struct nvmem_device	*fg_nvmem;
-	struct votable		*delta_esr_irq_en_votable;
-	struct votable		*pl_disable_votable;
-	struct votable		*cp_disable_votable;
-	struct votable		*parallel_current_en_votable;
-	struct votable		*mem_attn_irq_en_votable;
-	struct votable		*fv_votable;
-	struct work_struct	esr_calib_work;
-	struct work_struct	soc_scale_work;
-	struct alarm		esr_fast_cal_timer;
-	struct alarm		soc_scale_alarm_timer;
-	struct delayed_work	pl_enable_work;
-	struct work_struct	pl_current_en_work;
-	struct completion	mem_attn;
-	struct mutex		soc_scale_lock;
-	struct mutex		esr_calib_lock;
-	ktime_t			last_restart_time;
-	char			batt_profile[PROFILE_LEN];
-	enum slope_limit_status	slope_limit_sts;
-	int			ki_coeff_full_soc[2];
-	int			delta_esr_count;
-	int			recharge_soc_thr;
-	int			esr_actual;
-	int			esr_nominal;
-	int			soh;
-	int			esr_soh_cycle_count;
-	int			batt_age_level;
-	int			last_batt_age_level;
-	int			soc_scale_msoc;
-	int			prev_soc_scale_msoc;
-	int			soc_scale_slope;
-	int			msoc_actual;
-	int			vbatt_avg;
-	int			vbatt_now;
-	int			vbatt_res;
-	int			scale_timer;
-	int			current_now;
-	int			calib_level;
-	bool			first_profile_load;
-	bool			ki_coeff_dischg_en;
-	bool			slope_limit_en;
-	bool			esr_fast_calib;
-	bool			esr_fast_calib_done;
-	bool			esr_fast_cal_timer_expired;
-	bool			esr_fast_calib_retry;
-	bool			esr_fcc_ctrl_en;
-	bool			esr_soh_notified;
-	bool			rslow_low;
-	bool			rapid_soc_dec_en;
-	bool			vbatt_low;
-	bool			chg_term_good;
-	bool			soc_scale_mode;
-};
 
 struct bias_config {
 	u8	status_reg;
@@ -921,10 +793,10 @@ static int fg_gen4_get_cell_impedance(struct fg_gen4_chip *chip, int *val)
 	if (!chip->dt.five_pin_battery)
 		goto out;
 
-	if (fg->charge_type != POWER_SUPPLY_CHARGE_TYPE_TAPER)
+	if (fg->charge_type != POWER_SUPPLY_CHARGE_TYPE_ADAPTIVE)
 		goto out;
 
-	if ((fg->charge_type == POWER_SUPPLY_CHARGE_TYPE_TAPER) &&
+	if ((fg->charge_type == POWER_SUPPLY_CHARGE_TYPE_ADAPTIVE) &&
 		(fg->health != POWER_SUPPLY_HEALTH_GOOD)) {
 		if (!chip->fv_votable)
 			chip->fv_votable = find_votable("FV");
@@ -3024,19 +2896,17 @@ out:
 static int fg_gen4_esr_fcc_config(struct fg_gen4_chip *chip)
 {
 	struct fg_dev *fg = &chip->fg;
-	union power_supply_propval prop = {0, };
-	int rc;
+	int rc, val = 0;
 	bool parallel_en = false, cp_en = false, qnovo_en, esr_fcc_ctrl_en;
 	u8 val, mask;
 
 	if (is_parallel_charger_available(fg)) {
-		rc = power_supply_get_property(fg->parallel_psy,
-			POWER_SUPPLY_PROP_CHARGING_ENABLED, &prop);
+		rc = fg_gen4_read_iio_chan(chip, PARALLEL_CHARGING_ENABLED, &val);
 		if (rc < 0)
-			pr_err_ratelimited("Error in reading charging_enabled from parallel_psy, rc=%d\n",
+			pr_err_ratelimited("Error in reading parallel_charging_enabled, rc=%d\n",
 				rc);
 		else
-			parallel_en = prop.intval;
+			parallel_en = val;
 	}
 
 	if (chip->cp_disable_votable)
@@ -4178,7 +4048,7 @@ static void status_change_work(struct work_struct *work)
 	struct fg_dev *fg = container_of(work,
 			struct fg_dev, status_change_work);
 	struct fg_gen4_chip *chip = container_of(fg, struct fg_gen4_chip, fg);
-	int rc, batt_soc, batt_temp;
+	int rc, batt_soc, batt_temp, val = 0;
 	bool input_present, qnovo_en;
 	u32 batt_soc_cp;
 
@@ -4468,131 +4338,120 @@ ATTRIBUTE_GROUPS(fg);
 
 /* All power supply functions here */
 
-static int fg_psy_get_property(struct power_supply *psy,
-				       enum power_supply_property psp,
-				       union power_supply_propval *pval)
+static int fg_gen4_iio_read_raw(struct iio_dev *indio_dev,
+				struct iio_chan_spec const *chan, int *val1,
+				int *val2, long mask)
 {
-	struct fg_gen4_chip *chip = power_supply_get_drvdata(psy);
+	struct fg_gen4_chip *chip = iio_priv(indio_dev);
 	struct fg_dev *fg = &chip->fg;
 	int rc = 0, val;
 	int64_t temp;
 
-	switch (psp) {
-	case POWER_SUPPLY_PROP_CAPACITY:
-		rc = fg_gen4_get_prop_capacity(fg, &pval->intval);
+	switch (chan->channel) {
+	case PSY_IIO_CAPACITY:
+		rc = fg_gen4_get_prop_capacity(fg, val1);
 		break;
-	case POWER_SUPPLY_PROP_REAL_CAPACITY:
-		rc = fg_gen4_get_prop_real_capacity(fg, &pval->intval);
+	case PSY_IIO_REAL_CAPACITY:
+		rc = fg_gen4_get_prop_real_capacity(fg, val1);
 		break;
-	case POWER_SUPPLY_PROP_CAPACITY_RAW:
-		rc = fg_gen4_get_prop_capacity_raw(chip, &pval->intval);
+	case PSY_IIO_CAPACITY_RAW:
+		rc = fg_gen4_get_prop_capacity_raw(chip, val1);
 		break;
-	case POWER_SUPPLY_PROP_CC_SOC:
+	case PSY_IIO_CC_SOC:
 		rc = fg_get_sram_prop(&chip->fg, FG_SRAM_CC_SOC, &val);
 		if (rc < 0) {
 			pr_err("Error in getting CC_SOC, rc=%d\n", rc);
 			return rc;
 		}
 		/* Show it in centi-percentage */
-		pval->intval = div_s64((int64_t)val * 10000,  CC_SOC_30BIT);
+		*val1 = div_s64((int64_t)val * 10000,  CC_SOC_30BIT);
 		break;
-	case POWER_SUPPLY_PROP_VOLTAGE_NOW:
+	case PSY_IIO_VOLTAGE_NOW:
 		if (fg->battery_missing)
-			pval->intval = 3700000;
+			*val1 = 3700000;
 		else
-			rc = fg_get_battery_voltage(fg, &pval->intval);
+			rc = fg_get_battery_voltage(fg, val1);
 		break;
-	case POWER_SUPPLY_PROP_CURRENT_NOW:
-		rc = fg_get_battery_current(fg, &pval->intval);
+	case PSY_IIO_CURRENT_NOW:
+		rc = fg_get_battery_current(fg, val1);
 		break;
-	case POWER_SUPPLY_PROP_CURRENT_AVG:
-		rc = fg_get_sram_prop(fg, FG_SRAM_IBAT_FLT, &pval->intval);
+	case PSY_IIO_CURRENT_AVG:
+		rc = fg_get_sram_prop(fg, FG_SRAM_IBAT_FLT, val1);
 		break;
-	case POWER_SUPPLY_PROP_TEMP:
-		rc = fg_gen4_get_battery_temp(fg, &pval->intval);
+	case PSY_IIO_TEMP:
+		rc = fg_gen4_get_battery_temp(fg, val1);
 		break;
-	case POWER_SUPPLY_PROP_RESISTANCE:
-		rc = fg_get_battery_resistance(fg, &pval->intval);
+	case PSY_IIO_RESISTANCE:
+		rc = fg_get_battery_resistance(fg, val1);
 		break;
-	case POWER_SUPPLY_PROP_ESR_ACTUAL:
-		pval->intval = chip->esr_actual;
+	case PSY_IIO_ESR_ACTUAL:
+		*val1 = chip->esr_actual;
 		break;
-	case POWER_SUPPLY_PROP_ESR_NOMINAL:
-		pval->intval = chip->esr_nominal;
+	case PPSY_IIO_ESR_NOMINAL:
+		*val1 = chip->esr_nominal;
 		break;
-	case POWER_SUPPLY_PROP_VOLTAGE_OCV:
-		rc = fg_get_sram_prop(fg, FG_SRAM_OCV, &pval->intval);
+	case PSY_IIO_VOLTAGE_OCV:
+		rc = fg_get_sram_prop(fg, FG_SRAM_OCV, val1);
 		break;
-	case POWER_SUPPLY_PROP_VOLTAGE_AVG:
-		rc = fg_get_sram_prop(fg, FG_SRAM_VBAT_FLT, &pval->intval);
+	case PSY_IIO_VOLTAGE_AVG:
+		rc = fg_get_sram_prop(fg, FG_SRAM_VBAT_FLT, val1);
 		break;
-	case POWER_SUPPLY_PROP_RESISTANCE_ID:
-		pval->intval = fg->batt_id_ohms;
+	case PSY_IIO_RESISTANCE_ID:
+		*val1 = fg->batt_id_ohms;
 		break;
-	case POWER_SUPPLY_PROP_BATTERY_TYPE:
-		pval->strval = fg_get_battery_type(fg);
+	case PSY_IIO_VOLTAGE_MAX_DESIGN:
+		*val1 = fg->bp.float_volt_uv;
 		break;
-	case POWER_SUPPLY_PROP_VOLTAGE_MAX_DESIGN:
-		pval->intval = fg->bp.float_volt_uv;
+	case PSY_IIO_CHARGE_NOW_RAW:
+		rc = fg_gen4_get_charge_raw(chip, val1);
 		break;
-	case POWER_SUPPLY_PROP_CHARGE_NOW_RAW:
-		rc = fg_gen4_get_charge_raw(chip, &pval->intval);
+	case PSY_IIO_CHARGE_NOW:
+		val1 = chip->cl->init_cap_uah;
 		break;
-	case POWER_SUPPLY_PROP_CHARGE_NOW:
-		pval->intval = chip->cl->init_cap_uah;
-		break;
-	case POWER_SUPPLY_PROP_CHARGE_FULL:
+	case PSY_IIO_CHARGE_FULL:
 		rc = fg_gen4_get_learned_capacity(chip, &temp);
 		if (!rc)
-			pval->intval = (int)temp;
+			*val1 = (int)temp;
 		break;
-	case POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN:
+	case PSY_IIO_CHARGE_FULL_DESIGN:
 		rc = fg_gen4_get_nominal_capacity(chip, &temp);
 		if (!rc)
-			pval->intval = (int)temp;
+			*val1 = (int)temp;
 		break;
-	case POWER_SUPPLY_PROP_CHARGE_COUNTER:
-		rc = fg_gen4_get_charge_counter(chip, &pval->intval);
+	case PSY_IIO_CHARGE_COUNTER:
+		rc = fg_gen4_get_charge_counter(chip, val1);
 		break;
-	case POWER_SUPPLY_PROP_CHARGE_COUNTER_SHADOW:
-		rc = fg_gen4_get_charge_counter_shadow(chip, &pval->intval);
+	case PPSY_IIO_CHARGE_COUNTER_SHADOW:
+		rc = fg_gen4_get_charge_counter_shadow(chip, val1);
 		break;
-	case POWER_SUPPLY_PROP_CYCLE_COUNT:
-		rc = get_cycle_count(chip->counter, &pval->intval);
+	case PSY_IIO_CYCLE_COUNT:
+		rc = get_cycle_count(chip->counter, val1);
 		break;
-	case POWER_SUPPLY_PROP_CYCLE_COUNTS:
-		rc = get_cycle_counts(chip->counter, &pval->strval);
-		if (rc < 0)
-			pval->strval = NULL;
+	case PSY_IIO_SOC_REPORTING_READY:
+		*val1 = fg->soc_reporting_ready;
 		break;
-	case POWER_SUPPLY_PROP_SOC_REPORTING_READY:
-		pval->intval = fg->soc_reporting_ready;
+	case PSY_IIO_CLEAR_SOH:
+		*val1 = chip->first_profile_load;
 		break;
-	case POWER_SUPPLY_PROP_CLEAR_SOH:
-		pval->intval = chip->first_profile_load;
+	case PSY_IIO_SOH:
+		*val1 = chip->soh;
 		break;
-	case POWER_SUPPLY_PROP_SOH:
-		pval->intval = chip->soh;
+	case PSYPSY_IIO_CONSTANT_CHARGE_VOLTAGE:
+		rc = fg_get_sram_prop(fg, FG_SRAM_VBATT_FULL, val1);
 		break;
-	case POWER_SUPPLY_PROP_DEBUG_BATTERY:
-		pval->intval = is_debug_batt_id(fg);
+	case PSY_IIO_TIME_TO_FULL_AVG:
+		rc = ttf_get_time_to_full(chip->ttf, val1);
 		break;
-	case POWER_SUPPLY_PROP_CONSTANT_CHARGE_VOLTAGE:
-		rc = fg_get_sram_prop(fg, FG_SRAM_VBATT_FULL, &pval->intval);
+	case PSY_IIO_TIME_TO_FULL_NOW:
+		rc = ttf_get_time_to_full(chip->ttf, val1);
 		break;
-	case POWER_SUPPLY_PROP_TIME_TO_FULL_AVG:
-		rc = ttf_get_time_to_full(chip->ttf, &pval->intval);
+	case PSY_IIO_TIME_TO_EMPTY_AVG:
+		rc = ttf_get_time_to_empty(chip->ttf, val1);
 		break;
-	case POWER_SUPPLY_PROP_TIME_TO_FULL_NOW:
-		rc = ttf_get_time_to_full(chip->ttf, &pval->intval);
-		break;
-	case POWER_SUPPLY_PROP_TIME_TO_EMPTY_AVG:
-		rc = ttf_get_time_to_empty(chip->ttf, &pval->intval);
-		break;
-	case POWER_SUPPLY_PROP_CC_STEP:
+	case PSY_IIO_CC_STEP:
 		if ((chip->ttf->cc_step.sel >= 0) &&
 				(chip->ttf->cc_step.sel < MAX_CC_STEPS)) {
-			pval->intval =
+			*val1 =
 				chip->ttf->cc_step.arr[chip->ttf->cc_step.sel];
 		} else {
 			pr_err("cc_step_sel is out of bounds [0, %d]\n",
@@ -4600,26 +4459,26 @@ static int fg_psy_get_property(struct power_supply *psy,
 			return -EINVAL;
 		}
 		break;
-	case POWER_SUPPLY_PROP_CC_STEP_SEL:
-		pval->intval = chip->ttf->cc_step.sel;
+	case PSY_IIO_CC_STEP_SEL:
+		*val1 = chip->ttf->cc_step.sel;
 		break;
-	case POWER_SUPPLY_PROP_BATT_AGE_LEVEL:
-		pval->intval = chip->batt_age_level;
+	case PSY_IIO_BATT_AGE_LEVEL:
+		*val1 = chip->batt_age_level;
 		break;
-	case POWER_SUPPLY_PROP_SCALE_MODE_EN:
-		pval->intval = chip->soc_scale_mode;
+	case PSY_IIO_SCALE_MODE_EN:
+		*val1 = chip->soc_scale_mode;
 		break;
-	case POWER_SUPPLY_PROP_POWER_NOW:
-		rc = fg_gen4_get_power(chip, &pval->intval, false);
+	case PSY_IIO_POWER_NOW:
+		rc = fg_gen4_get_power(chip, val1, false);
 		break;
-	case POWER_SUPPLY_PROP_POWER_AVG:
-		rc = fg_gen4_get_power(chip, &pval->intval, true);
+	case PSY_IIO_POWER_AVG:
+		rc = fg_gen4_get_power(chip, &al1, true);
 		break;
-	case POWER_SUPPLY_PROP_CALIBRATE:
-		pval->intval = chip->calib_level;
+	case PSY_IIO_CALIBRATE:
+		val1 = chip->calib_level;
 		break;
 	default:
-		pr_err("unsupported property %d\n", psp);
+		pr_err("unsupported property %d\n", chan->channel);
 		rc = -EINVAL;
 		break;
 	}
@@ -4630,64 +4489,64 @@ static int fg_psy_get_property(struct power_supply *psy,
 	return 0;
 }
 
-static int fg_psy_set_property(struct power_supply *psy,
-				  enum power_supply_property psp,
-				  const union power_supply_propval *pval)
+static int fg_gen4_iio_write_raw(struct iio_dev *indio_dev,
+		struct iio_chan_spec const *chan, int val1,
+		int val2, long mask)
 {
-	struct fg_gen4_chip *chip = power_supply_get_drvdata(psy);
+	struct fg_gen4_chip *chip = iio_priv(indio_dev);
 	struct fg_dev *fg = &chip->fg;
 	int rc = 0;
 	u8 val, mask;
 
-	switch (psp) {
-	case POWER_SUPPLY_PROP_CHARGE_FULL:
+	switch (chan->channel) {
+	case PSY_IIO_CHARGE_FULL:
 		if (chip->cl->active) {
 			pr_warn("Capacity learning active!\n");
 			return 0;
 		}
-		if (pval->intval <= 0 || pval->intval > chip->cl->nom_cap_uah) {
+		if (val1 <= 0 || val1 > chip->cl->nom_cap_uah) {
 			pr_err("charge_full is out of bounds\n");
 			return -EINVAL;
 		}
 		mutex_lock(&chip->cl->lock);
-		rc = fg_gen4_store_learned_capacity(chip, pval->intval);
+		rc = fg_gen4_store_learned_capacity(chip, val1);
 		if (!rc)
-			chip->cl->learned_cap_uah = pval->intval;
+			chip->cl->learned_cap_uah = val1;
 		mutex_unlock(&chip->cl->lock);
 		break;
-	case POWER_SUPPLY_PROP_CC_STEP:
+	case PSY_IIO_CC_STEP:
 		if ((chip->ttf->cc_step.sel >= 0) &&
 				(chip->ttf->cc_step.sel < MAX_CC_STEPS)) {
 			chip->ttf->cc_step.arr[chip->ttf->cc_step.sel] =
-								pval->intval;
+								val1;
 		} else {
 			pr_err("cc_step_sel is out of bounds [0, %d]\n",
 				chip->ttf->cc_step.sel);
 			return -EINVAL;
 		}
 		break;
-	case POWER_SUPPLY_PROP_CC_STEP_SEL:
-		if ((pval->intval >= 0) && (pval->intval < MAX_CC_STEPS)) {
-			chip->ttf->cc_step.sel = pval->intval;
+	case PSY_IIO_CC_STEP_SEL:
+		if ((val1 >= 0) && (val1 < MAX_CC_STEPS)) {
+			chip->ttf->cc_step.sel = val1;
 		} else {
 			pr_err("cc_step_sel is out of bounds [0, %d]\n",
 				pval->intval);
 			return -EINVAL;
 		}
 		break;
-	case POWER_SUPPLY_PROP_ESR_ACTUAL:
-		chip->esr_actual = pval->intval;
+	case PSY_IIO_ESR_ACTUAL:
+		chip->esr_actual = val1;
 		break;
-	case POWER_SUPPLY_PROP_ESR_NOMINAL:
-		chip->esr_nominal = pval->intval;
+	case PSY_IIO_ESR_NOMINAL:
+		chip->esr_nominal = val1;
 		break;
-	case POWER_SUPPLY_PROP_SOH:
-		chip->soh = pval->intval;
+	case PSY_IIO_SOH:
+		chip->soh = val1;
 		if (chip->sp)
 			soh_profile_update(chip->sp, chip->soh);
 		break;
-	case POWER_SUPPLY_PROP_CLEAR_SOH:
-		if (chip->first_profile_load && !pval->intval) {
+	case PSY_IIO_CLEAR_SOH:
+		if (chip->first_profile_load && !val1) {
 			fg_dbg(fg, FG_STATUS, "Clearing first profile load bit\n");
 			val = 0;
 			mask = FIRST_PROFILE_LOAD_BIT;
@@ -4701,16 +4560,16 @@ static int fg_psy_set_property(struct power_supply *psy,
 				chip->first_profile_load = false;
 		}
 		break;
-	case POWER_SUPPLY_PROP_BATT_AGE_LEVEL:
-		if (!chip->dt.multi_profile_load || pval->intval < 0 ||
-			chip->batt_age_level == pval->intval)
+	case PSY_IIO_BATT_AGE_LEVEL:
+		if (!chip->dt.multi_profile_load || val1 < 0 ||
+			chip->batt_age_level == val1)
 			return -EINVAL;
 		chip->last_batt_age_level = chip->batt_age_level;
-		chip->batt_age_level = pval->intval;
+		chip->batt_age_level = val1;
 		schedule_delayed_work(&fg->profile_load_work, 0);
 		break;
-	case POWER_SUPPLY_PROP_CALIBRATE:
-		rc = fg_gen4_set_calibrate_level(chip, pval->intval);
+	case PSY_IIO_CALIBRATE:
+		rc = fg_gen4_set_calibrate_level(chip, val1);
 		break;
 	default:
 		break;
@@ -4719,76 +4578,47 @@ static int fg_psy_set_property(struct power_supply *psy,
 	return rc;
 }
 
-static int fg_property_is_writeable(struct power_supply *psy,
-						enum power_supply_property psp)
+static int fg_gen3_iio_of_xlate(struct iio_dev *indio_dev,
+				const struct of_phandle_args *iiospec)
 {
-	switch (psp) {
-	case POWER_SUPPLY_PROP_CHARGE_FULL:
-	case POWER_SUPPLY_PROP_CC_STEP:
-	case POWER_SUPPLY_PROP_CC_STEP_SEL:
-	case POWER_SUPPLY_PROP_ESR_ACTUAL:
-	case POWER_SUPPLY_PROP_ESR_NOMINAL:
-	case POWER_SUPPLY_PROP_SOH:
-	case POWER_SUPPLY_PROP_CLEAR_SOH:
-	case POWER_SUPPLY_PROP_BATT_AGE_LEVEL:
-	case POWER_SUPPLY_PROP_CALIBRATE:
-		return 1;
-	default:
-		break;
-	}
+	struct fg_gen4_chip *chip = iio_priv(indio_dev);
+	struct iio_chan_spec *iio_chan = chip->iio_chan;
+	int i;
+
+	for (i = 0; i < ARRAY_SIZE(fg_gen4_iio_psy_channels);
+					i++, iio_chan++)
+		if (iio_chan->channel == iiospec->args[0])
+			return i;
+
+	return -EINVAL;
+}
+
+static const struct iio_info fg_gen4_iio_info = {
+	.read_raw	= fg_gen4_iio_read_raw,
+	.write_raw	= fg_gen4_iio_write_raw,
+	.of_xlate	= fg_gen4_iio_of_xlate,
+};
+
+static int fg_gen4_psy_get_property(struct power_supply *psy,
+			       enum power_supply_property psp,
+			       union power_supply_propval *pval)
+{
+	if (psp == POWER_SUPPLY_PROP_TYPE)
+		pval->intval = POWER_SUPPLY_TYPE_MAINS;
 
 	return 0;
 }
 
 static enum power_supply_property fg_psy_props[] = {
-	POWER_SUPPLY_PROP_CAPACITY,
-	POWER_SUPPLY_PROP_REAL_CAPACITY,
-	POWER_SUPPLY_PROP_CAPACITY_RAW,
-	POWER_SUPPLY_PROP_CC_SOC,
-	POWER_SUPPLY_PROP_TEMP,
-	POWER_SUPPLY_PROP_VOLTAGE_NOW,
-	POWER_SUPPLY_PROP_VOLTAGE_OCV,
-	POWER_SUPPLY_PROP_VOLTAGE_AVG,
-	POWER_SUPPLY_PROP_CURRENT_NOW,
-	POWER_SUPPLY_PROP_CURRENT_AVG,
-	POWER_SUPPLY_PROP_RESISTANCE_ID,
-	POWER_SUPPLY_PROP_RESISTANCE,
-	POWER_SUPPLY_PROP_ESR_ACTUAL,
-	POWER_SUPPLY_PROP_ESR_NOMINAL,
-	POWER_SUPPLY_PROP_BATTERY_TYPE,
-	POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN,
-	POWER_SUPPLY_PROP_VOLTAGE_MAX_DESIGN,
-	POWER_SUPPLY_PROP_CHARGE_NOW_RAW,
-	POWER_SUPPLY_PROP_CHARGE_NOW,
-	POWER_SUPPLY_PROP_CHARGE_FULL,
-	POWER_SUPPLY_PROP_CHARGE_COUNTER,
-	POWER_SUPPLY_PROP_CHARGE_COUNTER_SHADOW,
-	POWER_SUPPLY_PROP_CYCLE_COUNTS,
-	POWER_SUPPLY_PROP_SOC_REPORTING_READY,
-	POWER_SUPPLY_PROP_CLEAR_SOH,
-	POWER_SUPPLY_PROP_SOH,
-	POWER_SUPPLY_PROP_DEBUG_BATTERY,
-	POWER_SUPPLY_PROP_CONSTANT_CHARGE_VOLTAGE,
-	POWER_SUPPLY_PROP_TIME_TO_FULL_AVG,
-	POWER_SUPPLY_PROP_TIME_TO_FULL_NOW,
-	POWER_SUPPLY_PROP_TIME_TO_EMPTY_AVG,
-	POWER_SUPPLY_PROP_CC_STEP,
-	POWER_SUPPLY_PROP_CC_STEP_SEL,
-	POWER_SUPPLY_PROP_BATT_AGE_LEVEL,
-	POWER_SUPPLY_PROP_POWER_NOW,
-	POWER_SUPPLY_PROP_POWER_AVG,
-	POWER_SUPPLY_PROP_SCALE_MODE_EN,
-	POWER_SUPPLY_PROP_CALIBRATE,
+	POWER_SUPPLY_PROP_TYPE,
 };
 
 static const struct power_supply_desc fg_psy_desc = {
 	.name = "bms",
-	.type = POWER_SUPPLY_TYPE_BMS,
+	.type = POWER_SUPPLY_TYPE_MAINS,
 	.properties = fg_psy_props,
 	.num_properties = ARRAY_SIZE(fg_psy_props),
-	.get_property = fg_psy_get_property,
-	.set_property = fg_psy_set_property,
-	.property_is_writeable = fg_property_is_writeable,
+	.get_property = fg_gen4_psy_get_property,
 };
 
 /* All callback functions below */
@@ -5966,6 +5796,64 @@ static int fg_gen4_parse_child_nodes_dt(struct fg_gen4_chip *chip)
 #define DEFAULT_SCALE_ALARM_TIMER_MS	10000
 #define DEFAULT_BATT_ID_PULLUP_KOHMS	100
 
+static int fg_gen4_init_iio_psy(struct fg_gen4_chip *chip,
+				struct platform_device *pdev)
+{
+	struct iio_dev *indio_dev = chip->indio_dev;
+	struct iio_chan_spec *chan;
+	struct fg_dev *fg = &chip->fg;
+	int fg_gen3_num_iio_channels = ARRAY_SIZE(fg_gen4_iio_psy_channels);
+	int rc, i;
+
+	chip->iio_chan = devm_kcalloc(fg->dev, fg_gen4_num_iio_channels,
+				sizeof(*chip->iio_chan), GFP_KERNEL);
+	if (!chip->iio_chan)
+		return -ENOMEM;
+
+	chip->int_iio_chans = devm_kcalloc(fg->dev,
+				fg_gen4_num_iio_channels,
+				sizeof(*chip->int_iio_chans),
+				GFP_KERNEL);
+	if (!chip->int_iio_chans)
+		return -ENOMEM;
+
+	chip->ext_iio_chans = devm_kcalloc(fg->dev,
+				ARRAY_SIZE(fg_gen4_ext_iio_chan_name),
+				sizeof(*chip->ext_iio_chans),
+				GFP_KERNEL);
+	if (!chip->ext_iio_chans)
+		return -ENOMEM;
+
+	indio_dev->info = &fg_gen4_iio_info;
+	indio_dev->dev.parent = fg->dev;
+	indio_dev->dev.of_node = fg->dev->of_node;
+	indio_dev->name = pdev->name;
+	indio_dev->modes = INDIO_DIRECT_MODE;
+	indio_dev->channels = chip->iio_chan;
+	indio_dev->num_channels = fg_gen4_num_iio_channels;
+
+	for (i = 0; i < fg_gen4_num_iio_channels; i++) {
+		chip->int_iio_chans[i].indio_dev = indio_dev;
+		chan = &chip->iio_chan[i];
+		chip->int_iio_chans[i].channel = chan;
+		chan->address = i;
+		chan->channel = fg_gen4_iio_psy_channels[i].channel_num;
+		chan->type = fg_gen4_iio_psy_channels[i].type;
+		chan->datasheet_name =
+			fg_gen4_iio_psy_channels[i].datasheet_name;
+		chan->extend_name =
+			fg_gen4_iio_psy_channels[i].datasheet_name;
+		chan->info_mask_separate =
+			fg_gen4_iio_psy_channels[i].info_mask;
+	}
+
+	rc = devm_iio_device_register(fg->dev, indio_dev);
+	if (rc)
+		pr_err("Failed to register fg_gen4 IIO device, rc=%d\n", rc);
+
+	return rc;
+}
+
 static int fg_gen4_parse_dt(struct fg_gen4_chip *chip)
 {
 	struct fg_dev *fg = &chip->fg;
@@ -6118,7 +6006,7 @@ static int fg_gen4_parse_dt(struct fg_gen4_chip *chip)
 	rc = of_property_read_u32(node, "qcom,fg-esr-meas-curr-ma", &temp);
 	if (!rc) {
 		/* ESR measurement current range is 60-240 mA */
-		if (temp >= 60 || temp <= 240)
+		if (temp >= 60 && temp <= 240)
 			chip->dt.esr_meas_curr_ma = temp;
 	}
 
@@ -6215,10 +6103,14 @@ static int fg_gen4_probe(struct platform_device *pdev)
 	struct fg_dev *fg;
 	struct power_supply_config fg_psy_cfg = {};
 	int rc, msoc, volt_uv, batt_temp;
+	struct iio_dev *indio_dev;
 
-	chip = devm_kzalloc(&pdev->dev, sizeof(*chip), GFP_KERNEL);
-	if (!chip)
+	indio_dev = devm_iio_device_alloc(&pdev->dev, sizeof(*chip));
+	if (!indio_dev)
 		return -ENOMEM;
+
+	chip = iio_priv(indio_dev);
+	chip->indio_dev = indio_dev;
 
 	fg = &chip->fg;
 	fg->dev = &pdev->dev;
@@ -6303,6 +6195,12 @@ static int fg_gen4_probe(struct platform_device *pdev)
 	if (rc < 0) {
 		dev_err(fg->dev, "Error in alg_init, rc:%d\n",
 			rc);
+		goto exit;
+	}
+
+	rc = fg_gen4_init_iio_psy(chip, pdev);
+	if (rc < 0) {
+		pr_err("Failed to initialize QG IIO PSY, rc=%d\n", rc);
 		goto exit;
 	}
 
@@ -6516,7 +6414,9 @@ static const struct dev_pm_ops fg_gen4_pm_ops = {
 };
 
 static const struct of_device_id fg_gen4_match_table[] = {
-	{.compatible = FG_GEN4_DEV_NAME},
+	{ .compatible = "qcom,fg-gen4",
+	  .data = (void *)PM8150B,
+	},
 	{},
 };
 
