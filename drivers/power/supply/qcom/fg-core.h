@@ -492,6 +492,10 @@ struct fg_dt_props {
 	bool	soc_hi_res;
 	bool	soc_scale_mode;
 	int	cutoff_volt_mv;
+#ifdef CONFIG_LGE_PM
+	int	cutoff_ki_coeff;
+	int	cutoff_lt_ki_coeff;
+#endif
 	int	empty_volt_mv;
 	int	sys_min_volt_mv;
 	int	cutoff_curr_ma;
@@ -544,6 +548,9 @@ struct fg_gen4_chip {
 	struct iio_channel	*int_iio_chans;
 	struct iio_channel	**ext_iio_chans;
 	struct cycle_counter	*counter;
+#ifdef CONFIG_LGE_PM
+	u16	cyc_backup[BUCKET_COUNT];
+#endif
 	struct cap_learning	*cl;
 	struct ttf		*ttf;
 	struct soh_profile	*sp;
@@ -588,6 +595,9 @@ struct fg_gen4_chip {
 	int			calib_level;
 	bool			first_profile_load;
 	bool			ki_coeff_dischg_en;
+#ifdef CONFIG_LGE_PM
+	bool			cutoff_ki_coeff_en;
+#endif
 	bool			slope_limit_en;
 	bool			esr_fast_calib;
 	bool			esr_fast_calib_done;
