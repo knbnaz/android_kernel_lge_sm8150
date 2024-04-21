@@ -432,13 +432,13 @@ bool batt_psy_initialized(struct fg_dev *fg)
 
 bool is_qnovo_en(struct fg_dev *fg)
 {
-	struct fg_gen3_chip *chip = container_of(fg, struct fg_gen3_chip, fg);
+	struct fg_gen4_chip *chip = container_of(fg, struct fg_gen4_chip, fg);
 	int rc, val;
 
 	if (!batt_psy_initialized(fg))
 		return false;
 
-	rc = fg_gen3_read_iio_chan(chip, QNOVO_ENABLE, &val);
+	rc = fg_gen4_read_iio_chan(chip, QNOVO_ENABLE, &val);
 	if (rc < 0) {
 		pr_debug("Failed to get QNOVO_ENABLE value\n");
 		return false;
@@ -461,7 +461,7 @@ bool pc_port_psy_initialized(struct fg_dev *fg)
 
 bool is_parallel_charger_available(struct fg_dev *fg)
 {
-	struct fg_gen3_chip *chip = container_of(fg, struct fg_gen3_chip, fg);
+	struct fg_gen4_chip *chip = container_of(fg, struct fg_gen4_chip, fg);
 	if (is_chan_valid(chip, PARALLEL_CHARGING_ENABLED))
 		return true;
 
@@ -1668,8 +1668,8 @@ err_remove_fs:
 	return -ENOMEM;
 }
 
-bool is_chan_valid(struct fg_gen3_chip *chip,
-		enum fg_gen3_ext_iio_channels chan)
+bool is_chan_valid(struct fg_gen4_chip *chip,
+		enum fg_gen4_ext_iio_channels chan)
 {
 	int rc;
 
@@ -1678,14 +1678,14 @@ bool is_chan_valid(struct fg_gen3_chip *chip,
 
 	if (!chip->ext_iio_chans[chan]) {
 		chip->ext_iio_chans[chan] = iio_channel_get(chip->fg.dev,
-					fg_gen3_ext_iio_chan_name[chan]);
+					fg_gen4_ext_iio_chan_name[chan]);
 		if (IS_ERR(chip->ext_iio_chans[chan])) {
 			rc = PTR_ERR(chip->ext_iio_chans[chan]);
 			if (rc == -EPROBE_DEFER)
 				chip->ext_iio_chans[chan] = NULL;
 
 			pr_err("Failed to get IIO channel %s, rc=%d\n",
-				fg_gen3_ext_iio_chan_name[chan], rc);
+				fg_gen4_ext_iio_chan_name[chan], rc);
 			return false;
 		}
 	}

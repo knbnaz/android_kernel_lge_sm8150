@@ -39,7 +39,7 @@
 		|| ((left) <= (right) && (left) <= (value) \
 			&& (value) <= (right)))
 
-#define PARAM(_id, _addr_word, _addr_byte, _len, _num, _den, _offset,	\
+#define FG_PARAM(_id, _addr_word, _addr_byte, _len, _num, _den, _offset,	\
 	      _enc, _dec)						\
 	[FG_SRAM_##_id] = {						\
 		.addr_word	= _addr_word,				\
@@ -539,6 +539,10 @@ struct fg_gen4_chip {
 	struct fg_dev		fg;
 	struct fg_dt_props	dt;
 	struct iio_channel	*batt_id_chan;
+	struct iio_dev		*indio_dev;
+	struct iio_chan_spec	*iio_chan;
+	struct iio_channel	*int_iio_chans;
+	struct iio_channel	**ext_iio_chans;
 	struct cycle_counter	*counter;
 	struct cap_learning	*cl;
 	struct ttf		*ttf;

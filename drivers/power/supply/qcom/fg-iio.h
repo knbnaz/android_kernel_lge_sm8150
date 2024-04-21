@@ -3,8 +3,8 @@
  * Copyright (c) 2023, Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
-#ifndef __FG_GEN3_IIO_H
-#define __FG_GEN3_IIO_H
+#ifndef __FG_GEN4_IIO_H
+#define __FG_GEN4_IIO_H
 
 #include <linux/iio/iio.h>
 #include <dt-bindings/iio/qti_power_supply_iio.h>
@@ -84,27 +84,25 @@ static const struct fg_gen4_iio_channels fg_gen4_iio_psy_channels[] = {
 	FG_GEN4_CHAN_TSTAMP("time_to_full_now", PSY_IIO_TIME_TO_FULL_NOW)
 	FG_GEN4_CHAN_TSTAMP("time_to_empty_avg", PSY_IIO_TIME_TO_EMPTY_AVG)
 	FG_GEN4_CHAN_ACT("fg_reset", PSY_IIO_FG_RESET)
-	FG_GEN4_CHAN_TEMP("cold_temp", PSY_IIO_COLD_TEMP)
-	FG_GEN4_CHAN_TEMP("cool_temp", PSY_IIO_COOL_TEMP)
-	FG_GEN4_CHAN_TEMP("warm_temp", PSY_IIO_WARM_TEMP)
 	FG_GEN4_CHAN_TEMP("hot_temp", PSY_IIO_HOT_TEMP)
 	FG_GEN4_CHAN_VOLT("voltage_max_design", PSY_IIO_VOLTAGE_MAX_DESIGN)
 	FG_GEN4_CHAN_ENERGY("charge_now", PSY_IIO_CHARGE_NOW)
 	FG_GEN4_CHAN_ENERGY("charge_now_raw", PSY_IIO_CHARGE_NOW_RAW)
 	FG_GEN4_CHAN_ENERGY("charge_counter_shadow", PSY_IIO_CHARGE_COUNTER_SHADOW)
 	FG_GEN4_CHAN_VOLT("constant_charge_voltage", PSY_IIO_CONSTANT_CHARGE_VOLTAGE)
-	FG_GEN4_CHAN_ACT("charge_qnovo_enable", PSY_IIO_CHARGE_QNOVO_ENABLE)
 };
 
 enum fg_gen4_ext_iio_channels {
 	QNOVO_ENABLE = 0,
 	CHARGE_DONE,
+	RECHARGE_SOC,
 	PARALLEL_CHARGING_ENABLED,
 };
 
-static const char * const fg_gen3_ext_iio_chan_name[] = {
+static const char * const fg_gen4_ext_iio_chan_name[] = {
 	[QNOVO_ENABLE]			= "qnovo_enable",
 	[CHARGE_DONE]			= "charge_done",
+	[RECHARGE_SOC]			= "recharge_soc",
 	[PARALLEL_CHARGING_ENABLED]	= "parallel_charging_enabled",
 };
 

@@ -255,212 +255,212 @@ static int fg_gen4_validate_soc_scale_mode(struct fg_gen4_chip *chip);
 static int fg_gen4_esr_fast_calib_config(struct fg_gen4_chip *chip, bool en);
 
 static struct fg_sram_param pm8150b_v1_sram_params[] = {
-	PARAM(BATT_SOC, BATT_SOC_WORD, BATT_SOC_OFFSET, 4, 1, 1, 0, NULL,
+	FG_PARAM(BATT_SOC, BATT_SOC_WORD, BATT_SOC_OFFSET, 4, 1, 1, 0, NULL,
 		fg_decode_default),
-	PARAM(FULL_SOC, FULL_SOC_WORD, FULL_SOC_OFFSET, 2, 1, 1, 0,
+	FG_PARAM(FULL_SOC, FULL_SOC_WORD, FULL_SOC_OFFSET, 2, 1, 1, 0,
 		fg_encode_default, fg_decode_default),
-	PARAM(MONOTONIC_SOC, MONOTONIC_SOC_WORD, MONOTONIC_SOC_OFFSET, 2, 1, 1,
+	FG_PARAM(MONOTONIC_SOC, MONOTONIC_SOC_WORD, MONOTONIC_SOC_OFFSET, 2, 1, 1,
 		0, NULL, fg_decode_default),
-	PARAM(VOLTAGE_PRED, VOLTAGE_PRED_WORD, VOLTAGE_PRED_OFFSET, 2, 1000,
+	FG_PARAM(VOLTAGE_PRED, VOLTAGE_PRED_WORD, VOLTAGE_PRED_OFFSET, 2, 1000,
 		244141, 0, NULL, fg_decode_voltage_15b),
-	PARAM(OCV, OCV_WORD, OCV_OFFSET, 2, 1000, 244141, 0, NULL,
+	FG_PARAM(OCV, OCV_WORD, OCV_OFFSET, 2, 1000, 244141, 0, NULL,
 		fg_decode_voltage_15b),
-	PARAM(VBAT_FINAL, VBAT_FINAL_WORD, VBAT_FINAL_OFFSET, 2, 1000, 244141,
+	FG_PARAM(VBAT_FINAL, VBAT_FINAL_WORD, VBAT_FINAL_OFFSET, 2, 1000, 244141,
 		0, NULL, fg_decode_voltage_15b),
-	PARAM(IBAT_FINAL, IBAT_FINAL_WORD, IBAT_FINAL_OFFSET, 2, 1000, 488282,
+	FG_PARAM(IBAT_FINAL, IBAT_FINAL_WORD, IBAT_FINAL_OFFSET, 2, 1000, 488282,
 		0, NULL, fg_decode_current_16b),
-	PARAM(RCONN, RCONN_WORD, RCONN_OFFSET, 2, 1000, 122070, 0,
+	FG_PARAM(RCONN, RCONN_WORD, RCONN_OFFSET, 2, 1000, 122070, 0,
 		fg_encode_default, fg_decode_value_16b),
-	PARAM(ESR, ESR_WORD, ESR_OFFSET, 2, 1000, 244141, 0, fg_encode_default,
+	FG_PARAM(ESR, ESR_WORD, ESR_OFFSET, 2, 1000, 244141, 0, fg_encode_default,
 		fg_decode_value_16b),
-	PARAM(ESR_MDL, ESR_MDL_WORD, ESR_MDL_OFFSET, 2, 1000, 244141, 0,
+	FG_PARAM(ESR_MDL, ESR_MDL_WORD, ESR_MDL_OFFSET, 2, 1000, 244141, 0,
 		fg_encode_default, fg_decode_value_16b),
-	PARAM(ESR_ACT, ESR_ACT_WORD, ESR_ACT_OFFSET, 2, 1000, 244141, 0,
+	FG_PARAM(ESR_ACT, ESR_ACT_WORD, ESR_ACT_OFFSET, 2, 1000, 244141, 0,
 		fg_encode_default, fg_decode_value_16b),
-	PARAM(RSLOW, RSLOW_WORD, RSLOW_OFFSET, 2, 1000, 244141, 0, NULL,
+	FG_PARAM(RSLOW, RSLOW_WORD, RSLOW_OFFSET, 2, 1000, 244141, 0, NULL,
 		fg_decode_value_16b),
-	PARAM(CC_SOC, CC_SOC_WORD, CC_SOC_OFFSET, 4, 1, 1, 0, NULL,
+	FG_PARAM(CC_SOC, CC_SOC_WORD, CC_SOC_OFFSET, 4, 1, 1, 0, NULL,
 		fg_decode_cc_soc),
-	PARAM(CC_SOC_SW, CC_SOC_SW_WORD, CC_SOC_SW_OFFSET, 4, 1, 1, 0, NULL,
+	FG_PARAM(CC_SOC_SW, CC_SOC_SW_WORD, CC_SOC_SW_OFFSET, 4, 1, 1, 0, NULL,
 		fg_decode_cc_soc),
-	PARAM(ACT_BATT_CAP, ACT_BATT_CAP_WORD, ACT_BATT_CAP_OFFSET, 2,
+	FG_PARAM(ACT_BATT_CAP, ACT_BATT_CAP_WORD, ACT_BATT_CAP_OFFSET, 2,
 		1, 1, 0, NULL, fg_decode_default),
 	/* Entries below here are configurable during initialization */
-	PARAM(CUTOFF_VOLT, CUTOFF_VOLT_WORD, CUTOFF_VOLT_OFFSET, 2, 1000000,
+	FG_PARAM(CUTOFF_VOLT, CUTOFF_VOLT_WORD, CUTOFF_VOLT_OFFSET, 2, 1000000,
 		244141, 0, fg_encode_voltage, NULL),
-	PARAM(VBATT_LOW, VBATT_LOW_WORD, VBATT_LOW_OFFSET, 1, 1000,
+	FG_PARAM(VBATT_LOW, VBATT_LOW_WORD, VBATT_LOW_OFFSET, 1, 1000,
 		15625, -2000, fg_encode_voltage, NULL),
-	PARAM(VBATT_FULL, VBATT_FULL_WORD, VBATT_FULL_OFFSET, 2, 1000,
+	FG_PARAM(VBATT_FULL, VBATT_FULL_WORD, VBATT_FULL_OFFSET, 2, 1000,
 		244141, 0, fg_encode_voltage, fg_decode_voltage_15b),
-	PARAM(CUTOFF_CURR, CUTOFF_CURR_WORD, CUTOFF_CURR_OFFSET, 2,
+	FG_PARAM(CUTOFF_CURR, CUTOFF_CURR_WORD, CUTOFF_CURR_OFFSET, 2,
 		100000, 48828, 0, fg_encode_current, NULL),
-	PARAM(SYS_TERM_CURR, SYS_TERM_CURR_WORD, SYS_TERM_CURR_OFFSET, 2,
+	FG_PARAM(SYS_TERM_CURR, SYS_TERM_CURR_WORD, SYS_TERM_CURR_OFFSET, 2,
 		100000, 48828, 0, fg_encode_current, NULL),
-	PARAM(DELTA_MSOC_THR, DELTA_MSOC_THR_WORD, DELTA_MSOC_THR_OFFSET,
+	FG_PARAM(DELTA_MSOC_THR, DELTA_MSOC_THR_WORD, DELTA_MSOC_THR_OFFSET,
 		1, 2048, 1000, 0, fg_encode_default, NULL),
-	PARAM(DELTA_BSOC_THR, DELTA_BSOC_THR_WORD, DELTA_BSOC_THR_OFFSET,
+	FG_PARAM(DELTA_BSOC_THR, DELTA_BSOC_THR_WORD, DELTA_BSOC_THR_OFFSET,
 		1, 2048, 1000, 0, fg_encode_default, NULL),
-	PARAM(ESR_TIMER_DISCHG_MAX, ESR_TIMER_DISCHG_MAX_WORD,
+	FG_PARAM(ESR_TIMER_DISCHG_MAX, ESR_TIMER_DISCHG_MAX_WORD,
 		ESR_TIMER_DISCHG_MAX_OFFSET, 1, 1, 1, 0, fg_encode_default,
 		NULL),
-	PARAM(ESR_TIMER_DISCHG_INIT, ESR_TIMER_DISCHG_INIT_WORD,
+	FG_PARAM(ESR_TIMER_DISCHG_INIT, ESR_TIMER_DISCHG_INIT_WORD,
 		ESR_TIMER_DISCHG_INIT_OFFSET, 1, 1, 1, 0, fg_encode_default,
 		NULL),
-	PARAM(ESR_TIMER_CHG_MAX, ESR_TIMER_CHG_MAX_WORD,
+	FG_PARAM(ESR_TIMER_CHG_MAX, ESR_TIMER_CHG_MAX_WORD,
 		ESR_TIMER_CHG_MAX_OFFSET, 1, 1, 1, 0, fg_encode_default, NULL),
-	PARAM(ESR_TIMER_CHG_INIT, ESR_TIMER_CHG_INIT_WORD,
+	FG_PARAM(ESR_TIMER_CHG_INIT, ESR_TIMER_CHG_INIT_WORD,
 		ESR_TIMER_CHG_INIT_OFFSET, 1, 1, 1, 0, fg_encode_default, NULL),
-	PARAM(ESR_PULSE_THRESH, ESR_PULSE_THRESH_WORD, ESR_PULSE_THRESH_OFFSET,
+	FG_PARAM(ESR_PULSE_THRESH, ESR_PULSE_THRESH_WORD, ESR_PULSE_THRESH_OFFSET,
 		1, 1000, 15625, 0, fg_encode_default, NULL),
-	PARAM(DELTA_ESR_THR, DELTA_ESR_THR_WORD, DELTA_ESR_THR_OFFSET, 2, 1000,
+	FG_PARAM(DELTA_ESR_THR, DELTA_ESR_THR_WORD, DELTA_ESR_THR_OFFSET, 2, 1000,
 		61036, 0, fg_encode_default, NULL),
-	PARAM(KI_COEFF_CUTOFF, KI_COEFF_CUTOFF_WORD, KI_COEFF_CUTOFF_OFFSET,
+	FG_PARAM(KI_COEFF_CUTOFF, KI_COEFF_CUTOFF_WORD, KI_COEFF_CUTOFF_OFFSET,
 		1, 1000, 61035, 0, fg_encode_default, NULL),
-	PARAM(KI_COEFF_FULL_SOC, KI_COEFF_FULL_SOC_NORM_WORD,
+	FG_PARAM(KI_COEFF_FULL_SOC, KI_COEFF_FULL_SOC_NORM_WORD,
 		KI_COEFF_FULL_SOC_NORM_OFFSET, 1, 1000, 61035, 0,
 		fg_encode_default, NULL),
-	PARAM(KI_COEFF_LOW_DISCHG, KI_COEFF_LOW_DISCHG_WORD,
+	FG_PARAM(KI_COEFF_LOW_DISCHG, KI_COEFF_LOW_DISCHG_WORD,
 		KI_COEFF_LOW_DISCHG_OFFSET, 1, 1000, 61035, 0,
 		fg_encode_default, NULL),
-	PARAM(KI_COEFF_MED_DISCHG, KI_COEFF_MED_DISCHG_WORD,
+	FG_PARAM(KI_COEFF_MED_DISCHG, KI_COEFF_MED_DISCHG_WORD,
 		KI_COEFF_MED_DISCHG_OFFSET, 1, 1000, 61035, 0,
 		fg_encode_default, NULL),
-	PARAM(KI_COEFF_HI_DISCHG, KI_COEFF_HI_DISCHG_WORD,
+	FG_PARAM(KI_COEFF_HI_DISCHG, KI_COEFF_HI_DISCHG_WORD,
 		KI_COEFF_HI_DISCHG_OFFSET, 1, 1000, 61035, 0,
 		fg_encode_default, NULL),
-	PARAM(KI_COEFF_LOW_CHG, KI_COEFF_LOW_CHG_WORD, KI_COEFF_LOW_CHG_OFFSET,
+	FG_PARAM(KI_COEFF_LOW_CHG, KI_COEFF_LOW_CHG_WORD, KI_COEFF_LOW_CHG_OFFSET,
 		1, 1000, 61035, 0, fg_encode_default, NULL),
-	PARAM(KI_COEFF_MED_CHG, KI_COEFF_MED_CHG_WORD, KI_COEFF_MED_CHG_OFFSET,
+	FG_PARAM(KI_COEFF_MED_CHG, KI_COEFF_MED_CHG_WORD, KI_COEFF_MED_CHG_OFFSET,
 		1, 1000, 61035, 0, fg_encode_default, NULL),
-	PARAM(KI_COEFF_HI_CHG, KI_COEFF_HI_CHG_WORD, KI_COEFF_HI_CHG_OFFSET, 1,
+	FG_PARAM(KI_COEFF_HI_CHG, KI_COEFF_HI_CHG_WORD, KI_COEFF_HI_CHG_OFFSET, 1,
 		1000, 61035, 0, fg_encode_default, NULL),
-	PARAM(SLOPE_LIMIT, SLOPE_LIMIT_WORD, SLOPE_LIMIT_OFFSET, 1, 8192,
+	FG_PARAM(SLOPE_LIMIT, SLOPE_LIMIT_WORD, SLOPE_LIMIT_OFFSET, 1, 8192,
 		1000000, 0, fg_encode_default, NULL),
-	PARAM(BATT_TEMP_COLD, BATT_TEMP_CONFIG_WORD, BATT_TEMP_COLD_OFFSET, 1,
+	FG_PARAM(BATT_TEMP_COLD, BATT_TEMP_CONFIG_WORD, BATT_TEMP_COLD_OFFSET, 1,
 		1, 1, 0, fg_encode_default, NULL),
-	PARAM(BATT_TEMP_HOT, BATT_TEMP_CONFIG_WORD, BATT_TEMP_HOT_OFFSET, 1,
+	FG_PARAM(BATT_TEMP_HOT, BATT_TEMP_CONFIG_WORD, BATT_TEMP_HOT_OFFSET, 1,
 		1, 1, 0, fg_encode_default, NULL),
-	PARAM(ESR_CAL_SOC_MIN, BATT_TEMP_CONFIG2_WORD, ESR_CAL_SOC_MIN_OFFSET,
+	FG_PARAM(ESR_CAL_SOC_MIN, BATT_TEMP_CONFIG2_WORD, ESR_CAL_SOC_MIN_OFFSET,
 		1, 1, 1, 0, fg_encode_default, NULL),
-	PARAM(ESR_CAL_SOC_MAX, ESR_CAL_THRESH_WORD, ESR_CAL_SOC_MAX_OFFSET,
+	FG_PARAM(ESR_CAL_SOC_MAX, ESR_CAL_THRESH_WORD, ESR_CAL_SOC_MAX_OFFSET,
 		1, 1, 1, 0, fg_encode_default, NULL),
-	PARAM(ESR_CAL_TEMP_MIN, ESR_CAL_THRESH_WORD, ESR_CAL_TEMP_MIN_OFFSET,
+	FG_PARAM(ESR_CAL_TEMP_MIN, ESR_CAL_THRESH_WORD, ESR_CAL_TEMP_MIN_OFFSET,
 		1, 1, 1, 0, fg_encode_default, NULL),
-	PARAM(ESR_CAL_TEMP_MAX, ESR_PULSE_THRESH_WORD, ESR_CAL_TEMP_MAX_OFFSET,
+	FG_PARAM(ESR_CAL_TEMP_MAX, ESR_PULSE_THRESH_WORD, ESR_CAL_TEMP_MAX_OFFSET,
 		1, 1, 1, 0, fg_encode_default, NULL),
 };
 
 static struct fg_sram_param pm8150b_v2_sram_params[] = {
-	PARAM(VBAT_TAU, LOW_PASS_VBATT_WORD, LOW_PASS_VBATT_OFFSET, 1, 1, 1, 0,
+	FG_PARAM(VBAT_TAU, LOW_PASS_VBATT_WORD, LOW_PASS_VBATT_OFFSET, 1, 1, 1, 0,
 		NULL, NULL),
-	PARAM(BATT_SOC, BATT_SOC_v2_WORD, BATT_SOC_v2_OFFSET, 4, 1, 1, 0, NULL,
+	FG_PARAM(BATT_SOC, BATT_SOC_v2_WORD, BATT_SOC_v2_OFFSET, 4, 1, 1, 0, NULL,
 		fg_decode_default),
-	PARAM(FULL_SOC, FULL_SOC_v2_WORD, FULL_SOC_v2_OFFSET, 2, 1, 1, 0,
+	FG_PARAM(FULL_SOC, FULL_SOC_v2_WORD, FULL_SOC_v2_OFFSET, 2, 1, 1, 0,
 		fg_encode_default, fg_decode_default),
-	PARAM(MONOTONIC_SOC, MONOTONIC_SOC_v2_WORD, MONOTONIC_SOC_v2_OFFSET, 2,
+	FG_PARAM(MONOTONIC_SOC, MONOTONIC_SOC_v2_WORD, MONOTONIC_SOC_v2_OFFSET, 2,
 		1, 1, 0, NULL, fg_decode_default),
-	PARAM(VOLTAGE_PRED, VOLTAGE_PRED_v2_WORD, VOLTAGE_PRED_v2_OFFSET, 2,
+	FG_PARAM(VOLTAGE_PRED, VOLTAGE_PRED_v2_WORD, VOLTAGE_PRED_v2_OFFSET, 2,
 		1000, 244141, 0, NULL, fg_decode_voltage_15b),
-	PARAM(OCV, OCV_v2_WORD, OCV_v2_OFFSET, 2, 1000, 244141, 0, NULL,
+	FG_PARAM(OCV, OCV_v2_WORD, OCV_v2_OFFSET, 2, 1000, 244141, 0, NULL,
 		fg_decode_voltage_15b),
-	PARAM(VBAT_FLT, VBAT_FLT_WORD, VBAT_FLT_OFFSET, 4, 10000, 19073, 0,
+	FG_PARAM(VBAT_FLT, VBAT_FLT_WORD, VBAT_FLT_OFFSET, 4, 10000, 19073, 0,
 		NULL, fg_decode_voltage_24b),
-	PARAM(VBAT_FINAL, VBAT_FINAL_WORD, VBAT_FINAL_OFFSET, 2, 1000, 244141,
+	FG_PARAM(VBAT_FINAL, VBAT_FINAL_WORD, VBAT_FINAL_OFFSET, 2, 1000, 244141,
 		0, NULL, fg_decode_voltage_15b),
-	PARAM(IBAT_FINAL, IBAT_FINAL_WORD, IBAT_FINAL_OFFSET, 2, 1000, 488282,
+	FG_PARAM(IBAT_FINAL, IBAT_FINAL_WORD, IBAT_FINAL_OFFSET, 2, 1000, 488282,
 		0, NULL, fg_decode_current_16b),
-	PARAM(IBAT_FLT, IBAT_FLT_WORD, IBAT_FLT_OFFSET, 4, 10000, 19073, 0,
+	FG_PARAM(IBAT_FLT, IBAT_FLT_WORD, IBAT_FLT_OFFSET, 4, 10000, 19073, 0,
 		NULL, fg_decode_current_24b),
-	PARAM(RCONN, RCONN_WORD, RCONN_OFFSET, 2, 1000, 122070, 0,
+	FG_PARAM(RCONN, RCONN_WORD, RCONN_OFFSET, 2, 1000, 122070, 0,
 		fg_encode_default, fg_decode_value_16b),
-	PARAM(ESR, ESR_WORD, ESR_OFFSET, 2, 1000, 244141, 0, fg_encode_default,
+	FG_PARAM(ESR, ESR_WORD, ESR_OFFSET, 2, 1000, 244141, 0, fg_encode_default,
 		fg_decode_value_16b),
-	PARAM(ESR_MDL, ESR_MDL_WORD, ESR_MDL_OFFSET, 2, 1000, 244141, 0,
+	FG_PARAM(ESR_MDL, ESR_MDL_WORD, ESR_MDL_OFFSET, 2, 1000, 244141, 0,
 		fg_encode_default, fg_decode_value_16b),
-	PARAM(ESR_ACT, ESR_ACT_WORD, ESR_ACT_OFFSET, 2, 1000, 244141, 0,
+	FG_PARAM(ESR_ACT, ESR_ACT_WORD, ESR_ACT_OFFSET, 2, 1000, 244141, 0,
 		fg_encode_default, fg_decode_value_16b),
-	PARAM(RSLOW, RSLOW_v2_WORD, RSLOW_v2_OFFSET, 2, 1000, 244141, 0, NULL,
+	FG_PARAM(RSLOW, RSLOW_v2_WORD, RSLOW_v2_OFFSET, 2, 1000, 244141, 0, NULL,
 		fg_decode_value_16b),
-	PARAM(CC_SOC, CC_SOC_v2_WORD, CC_SOC_v2_OFFSET, 4, 1, 1, 0, NULL,
+	FG_PARAM(CC_SOC, CC_SOC_v2_WORD, CC_SOC_v2_OFFSET, 4, 1, 1, 0, NULL,
 		fg_decode_cc_soc),
-	PARAM(CC_SOC_SW, CC_SOC_SW_v2_WORD, CC_SOC_SW_v2_OFFSET, 4, 1, 1, 0,
+	FG_PARAM(CC_SOC_SW, CC_SOC_SW_v2_WORD, CC_SOC_SW_v2_OFFSET, 4, 1, 1, 0,
 		NULL, fg_decode_cc_soc),
-	PARAM(ACT_BATT_CAP, ACT_BATT_CAP_v2_WORD, ACT_BATT_CAP_v2_OFFSET, 2,
+	FG_PARAM(ACT_BATT_CAP, ACT_BATT_CAP_v2_WORD, ACT_BATT_CAP_v2_OFFSET, 2,
 		1, 1, 0, NULL, fg_decode_default),
 	/* Entries below here are configurable during initialization */
-	PARAM(CUTOFF_VOLT, CUTOFF_VOLT_WORD, CUTOFF_VOLT_OFFSET, 2, 1000000,
+	FG_PARAM(CUTOFF_VOLT, CUTOFF_VOLT_WORD, CUTOFF_VOLT_OFFSET, 2, 1000000,
 		244141, 0, fg_encode_voltage, NULL),
-	PARAM(VBATT_LOW, VBATT_LOW_WORD, VBATT_LOW_OFFSET, 1, 1000,
+	FG_PARAM(VBATT_LOW, VBATT_LOW_WORD, VBATT_LOW_OFFSET, 1, 1000,
 		15625, -2000, fg_encode_voltage, NULL),
-	PARAM(VBATT_FULL, VBATT_FULL_WORD, VBATT_FULL_OFFSET, 2, 1000,
+	FG_PARAM(VBATT_FULL, VBATT_FULL_WORD, VBATT_FULL_OFFSET, 2, 1000,
 		244141, 0, fg_encode_voltage, fg_decode_voltage_15b),
-	PARAM(CUTOFF_CURR, CUTOFF_CURR_WORD, CUTOFF_CURR_OFFSET, 2,
+	FG_PARAM(CUTOFF_CURR, CUTOFF_CURR_WORD, CUTOFF_CURR_OFFSET, 2,
 		100000, 48828, 0, fg_encode_current, NULL),
-	PARAM(SYS_TERM_CURR, SYS_TERM_CURR_WORD, SYS_TERM_CURR_OFFSET, 2,
+	FG_PARAM(SYS_TERM_CURR, SYS_TERM_CURR_WORD, SYS_TERM_CURR_OFFSET, 2,
 		100000, 48828, 0, fg_encode_current, NULL),
-	PARAM(DELTA_MSOC_THR, DELTA_MSOC_THR_WORD, DELTA_MSOC_THR_OFFSET,
+	FG_PARAM(DELTA_MSOC_THR, DELTA_MSOC_THR_WORD, DELTA_MSOC_THR_OFFSET,
 		1, 2048, 1000, 0, fg_encode_default, NULL),
-	PARAM(DELTA_BSOC_THR, DELTA_BSOC_THR_WORD, DELTA_BSOC_THR_OFFSET,
+	FG_PARAM(DELTA_BSOC_THR, DELTA_BSOC_THR_WORD, DELTA_BSOC_THR_OFFSET,
 		1, 2048, 1000, 0, fg_encode_default, NULL),
-	PARAM(ESR_TIMER_DISCHG_MAX, ESR_TIMER_DISCHG_MAX_WORD,
+	FG_PARAM(ESR_TIMER_DISCHG_MAX, ESR_TIMER_DISCHG_MAX_WORD,
 		ESR_TIMER_DISCHG_MAX_OFFSET, 1, 1, 1, 0, fg_encode_default,
 		NULL),
-	PARAM(ESR_TIMER_DISCHG_INIT, ESR_TIMER_DISCHG_INIT_WORD,
+	FG_PARAM(ESR_TIMER_DISCHG_INIT, ESR_TIMER_DISCHG_INIT_WORD,
 		ESR_TIMER_DISCHG_INIT_OFFSET, 1, 1, 1, 0, fg_encode_default,
 		NULL),
-	PARAM(ESR_TIMER_CHG_MAX, ESR_TIMER_CHG_MAX_WORD,
+	FG_PARAM(ESR_TIMER_CHG_MAX, ESR_TIMER_CHG_MAX_WORD,
 		ESR_TIMER_CHG_MAX_OFFSET, 1, 1, 1, 0, fg_encode_default, NULL),
-	PARAM(ESR_TIMER_CHG_INIT, ESR_TIMER_CHG_INIT_WORD,
+	FG_PARAM(ESR_TIMER_CHG_INIT, ESR_TIMER_CHG_INIT_WORD,
 		ESR_TIMER_CHG_INIT_OFFSET, 1, 1, 1, 0, fg_encode_default, NULL),
-	PARAM(ESR_PULSE_THRESH, ESR_PULSE_THRESH_WORD, ESR_PULSE_THRESH_OFFSET,
+	FG_PARAM(ESR_PULSE_THRESH, ESR_PULSE_THRESH_WORD, ESR_PULSE_THRESH_OFFSET,
 		1, 1000, 15625, 0, fg_encode_default, NULL),
-	PARAM(DELTA_ESR_THR, DELTA_ESR_THR_WORD, DELTA_ESR_THR_OFFSET, 2, 1000,
+	FG_PARAM(DELTA_ESR_THR, DELTA_ESR_THR_WORD, DELTA_ESR_THR_OFFSET, 2, 1000,
 		61036, 0, fg_encode_default, NULL),
-	PARAM(KI_COEFF_CUTOFF, KI_COEFF_CUTOFF_WORD, KI_COEFF_CUTOFF_OFFSET,
+	FG_PARAM(KI_COEFF_CUTOFF, KI_COEFF_CUTOFF_WORD, KI_COEFF_CUTOFF_OFFSET,
 		1, 1000, 61035, 0, fg_encode_default, NULL),
-	PARAM(KI_COEFF_FULL_SOC, KI_COEFF_FULL_SOC_NORM_WORD,
+	FG_PARAM(KI_COEFF_FULL_SOC, KI_COEFF_FULL_SOC_NORM_WORD,
 		KI_COEFF_FULL_SOC_NORM_OFFSET, 1, 1000, 61035, 0,
 		fg_encode_default, NULL),
-	PARAM(KI_COEFF_LOW_DISCHG, KI_COEFF_LOW_DISCHG_WORD,
+	FG_PARAM(KI_COEFF_LOW_DISCHG, KI_COEFF_LOW_DISCHG_WORD,
 		KI_COEFF_LOW_DISCHG_OFFSET, 1, 1000, 61035, 0,
 		fg_encode_default, NULL),
-	PARAM(KI_COEFF_MED_DISCHG, KI_COEFF_MED_DISCHG_WORD,
+	FG_PARAM(KI_COEFF_MED_DISCHG, KI_COEFF_MED_DISCHG_WORD,
 		KI_COEFF_MED_DISCHG_OFFSET, 1, 1000, 61035, 0,
 		fg_encode_default, NULL),
-	PARAM(KI_COEFF_HI_DISCHG, KI_COEFF_HI_DISCHG_WORD,
+	FG_PARAM(KI_COEFF_HI_DISCHG, KI_COEFF_HI_DISCHG_WORD,
 		KI_COEFF_HI_DISCHG_OFFSET, 1, 1000, 61035, 0,
 		fg_encode_default, NULL),
-	PARAM(KI_COEFF_LO_MED_DCHG_THR, KI_COEFF_LO_MED_DCHG_THR_WORD,
+	FG_PARAM(KI_COEFF_LO_MED_DCHG_THR, KI_COEFF_LO_MED_DCHG_THR_WORD,
 		KI_COEFF_LO_MED_DCHG_THR_OFFSET, 1, 1000, 15625, 0,
 		fg_encode_default, NULL),
-	PARAM(KI_COEFF_MED_HI_DCHG_THR, KI_COEFF_MED_HI_DCHG_THR_WORD,
+	FG_PARAM(KI_COEFF_MED_HI_DCHG_THR, KI_COEFF_MED_HI_DCHG_THR_WORD,
 		KI_COEFF_MED_HI_DCHG_THR_OFFSET, 1, 1000, 15625, 0,
 		fg_encode_default, NULL),
-	PARAM(KI_COEFF_LOW_CHG, KI_COEFF_LOW_CHG_WORD, KI_COEFF_LOW_CHG_OFFSET,
+	FG_PARAM(KI_COEFF_LOW_CHG, KI_COEFF_LOW_CHG_WORD, KI_COEFF_LOW_CHG_OFFSET,
 		1, 1000, 61035, 0, fg_encode_default, NULL),
-	PARAM(KI_COEFF_MED_CHG, KI_COEFF_MED_CHG_WORD, KI_COEFF_MED_CHG_OFFSET,
+	FG_PARAM(KI_COEFF_MED_CHG, KI_COEFF_MED_CHG_WORD, KI_COEFF_MED_CHG_OFFSET,
 		1, 1000, 61035, 0, fg_encode_default, NULL),
-	PARAM(KI_COEFF_HI_CHG, KI_COEFF_HI_CHG_WORD, KI_COEFF_HI_CHG_OFFSET, 1,
+	FG_PARAM(KI_COEFF_HI_CHG, KI_COEFF_HI_CHG_WORD, KI_COEFF_HI_CHG_OFFSET, 1,
 		1000, 61035, 0, fg_encode_default, NULL),
-	PARAM(KI_COEFF_LO_MED_CHG_THR, KI_COEFF_LO_MED_CHG_THR_WORD,
+	FG_PARAM(KI_COEFF_LO_MED_CHG_THR, KI_COEFF_LO_MED_CHG_THR_WORD,
 		KI_COEFF_LO_MED_CHG_THR_OFFSET, 1, 1000, 15625, 0,
 		fg_encode_default, NULL),
-	PARAM(KI_COEFF_MED_HI_CHG_THR, KI_COEFF_MED_HI_CHG_THR_WORD,
+	FG_PARAM(KI_COEFF_MED_HI_CHG_THR, KI_COEFF_MED_HI_CHG_THR_WORD,
 		KI_COEFF_MED_HI_CHG_THR_OFFSET, 1, 1000, 15625, 0,
 		fg_encode_default, NULL),
-	PARAM(SLOPE_LIMIT, SLOPE_LIMIT_WORD, SLOPE_LIMIT_OFFSET, 1, 8192,
+	FG_PARAM(SLOPE_LIMIT, SLOPE_LIMIT_WORD, SLOPE_LIMIT_OFFSET, 1, 8192,
 		1000000, 0, fg_encode_default, NULL),
-	PARAM(BATT_TEMP_COLD, BATT_TEMP_CONFIG_WORD, BATT_TEMP_COLD_OFFSET, 1,
+	FG_PARAM(BATT_TEMP_COLD, BATT_TEMP_CONFIG_WORD, BATT_TEMP_COLD_OFFSET, 1,
 		1, 1, 0, fg_encode_default, NULL),
-	PARAM(BATT_TEMP_HOT, BATT_TEMP_CONFIG_WORD, BATT_TEMP_HOT_OFFSET, 1,
+	FG_PARAM(BATT_TEMP_HOT, BATT_TEMP_CONFIG_WORD, BATT_TEMP_HOT_OFFSET, 1,
 		1, 1, 0, fg_encode_default, NULL),
-	PARAM(ESR_CAL_SOC_MIN, BATT_TEMP_CONFIG2_WORD, ESR_CAL_SOC_MIN_OFFSET,
+	FG_PARAM(ESR_CAL_SOC_MIN, BATT_TEMP_CONFIG2_WORD, ESR_CAL_SOC_MIN_OFFSET,
 		1, 1, 1, 0, fg_encode_default, NULL),
-	PARAM(ESR_CAL_SOC_MAX, ESR_CAL_THRESH_WORD, ESR_CAL_SOC_MAX_OFFSET,
+	FG_PARAM(ESR_CAL_SOC_MAX, ESR_CAL_THRESH_WORD, ESR_CAL_SOC_MAX_OFFSET,
 		1, 1, 1, 0, fg_encode_default, NULL),
-	PARAM(ESR_CAL_TEMP_MIN, ESR_CAL_THRESH_WORD, ESR_CAL_TEMP_MIN_OFFSET,
+	FG_PARAM(ESR_CAL_TEMP_MIN, ESR_CAL_THRESH_WORD, ESR_CAL_TEMP_MIN_OFFSET,
 		1, 1, 1, 0, fg_encode_default, NULL),
-	PARAM(ESR_CAL_TEMP_MAX, ESR_PULSE_THRESH_WORD, ESR_CAL_TEMP_MAX_OFFSET,
+	FG_PARAM(ESR_CAL_TEMP_MAX, ESR_PULSE_THRESH_WORD, ESR_CAL_TEMP_MAX_OFFSET,
 		1, 1, 1, 0, fg_encode_default, NULL),
 };
 
@@ -1419,14 +1419,10 @@ static int fg_gen4_adjust_ki_coeff_full_soc(struct fg_gen4_chip *chip,
 						int batt_temp)
 {
 	struct fg_dev *fg = &chip->fg;
-	int rc, ki_coeff_full_soc_norm, ki_coeff_full_soc_low;
+	int rc, ki_coeff_full_soc_norm = 0, ki_coeff_full_soc_low = 0;
 	u8 val;
 
-	if ((batt_temp < 0) ||
-		(fg->charge_status == POWER_SUPPLY_STATUS_DISCHARGING)) {
-		ki_coeff_full_soc_norm = 0;
-		ki_coeff_full_soc_low = 0;
-	} else if (fg->charge_status == POWER_SUPPLY_STATUS_CHARGING) {
+	if ((batt_temp >= 0) || fg->charge_status == POWER_SUPPLY_STATUS_CHARGING) {
 		ki_coeff_full_soc_norm = chip->dt.ki_coeff_full_soc_dischg[0];
 		ki_coeff_full_soc_low = chip->dt.ki_coeff_full_soc_dischg[1];
 	}
@@ -1639,6 +1635,78 @@ static int fg_gen4_rapid_soc_config(struct fg_gen4_chip *chip, bool en)
 	return 0;
 }
 
+static int fg_read_range_data_from_node(struct device_node *node,
+		const char *prop_str, struct range_data *ranges,
+		int max_threshold, u32 max_value)
+{
+	int rc = 0, i, length, per_tuple_length, tuples;
+
+	if (!node || !prop_str || !ranges) {
+		pr_err("Invalid parameters passed\n");
+		return -EINVAL;
+	}
+
+	rc = of_property_count_elems_of_size(node, prop_str, sizeof(u32));
+	if (rc < 0) {
+		pr_err("Count %s failed, rc=%d\n", prop_str, rc);
+		return rc;
+	}
+
+	length = rc;
+	per_tuple_length = sizeof(struct range_data) / sizeof(u32);
+	if (length % per_tuple_length) {
+		pr_err("%s length (%d) should be multiple of %d\n",
+				prop_str, length, per_tuple_length);
+		return -EINVAL;
+	}
+	tuples = length / per_tuple_length;
+
+	if (tuples > MAX_STEP_CHG_ENTRIES) {
+		pr_err("too many entries(%d), only %d allowed\n",
+				tuples, MAX_STEP_CHG_ENTRIES);
+		return -EINVAL;
+	}
+
+	rc = of_property_read_u32_array(node, prop_str,
+			(u32 *)ranges, length);
+	if (rc) {
+		pr_err("Read %s failed, rc=%d\n", prop_str, rc);
+		return rc;
+	}
+
+	for (i = 0; i < tuples; i++) {
+		if (ranges[i].low_threshold >
+				ranges[i].high_threshold) {
+			pr_err("%s thresholds should be in ascendant ranges\n",
+						prop_str);
+			rc = -EINVAL;
+			goto clean;
+		}
+
+		if (i != 0) {
+			if (ranges[i - 1].high_threshold >
+					ranges[i].low_threshold) {
+				pr_err("%s thresholds should be in ascendant ranges\n",
+							prop_str);
+				rc = -EINVAL;
+				goto clean;
+			}
+		}
+
+		if (ranges[i].low_threshold > max_threshold)
+			ranges[i].low_threshold = max_threshold;
+		if (ranges[i].high_threshold > max_threshold)
+			ranges[i].high_threshold = max_threshold;
+		if (ranges[i].value > max_value)
+			ranges[i].value = max_value;
+	}
+
+	return rc;
+clean:
+	memset(ranges, 0, tuples * sizeof(struct range_data));
+	return rc;
+}
+
 static int qpnp_fg_gen4_get_step_charging_params(struct fg_gen4_chip *chip,
 					struct device_node *profile_node)
 {
@@ -1675,7 +1743,7 @@ static int qpnp_fg_gen4_get_step_charging_params(struct fg_gen4_chip *chip,
 			return -ENOMEM;
 		}
 
-		rc = read_range_data_from_node(profile_node,
+		rc = fg_read_range_data_from_node(profile_node,
 				"qcom,step-chg-ranges",
 				chip->ttf->step_chg_cfg,
 				fg->bp.float_volt_uv,
@@ -2494,7 +2562,7 @@ static void get_batt_psy_props(struct fg_dev *fg)
 {
 	struct fg_gen4_chip *chip = container_of(fg, struct fg_gen4_chip, fg);
 	union power_supply_propval prop = {0, };
-	int rc;
+	int rc, val = 0;
 
 	if (!batt_psy_initialized(fg))
 		return;
@@ -2515,14 +2583,13 @@ static void get_batt_psy_props(struct fg_dev *fg)
 	}
 
 	fg->charge_type = prop.intval;
-	rc = power_supply_get_property(fg->batt_psy,
-			POWER_SUPPLY_PROP_CHARGE_DONE, &prop);
+	rc = fg_gen4_read_iio_chan(chip, CHARGE_DONE, &val);
 	if (rc < 0) {
 		pr_err("Error in getting charge_done, rc=%d\n", rc);
 		return;
 	}
 
-	fg->charge_done = prop.intval;
+	fg->charge_done = val;
 	rc = power_supply_get_property(fg->batt_psy, POWER_SUPPLY_PROP_HEALTH,
 		&prop);
 	if (rc < 0) {
@@ -2533,18 +2600,17 @@ static void get_batt_psy_props(struct fg_dev *fg)
 	fg->health = prop.intval;
 
 	if (!chip->recharge_soc_thr) {
-		rc = power_supply_get_property(fg->batt_psy,
-			POWER_SUPPLY_PROP_RECHARGE_SOC, &prop);
+		rc = fg_gen4_read_iio_chan(chip, RECHARGE_SOC, &val);
 		if (rc < 0) {
 			pr_err("Error in getting recharge SOC, rc=%d\n", rc);
 			return;
 		}
 
-		if (prop.intval < 0)
+		if (val < 0)
 			pr_debug("Recharge SOC not configured %d\n",
-				prop.intval);
+				val);
 		else
-			chip->recharge_soc_thr = prop.intval;
+			chip->recharge_soc_thr = val;
 	}
 }
 
@@ -2691,15 +2757,14 @@ static int fg_gen4_configure_full_soc(struct fg_dev *fg, int bsoc)
 
 static int fg_gen4_set_recharge_soc(struct fg_dev *fg, int recharge_soc)
 {
-	union power_supply_propval prop = {0, };
-	int rc;
+	struct fg_gen4_chip *chip = container_of(fg, struct fg_gen4_chip, fg);
+	int rc, val = 0;
 
-	if (recharge_soc < 0 || recharge_soc > FULL_CAPACITY || !fg->batt_psy)
+	if (recharge_soc < 0 || recharge_soc > FULL_CAPACITY || !chip)
 		return 0;
 
-	prop.intval = recharge_soc;
-	rc = power_supply_set_property(fg->batt_psy,
-		POWER_SUPPLY_PROP_RECHARGE_SOC, &prop);
+	val = recharge_soc;
+	rc = fg_gen4_write_iio_chan(chip, RECHARGE_SOC, val);
 	if (rc < 0) {
 		pr_err("Error in setting recharge SOC, rc=%d\n", rc);
 		return rc;
@@ -2805,8 +2870,7 @@ static int fg_gen4_adjust_recharge_soc(struct fg_gen4_chip *chip)
 static int fg_gen4_charge_full_update(struct fg_dev *fg)
 {
 	struct fg_gen4_chip *chip = container_of(fg, struct fg_gen4_chip, fg);
-	union power_supply_propval prop = {0, };
-	int rc, msoc, bsoc, recharge_soc, msoc_raw;
+	int rc, msoc, bsoc, recharge_soc, msoc_raw, val = 0;
 
 	if (!chip->dt.hold_soc_while_full)
 		return 0;
@@ -2817,14 +2881,13 @@ static int fg_gen4_charge_full_update(struct fg_dev *fg)
 	mutex_lock(&fg->charge_full_lock);
 	vote(fg->delta_bsoc_irq_en_votable, DELTA_BSOC_IRQ_VOTER,
 		fg->charge_done, 0);
-	rc = power_supply_get_property(fg->batt_psy,
-		POWER_SUPPLY_PROP_RECHARGE_SOC, &prop);
+	rc = fg_gen4_read_iio_chan(chip, RECHARGE_SOC, &val);
 	if (rc < 0) {
 		pr_err("Error in getting recharge_soc, rc=%d\n", rc);
 		goto out;
 	}
 
-	recharge_soc = prop.intval;
+	recharge_soc = val;
 	recharge_soc = DIV_ROUND_CLOSEST(recharge_soc * FULL_SOC_RAW,
 				FULL_CAPACITY);
 	rc = fg_get_sram_prop(fg, FG_SRAM_BATT_SOC, &bsoc);
@@ -2896,17 +2959,17 @@ out:
 static int fg_gen4_esr_fcc_config(struct fg_gen4_chip *chip)
 {
 	struct fg_dev *fg = &chip->fg;
-	int rc, val = 0;
+	int rc, val1 = 0;
 	bool parallel_en = false, cp_en = false, qnovo_en, esr_fcc_ctrl_en;
 	u8 val, mask;
 
 	if (is_parallel_charger_available(fg)) {
-		rc = fg_gen4_read_iio_chan(chip, PARALLEL_CHARGING_ENABLED, &val);
+		rc = fg_gen4_read_iio_chan(chip, PARALLEL_CHARGING_ENABLED, &val1);
 		if (rc < 0)
 			pr_err_ratelimited("Error in reading parallel_charging_enabled, rc=%d\n",
 				rc);
 		else
-			parallel_en = val;
+			parallel_en = val1;
 	}
 
 	if (chip->cp_disable_votable)
@@ -4048,7 +4111,7 @@ static void status_change_work(struct work_struct *work)
 	struct fg_dev *fg = container_of(work,
 			struct fg_dev, status_change_work);
 	struct fg_gen4_chip *chip = container_of(fg, struct fg_gen4_chip, fg);
-	int rc, batt_soc, batt_temp, val = 0;
+	int rc, batt_soc, batt_temp;
 	bool input_present, qnovo_en;
 	u32 batt_soc_cp;
 
@@ -4387,7 +4450,7 @@ static int fg_gen4_iio_read_raw(struct iio_dev *indio_dev,
 	case PSY_IIO_ESR_ACTUAL:
 		*val1 = chip->esr_actual;
 		break;
-	case PPSY_IIO_ESR_NOMINAL:
+	case PSY_IIO_ESR_NOMINAL:
 		*val1 = chip->esr_nominal;
 		break;
 	case PSY_IIO_VOLTAGE_OCV:
@@ -4406,7 +4469,7 @@ static int fg_gen4_iio_read_raw(struct iio_dev *indio_dev,
 		rc = fg_gen4_get_charge_raw(chip, val1);
 		break;
 	case PSY_IIO_CHARGE_NOW:
-		val1 = chip->cl->init_cap_uah;
+		*val1 = chip->cl->init_cap_uah;
 		break;
 	case PSY_IIO_CHARGE_FULL:
 		rc = fg_gen4_get_learned_capacity(chip, &temp);
@@ -4421,7 +4484,7 @@ static int fg_gen4_iio_read_raw(struct iio_dev *indio_dev,
 	case PSY_IIO_CHARGE_COUNTER:
 		rc = fg_gen4_get_charge_counter(chip, val1);
 		break;
-	case PPSY_IIO_CHARGE_COUNTER_SHADOW:
+	case PSY_IIO_CHARGE_COUNTER_SHADOW:
 		rc = fg_gen4_get_charge_counter_shadow(chip, val1);
 		break;
 	case PSY_IIO_CYCLE_COUNT:
@@ -4436,7 +4499,7 @@ static int fg_gen4_iio_read_raw(struct iio_dev *indio_dev,
 	case PSY_IIO_SOH:
 		*val1 = chip->soh;
 		break;
-	case PSYPSY_IIO_CONSTANT_CHARGE_VOLTAGE:
+	case PSY_IIO_CONSTANT_CHARGE_VOLTAGE:
 		rc = fg_get_sram_prop(fg, FG_SRAM_VBATT_FULL, val1);
 		break;
 	case PSY_IIO_TIME_TO_FULL_AVG:
@@ -4472,10 +4535,10 @@ static int fg_gen4_iio_read_raw(struct iio_dev *indio_dev,
 		rc = fg_gen4_get_power(chip, val1, false);
 		break;
 	case PSY_IIO_POWER_AVG:
-		rc = fg_gen4_get_power(chip, &al1, true);
+		rc = fg_gen4_get_power(chip, val1, true);
 		break;
 	case PSY_IIO_CALIBRATE:
-		val1 = chip->calib_level;
+		*val1 = chip->calib_level;
 		break;
 	default:
 		pr_err("unsupported property %d\n", chan->channel);
@@ -4491,7 +4554,7 @@ static int fg_gen4_iio_read_raw(struct iio_dev *indio_dev,
 
 static int fg_gen4_iio_write_raw(struct iio_dev *indio_dev,
 		struct iio_chan_spec const *chan, int val1,
-		int val2, long mask)
+		int val2, long mask1)
 {
 	struct fg_gen4_chip *chip = iio_priv(indio_dev);
 	struct fg_dev *fg = &chip->fg;
@@ -4529,8 +4592,7 @@ static int fg_gen4_iio_write_raw(struct iio_dev *indio_dev,
 		if ((val1 >= 0) && (val1 < MAX_CC_STEPS)) {
 			chip->ttf->cc_step.sel = val1;
 		} else {
-			pr_err("cc_step_sel is out of bounds [0, %d]\n",
-				pval->intval);
+			pr_err("cc_step_sel is out of bounds [0, %d]\n", val1);
 			return -EINVAL;
 		}
 		break;
@@ -4578,7 +4640,7 @@ static int fg_gen4_iio_write_raw(struct iio_dev *indio_dev,
 	return rc;
 }
 
-static int fg_gen3_iio_of_xlate(struct iio_dev *indio_dev,
+static int fg_gen4_iio_of_xlate(struct iio_dev *indio_dev,
 				const struct of_phandle_args *iiospec)
 {
 	struct fg_gen4_chip *chip = iio_priv(indio_dev);
@@ -5802,7 +5864,7 @@ static int fg_gen4_init_iio_psy(struct fg_gen4_chip *chip,
 	struct iio_dev *indio_dev = chip->indio_dev;
 	struct iio_chan_spec *chan;
 	struct fg_dev *fg = &chip->fg;
-	int fg_gen3_num_iio_channels = ARRAY_SIZE(fg_gen4_iio_psy_channels);
+	int fg_gen4_num_iio_channels = ARRAY_SIZE(fg_gen4_iio_psy_channels);
 	int rc, i;
 
 	chip->iio_chan = devm_kcalloc(fg->dev, fg_gen4_num_iio_channels,
