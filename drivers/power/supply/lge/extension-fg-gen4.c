@@ -205,7 +205,7 @@ static int get_batt_temp_current(struct fg_dev *fg)
 			POWER_SUPPLY_PROP_STATUS_RAW, &val)
 				&& val.intval == POWER_SUPPLY_STATUS_CHARGING) {
 		if (!power_supply_get_property(fg->usb_psy,
-				POWER_SUPPLY_PROP_REAL_TYPE, &val)) {
+				POWER_SUPPLY_PROP_EXT_REAL_TYPE, &val)) {
 
 			if (val.intval == POWER_SUPPLY_TYPE_USB_HVDCP ||
 				val.intval == POWER_SUPPLY_TYPE_USB_HVDCP_3 ||
@@ -567,13 +567,13 @@ fginfo_snapshot_inputnow(int* vusb, int* iusb, int* vwlc, int* iwlc, int* aicl)
 	union power_supply_propval val = { 0, };
 
 	*aicl = (psy_main && !power_supply_get_property(
-			psy_main, POWER_SUPPLY_PROP_INPUT_CURRENT_SETTLED, &val))
+			psy_main, POWER_SUPPLY_PROP_EXT_INPUT_CURRENT_SETTLED, &val))
 				? val.intval/1000 : LGE_FG_INITVAL;
 	*vusb = (psy_usb && !power_supply_get_property(
 			psy_usb, POWER_SUPPLY_PROP_VOLTAGE_NOW, &val))
 				? val.intval/1000 : LGE_FG_INITVAL;
 	*iusb = (psy_usb && !power_supply_get_property(
-			psy_usb, POWER_SUPPLY_PROP_INPUT_CURRENT_NOW, &val))
+			psy_usb, POWER_SUPPLY_PROP_CURRENT_NOW, &val))
 				? val.intval/1000 : LGE_FG_INITVAL;
 	*vwlc = (psy_dc && !power_supply_get_property(
 			psy_dc, POWER_SUPPLY_PROP_VOLTAGE_NOW, &val))
@@ -658,10 +658,10 @@ static void fginfo_snapshot_update(struct power_supply *psy)
 #define PROPERTY_BYPASS_REASON_NOENTRY	ENOENT
 #define PROPERTY_BYPASS_REASON_ONEMORE	EAGAIN
 
-static int wa_backup_bms_property[POWER_SUPPLY_PROP_CYCLE_COUNTS + 1];
+static int wa_backup_bms_property[PSY_IIO_CYCLE_COUNTS + 1];
 
 static enum power_supply_property extension_bms_appended [] = {
-	POWER_SUPPLY_PROP_UPDATE_NOW,
+	POWER_SUPPLY_PROP_UPDATE_UEVENT,
 	POWER_SUPPLY_PROP_CYCLE_COUNT,
 	POWER_SUPPLY_PROP_CAPACITY_ALERT_MIN, /* cl.skew coulomb count for qnovo */
 	POWER_SUPPLY_PROP_CAPACITY_ALERT_MAX, /* cl.skew ration for qnovo */
@@ -677,16 +677,13 @@ extension_bms_get_property_pre(struct power_supply *psy,
 	struct irq_desc* irq = irq_to_desc(fg->irqs[SOC_UPDATE_IRQ].irq);
 
 	switch (prop) {
-	case POWER_SUPPLY_PROP_RESISTANCE:
+	case POWER_SUPPLY_PROP_EXT_RESISTANCE:
 	case POWER_SUPPLY_PROP_VOLTAGE_OCV:
 	case POWER_SUPPLY_PROP_VOLTAGE_AVG:
-	case POWER_SUPPLY_PROP_CHARGE_NOW_RAW:
 	case POWER_SUPPLY_PROP_CHARGE_COUNTER:
-	case POWER_SUPPLY_PROP_CHARGE_COUNTER_SHADOW:
 	case POWER_SUPPLY_PROP_CONSTANT_CHARGE_VOLTAGE:
 	case POWER_SUPPLY_PROP_TIME_TO_FULL_AVG:
 	case POWER_SUPPLY_PROP_TIME_TO_EMPTY_AVG:
-	case POWER_SUPPLY_PROP_CC_SOC:
 	case POWER_SUPPLY_PROP_CURRENT_AVG:
 	case POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN:
 	case POWER_SUPPLY_PROP_POWER_NOW:
@@ -732,7 +729,7 @@ extension_bms_get_property_pre(struct power_supply *psy,
 		val->intval = rescale.rawsoc;
 		break;
 
-	case POWER_SUPPLY_PROP_UPDATE_NOW :
+	case POWER_SUPPLY_PROP_UPDATE_UEVENT :
 		/* Do nothing and just consume getting */
 		val->intval = -1;
 		break;
@@ -750,16 +747,13 @@ extension_bms_get_property_post(struct power_supply *psy,
 	enum power_supply_property prop, union power_supply_propval *val, int rc)
 {
 	switch (prop) {
-	case POWER_SUPPLY_PROP_RESISTANCE:
+	case POWER_SUPPLY_PROP_EXT_RESISTANCE:
 	case POWER_SUPPLY_PROP_VOLTAGE_OCV:
 	case POWER_SUPPLY_PROP_VOLTAGE_AVG:
-	case POWER_SUPPLY_PROP_CHARGE_NOW_RAW:
 	case POWER_SUPPLY_PROP_CHARGE_COUNTER:
-	case POWER_SUPPLY_PROP_CHARGE_COUNTER_SHADOW:
 	case POWER_SUPPLY_PROP_CONSTANT_CHARGE_VOLTAGE:
 	case POWER_SUPPLY_PROP_TIME_TO_FULL_AVG:
 	case POWER_SUPPLY_PROP_TIME_TO_EMPTY_AVG:
-	case POWER_SUPPLY_PROP_CC_SOC:
 	case POWER_SUPPLY_PROP_CURRENT_AVG:
 	case POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN:
 	case POWER_SUPPLY_PROP_POWER_NOW:
@@ -771,57 +765,6 @@ extension_bms_get_property_post(struct power_supply *psy,
 		break;
 	}
 
-	return rc;
-}
-
-static int
-extension_bms_set_property_pre(struct power_supply *psy,
-	enum power_supply_property prop, const union power_supply_propval *val)
-{
-	int* fakeset = NULL;
-	int  rc = PROPERTY_CONSUMED_WITH_SUCCESS;
-	struct fg_dev* fg = power_supply_get_drvdata(psy);
-	struct fg_gen4_chip *chip = container_of(fg, struct fg_gen4_chip, fg);
-
-	switch (prop) {
-	case POWER_SUPPLY_PROP_UPDATE_NOW :
-		if (val->intval)
-			fginfo_snapshot_update(psy);
-		break;
-
-	case POWER_SUPPLY_PROP_TEMP :
-		fakeset = &fake.temperature;
-		break;
-	case POWER_SUPPLY_PROP_CAPACITY :
-		fakeset = &fake.capacity;
-		break;
-	case POWER_SUPPLY_PROP_VOLTAGE_NOW :
-		fakeset = &fake.uvoltage;
-		break;
-
-	case POWER_SUPPLY_PROP_CAPACITY_ALERT_MIN : /* cl.skew coulomb count for qnovo */
-		chip->cl->dt.skew_cc = val->intval;
-		break;
-	case POWER_SUPPLY_PROP_CAPACITY_ALERT_MAX : /* cl.skew ration for qnovo */
-		chip->cl->dt.skew_decipct = val->intval;
-		break;
-
-	default:
-		rc = -PROPERTY_BYPASS_REASON_NOENTRY;
-	}
-
-	if (fakeset && *fakeset != val->intval) {
-		*fakeset = val->intval;
-		power_supply_changed(fg->batt_psy);
-	}
-
-	return rc;
-}
-
-static int
-extension_bms_set_property_post(struct power_supply *psy,
-	enum power_supply_property prop, const union power_supply_propval *val, int rc)
-{
 	return rc;
 }
 
@@ -856,41 +799,9 @@ static int extension_bms_get_property(struct power_supply *psy,
 	int rc = extension_bms_get_property_pre(psy, prop, val);
 	if (rc == -PROPERTY_BYPASS_REASON_NOENTRY
 		|| rc == -PROPERTY_BYPASS_REASON_ONEMORE)
-		rc = fg_psy_get_property(psy, prop, val);
+		rc = fg_gen4_psy_get_property(psy, prop, val);
 	rc = extension_bms_get_property_post(psy, prop, val, rc);
 
-	return rc;
-}
-
-static int extension_bms_set_property(struct power_supply *psy,
-	enum power_supply_property prop, const union power_supply_propval *val)
-{
-	int rc = extension_bms_set_property_pre(psy, prop, val);
-	if (rc == -PROPERTY_BYPASS_REASON_NOENTRY
-		|| rc == -PROPERTY_BYPASS_REASON_ONEMORE)
-		rc = fg_psy_set_property(psy, prop, val);
-	rc = extension_bms_set_property_post(psy, prop, val, rc);
-
-	return rc;
-}
-
-static int extension_bms_property_is_writeable(
-	struct power_supply *psy, enum power_supply_property prop)
-{
-	int rc;
-
-	switch (prop) {
-	case POWER_SUPPLY_PROP_TEMP:
-	case POWER_SUPPLY_PROP_CAPACITY:
-	case POWER_SUPPLY_PROP_UPDATE_NOW:
-	case POWER_SUPPLY_PROP_VOLTAGE_NOW:
-	case POWER_SUPPLY_PROP_CAPACITY_RAW:
-		rc = 1;
-		break;
-	default:
-		rc = fg_property_is_writeable(psy, prop);
-		break;
-	}
 	return rc;
 }
 

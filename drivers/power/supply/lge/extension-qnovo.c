@@ -4,6 +4,8 @@
  *
  **********************************************************/
 
+#include "smb5-iio.h"
+
 #define QNA_UNSAFETY_VOTER          "QNA_UNSAFETY_VOTER"
 #define CHG_PROBATION_VOTER         "QNI_PROBATION_VOTER"
 
@@ -110,6 +112,7 @@ struct _extension_qnovo {
 	struct delayed_work	rt_monitor_fcc_work;
 	struct delayed_work	pt_done_watchdog_work;
 	struct delayed_work	pt_start_watchdog_work;
+	struct smb_charger	chg;
 } ext_qnovo;
 
 struct _extension_qnovo_dt_props {
@@ -189,14 +192,14 @@ static bool is_wireless_available(void)
 static int set_fcc_compensation(int updown)
 {
 	int rc = 0;
-	union power_supply_propval pval = {0, };
+	struct smb_charger *chg = &ext_qnovo.chg;
+	int val;
 
 	if (!is_main_available())
 		return -EINVAL;
 
-	pval.intval = updown;
-	rc = power_supply_set_property(ext_qnovo.main_psy,
-			POWER_SUPPLY_PROP_FCC_DELTA, &pval);
+	val = updown;
+	rc = smb5_iio_set_prop(chg, PSY_IIO_FCC_DELTA, val);
 
 	return rc;
 }
@@ -256,7 +259,7 @@ static void input_ready_work(struct work_struct *work)
 		return;
 
 	rc = power_supply_get_property(ext_qnovo.me->usb_psy,
-			POWER_SUPPLY_PROP_REAL_TYPE, &pval);
+			POWER_SUPPLY_PROP_EXT_REAL_TYPE, &pval);
 	if (rc < 0 ||
 		pval.intval == POWER_SUPPLY_TYPE_USB ||
 		pval.intval == POWER_SUPPLY_TYPE_UNKNOWN ||
@@ -318,7 +321,7 @@ static void pt_start_watchdog_work(struct work_struct *work)
 
 		if (is_batt_available(ext_qnovo.me))
 			power_supply_set_property(ext_qnovo.me->batt_psy,
-				POWER_SUPPLY_PROP_DEBUG_BATTERY, &debug);
+				POWER_SUPPLY_PROP_EXT_DEBUG_BATTERY, &debug);
 
 		qnovo5_masked_write(ext_qnovo.me, QNOVO_PE_CTRL,
 			QNOVO_PTRAIN_EN_BIT, 0);
@@ -341,7 +344,7 @@ static void pt_done_watchdog_work(struct work_struct *work)
 
 	if (is_batt_available(ext_qnovo.me))
 		power_supply_set_property(ext_qnovo.me->batt_psy,
-			POWER_SUPPLY_PROP_DEBUG_BATTERY, &debug);
+			POWER_SUPPLY_PROP_EXT_DEBUG_BATTERY, &debug);
 
 	// fake interrupt
 	done_pt_manager(ext_qnovo.me);
@@ -397,7 +400,7 @@ static bool set_pt_manager(struct qnovo *chip, unsigned long en)
 	return true;
 }
 
-static int qnovo_skew_set()
+static int qnovo_skew_set(void)
 {
 	int rc = 0;
 	union power_supply_propval pval = {0, };
@@ -420,7 +423,7 @@ static int qnovo_skew_set()
 	return rc;
 }
 
-static int qnovo_skew_reset()
+static int qnovo_skew_reset(void)
 {
 	int rc = 0;
 	union power_supply_propval pval = {0, };
@@ -734,7 +737,8 @@ static int monitor_fcc(struct qnovo *chip)
 static int rt_qni_probation(struct qnovo *chip)
 {
 	int rc = -1;
-	union power_supply_propval pval = {0};
+	struct smb_charger *chg = &ext_qnovo.me->chg;
+	int val;
 
 	if (!is_main_available())
 		return -EINVAL;
@@ -754,32 +758,19 @@ static int rt_qni_probation(struct qnovo *chip)
 	}
 
 	/* current */
-	pval.intval = min(ext_qnovo.set_fcc, ext_dt.qni_probation_max_fcc);
-	if (pval.intval != ext_qnovo.set_fcc ) {
-	/* this code will make a problem when parallel charging.
-	 *
-	 *	rc = power_supply_set_property(ext_qnovo.main_psy,
-	 *			POWER_SUPPLY_PROP_CONSTANT_CHARGE_CURRENT_MAX, &pval);
-	 *	if (rc < 0) {
-	 *		pr_err("Couldn't set prop qnovo_fcc rc = %d\n", rc);
-	 *		return -EINVAL;
-	 *	}
-	 */
-	}
-	ext_qnovo.locked_fcc = pval.intval;
+	ext_qnovo.locked_fcc = min(ext_qnovo.set_fcc, ext_dt.qni_probation_max_fcc);
 
 	/* voltage */
-	pval.intval = ext_dt.qni_probation_min_fv;
-	pval.intval = min(chip->fv_uV_request, pval.intval);
-	if (pval.intval > 0 && (ext_qnovo.locked_fv != pval.intval)) {
-		rc = power_supply_set_property(ext_qnovo.me->batt_psy,
-				POWER_SUPPLY_PROP_VOLTAGE_QNOVO, &pval);
+	val = ext_dt.qni_probation_min_fv;
+	val = min(chip->fv_uV_request, val);
+	if (val > 0 && (ext_qnovo.locked_fv != val)) {
+		rc = smb5_iio_set_prop(chg, PSY_IIO_VOLTAGE_QNOVO, val);
 		if (rc < 0) {
 			pr_err("Couldn't set prop qnovo_fv rc = %d\n", rc);
 			return -EINVAL;
 		}
 	}
-	ext_qnovo.locked_fv = pval.intval;
+	ext_qnovo.locked_fv = val;
 
 	pr_info("[QNI-PROB] set run-time qni probation: "
 			"[fcc] now:%d, max:%d, sel:%d "
@@ -813,7 +804,8 @@ static void taper_confirm_work(struct work_struct *work)
 {
 	int rc = 0;
 	struct qnovo *chip = ext_qnovo.me;
-	union power_supply_propval pval = {0};
+	struct smb_charger *chg = &chip->chg;
+	int val;
 	union power_supply_propval chg_type = {0};
 
 	if (!is_batt_available(chip))
@@ -826,7 +818,7 @@ static void taper_confirm_work(struct work_struct *work)
 		return;
 	}
 
-	if (chg_type.intval == POWER_SUPPLY_CHARGE_TYPE_TAPER) {
+	if (chg_type.intval == POWER_SUPPLY_CHARGE_TYPE_ADAPTIVE) {
 		if (get_qps() == QPS_IN_RUNTIME
 			&& ext_qnovo.locked_fcc > ext_dt.qni_step_min_fcc) {
 
@@ -835,14 +827,13 @@ static void taper_confirm_work(struct work_struct *work)
 					ext_qnovo.locked_fcc/1000,
 					ext_qnovo.locked_fcc/1000-100);
 
-			pval.intval = ext_qnovo.locked_fcc - 100000;
-			rc = power_supply_set_property(chip->batt_psy,
-					POWER_SUPPLY_PROP_CURRENT_QNOVO, &pval);
+			val = ext_qnovo.locked_fcc - 100000;
+			rc = smb5_iio_set_prop(chg, PSY_IIO_CURRENT_QNOVO, val);
 			if (rc < 0) {
 				pr_err("Couldn't set prop qnovo_fcc rc = %d\n", rc);
 				return;
 			}
-			ext_qnovo.locked_fcc = pval.intval;
+			ext_qnovo.locked_fcc = val;
 		}
 		else if (get_qps() > QPS_PRE_DEFINED_WLC) {
 			set_qps(QPS_IN_CV_MODE);
@@ -879,7 +870,7 @@ static bool pred_usb_probation(struct qnovo *chip)
 
 	if(is_usb_available(chip)) {
 		rc = power_supply_get_property(chip->usb_psy,
-						POWER_SUPPLY_PROP_REAL_TYPE, &pval);
+						POWER_SUPPLY_PROP_EXT_REAL_TYPE, &pval);
 		if (rc < 0) {
 			pr_err("Couldn't get usb prop rc=%d\n", rc);
 			goto out;
@@ -989,7 +980,7 @@ static int override_qnovo5_update_status(struct qnovo *chip)
 		if (get_qps() < QPS_PRE_DEFINED_WLC)
 			goto out;
 
-		if (chg_type.intval == POWER_SUPPLY_CHARGE_TYPE_TAPER) {
+		if (chg_type.intval == POWER_SUPPLY_CHARGE_TYPE_ADAPTIVE) {
 			schedule_delayed_work(&ext_qnovo.taper_confirm_work,
 				msecs_to_jiffies(TAPER_CONFIRM_TIME));
 		}

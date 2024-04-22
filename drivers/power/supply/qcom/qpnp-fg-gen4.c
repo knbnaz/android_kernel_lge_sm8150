@@ -493,8 +493,6 @@ static struct power_supply_desc fg_psy_desc_extension;
 static enum power_supply_property* extension_bms_properties(void);
 static size_t extension_bms_num_properties(void);
 static int extension_bms_get_property(struct power_supply *psy, enum power_supply_property prop, union power_supply_propval *val);
-static int extension_bms_set_property(struct power_supply *psy, enum power_supply_property prop, const union power_supply_propval *val);
-static int extension_bms_property_is_writeable(struct power_supply *psy, enum power_supply_property prop);
 static struct device_node* extension_get_batt_profile(struct fg_dev *fg, struct device_node* container, int resistance_id);
 #endif
 static int lge_get_ui_soc(struct fg_dev *fg, int msoc_raw);
@@ -509,6 +507,7 @@ static int backup_to_cycle_counter(struct fg_dev *fg, struct cycle_counter *ori,
 #endif
 
 #define BID_VREF_MV	1875
+#ifndef CONFIG_LGE_PM
 static int fg_get_batt_id_adc(struct fg_gen4_chip *chip, u32 *batt_id_ohms)
 {
 	int rc, batt_id_mv;
@@ -539,6 +538,7 @@ static int fg_get_batt_id_adc(struct fg_gen4_chip *chip, u32 *batt_id_ohms)
 
 	return 0;
 }
+#endif
 
 #define MAX_BIAS_CODE	0x70E4
 static int fg_gen4_get_batt_id(struct fg_gen4_chip *chip)
@@ -3575,7 +3575,7 @@ static irqreturn_t fg_delta_esr_irq_handler(int irq, void *data)
 		irq, esr_uohms/1000, esr_uohms%1000);
 #else
 	fg_dbg(fg, FG_IRQ, "irq %d triggered esr_uohms: %d\n", irq, esr_uohms);
-#enif
+#endif
 
 	if (chip->esr_fast_calib) {
 		vote(fg->awake_votable, ESR_CALIB, true, 0);
@@ -6479,8 +6479,6 @@ static int fg_gen4_probe(struct platform_device *pdev)
 	fg_psy_desc_extension.properties = extension_bms_properties();
 	fg_psy_desc_extension.num_properties = extension_bms_num_properties();
 	fg_psy_desc_extension.get_property = extension_bms_get_property;
-	fg_psy_desc_extension.set_property = extension_bms_set_property;
-	fg_psy_desc_extension.property_is_writeable = extension_bms_property_is_writeable;
 
 	fg->fg_psy = devm_power_supply_register(fg->dev, &fg_psy_desc_extension,
 			&fg_psy_cfg);
