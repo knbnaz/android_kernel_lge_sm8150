@@ -22,7 +22,6 @@
 #include <linux/power_supply.h>
 #include <linux/platform_device.h>
 #include <linux/qti_power_supply.h>
-#include <dt-bindings/iio/qti_power_supply_iio.h>
 
 #include "veneer-primitives.h"
 
@@ -285,7 +284,7 @@ static void update_veneer_supplier(struct veneer* veneer_me)
 		psy = get_psy_usb(veneer_me);
 		if (psy) {
 			val.intval = veneer_me->usbin_realtype;
-			pr_dbg_veneer("PSY_IIO_USB_REAL_TYPE = %d\n", val.intval);
+			pr_dbg_veneer("POWER_SUPPLY_PROP_EXT_REAL_TYPE = %d\n", val.intval);
 
 			switch (val.intval) {
 			case POWER_SUPPLY_TYPE_USB_FLOAT :
@@ -592,8 +591,8 @@ static const char* psy_property_name(enum power_supply_property prop)
 		return "POWER_SUPPLY_PROP_STATUS";
 	case POWER_SUPPLY_PROP_HEALTH :
 		return "POWER_SUPPLY_PROP_HEALTH";
-	case PSY_IIO_USB_REAL_TYPE :
-		return "PSY_IIO_USB_REAL_TYPE";
+	case POWER_SUPPLY_PROP_EXT_REAL_TYPE :
+		return "POWER_SUPPLY_PROP_EXT_REAL_TYPE";
 	case POWER_SUPPLY_PROP_TIME_TO_FULL_NOW:
 		return "POWER_SUPPLY_PROP_TIME_TO_FULL_NOW";
 	case POWER_SUPPLY_PROP_EXT_INPUT_CURRENT_SETTLED:
@@ -672,7 +671,7 @@ static int psy_property_get(
 		}
 		break;
 
-	case PSY_IIO_USB_REAL_TYPE :
+	case POWER_SUPPLY_PROP_EXT_REAL_TYPE :
 		val->intval = veneer_me->presence_wireless
 			? POWER_SUPPLY_TYPE_WIRELESS : veneer_me->usbin_realtype;
 		break;
@@ -707,11 +706,11 @@ static int psy_property_set(
  */
 	switch (prop) {
 
-/* 'veneer_me->set_property(PSY_IIO_USB_REAL_TYPE, real_type)'
+/* 'veneer_me->set_property(POWER_SUPPLY_PROP_EXT_REAL_TYPE, real_type)'
  *   is designed veneer to accept the real charger type enumerated
  *   from charger driver.
  */
-	case PSY_IIO_USB_REAL_TYPE :
+	case POWER_SUPPLY_PROP_EXT_REAL_TYPE :
 		switch (val->intval) {
 		case POWER_SUPPLY_TYPE_USB_FLOAT :
 			if (veneer_me->veneer_supplier != CHARGING_SUPPLY_TYPE_FLOAT)
@@ -823,7 +822,7 @@ static void psy_external_changed(struct power_supply* psy_me)
 	if (psy_batt) {
 		/* Update eoc */
 		if (!power_supply_get_property(
-				psy_batt, PSY_IIO_CHARGE_DONE, &buffer))
+				psy_batt, POWER_SUPPLY_PROP_EXT_CHARGE_DONE, &buffer))
 		{
 			/* 'terminated' is true only when
 			 *    1. CHARGE_DONE and
@@ -890,7 +889,7 @@ static void psy_external_changed(struct power_supply* psy_me)
 		if (veneer_me->presence_usb
 			&& !veneer_me->usbin_typefix
 			&& !power_supply_get_property(
-				psy_usb, PSY_IIO_USB_REAL_TYPE, &buffer)
+				psy_usb, POWER_SUPPLY_PROP_EXT_REAL_TYPE, &buffer)
 			&& buffer.intval != veneer_me->usbin_realtype
 			&& buffer.intval != POWER_SUPPLY_TYPE_UNKNOWN) {
 			// Changing wired status to UNKNOWN is skipped
@@ -947,7 +946,7 @@ static void psy_external_changed(struct power_supply* psy_me)
 		if (veneer_me->presence_wireless
 			&& veneer_me->battery_eoc
 			&& power_supply_set_property(psy_wireless,
-			PSY_IIO_CHARGE_DONE, &buffer)) {
+			POWER_SUPPLY_PROP_EXT_CHARGE_DONE, &buffer)) {
 			pr_veneer("Error to set full wireless : %d\n", buffer.intval);
 		}
 	}

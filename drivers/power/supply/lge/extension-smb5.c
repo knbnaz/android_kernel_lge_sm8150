@@ -176,6 +176,10 @@ static void debug_polling(struct smb_charger* chg) {
 			psy_wireless ? atomic_read(&psy_wireless->use_cnt) : 0);
 	}
 
+	val.intval = LOGGING_ON_BMS;
+	if (chg->bms_psy)
+		power_supply_set_property(chg->bms_psy, POWER_SUPPLY_PROP_UPDATE_UEVENT, &val);
+
 	pr_info("PMINFO: [VOT] IUSB:%d(%s), IBAT:%d(%s), IDC:%d(%s), FLOAT:%d(%s), CHDIS:%d(%s), PLDIS:%d(%s)\n",
 		capping_iusb,	get_effective_client(chg->usb_icl_votable),
 		capping_ibat,	get_effective_client(disabled_ibat ? chg->chg_disable_votable : chg->fcc_votable),
@@ -246,11 +250,15 @@ static void debug_polling(struct smb_charger* chg) {
 
 		int prll_chgen = !chg->pl.psy ? -2 : (!power_supply_get_property(chg->pl.psy,
 			POWER_SUPPLY_PROP_EXT_CHARGING_ENABLED, &val) ? !!val.intval : -1);
+		int prll_pinen = !chg->pl.psy ? -2 : (!smb5_iio_get_prop(chg,
+			PSY_IIO_PIN_ENABLED, &val.intval) ? !!val.intval : -1);
 		int prll_suspd = !chg->pl.psy ? -2 : (!power_supply_get_property(chg->pl.psy,
 			POWER_SUPPLY_PROP_EXT_INPUT_SUSPEND, &val) ? !!val.intval : -1);
 
 		int temp_pmi = smblib_get_prop_charger_temp(chg, &val.intval)
 			? val.intval : -1;
+		int temp_smb = !chg->pl.psy ? -2 : (!smb5_iio_get_prop(chg,
+			PSY_IIO_CHARGER_TEMP, &val.intval) ? val.intval : -1);
 		int iusb_now = smblib_get_prop_usb_current_now(chg, &val)
 			? val.intval/1000 : -1;
 		int iusb_set = !smblib_get_prop_input_current_settled(chg, &val)
@@ -259,6 +267,8 @@ static void debug_polling(struct smb_charger* chg) {
 			? val.intval/1000 : -1;
 		int ibat_pmi = !smblib_get_charge_param(chg, &chg->param.fcc, &val.intval)
 			? val.intval/1000 : 0;
+		int ibat_pmi_comp = (!smb5_iio_get_prop(chg,
+			PSY_IIO_FCC_DELTA, &val) ? val.intval : -1);
 		int ibat_smb = (prll_chgen <= 0) ? 0 : (!power_supply_get_property(chg->pl.psy,
 			POWER_SUPPLY_PROP_CONSTANT_CHARGE_CURRENT_MAX, &val) ? val.intval/1000 : -1);
 		int icl_override_aftapsd = (smblib_read(chg, USBIN_LOAD_CFG_REG, &reg) >= 0)
@@ -266,15 +276,15 @@ static void debug_polling(struct smb_charger* chg) {
 		int icl_override_usbmode = (smblib_read(chg, USBIN_ICL_OPTIONS_REG, &reg) >= 0)
 			? reg : -1;
 
-		pr_info("PMINFO: [USB] REAL:%s, VNOW:%d, TPMI:%d,"
+		pr_info("PMINFO: [USB] REAL:%s, VNOW:%d, TPMI:%d, TSMB:%d, "
 			"IUSB_N:%d, IUSB_S:%d, IUSB_C:%d, "
-			"IBAT_N:%d, IBAT_P:%d, IBAT_S:%d, IBAT_C:%d, "
-			"[PRL] CHGEN:%d, SUSPN:%d, "
+			"IBAT_N:%d, IBAT_P:%d(comp=%d), IBAT_S:%d, IBAT_C:%d, "
+			"[PRL] CHGEN:%d, PINEN:%d, SUSPN:%d, "
 			"[OVR] AFTAPSD:%d, USBMODE:0x%02x\n",
-			usb_real, usb_vnow, temp_pmi,
+			usb_real, usb_vnow, temp_pmi, temp_smb,
 			iusb_now, iusb_set, capping_iusb,
-			ibat_now, ibat_pmi, ibat_smb, capping_ibat,
-			prll_chgen, prll_suspd,
+			ibat_now, ibat_pmi, ibat_pmi_comp, ibat_smb, capping_ibat,
+			prll_chgen, prll_pinen, prll_suspd,
 			icl_override_aftapsd, icl_override_usbmode);
 	}
 	if (wireless_psy && presence_dc) { // On DC(Wireless) charging
@@ -497,6 +507,8 @@ static int restricted_charging_vfloat(struct smb_charger* chg, int mvalue) {
 			* to avoid bat-ov.
 			*/
 			uv_float = mvalue*1000;
+			rc |= power_supply_get_property(chg->bms_psy,
+				POWER_SUPPLY_PROP_VOLTAGE_OCV, &val);
 			uv_now = val.intval;
 			pr_debug("uv_now : %d\n", uv_now);
 			if (uv_now > uv_float
@@ -1025,7 +1037,7 @@ static bool moisture_detected = false;
 
 static int moisture_mode_on(struct smb_charger* chg) {
 	int rc;
-	union power_supply_propval val = {0, };
+	int val = 0;
 
 	if (moisture_charging == 0) {
 	// 1. change UVLO to 10.3v
@@ -1046,7 +1058,8 @@ static int moisture_mode_on(struct smb_charger* chg) {
 	}
 
 	// 4. TYPEC_PR_NONE for power role
-	val.intval = QTI_POWER_SUPPLY_TYPEC_PR_NONE;
+	val = QTI_POWER_SUPPLY_TYPEC_PR_NONE;
+	smb5_iio_set_prop(chg, PSY_IIO_TYPEC_POWER_ROLE, val);
 
 	// 5. disable Dp Dm
 	if (chg->dpdm_reg && regulator_is_enabled(chg->dpdm_reg)) {
@@ -1237,14 +1250,14 @@ static int charger_power_sdp(/*@Nonnull*/ struct power_supply* usb, int type) {
 	return power;
 }
 
-static int charger_power_pd(/*@Nonnull*/ struct power_supply* usb, int type) {
+static int charger_power_pd(/*@Nonnull*/ struct smb_charger* usb, int type) {
 	int voltage_mv, current_ma, power = 0;
 	union power_supply_propval buf = { .intval = 0, };
 
 	if (type == POWER_SUPPLY_TYPE_USB_PD) {
-		voltage_mv = !smb5_usb_get_prop(usb, POWER_SUPPLY_PROP_VOLTAGE_MAX, &buf)
+		voltage_mv = !smb5_iio_get_prop(usb, PSY_IIO_PD_VOLTAGE_MAX, &buf)
 			? buf.intval / 1000 : 0;
-		current_ma = !smb5_usb_get_prop(usb, POWER_SUPPLY_PROP_CURRENT_MAX, &buf)
+		current_ma = !smb5_iio_get_prop(usb, PSY_IIO_PD_CURRENT_MAX, &buf)
 			? buf.intval / 1000 : 0;
 
 		power = voltage_mv * current_ma;
@@ -1331,7 +1344,7 @@ static int usb_pcport_current(/*@Nonnull*/ struct smb_charger *chg, int req) {
 		if (req == USBIN_900MA) {
 			// Update veneer's supplier type to USB 3.x
 			val.intval = POWER_SUPPLY_TYPE_USB;
-			power_supply_set_property(veneer, PSY_IIO_USB_REAL_TYPE, &val);
+			power_supply_set_property(veneer, POWER_SUPPLY_PROP_EXT_REAL_TYPE, &val);
 		}
 		power_supply_get_property(veneer, POWER_SUPPLY_PROP_INPUT_CURRENT_LIMIT, &val);
 		power_supply_put(veneer);
@@ -1366,7 +1379,7 @@ static bool extension_usb_get_online(/*@Nonnull*/ struct power_supply *psy) {
 // Getting chg type from veneer
 	struct power_supply* veneer
 		= power_supply_get_by_name("veneer");
-	int chgtype = (veneer && !power_supply_get_property(veneer, PSY_IIO_USB_REAL_TYPE,
+	int chgtype = (veneer && !power_supply_get_property(veneer, POWER_SUPPLY_PROP_EXT_REAL_TYPE,
 		&val)) ? val.intval : POWER_SUPPLY_TYPE_UNKNOWN;
 // Pre-loading conditions
 	bool online = !smb5_usb_get_prop(psy, POWER_SUPPLY_PROP_ONLINE, &val)
@@ -1444,7 +1457,7 @@ static void extension_usb_set_pd_active(/*@Nonnull*/ struct smb_charger *chg, in
 
 	if (pd_active) {
 		if (veneer) {
-			power_supply_set_property(veneer, PSY_IIO_USB_REAL_TYPE, &pd);
+			power_supply_set_property(veneer, POWER_SUPPLY_PROP_EXT_REAL_TYPE, &pd);
 			power_supply_changed(veneer);
 			power_supply_put(veneer);
 		}
@@ -1490,7 +1503,7 @@ int extension_usb_get_property(struct power_supply *psy,
 
 	switch (psp) {
 	case POWER_SUPPLY_PROP_POWER_NOW :
-		if (!smb5_usb_get_prop(psy, PSY_IIO_USB_REAL_TYPE, val)) {
+		if (!smb5_usb_get_prop(psy, POWER_SUPPLY_PROP_EXT_REAL_TYPE, val)) {
 			if (fake_hvdcp_enable(chg, true) && fake_hvdcp_effected(chg))
 				val->intval = POWER_SUPPLY_TYPE_USB_HVDCP_3;
 
@@ -1507,7 +1520,7 @@ int extension_usb_get_property(struct power_supply *psy,
 					val->intval = charger_power_sdp(psy, val->intval);
 					break;
 				case POWER_SUPPLY_TYPE_USB_PD:		/* Power Delivery */
-					val->intval = charger_power_pd(psy, val->intval);
+					val->intval = charger_power_pd(chg, val->intval);
 					break;
 				case POWER_SUPPLY_TYPE_USB_FLOAT:	/* D+/D- are open but are not data lines */
 					val->intval = charger_power_float(psy, val->intval);
@@ -1549,10 +1562,6 @@ int extension_usb_get_property(struct power_supply *psy,
 
 	case POWER_SUPPLY_PROP_EXT_FAKE_HVDCP :
 		val->intval = fake_hvdcp_effected(chg);
-		return 0;
-
-	case PSY_IIO_MOISTURE_DETECTED :
-		val->intval = moisture_detected;
 		return 0;
 
 	case POWER_SUPPLY_PROP_EXT_TYPEC_MODE :
@@ -1611,9 +1620,6 @@ int extension_usb_set_property(struct power_supply* psy,
 		psy_usbid_update(chg);
 		return 0;
 
-	case PSY_IIO_MOISTURE_DETECTED :
-		return moisture_mode_command(chg, !!val->intval);
-
 	default:
 		break;
 	}
@@ -1627,7 +1633,6 @@ int extension_usb_property_is_writeable(struct power_supply *psy,
 
 	switch (psp) {
 	case POWER_SUPPLY_PROP_EXT_RESISTANCE :
-	case PSY_IIO_MOISTURE_DETECTED:
 		rc = 1;
 		break;
 
@@ -1651,7 +1656,7 @@ static bool extension_usb_port_get_online(/*@Nonnull*/ struct power_supply *psy)
 	union power_supply_propval val;
 	struct power_supply* veneer
 		= power_supply_get_by_name("veneer");
-	int  chgtype = (veneer && !power_supply_get_property(veneer, PSY_IIO_USB_REAL_TYPE,
+	int  chgtype = (veneer && !power_supply_get_property(veneer, POWER_SUPPLY_PROP_EXT_REAL_TYPE,
 		&val)) ? val.intval : POWER_SUPPLY_TYPE_UNKNOWN;
 	bool online = !smb5_usb_port_get_prop(psy, POWER_SUPPLY_PROP_ONLINE, &val)
 		? !!val.intval : false;

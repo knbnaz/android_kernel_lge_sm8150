@@ -3277,7 +3277,7 @@ static void enter_state_snk_startup(struct usbpd *pd)
 		pd->current_dr = DR_UFP;
 
 		ret = usbpd_get_psy_iio_property(pd,
-				PSY_IIO_USB_REAL_TYPE, &val);
+				POWER_SUPPLY_PROP_REAL_TYPE, &val);
 		if (!ret) {
 			usbpd_dbg(&pd->dev, "type:%d\n", val.intval);
 #ifdef CONFIG_LGE_USB
@@ -4541,8 +4541,8 @@ static void psy_changed_notifier_work(struct work_struct *w)
 	int pd_vpd_active;
 #endif
 
-	ret = power_supply_get_property(pd->usb_psy,
-			POWER_SUPPLY_PROP_EXT_TYPEC_MODE, &val);
+	ret = usbpd_get_psy_iio_property(pd,
+			POWER_SUPPLY_PROP_TYPEC_MODE, &val);
 	if (ret) {
 		usbpd_err(&pd->dev, "Unable to read USB TYPEC_MODE: %d\n", ret);
 		return;
@@ -4566,7 +4566,7 @@ static void psy_changed_notifier_work(struct work_struct *w)
 	if (!val.intval && !pd->pd_connected &&
 			typec_mode >= QTI_POWER_SUPPLY_TYPEC_SOURCE_DEFAULT) {
 		ret = usbpd_get_psy_iio_property(pd,
-				PSY_IIO_USB_REAL_TYPE, &val);
+				POWER_SUPPLY_PROP_REAL_TYPE, &val);
 		if (ret) {
 			usbpd_err(&pd->dev, "Unable to read USB TYPE: %d\n",
 					ret);
@@ -4610,7 +4610,7 @@ static void psy_changed_notifier_work(struct work_struct *w)
 
 #ifdef CONFIG_LGE_USB
 	ret = usbpd_get_psy_iio_property(pd,
-			PSY_IIO_USB_REAL_TYPE, &val);
+			POWER_SUPPLY_PROP_REAL_TYPE, &val);
 	if (ret) {
 		usbpd_err(&pd->dev, "Unable to read USB TYPE: %d\n",
 			  ret);

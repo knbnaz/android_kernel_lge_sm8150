@@ -391,7 +391,7 @@ static void wa_charging_for_unknown_cable_main(struct work_struct *unused) {
 	pd_hard_reset = chg->pd_hard_reset;
 	usb_type_unknown = chg->real_charger_type == POWER_SUPPLY_TYPE_UNKNOWN;
 	moisture_detected
-		= !power_supply_get_property(chg->usb_psy, PSY_IIO_MOISTURE_DETECTED, &val)
+		= !smb5_iio_get_prop(chg, PSY_IIO_MOISTURE_DETECTED, &val.intval)
 		? (val.intval == PSY_IIO_MOISTURE_DETECTED): false;
 	usb_vbus_high
 		= !power_supply_get_property(chg->usb_psy, POWER_SUPPLY_PROP_PRESENT, &val)
@@ -1231,11 +1231,13 @@ void wa_drop_vbus_on_eoc_trigger(struct smb_charger* chg) {
 			wa_drop_vbus_on_eoc_running = true;
 			pr_wa("Vbus is set to 5V on HVDCP2\n");
 			val.intval = QTI_POWER_SUPPLY_DP_DM_FORCE_5V;
+			smb5_iio_set_prop(chg, PSY_IIO_DP_DM, val.intval);
 		} else if (chg->real_charger_type == POWER_SUPPLY_TYPE_USB_HVDCP_3
 				&& chg->pulse_cnt) {
 			wa_drop_vbus_on_eoc_running = true;
 			pr_wa("Vbus is dropped on HVDCP3 (%d)\n", chg->pulse_cnt);
 			val.intval = QTI_POWER_SUPPLY_DP_DM_DM_PULSE;
+			smb5_iio_set_prop(chg, PSY_IIO_DP_DM, val.intval);
 		} else {
 			wa_drop_vbus_on_eoc_running = false;
 		}
@@ -1252,6 +1254,7 @@ void wa_drop_vbus_on_eoc_required(struct smb_charger* chg) {
 			&& chg->pulse_cnt) {
 		pr_wa("Vbus is dropped on HVDCP3 (%d)\n", chg->pulse_cnt);
 		val.intval = QTI_POWER_SUPPLY_DP_DM_DM_PULSE;
+		smb5_iio_set_prop(chg, PSY_IIO_DP_DM, val.intval);
 	}
 }
 
