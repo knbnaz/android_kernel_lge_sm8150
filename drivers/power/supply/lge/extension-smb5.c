@@ -176,10 +176,6 @@ static void debug_polling(struct smb_charger* chg) {
 			psy_wireless ? atomic_read(&psy_wireless->use_cnt) : 0);
 	}
 
-	val.intval = LOGGING_ON_BMS;
-	if (chg->bms_psy)
-		power_supply_set_property(chg->bms_psy, POWER_SUPPLY_PROP_UPDATE_UEVENT, &val);
-
 	pr_info("PMINFO: [VOT] IUSB:%d(%s), IBAT:%d(%s), IDC:%d(%s), FLOAT:%d(%s), CHDIS:%d(%s), PLDIS:%d(%s)\n",
 		capping_iusb,	get_effective_client(chg->usb_icl_votable),
 		capping_ibat,	get_effective_client(disabled_ibat ? chg->chg_disable_votable : chg->fcc_votable),
@@ -268,7 +264,7 @@ static void debug_polling(struct smb_charger* chg) {
 		int ibat_pmi = !smblib_get_charge_param(chg, &chg->param.fcc, &val.intval)
 			? val.intval/1000 : 0;
 		int ibat_pmi_comp = (!smb5_iio_get_prop(chg,
-			PSY_IIO_FCC_DELTA, &val) ? val.intval : -1);
+			PSY_IIO_FCC_DELTA, &val.intval) ? val.intval : -1);
 		int ibat_smb = (prll_chgen <= 0) ? 0 : (!power_supply_get_property(chg->pl.psy,
 			POWER_SUPPLY_PROP_CONSTANT_CHARGE_CURRENT_MAX, &val) ? val.intval/1000 : -1);
 		int icl_override_aftapsd = (smblib_read(chg, USBIN_LOAD_CFG_REG, &reg) >= 0)
@@ -507,8 +503,6 @@ static int restricted_charging_vfloat(struct smb_charger* chg, int mvalue) {
 			* to avoid bat-ov.
 			*/
 			uv_float = mvalue*1000;
-			rc |= power_supply_get_property(chg->bms_psy,
-				POWER_SUPPLY_PROP_VOLTAGE_OCV, &val);
 			uv_now = val.intval;
 			pr_debug("uv_now : %d\n", uv_now);
 			if (uv_now > uv_float
@@ -1255,9 +1249,9 @@ static int charger_power_pd(/*@Nonnull*/ struct smb_charger* usb, int type) {
 	union power_supply_propval buf = { .intval = 0, };
 
 	if (type == POWER_SUPPLY_TYPE_USB_PD) {
-		voltage_mv = !smb5_iio_get_prop(usb, PSY_IIO_PD_VOLTAGE_MAX, &buf)
+		voltage_mv = !smb5_iio_get_prop(usb, PSY_IIO_PD_VOLTAGE_MAX, &buf.intval)
 			? buf.intval / 1000 : 0;
-		current_ma = !smb5_iio_get_prop(usb, PSY_IIO_PD_CURRENT_MAX, &buf)
+		current_ma = !smb5_iio_get_prop(usb, PSY_IIO_PD_CURRENT_MAX, &buf.intval)
 			? buf.intval / 1000 : 0;
 
 		power = voltage_mv * current_ma;

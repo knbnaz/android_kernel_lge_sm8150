@@ -627,7 +627,7 @@ static int psy_property_set(struct power_supply* psy,
 	struct idtp9222_struct* idtp9222 = power_supply_get_drvdata(psy);
 
 	switch (prop) {
-	case POWER_SUPPLY_PROP_EXT_CHARGE_DONEE:
+	case POWER_SUPPLY_PROP_EXT_CHARGE_DONE:
 		psy_set_charge_done(idtp9222, !!val->intval);
 		break;
 	case POWER_SUPPLY_PROP_EXT_CHARGING_ENABLED:
