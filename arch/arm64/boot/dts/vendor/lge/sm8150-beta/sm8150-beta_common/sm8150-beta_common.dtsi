@@ -24,6 +24,7 @@
 };
 
 &soc {
+	interrupt-parent = <&pdc>;
 	wdog: qcom,wdt@17c10000{
 		qcom,bark-time = <16000>;
 	};

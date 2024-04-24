@@ -2717,6 +2717,8 @@
 			label = "adsp";
 			qcom,glink-label = "lpass";
 			cpu-affinity = <1 2>;
+			#address-cells = <1>;
+			#size-cells = <0>;
 
 			qcom,adsp_qrtr {
 				qcom,glink-channels = "IPCRTR";
@@ -2735,6 +2737,8 @@
 				qcom,glink-channels = "to_apps";
 				qcom,intents = <0x200 20>;
 				reg = <GPR_DOMAIN_ADSP>;
+				#address-cells = <1>;
+				#size-cells = <0>;
 				gecko_core {
 					compatible = "qcom,gecko_core";
 					reg = <GPR_SVC_ADSP_CORE>;
@@ -3005,11 +3009,6 @@
 		interrupt-parent = <&sleepstate_smp2p_in>;
 		interrupts = <0 0>;
 		interrupt-names = "smp2p-sleepstate-in";
-	};
-
-	system_pm {
-		compatible = "qcom,system-pm";
-		mboxes = <&apps_rsc 0>;
 	};
 
 	cmd_db: qcom,cmd-db@c3f000c {
