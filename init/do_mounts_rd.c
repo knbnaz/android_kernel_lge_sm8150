@@ -272,7 +272,7 @@ noclose_input:
 	fput(out_file);
 out:
 	kfree(buf);
-	init_unlink("/dev/ram");
+	ksys_unlink("/dev/ram");
 	return res;
 }
 

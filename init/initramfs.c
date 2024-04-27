@@ -12,7 +12,6 @@
 #include <linux/file.h>
 #include <linux/memblock.h>
 #include <linux/namei.h>
-#include <linux/init_syscalls.h>
 
 static ssize_t __init xwrite(struct file *file, const char *p, size_t count,
 		loff_t *pos)
@@ -302,7 +301,7 @@ static void __init clean_path(char *path, umode_t fmode)
 		if (S_ISDIR(st.mode))
 			init_rmdir(path);
 		else
-			init_unlink(path);
+			ksys_unlink(path);
 	}
 }
 

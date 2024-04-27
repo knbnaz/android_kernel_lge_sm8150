@@ -1269,6 +1269,13 @@ int compat_ksys_ipc(u32 call, int first, int second,
  * The following kernel syscall equivalents are just wrappers to fs-internal
  * functions. Therefore, provide stubs to be inlined at the callsites.
  */
+extern long do_unlinkat(int dfd, struct filename *name);
+
+static inline long ksys_unlink(const char __user *pathname)
+{
+	return do_unlinkat(AT_FDCWD, getname(pathname));
+}
+
 extern long do_mkdirat(int dfd, const char __user *pathname, umode_t mode);
 
 static inline long ksys_mkdir(const char __user *pathname, umode_t mode)
