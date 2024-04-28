@@ -22,7 +22,7 @@
 		pci-ids = "17cb:0305", "17cb:0306", "17cb:0307", "17cb:0308";
 
 		/* controller specific configuration */
-		qcom,smmu-cfg = <0x3>;
+		qcom,static-gpii-mask = <0x3>;
 
 		/* mhi bus specific settings */
 		mhi,max-channels = <111>;
@@ -557,7 +557,6 @@
 			mhi_netdev_0: mhi_rmnet@0 {
 				reg = <0x0>;
 				mhi,chan = "IP_HW0";
-				mhi,interface-name = "rmnet_mhi";
 				mhi,mru = <0x8000>;
 				mhi,chan-skb;
 				mhi,rsc-child = <&mhi_netdev_0_rsc>;
@@ -589,13 +588,9 @@
 		pci-ids = "17cb:0305", "17cb:0306", "17cb:0307", "17cb:0308";
 
 		/* controller specific configuration */
-		qcom,smmu-cfg = <0x3>;
-		qcom,msm-bus,name = "mhi";
-		qcom,msm-bus,num-cases = <2>;
-		qcom,msm-bus,num-paths = <1>;
-		qcom,msm-bus,vectors-KBps =
-			<45 512 0 0>,
-			<45 512 1200000000 650000000>;
+		qcom,static-gpii-mask = <0x3>;
+		interconnect-names = "icc_path";
+		interconnects = <&aggre2_noc MASTER_PCIE_0 &mc_virt SLAVE_EBI1>;
 
 		/* mhi bus specific settings */
 		mhi,max-channels = <111>;
@@ -1161,7 +1156,6 @@
 			mhi_netdev_2: mhi_rmnet@0 {
 				reg = <0x0>;
 				mhi,chan = "IP_HW0";
-				mhi,interface-name = "rmnet_mhi";
 				mhi,mru = <0x8000>;
 				mhi,chan-skb;
 			};

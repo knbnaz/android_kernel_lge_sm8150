@@ -26,7 +26,7 @@
 &mhi_0 {
 	esoc-names = "mdm";
 	esoc-0 = <&mdm3>;
-	qcom,smmu-cfg = <0>;
+	qcom,static-gpii-mask = <0>;
 	memory-region = <&mhi_mem>;
 	mhi,use-bb;
 	mhi,allow-m1; /* use legacy mode for suspends */
@@ -298,12 +298,8 @@
 	iommu-map = <0x0 &apps_smmu 0x1e00 0x1>,
 		<0x100 &apps_smmu 0x1e7f 0x1>;
 
-	qcom,msm-bus,name = "pcie1";
-	qcom,msm-bus,num-cases = <2>;
-	qcom,msm-bus,num-paths = <1>;
-	qcom,msm-bus,vectors-KBps =
-		<100 512 0 0>,
-		<100 512 4500000 0>;
+	interconnect-names = "icc_path";
+	interconnects = <&aggre2_noc MASTER_PCIE_1 &mc_virt SLAVE_EBI1>;
 };
 
 &soc {
@@ -636,13 +632,11 @@
 	#size-cells = <2>;
 
 	pil_buffer_p2_mem: pil_buffer_p2_region@a0000000 {
-		compatible = "removed-dma-pool";
 		no-map;
 		reg = <0x0 0xa0000000 0x0 0x01000000>;
 	};
 
 	pil_buffer_p1_mem: pil_buffer_p1_region@0a1000000 {
-		compatible = "removed-dma-pool";
 		no-map;
 		reg = <0x0 0xa1000000 0x0 0x02c00000>;
 	};
