@@ -10,6 +10,8 @@
  * GNU General Public License for more details.
  */
 
+#include <dt-bindings/interconnect/qcom,sm8150.h>
+
 &mdm3 {
 	compatible = "qcom,ext-sdx50m";
 	qcom,mdm-link-info = "0305_01.01.00";
