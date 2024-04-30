@@ -33,7 +33,7 @@
                 sony,i2c-pull-up = <1>;
                 qcom,clk-src = "BBCLK2";
                 interrupt-parent = <&tlmm>;
-                interrupts = <47 0>;
+                interrupts = <47 IRQ_TYPE_LEVEL_HIGH>;
                 interrupt-names = "nfc_irq";
         };
 };

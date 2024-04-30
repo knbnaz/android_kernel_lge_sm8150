@@ -22,7 +22,7 @@
 
 		reg = <0x20>;
 		interrupt-parent = <&tlmm>;
-		interrupts = <122 0x2008>;
+		interrupts = <122 (GIC_CPU_MASK_RAW(0x20) | IRQ_TYPE_LEVEL_LOW)>;
 		irqflags = <0x00000002>;      // Falling-Edge Trigger
 		//irqflags = <0x00000008>;        // Low-Level Trigger
 
@@ -80,7 +80,7 @@
 
 		reg = <0x38>;
 		interrupt-parent = <&tlmm>;
-		interrupts = <122 0x2008>;
+		interrupts = <122 (GIC_CPU_MASK_RAW(0x20) | IRQ_TYPE_LEVEL_LOW)>;
 		irqflags = <0x00000002>;
 
 		pinctrl-names = "touch_pin_active", "touch_pin_sleep";
@@ -137,7 +137,7 @@
 
 		reg = <0x20>;
 		interrupt-parent = <&tlmm>;
-		interrupts = <122 0x2008>;
+		interrupts = <122 (GIC_CPU_MASK_RAW(0x20) | IRQ_TYPE_LEVEL_LOW)>;
 		irqflags = <0x00000002>;
 
 		vdd-gpio = <&tlmm 152 0x00>;

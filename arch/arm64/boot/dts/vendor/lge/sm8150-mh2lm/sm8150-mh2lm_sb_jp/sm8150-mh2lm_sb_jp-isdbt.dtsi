@@ -15,7 +15,7 @@
 	qupv3_se1_i2c: i2c@884000 {
 		compatible = "qcom,i2c-geni";
 		reg = <0x884000 0x4000>;
-		interrupts = <GIC_SPI 602 0>;
+		interrupts = <GIC_SPI 602 IRQ_TYPE_LEVEL_HIGH>;
 		#address-cells = <1>;
 		#size-cells = <0>;
 		clock-names = "se-clk", "m-ahb", "s-ahb";

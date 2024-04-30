@@ -49,7 +49,7 @@
 		compatible = "qcom,mcd";
 		qcom,ce-hw-instance = <0>;
 		qcom,ce-device = <0>;
-		interrupts = <0 472 IRQ_TYPE_EDGE_RISING>;
+		interrupts = <GIC_SPI 472 IRQ_TYPE_EDGE_RISING>;
 		interrupt-names = "mcd_irq";
 	};
 

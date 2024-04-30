@@ -19,7 +19,7 @@
 		reg = <0x39>;
 		ams,gpio_irq = <&tlmm 96 0x00>;
 		interrupt-parent = <&tlmm>;
-		interrupts = <96 0x0>;
+		interrupts = <96 IRQ_TYPE_LEVEL_HIGH>;
 		pinctrl-names = "default", "sleep";
 		pinctrl-0 = <&tcs3407_int_active>;
 		pinctrl-1 = <&tcs3407_int_suspend>;

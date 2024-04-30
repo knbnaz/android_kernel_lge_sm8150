@@ -22,7 +22,7 @@
 		status = "ok";
 		reg = <0x5a>;
 		interrupt-parent = <&tlmm>;
-		interrupts = <37 0x2>;
+		interrupts = <37 IRQ_TYPE_EDGE_FALLING>;
 		pinctrl-names = "default", "sleep";
 		pinctrl-0 = <&atmf04_int_active>;
 		pinctrl-1 = <&atmf04_int_suspend>;

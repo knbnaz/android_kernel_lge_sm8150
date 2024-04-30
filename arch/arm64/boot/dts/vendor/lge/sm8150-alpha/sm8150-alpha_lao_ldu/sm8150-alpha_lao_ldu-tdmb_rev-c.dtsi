@@ -37,7 +37,7 @@
 		compatible = "lge,tdmb"; // [Fixed] Should be "lge,tdmb".
 		reg = <0>;
 		interrupt-parent = <&tlmm>;  // [Fixed] tlmm is the parent
-		interrupts = <108 0x0>; // [Modified] Set tdmb_int GPIO, first # is gpio #, second flag keep it 0.
+		interrupts = <108 IRQ_TYPE_LEVEL_HIGH>; // [Modified] Set tdmb_int GPIO, first # is gpio #, second flag keep it 0.
 
 		// [Fixed] Specifies maximum SPI clock frequency of DMB chipset(38.4 MHz). (ref. FC8080 datasheet)
 		spi-max-frequency = <40000000>;

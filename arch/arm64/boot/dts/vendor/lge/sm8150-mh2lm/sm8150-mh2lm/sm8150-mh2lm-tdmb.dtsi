@@ -47,7 +47,7 @@
 		interrupt-parent = <&tlmm>;
 
 		/* [Modified] Set DMB_INT GPIO, first # is gpio #, second flag keep it 0. */
-		interrupts = <108 0>;
+		interrupts = <108 IRQ_TYPE_LEVEL_HIGH>;
 
 		/* [Fixed] Specifies maximum SPI clock frequency of DMB chipset(38.4 MHz). (ref. FC8080 datasheet) */
 		spi-max-frequency = <40000000>;

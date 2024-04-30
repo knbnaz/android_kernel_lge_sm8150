@@ -14,13 +14,13 @@
 #include "../sm8150-beta_common/sm8150-beta_common-pm.dtsi"
 
 &pm8150_gpios {
-	interrupts = <0x0 0xc0 0 IRQ_TYPE_NONE>,
-			<0x0 0xc2 0 IRQ_TYPE_NONE>,
-			<0x0 0xc3 0 IRQ_TYPE_NONE>,
-			<0x0 0xc5 0 IRQ_TYPE_NONE>,
-			<0x0 0xc6 0 IRQ_TYPE_NONE>,
-			<0x0 0xc8 0 IRQ_TYPE_NONE>,
-			<0x0 0xc9 0 IRQ_TYPE_NONE>;
+	interrupts = <GIC_SPI 0xc0 0 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 0xc2 0 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 0xc3 0 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 0xc5 0 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 0xc6 0 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 0xc8 0 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 0xc9 0 IRQ_TYPE_LEVEL_HIGH>;
 	interrupt-names = "pm8150_gpio1", "pm8150_gpio3",
 			"pm8150_gpio4", "pm8150_gpio6",
 			"pm8150_gpio7", "pm8150_gpio9",

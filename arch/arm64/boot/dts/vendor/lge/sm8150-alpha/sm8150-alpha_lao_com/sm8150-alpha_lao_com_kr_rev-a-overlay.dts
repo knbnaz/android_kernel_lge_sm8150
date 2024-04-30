@@ -32,50 +32,50 @@
 
 &dsi_sw43410_mp_dsc_qhd_cmd {
 	interrupt-parent = <&tlmm>;
-	interrupts = <9 0x2001>; /*IRQF_ONESHOT | IRQF_TRIGGER_RISING*/
-	lge,err-detect-gpio = <&tlmm 9 0x2001>; /* IRQF_ONESHOT | IRQF_TRIGGER_RISING */
+	interrupts = <9 (GIC_CPU_MASK_RAW(0x20) | IRQ_TYPE_EDGE_RISING)>; /*IRQF_ONESHOT | IRQF_TRIGGER_RISING*/
+	lge,err-detect-gpio = <&tlmm 9 (GIC_CPU_MASK_RAW(0x20) | IRQ_TYPE_EDGE_RISING)>; /* IRQF_ONESHOT | IRQF_TRIGGER_RISING */
 };
 
 &dsi_sw43410_pv_gi_dsc_qhd_cmd {
 	interrupt-parent = <&tlmm>;
-	interrupts = <9 0x2001>; /*IRQF_ONESHOT | IRQF_TRIGGER_RISING*/
-	lge,err-detect-gpio = <&tlmm 9 0x2001>; /* IRQF_ONESHOT | IRQF_TRIGGER_RISING */
+	interrupts = <9 (GIC_CPU_MASK_RAW(0x20) | IRQ_TYPE_EDGE_RISING)>; /*IRQF_ONESHOT | IRQF_TRIGGER_RISING*/
+	lge,err-detect-gpio = <&tlmm 9 (GIC_CPU_MASK_RAW(0x20) | IRQ_TYPE_EDGE_RISING)>; /* IRQF_ONESHOT | IRQF_TRIGGER_RISING */
 };
 
 &dsi_sw43410_dv2_gi_dsc_qhd_cmd {
 	interrupt-parent = <&tlmm>;
-	interrupts = <9 0x2001>; /*IRQF_ONESHOT | IRQF_TRIGGER_RISING*/
-	lge,err-detect-gpio = <&tlmm 9 0x2001>; /* IRQF_ONESHOT | IRQF_TRIGGER_RISING */
+	interrupts = <9 (GIC_CPU_MASK_RAW(0x20) | IRQ_TYPE_EDGE_RISING)>; /*IRQF_ONESHOT | IRQF_TRIGGER_RISING*/
+	lge,err-detect-gpio = <&tlmm 9 (GIC_CPU_MASK_RAW(0x20) | IRQ_TYPE_EDGE_RISING)>; /* IRQF_ONESHOT | IRQF_TRIGGER_RISING */
 };
 
 &dsi_sw43410_pv_dsc_qhd_cmd {
 	interrupt-parent = <&tlmm>;
-	interrupts = <9 0x2001>; /*IRQF_ONESHOT | IRQF_TRIGGER_RISING*/
-	lge,err-detect-gpio = <&tlmm 9 0x2001>; /* IRQF_ONESHOT | IRQF_TRIGGER_RISING */
+	interrupts = <9 (GIC_CPU_MASK_RAW(0x20) | IRQ_TYPE_EDGE_RISING)>; /*IRQF_ONESHOT | IRQF_TRIGGER_RISING*/
+	lge,err-detect-gpio = <&tlmm 9 (GIC_CPU_MASK_RAW(0x20) | IRQ_TYPE_EDGE_RISING)>; /* IRQF_ONESHOT | IRQF_TRIGGER_RISING */
 };
 
 &dsi_sw43410_dv2_dsc_qhd_cmd {
 	interrupt-parent = <&tlmm>;
-	interrupts = <9 0x2001>; /*IRQF_ONESHOT | IRQF_TRIGGER_RISING*/
-	lge,err-detect-gpio = <&tlmm 9 0x2001>; /* IRQF_ONESHOT | IRQF_TRIGGER_RISING */
+	interrupts = <9 (GIC_CPU_MASK_RAW(0x20) | IRQ_TYPE_EDGE_RISING)>; /*IRQF_ONESHOT | IRQF_TRIGGER_RISING*/
+	lge,err-detect-gpio = <&tlmm 9 (GIC_CPU_MASK_RAW(0x20) | IRQ_TYPE_EDGE_RISING)>; /* IRQF_ONESHOT | IRQF_TRIGGER_RISING */
 };
 
 &dsi_sw43410_dv1_dsc_qhd_cmd {
 	interrupt-parent = <&tlmm>;
-	interrupts = <9 0x2001>; /*IRQF_ONESHOT | IRQF_TRIGGER_RISING*/
-	lge,err-detect-gpio = <&tlmm 9 0x2001>; /* IRQF_ONESHOT | IRQF_TRIGGER_RISING */
+	interrupts = <9 (GIC_CPU_MASK_RAW(0x20) | IRQ_TYPE_EDGE_RISING)>; /*IRQF_ONESHOT | IRQF_TRIGGER_RISING*/
+	lge,err-detect-gpio = <&tlmm 9 (GIC_CPU_MASK_RAW(0x20) | IRQ_TYPE_EDGE_RISING)>; /* IRQF_ONESHOT | IRQF_TRIGGER_RISING */
 };
 
 &dsi_sw43410_pp2_dsc_qhd_cmd {
 	interrupt-parent = <&tlmm>;
-	interrupts = <9 0x2001>; /*IRQF_ONESHOT | IRQF_TRIGGER_RISING*/
-	lge,err-detect-gpio = <&tlmm 9 0x2001>; /* IRQF_ONESHOT | IRQF_TRIGGER_RISING */
+	interrupts = <9 (GIC_CPU_MASK_RAW(0x20) | IRQ_TYPE_EDGE_RISING)>; /*IRQF_ONESHOT | IRQF_TRIGGER_RISING*/
+	lge,err-detect-gpio = <&tlmm 9 (GIC_CPU_MASK_RAW(0x20) | IRQ_TYPE_EDGE_RISING)>; /* IRQF_ONESHOT | IRQF_TRIGGER_RISING */
 };
 
 &dsi_sw43410_dsc_qhd_cmd_pxw {
 	interrupt-parent = <&tlmm>;
-	interrupts = <9 0x2001>; /*IRQF_ONESHOT | IRQF_TRIGGER_RISING*/
-	lge,err-detect-gpio = <&tlmm 9 0x2001>; /* IRQF_ONESHOT | IRQF_TRIGGER_RISING */
+	interrupts = <9 (GIC_CPU_MASK_RAW(0x20) | IRQ_TYPE_EDGE_RISING)>; /*IRQF_ONESHOT | IRQF_TRIGGER_RISING*/
+	lge,err-detect-gpio = <&tlmm 9 (GIC_CPU_MASK_RAW(0x20) | IRQ_TYPE_EDGE_RISING)>; /* IRQF_ONESHOT | IRQF_TRIGGER_RISING */
 };
 
 &pm8150b_charger {

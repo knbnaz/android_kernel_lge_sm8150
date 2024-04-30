@@ -280,8 +280,8 @@
 
 		lge,use-panel-err-detect;
 		interrupt-parent = <&tlmm>;
-		interrupts = <7 0x2001>; /*IRQF_ONESHOT | IRQF_TRIGGER_RISING*/
-		lge,err-detect-gpio = <&tlmm 7 0x2001>; /* IRQF_ONESHOT | IRQF_TRIGGER_RISING */
+		interrupts = <7 (GIC_CPU_MASK_RAW(0x20) | IRQ_TYPE_EDGE_RISING)>; /*IRQF_ONESHOT | IRQF_TRIGGER_RISING*/
+		lge,err-detect-gpio = <&tlmm 7 (GIC_CPU_MASK_RAW(0x20) | IRQ_TYPE_EDGE_RISING)>; /* IRQF_ONESHOT | IRQF_TRIGGER_RISING */
 
 		lge,memory-error-detect-command = [
 			39 01 00 00 00 00 05 CE 22 10 00 00
