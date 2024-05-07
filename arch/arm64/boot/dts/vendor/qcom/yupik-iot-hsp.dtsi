@@ -3,7 +3,7 @@
 
 &soc {
 };
-
+/*
 &sde_edp {
 	status = "disabled";
 	pinctrl-names = "mdss_dp_hpd_active", "mdss_dp_hpd_tlmm", "mdss_dp_hpd_ctrl",
@@ -27,7 +27,7 @@
 	qcom,bl-pmic-pwm-period-usecs = <100>;
 	pwms = <&pm8350c_pwm_2 0 65535>;
 };
-
+*/
 &mdss_mdp {
 	edp_panel_1080p_video: qcom,mdss_edp_panel_1080p_video {
 		status = "ok";
