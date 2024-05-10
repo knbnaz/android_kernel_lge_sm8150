@@ -433,13 +433,13 @@ bool batt_psy_initialized(struct fg_dev *fg)
 
 bool is_qnovo_en(struct fg_dev *fg)
 {
-	struct fg_gen3_chip *chip = container_of(fg, struct fg_gen3_chip, fg);
+	struct fg_gen4_chip *chip = container_of(fg, struct fg_gen4_chip, fg);
 	int rc, val;
 
 	if (!batt_psy_initialized(fg))
 		return false;
 
-	rc = fg_gen3_read_iio_chan(chip, CHARGE_QNOVO_ENABLE, &val);
+	rc = fg_gen4_read_iio_chan(chip, CHARGE_QNOVO_ENABLE, &val);
 	if (rc < 0) {
 		pr_debug("Failed to get CHARGE_QNOVO_ENABLE value\n");
 		return false;
@@ -462,7 +462,7 @@ bool pc_port_psy_initialized(struct fg_dev *fg)
 
 bool is_parallel_charger_available(struct fg_dev *fg)
 {
-		struct fg_gen3_chip *chip = container_of(fg, struct fg_gen3_chip, fg);
+		struct fg_gen4_chip *chip = container_of(fg, struct fg_gen4_chip, fg);
 	if (is_chan_valid(chip, PARALLEL_CHARGING_ENABLED))
 		return true;
 
@@ -1694,8 +1694,8 @@ void fg_relax(struct fg_dev *fg, int awake_reason)
 }
 
 
-bool is_chan_valid(struct fg_gen3_chip *chip,
-		enum fg_gen3_ext_iio_channels chan)
+bool is_chan_valid(struct fg_gen4_chip *chip,
+		enum fg_gen4_ext_iio_channels chan)
 {
 	int rc;
 
@@ -1704,14 +1704,14 @@ bool is_chan_valid(struct fg_gen3_chip *chip,
 
 	if (!chip->ext_iio_chans[chan]) {
 		chip->ext_iio_chans[chan] = iio_channel_get(chip->fg.dev,
-					fg_gen3_ext_iio_chan_name[chan]);
+					fg_gen4_ext_iio_chan_name[chan]);
 		if (IS_ERR(chip->ext_iio_chans[chan])) {
 			rc = PTR_ERR(chip->ext_iio_chans[chan]);
 			if (rc == -EPROBE_DEFER)
 				chip->ext_iio_chans[chan] = NULL;
 
 			pr_err("Failed to get IIO channel %s, rc=%d\n",
-				fg_gen3_ext_iio_chan_name[chan], rc);
+				fg_gen4_ext_iio_chan_name[chan], rc);
 			return false;
 		}
 	}
@@ -1719,8 +1719,8 @@ bool is_chan_valid(struct fg_gen3_chip *chip,
 	return true;
 }
 
-int fg_gen3_read_iio_chan(struct fg_gen3_chip *chip,
-	enum fg_gen3_ext_iio_channels chan, int *val)
+int fg_gen4_read_iio_chan(struct fg_gen4_chip *chip,
+	enum fg_gen4_ext_iio_channels chan, int *val)
 {
 	int rc;
 
@@ -1733,8 +1733,8 @@ int fg_gen3_read_iio_chan(struct fg_gen3_chip *chip,
 	return -EINVAL;
 }
 
-int fg_gen3_write_iio_chan(struct fg_gen3_chip *chip,
-	enum fg_gen3_ext_iio_channels chan, int val)
+int fg_gen4_write_iio_chan(struct fg_gen4_chip *chip,
+	enum fg_gen4_ext_iio_channels chan, int val)
 {
 	if (is_chan_valid(chip, chan))
 		return iio_write_channel_raw(chip->ext_iio_chans[chan],
@@ -1743,7 +1743,7 @@ int fg_gen3_write_iio_chan(struct fg_gen3_chip *chip,
 	return -EINVAL;
 }
 
-int fg_gen3_read_int_iio_chan(struct iio_channel *iio_chan_list, int chan_id,
+int fg_gen4_read_int_iio_chan(struct iio_channel *iio_chan_list, int chan_id,
 			int *val)
 {
 	int rc;
