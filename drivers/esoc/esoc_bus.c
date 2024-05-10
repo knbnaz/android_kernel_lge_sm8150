@@ -103,7 +103,7 @@ static void esoc_clink_release(struct device *dev)
 	kfree(esoc_clink);
 }
 
-static int esoc_clink_match_id(struct device *dev, void *id)
+static int esoc_clink_match_id(struct device *dev, const void *id)
 {
 	struct esoc_clink *esoc_clink = to_esoc_clink(dev);
 	int *esoc_id = (int *)id;
@@ -116,10 +116,10 @@ static int esoc_clink_match_id(struct device *dev, void *id)
 	return 0;
 }
 
-static int esoc_clink_match_node(struct device *dev, void *id)
+static int esoc_clink_match_node(struct device *dev, const void *id)
 {
 	struct esoc_clink *esoc_clink = to_esoc_clink(dev);
-	struct device_node *node = id;
+	struct device_node *node = (void *)id;
 
 	if (esoc_clink->np == node) {
 		if (!try_module_get(esoc_clink->owner))
