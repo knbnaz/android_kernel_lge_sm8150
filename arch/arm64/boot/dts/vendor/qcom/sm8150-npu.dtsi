@@ -11,26 +11,26 @@
 				<GIC_SPI 368 IRQ_TYPE_LEVEL_HIGH>;
 		interrupt-names = "error_irq", "wdg_bite_irq", "ipc_irq";
 		iommus = <&apps_smmu 0x1461 0x0>, <&apps_smmu 0x2061 0x0>;
-		clocks = <&aopcc QDSS_CLK>,
-				<&gcc GCC_NPU_AT_CLK>,
-				<&gcc GCC_NPU_TRIG_CLK>,
-				<&npucc NPU_CC_ARMWIC_CORE_CLK>,
-				<&npucc NPU_CC_CAL_DP_CLK>,
-				<&npucc NPU_CC_CAL_DP_CDC_CLK>,
-				<&npucc NPU_CC_CONF_NOC_AHB_CLK>,
-				<&npucc NPU_CC_COMP_NOC_AXI_CLK>,
-				<&npucc NPU_CC_NPU_CORE_CLK>,
-				<&npucc NPU_CC_NPU_CORE_CTI_CLK>,
-				<&npucc NPU_CC_NPU_CORE_APB_CLK>,
-				<&npucc NPU_CC_NPU_CORE_ATB_CLK>,
-				<&npucc NPU_CC_NPU_CPC_CLK>,
-				<&npucc NPU_CC_NPU_CPC_TIMER_CLK>,
-				<&npucc NPU_CC_QTIMER_CORE_CLK>,
-				<&npucc NPU_CC_SLEEP_CLK>,
-				<&npucc NPU_CC_BWMON_CLK>,
-				<&npucc NPU_CC_PERF_CNT_CLK>,
-				<&npucc NPU_CC_BTO_CORE_CLK>,
-				<&npucc NPU_CC_XO_CLK>;
+		clocks = <&clock_aop QDSS_CLK>,
+				<&clock_gcc GCC_NPU_AT_CLK>,
+				<&clock_gcc GCC_NPU_TRIG_CLK>,
+				<&clock_npucc NPU_CC_ARMWIC_CORE_CLK>,
+				<&clock_npucc NPU_CC_CAL_DP_CLK>,
+				<&clock_npucc NPU_CC_CAL_DP_CDC_CLK>,
+				<&clock_npucc NPU_CC_CONF_NOC_AHB_CLK>,
+				<&clock_npucc NPU_CC_COMP_NOC_AXI_CLK>,
+				<&clock_npucc NPU_CC_NPU_CORE_CLK>,
+				<&clock_npucc NPU_CC_NPU_CORE_CTI_CLK>,
+				<&clock_npucc NPU_CC_NPU_CORE_APB_CLK>,
+				<&clock_npucc NPU_CC_NPU_CORE_ATB_CLK>,
+				<&clock_npucc NPU_CC_NPU_CPC_CLK>,
+				<&clock_npucc NPU_CC_NPU_CPC_TIMER_CLK>,
+				<&clock_npucc NPU_CC_QTIMER_CORE_CLK>,
+				<&clock_npucc NPU_CC_SLEEP_CLK>,
+				<&clock_npucc NPU_CC_BWMON_CLK>,
+				<&clock_npucc NPU_CC_PERF_CNT_CLK>,
+				<&clock_npucc NPU_CC_BTO_CORE_CLK>,
+				<&clock_npucc NPU_CC_XO_CLK>;
 		clock-names = "qdss_clk",
 				"at_clk",
 				"trig_clk",
@@ -58,6 +58,8 @@
 		mboxes = <&qmp_aop 0>;
 		mbox-names = "aop";
 		#cooling-cells = <2>;
+		qcom,npubw-dev = <&npu_npu_ddr_bw>;
+		qcom,npu-cxlimit-enable;
 		qcom,npu-pwrlevels {
 			#address-cells = <1>;
 			#size-cells = <0>;

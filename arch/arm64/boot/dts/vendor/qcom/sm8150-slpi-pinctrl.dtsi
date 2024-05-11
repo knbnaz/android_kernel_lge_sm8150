@@ -3,7 +3,7 @@
 		compatible = "qcom,slpi-pinctrl";
 		reg = <0x2b40000 0x20000>;
 		clock-names = "ssc-clk";
-		clocks =  <&scc SCC_QUPV3_S_HCLK_CLK>;
+		clocks =  <&clock_scc SCC_QUPV3_S_HCLK_CLK>;
 		qcom,num-pins = <14>;
 		status = "disabled";
 

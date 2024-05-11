@@ -25,12 +25,12 @@
 		clock-names =  "gcc_video_axic", "gcc_video_axi0",
 			"gcc_video_axi1", "core_clk", "vcodec_clk",
 			"cvp_clk";
-		clocks = <&gcc GCC_VIDEO_AXIC_CLK>,
-			<&gcc GCC_VIDEO_AXI0_CLK>,
-			<&gcc GCC_VIDEO_AXI1_CLK>,
-			<&videocc VIDEO_CC_MVSC_CORE_CLK>,
-			<&videocc VIDEO_CC_MVS0_CORE_CLK>,
-			<&videocc VIDEO_CC_MVS1_CORE_CLK>;
+		clocks = <&clock_gcc GCC_VIDEO_AXIC_CLK>,
+			<&clock_gcc GCC_VIDEO_AXI0_CLK>,
+			<&clock_gcc GCC_VIDEO_AXI1_CLK>,
+			<&clock_videocc VIDEO_CC_MVSC_CORE_CLK>,
+			<&clock_videocc VIDEO_CC_MVS0_CORE_CLK>,
+			<&clock_videocc VIDEO_CC_MVS1_CORE_CLK>;
 
 		qcom,proxy-clock-names = "gcc_video_axic",
 			"gcc_video_axi0", "gcc_video_axi1",

@@ -23,9 +23,9 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 		clock-names = "se-clk", "m-ahb", "s-ahb";
-		clocks = <&scc SCC_QUPV3_SE0_CLK>,
-			<&scc SCC_QUPV3_M_HCLK_CLK>,
-			<&scc SCC_QUPV3_S_HCLK_CLK>;
+		clocks = <&clock_scc SCC_QUPV3_SE0_CLK>,
+			<&clock_scc SCC_QUPV3_M_HCLK_CLK>,
+			<&clock_scc SCC_QUPV3_S_HCLK_CLK>;
 		pinctrl-names = "default", "sleep";
 		pinctrl-0 = <&qupv3_se20_i2c_active>;
 		pinctrl-1 = <&qupv3_se20_i2c_sleep>;
@@ -41,9 +41,9 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 		clock-names = "se-clk", "m-ahb", "s-ahb";
-		clocks = <&scc SCC_QUPV3_SE1_CLK>,
-			<&scc SCC_QUPV3_M_HCLK_CLK>,
-			<&scc SCC_QUPV3_S_HCLK_CLK>;
+		clocks = <&clock_scc SCC_QUPV3_SE1_CLK>,
+			<&clock_scc SCC_QUPV3_M_HCLK_CLK>,
+			<&clock_scc SCC_QUPV3_S_HCLK_CLK>;
 		pinctrl-names = "default", "sleep";
 		pinctrl-0 = <&qupv3_se21_i2c_active>;
 		pinctrl-1 = <&qupv3_se21_i2c_sleep>;
@@ -59,12 +59,30 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 		clock-names = "se-clk", "m-ahb", "s-ahb";
-		clocks = <&scc SCC_QUPV3_SE2_CLK>,
-			<&scc SCC_QUPV3_M_HCLK_CLK>,
-			<&scc SCC_QUPV3_S_HCLK_CLK>;
+		clocks = <&clock_scc SCC_QUPV3_SE2_CLK>,
+			<&clock_scc SCC_QUPV3_M_HCLK_CLK>,
+			<&clock_scc SCC_QUPV3_S_HCLK_CLK>;
 		pinctrl-names = "default", "sleep";
 		pinctrl-0 = <&qupv3_se22_i2c_active>;
 		pinctrl-1 = <&qupv3_se22_i2c_sleep>;
+		qcom,wrapper-core = <&qupv3_3>;
+		qcom,disable-dma;
+		status = "disabled";
+	};
+
+	qupv3_se23_i2c: i2c@268c000 {
+		compatible = "qcom,i2c-geni";
+		reg = <0x268c000 0x4000>;
+		interrupts = <GIC_SPI 445 IRQ_TYPE_LEVEL_HIGH>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+		clock-names = "se-clk", "m-ahb", "s-ahb";
+		clocks = <&clock_scc SCC_QUPV3_SE3_CLK>,
+			<&clock_scc SCC_QUPV3_M_HCLK_CLK>,
+			<&clock_scc SCC_QUPV3_S_HCLK_CLK>;
+		pinctrl-names = "default", "sleep";
+		pinctrl-0 = <&qupv3_se23_i2c_active>;
+		pinctrl-1 = <&qupv3_se23_i2c_sleep>;
 		qcom,wrapper-core = <&qupv3_3>;
 		qcom,disable-dma;
 		status = "disabled";
@@ -79,9 +97,9 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 		clock-names = "se-clk", "m-ahb", "s-ahb";
-		clocks = <&scc SCC_QUPV3_SE1_CLK>,
-			<&scc SCC_QUPV3_M_HCLK_CLK>,
-			<&scc SCC_QUPV3_S_HCLK_CLK>;
+		clocks = <&clock_scc SCC_QUPV3_SE1_CLK>,
+			<&clock_scc SCC_QUPV3_M_HCLK_CLK>,
+			<&clock_scc SCC_QUPV3_S_HCLK_CLK>;
 		pinctrl-names = "default", "sleep";
 		pinctrl-0 = <&qupv3_se21_spi_active>;
 		pinctrl-1 = <&qupv3_se21_spi_sleep>;
@@ -99,9 +117,9 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 		clock-names = "se-clk", "m-ahb", "s-ahb";
-		clocks = <&scc SCC_QUPV3_SE2_CLK>,
-			<&scc SCC_QUPV3_M_HCLK_CLK>,
-			<&scc SCC_QUPV3_S_HCLK_CLK>;
+		clocks = <&clock_scc SCC_QUPV3_SE2_CLK>,
+			<&clock_scc SCC_QUPV3_M_HCLK_CLK>,
+			<&clock_scc SCC_QUPV3_S_HCLK_CLK>;
 		pinctrl-names = "default", "sleep";
 		pinctrl-0 = <&qupv3_se22_spi_active>;
 		pinctrl-1 = <&qupv3_se22_spi_sleep>;
