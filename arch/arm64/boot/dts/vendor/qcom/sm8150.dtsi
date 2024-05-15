@@ -16,7 +16,6 @@
 #include <dt-bindings/clock/qcom,gpucc-sm8150.h>
 #include <dt-bindings/clock/qcom,scc-sm8150.h>
 #include <dt-bindings/clock/qcom,videocc-sm8150.h>
-#include <dt-bindings/clock/qcom,cpucc-sm8150.h>
 #include <dt-bindings/clock/qcom,npucc-sm8150.h>
 #include <dt-bindings/clock/qcom,rpmh.h>
 #include <dt-bindings/sound/qcom,gpr.h>
@@ -802,11 +801,11 @@
 
 #include "sm8150-gdsc.dtsi"
 
-#include "sm8150-sde-pll.dtsi"
-#include "sm8150-sde.dtsi"
+#include "display/sm8150-sde-pll.dtsi"
+#include "display/sm8150-sde.dtsi"
 #include "msm-rdbg.dtsi"
 
-#include "sm8150-camera.dtsi"
+#include "camera//sm8150-camera.dtsi"
 
 #include "msm-qvr-external.dtsi"
 
@@ -4217,7 +4216,6 @@
 #include "sm8150-slpi-pinctrl.dtsi"
 #include "sm8150-regulator.dtsi"
 #include "sm8150-ion.dtsi"
-#include "sm8150-bus.dtsi"
 #include "sm8150-pcie.dtsi"
 #include "sm8150-smp2p.dtsi"
 #include "sm8150-coresight.dtsi"
