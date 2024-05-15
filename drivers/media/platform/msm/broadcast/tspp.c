@@ -17,7 +17,6 @@
 #include <linux/uaccess.h>       /* copy_to_user */
 #include <linux/slab.h>          /* kfree, kzalloc */
 #include <linux/ioport.h>        /* XXX_ mem_region */
-#include <asm/dma-iommu.h>
 #include <linux/dma-mapping.h>   /* dma_XXX */
 #include <linux/dmapool.h>       /* DMA pools */
 #include <linux/delay.h>         /* msleep */
@@ -36,7 +35,7 @@
 #include <linux/of.h>
 #include <linux/of_gpio.h>
 #include <linux/string.h>
-#include <linux/msm-bus.h>
+#include <linux/interconnect.h>
 #include <linux/interrupt.h>    /* tasklet */
 #include <asm/arch_timer.h>     /* Timer */
 #include <linux/dma-buf.h>
@@ -456,7 +455,7 @@ struct tspp_device {
 	struct list_head devlist; /* list of all devices */
 	struct platform_device *pdev;
 	void __iomem *base;
-	uint32_t tsif_bus_client;
+	struct icc_path *icc_path;
 	unsigned int tspp_irq;
 	unsigned int bam_irq;
 	unsigned long bam_handle;
@@ -816,9 +815,8 @@ static int tspp_clock_start(struct tspp_device *device)
 {
 	int rc;
 
-	if (device->tsif_bus_client) {
-		rc = msm_bus_scale_client_update_request(
-					device->tsif_bus_client, 1);
+	if (device->icc_path) {
+		rc = icc_set_bw(device->icc_path, 600000, 800000);
 		if (rc) {
 			pr_err("%s: can't enable bus\n", __func__);
 			return -EBUSY;
@@ -831,9 +829,8 @@ static int tspp_clock_start(struct tspp_device *device)
 					RPMH_REGULATOR_LEVEL_MAX);
 		if (rc) {
 			pr_err("%s: unable to set CX voltage\n", __func__);
-			if (device->tsif_bus_client)
-				msm_bus_scale_client_update_request(
-					device->tsif_bus_client, 0);
+			if (device->icc_path)
+				icc_set_bw(device->icc_path, 0, 0);
 			return rc;
 		}
 	}
@@ -847,9 +844,8 @@ static int tspp_clock_start(struct tspp_device *device)
 					RPMH_REGULATOR_LEVEL_MAX);
 		}
 
-		if (device->tsif_bus_client)
-			msm_bus_scale_client_update_request(
-				device->tsif_bus_client, 0);
+		if (device->icc_path)
+			icc_set_bw(device->icc_path, 0, 0);
 		return -EBUSY;
 	}
 
@@ -863,9 +859,8 @@ static int tspp_clock_start(struct tspp_device *device)
 					RPMH_REGULATOR_LEVEL_MAX);
 		}
 
-		if (device->tsif_bus_client)
-			msm_bus_scale_client_update_request(
-				device->tsif_bus_client, 0);
+		if (device->icc_path)
+			icc_set_bw(device->icc_path, 0, 0);
 		return -EBUSY;
 	}
 
@@ -890,9 +885,8 @@ static void tspp_clock_stop(struct tspp_device *device)
 			pr_err("%s: unable to set CX voltage\n", __func__);
 	}
 
-	if (device->tsif_bus_client) {
-		rc = msm_bus_scale_client_update_request(
-					device->tsif_bus_client, 0);
+	if (device->icc_path) {
+		rc = icc_set_bw(device->icc_path, 0, 0);
 		if (rc)
 			pr_err("%s: can't disable bus\n", __func__);
 	}
@@ -2914,13 +2908,12 @@ static int msm_tspp_probe(struct platform_device *pdev)
 	struct resource *mem_tsif1;
 	struct resource *mem_tspp;
 	struct resource *mem_bam;
-	struct msm_bus_scale_pdata *tspp_bus_pdata = NULL;
 	unsigned long rate;
 
 	if (pdev->dev.of_node) {
 		/* ID is always 0 since there is only 1 instance of TSPP */
 		pdev->id = 0;
-		tspp_bus_pdata = msm_bus_cl_get_pdata(pdev);
+		device->icc_path = of_icc_get(&pdev->dev, "tsif");
 	} else {
 		/* must have device tree data */
 		pr_err("%s: Device tree data not available\n", __func__);
@@ -2948,13 +2941,12 @@ static int msm_tspp_probe(struct platform_device *pdev)
 	}
 
 	/* register bus client */
-	if (tspp_bus_pdata) {
-		device->tsif_bus_client =
-			msm_bus_scale_register_client(tspp_bus_pdata);
-		if (!device->tsif_bus_client)
+	if (device->icc_path) {
+		device->icc_path = of_icc_get(&pdev->dev, "tsif");
+		if (IS_ERR(device->icc_path))
 			pr_err("%s: Unable to register bus client\n", __func__);
 	} else {
-		device->tsif_bus_client = 0;
+		device->icc_path = 0;
 	}
 
 	/* map regulators */
@@ -3162,8 +3154,8 @@ err_pclock:
 	if (device->tsif_vreg)
 		regulator_disable(device->tsif_vreg);
 err_regulator:
-	if (device->tsif_bus_client)
-		msm_bus_scale_unregister_client(device->tsif_bus_client);
+	if (device->icc_path)
+		icc_put(device->icc_path);
 err_pinctrl:
 	kfree(device);
 
@@ -3189,8 +3181,8 @@ static int msm_tspp_remove(struct platform_device *pdev)
 
 	mutex_destroy(&device->mutex);
 
-	if (device->tsif_bus_client)
-		msm_bus_scale_unregister_client(device->tsif_bus_client);
+	if (device->icc_path)
+		icc_put(device->icc_path);
 
 	wakeup_source_trash(&device->ws);
 	if (device->req_irqs)
