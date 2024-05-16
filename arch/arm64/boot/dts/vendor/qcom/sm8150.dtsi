@@ -18,7 +18,6 @@
 #include <dt-bindings/clock/qcom,videocc-sm8150.h>
 #include <dt-bindings/clock/qcom,npucc-sm8150.h>
 #include <dt-bindings/clock/qcom,rpmh.h>
-#include <dt-bindings/sound/qcom,gpr.h>
 #include <dt-bindings/clock/qcom,aop-qmp.h>
 #include <dt-bindings/regulator/qcom,rpmh-regulator-levels.h>
 #include <dt-bindings/interconnect/qcom,icc.h>
@@ -2856,26 +2855,6 @@
 			qcom,apr_tal_rpmsg {
 				qcom,glink-channels = "apr_audio_svc";
 				qcom,intents = <0x200 20>;
-			};
-
-			qcom,gpr {
-				compatible = "qcom,gpr";
-				qcom,glink-channels = "to_apps";
-				qcom,intents = <0x200 20>;
-				reg = <GPR_DOMAIN_ADSP>;
-				gecko_core {
-					compatible = "qcom,gecko_core";
-					reg = <GPR_SVC_ADSP_CORE>;
-				};
-				audio-pkt {
-					compatible = "qcom,audio-pkt";
-					qcom,audiopkt-ch-name = "apr_audio_svc";
-					reg = <GPR_SVC_MAX>;
-				};
-				q6prm {
-					compatible = "qcom,q6prm";
-					reg = <GPR_SVC_ASM>;
-				};
 			};
 
 			qcom,msm_fastrpc_rpmsg {
