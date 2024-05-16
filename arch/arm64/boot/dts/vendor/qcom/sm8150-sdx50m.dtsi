@@ -632,13 +632,11 @@
 	#size-cells = <2>;
 
 	pil_buffer_p2_mem: pil_buffer_p2_region@a0000000 {
-		compatible = "removed-dma-pool";
 		no-map;
 		reg = <0x0 0xa0000000 0x0 0x01000000>;
 	};
 
 	pil_buffer_p1_mem: pil_buffer_p1_region@0a1000000 {
-		compatible = "removed-dma-pool";
 		no-map;
 		reg = <0x0 0xa1000000 0x0 0x02c00000>;
 	};
