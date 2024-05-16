@@ -36,10 +36,10 @@
 			"gcc_video_axi0", "gcc_video_axi1",
 			"core_clk", "vcodec_clk", "cvp_clk";
 
-		resets = <&gcc GCC_VIDEO_AXIC_CLK_BCR>,
-			<&videocc VIDEO_CC_MVSC_CORE_CLK_BCR>,
-			<&gcc GCC_VIDEO_AXI0_CLK_BCR>,
-			<&gcc GCC_VIDEO_AXI1_CLK_BCR>;
+		resets = <&clock_gcc GCC_VIDEO_AXIC_CLK_BCR>,
+			<&clock_videocc VIDEO_CC_MVSC_CORE_CLK_BCR>,
+			<&clock_gcc GCC_VIDEO_AXI0_CLK_BCR>,
+			<&clock_gcc GCC_VIDEO_AXI1_CLK_BCR>;
 
 		reset-names = "video_axi_reset", "video_core_reset",
 				"video_axi0_reset", "video_axi1_reset";
