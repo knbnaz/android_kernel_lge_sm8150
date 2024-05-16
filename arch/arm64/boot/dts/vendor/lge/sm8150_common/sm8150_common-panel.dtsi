@@ -11,7 +11,7 @@
  * GNU General Public License for more details.
  */
 
-#include <dt-bindings/clock/mdss-10nm-pll-clk.h>
+#include <dt-bindings/clock/mdss-7nm-pll-clk.h>
 #include "../../qcom/display/sm8150-sde-display-lge.dtsi"
 
 #include "./settings_panel/dsi-panel-sw43408a-dsc-qhd-cmd.dtsi"

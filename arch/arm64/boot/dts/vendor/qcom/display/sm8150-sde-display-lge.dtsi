@@ -12,7 +12,7 @@
 
 #include "dsi-panel-sim-video.dtsi"
 #include "dsi-panel-sim-cmd.dtsi"
-#include <dt-bindings/clock/mdss-10nm-pll-clk.h>
+#include <dt-bindings/clock/mdss-7nm-pll-clk.h>
 
 &tlmm {
 	display_panel_avdd_eldo_default: display_panel_avdd_eldo_default {
