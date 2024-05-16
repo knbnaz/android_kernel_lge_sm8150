@@ -559,9 +559,6 @@
 		clocks = <&clock_gcc GCC_QUPV3_WRAP1_S0_CLK>,
 			<&clock_gcc GCC_QUPV3_WRAP_1_M_AHB_CLK>,
 			<&clock_gcc GCC_QUPV3_WRAP_1_S_AHB_CLK>;
-		dmas = <&gpi_dma2 0 3 3 64 0>,
-			<&gpi_dma2 1 3 3 64 0>;
-		dma-names = "tx", "rx";
 		pinctrl-names = "default", "sleep";
 		pinctrl-0 = <&qupv3_se8_spi_active>;
 		pinctrl-1 = <&qupv3_se8_spi_active>;
