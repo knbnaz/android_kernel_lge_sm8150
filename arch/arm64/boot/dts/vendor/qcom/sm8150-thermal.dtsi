@@ -10,13 +10,13 @@
  * GNU General Public License for more details.
  */
 
-#include <dt-bindings/thermal/thermal.h>
+#include <dt-bindings/thermal/thermal_qti.h>
 
 &mdss_mdp {
 	#cooling-cells = <2>;
 };
 
-&clock_cpucc {
+&cpufreq_hw {
 	#address-cells = <1>;
 	#size-cells = <1>;
 	lmh_dcvs0: qcom,limits-dcvs@18358800 {
@@ -39,6 +39,49 @@
 		isens-vref-0p8-settings = <880000 880000 20000>;
 		isens_vref_1p8-supply = <&pm8150_l12_ao>;
 		isens-vref-1p8-settings = <1800000 1800000 20000>;
+	};
+
+	qcom,cpu-isolation {
+		compatible = "qcom,cpu-isolate";
+		cpu0_isolate: cpu0-isolate {
+			qcom,cpu = <&CPU0>;
+			#cooling-cells = <2>;
+		};
+
+		cpu1_isolate: cpu1-isolate {
+			qcom,cpu = <&CPU1>;
+			#cooling-cells = <2>;
+		};
+
+		cpu2_isolate: cpu2-isolate {
+			qcom,cpu = <&CPU2>;
+			#cooling-cells = <2>;
+		};
+
+		cpu3_isolate: cpu3-isolate {
+			qcom,cpu = <&CPU3>;
+			#cooling-cells = <2>;
+		};
+
+		cpu4_isolate: cpu4-isolate {
+			qcom,cpu = <&CPU4>;
+			#cooling-cells = <2>;
+		};
+
+		cpu5_isolate: cpu5-isolate {
+			qcom,cpu = <&CPU5>;
+			#cooling-cells = <2>;
+		};
+
+		cpu6_isolate: cpu6-isolate {
+			qcom,cpu = <&CPU6>;
+			#cooling-cells = <2>;
+		};
+
+		cpu7_isolate: cpu7-isolate {
+			qcom,cpu = <&CPU7>;
+			#cooling-cells = <2>;
+		};
 	};
 };
 

@@ -604,7 +604,7 @@
 		reg-names = "se_phys";
 		clock-names = "se-clk", "m-ahb", "s-ahb";
 		clocks = <&clock_gcc GCC_QUPV3_WRAP1_S2_CLK>,
-			<clock_&gcc GCC_QUPV3_WRAP_1_M_AHB_CLK>,
+			<&clock_gcc GCC_QUPV3_WRAP_1_M_AHB_CLK>,
 			<&clock_gcc GCC_QUPV3_WRAP_1_S_AHB_CLK>;
 		pinctrl-names = "default", "sleep";
 		pinctrl-0 = <&qupv3_se10_spi_active>;

@@ -1129,6 +1129,7 @@
 		qcom,count-unit = <0x10000>;
 	};
 
+	cdsp_cdsp_l3_lat: qcom,cdsp-cdsp-l3-lat {
 		compatible = "qcom,devfreq-icc-l3";
 		reg = <0x18321110 0x500>;
 		reg-names = "ftbl-base";
@@ -1557,6 +1558,20 @@
 		clock-names = "xo_clk_src";
 		clocks = <&clock_rpmh RPMH_CXO_CLK>;
 		#clock-cells = <1>;
+	};
+
+	cpufreq_hw: cpufreq@18323000 {
+		compatible = "qcom,cpufreq-hw";
+		reg = <0x18323000 0x1400>, <0x18325800 0x1400>,
+		      <0x18327800 0x1400>;
+		reg-names = "freq-domain0", "freq-domain1",
+			    "freq-domain2";
+
+		clocks = <&clock_rpmh RPMH_CXO_CLK>, <&clock_gcc GPLL0>;
+		clock-names = "xo", "alternate";
+		qcom,no-accumulative-counter;
+
+		#freq-domain-cells = <2>;
 	};
 
 	qcom_clk_led: qcom_clk_led {
