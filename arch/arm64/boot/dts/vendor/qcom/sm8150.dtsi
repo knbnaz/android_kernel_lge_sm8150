@@ -1111,10 +1111,11 @@
 	};
 
 	npu_npu_ddr_bw: qcom,npu-npu-ddr-bw {
-		compatible = "qcom,devbw";
+		compatible = "qcom,devfreq-icc-ddr";
 		governor = "performance";
-		qcom,src-dst-ports = <MSM_BUS_MASTER_NPU MSM_BUS_SLAVE_EBI_CH0>;
-		operating-points-v2 = <&suspendable_ddr_bw_opp_table>;
+		interconnects = <&compute_noc MASTER_NPU &mc_virt SLAVE_EBI1>;
+		operating-points-v2 = <&ddr_bw_opp_table>;
+		qcom,active-only;
 	};
 
 	npu_npu_ddr_bwmon: qcom,npu-npu-ddr-bwmon@9960300 {
@@ -1128,74 +1129,83 @@
 		qcom,count-unit = <0x10000>;
 	};
 
-	cdsp_cdsp_l3_lat: qcom,cdsp-cdsp-l3-lat {
-		compatible = "devfreq-simple-dev";
-		clock-names = "devfreq_clk";
-		clocks = <&clock_cpucc L3_MISC_VOTE_CLK>;
+		compatible = "qcom,devfreq-icc-l3";
+		reg = <0x18321110 0x500>;
+		reg-names = "ftbl-base";
+		qcom,ftbl-row-size = <0x20>;
 		governor = "powersave";
+		interconnects = <&osm_l3 MASTER_OSM_L3_APPS
+				&osm_l3 SLAVE_OSM_L3_MISC>;
 	};
 
 	cpu0_cpu_l3_lat: qcom,cpu0-cpu-l3-lat {
-		compatible = "devfreq-simple-dev";
-		clock-names = "devfreq_clk";
-		clocks = <&clock_cpucc L3_CLUSTER0_VOTE_CLK>;
+		compatible = "qcom,devfreq-icc-l3";
+		reg = <0x18321110 0x500>;
+		reg-names = "ftbl-base";
+		qcom,ftbl-row-size = <0x20>;
 		governor = "performance";
+		interconnects = <&osm_l3 MASTER_OSM_L3_APPS
+				&osm_l3 SLAVE_OSM_L3_CLUSTER0>;
 	};
 
 	cpu4_cpu_l3_lat: qcom,cpu4-cpu-l3-lat {
-		compatible = "devfreq-simple-dev";
-		clock-names = "devfreq_clk";
-		clocks = <&clock_cpucc L3_CLUSTER1_VOTE_CLK>;
+		compatible = "qcom,devfreq-icc-l3";
+		reg = <0x18321110 0x500>;
+		reg-names = "ftbl-base";
+		qcom,ftbl-row-size = <0x20>;
 		governor = "performance";
+		interconnects = <&osm_l3 MASTER_OSM_L3_APPS
+				&osm_l3 SLAVE_OSM_L3_CLUSTER1>;
 	};
+
 	cpu7_cpu_l3_lat: qcom,cpu7-cpu-l3-lat {
-		compatible = "devfreq-simple-dev";
-		clock-names = "devfreq_clk";
-		clocks = <&clock_cpucc L3_CLUSTER2_VOTE_CLK>;
+		compatible = "qcom,devfreq-icc-l3";
+		reg = <0x18321110 0x500>;
+		reg-names = "ftbl-base";
+		qcom,ftbl-row-size = <0x20>;
 		governor = "performance";
+		interconnects = <&osm_l3 MASTER_OSM_L3_APPS
+				&osm_l3 SLAVE_OSM_L3_CLUSTER2>;
 	};
 
 	cpu0_cpu_llcc_lat: qcom,cpu0-cpu-llcc-lat {
-		compatible = "qcom,devbw";
+		compatible = "qcom,devfreq-icc";
 		governor = "performance";
-		qcom,src-dst-ports =
-			<MSM_BUS_MASTER_AMPSS_M0 MSM_BUS_SLAVE_LLCC>;
+		interconnects = <&gem_noc MASTER_APPSS_PROC
+				&gem_noc SLAVE_LLCC>;
 		qcom,active-only;
 		operating-points-v2 = <&llcc_bw_opp_table>;
 	};
 
 	cpu4_cpu_llcc_lat: qcom,cpu4-cpu-llcc-lat {
-		compatible = "qcom,devbw";
+		compatible = "qcom,devfreq-icc";
 		governor = "performance";
-		qcom,src-dst-ports =
-			<MSM_BUS_MASTER_AMPSS_M0 MSM_BUS_SLAVE_LLCC>;
+		interconnects = <&gem_noc MASTER_APPSS_PROC
+				&gem_noc SLAVE_LLCC>;
 		qcom,active-only;
 		operating-points-v2 = <&llcc_bw_opp_table>;
 	};
 
 	cpu0_llcc_ddr_lat: qcom,cpu0-llcc-ddr-lat {
-		compatible = "qcom,devbw";
+		compatible = "qcom,devfreq-icc-ddr";
 		governor = "performance";
-		qcom,src-dst-ports =
-			<MSM_BUS_MASTER_LLCC MSM_BUS_SLAVE_EBI_CH0>;
+		interconnects = <&mc_virt MASTER_LLCC &mc_virt SLAVE_EBI1>;
 		qcom,active-only;
 		operating-points-v2 = <&ddr_bw_opp_table>;
 	};
 
 	cpu4_llcc_ddr_lat: qcom,cpu4-llcc-ddr-lat {
-		compatible = "qcom,devbw";
+		compatible = "qcom,devfreq-icc-ddr";
 		governor = "performance";
-		qcom,src-dst-ports =
-			<MSM_BUS_MASTER_LLCC MSM_BUS_SLAVE_EBI_CH0>;
+		interconnects = <&mc_virt MASTER_LLCC &mc_virt SLAVE_EBI1>;
 		qcom,active-only;
 		operating-points-v2 = <&ddr_bw_opp_table>;
 	};
 
 	cpu4_cpu_ddr_latfloor: qcom,cpu4-cpu-ddr-latfloor {
-		compatible = "qcom,devbw";
+		compatible = "qcom,devfreq-icc-ddr";
 		governor = "performance";
-		qcom,src-dst-ports =
-			<MSM_BUS_MASTER_LLCC MSM_BUS_SLAVE_EBI_CH0>;
+		interconnects = <&mc_virt MASTER_LLCC &mc_virt SLAVE_EBI1>;
 		qcom,active-only;
 		operating-points-v2 = <&ddr_bw_opp_table>;
 	};
@@ -1532,20 +1542,6 @@
 	mccc_debug: syscon@90b0000 {
 		compatible = "syscon";
 		reg = <0x90b0000 0x1000>;
-	};
-
-	clock_cpucc: qcom,cpucc {
-		compatible = "qcom,clk-cpu-osm";
-		reg = <0x18321000 0x1400>,
-			<0x18323000 0x1400>,
-			<0x18325800 0x1400>,
-			<0x18327800 0x1400>;
-		reg-names = "osm_l3_base", "osm_pwrcl_base",
-			"osm_perfcl_base", "osm_perfpcl_base";
-		l3-devs = <&cpu0_cpu_l3_lat &cpu4_cpu_l3_lat &cdsp_cdsp_l3_lat
-			&cpu7_cpu_l3_lat>;
-
-		#clock-cells = <1>;
 	};
 
 	clock_debugcc: qcom,cc-debug {
