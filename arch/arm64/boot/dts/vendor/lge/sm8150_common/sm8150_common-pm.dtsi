@@ -376,7 +376,7 @@
 	qcom,fg-esr-cal-temp-thresh = <10 40>;
 	qcom,fg-batt-therm-freq = <8>;
 	qcom,fg-delta-soc-thr = <3>;
-	io-channels = <&pm8150b_vadc ADC_BAT_ID_PU2>;
+	io-channels = <&pm8150b_vadc ADC5_BAT_ID_100K_PU>;
 	io-channel-names = "bat_id";
 };
 
@@ -389,12 +389,12 @@
 	lge,prot-overchg-ent-chg-off-uv = <20000>;
 	lge,prot-overchg-rel-off-uv = <50000>;
 
-	io-channels = <&pm8150b_vadc ADC_MID_CHG_DIV6>,
-		<&pm8150b_vadc ADC_USB_IN_I>,
-		<&pm8150b_vadc ADC_SBUx>,
-		<&pm8150b_vadc ADC_VPH_PWR>,
-		<&pm8150b_vadc ADC_CHG_TEMP>,
-		<&pm8150l_vadc ADC_AMUX_THM2>;
+	io-channels = <&pm8150b_vadc ADC5_MID_CHG_DIV6>,
+		<&pm8150b_vadc ADC5_USB_IN_I>,
+		<&pm8150b_vadc ADC5_SBUx>,
+		<&pm8150b_vadc ADC5_VPH_PWR>,
+		<&pm8150b_vadc ADC5_CHG_TEMP>,
+		<&pm8150l_vadc ADC5_AMUX_THM2>;
 	io-channel-names = "mid_voltage",
 		"usb_in_current",
 		"sbux_res",
@@ -422,26 +422,26 @@
 };
 
 &smb1355_charger {
-	io-channels = <&pm8150b_vadc ADC_AMUX_THM2>;
+	io-channels = <&pm8150b_vadc ADC5_AMUX_THM2>;
 	io-channel-names = "charger_temp";
 	status = "ok";
 };
 
 &pm8150b_vadc {
 	vph_pwr {
-		reg = <ADC_VPH_PWR>;
+		reg = <ADC5_VPH_PWR>;
 		label = "vph_pwr";
 		qcom,pre-scaling = <1 3>;
 	};
 
 	vcoin {
-		reg = <ADC_VCOIN>;
+		reg = <ADC5_VCOIN>;
 		label = "vcoin";
 		qcom,pre-scaling = <1 3>;
 	};
 
 	conn_therm {
-		reg = <ADC_AMUX_THM3_PU2>;
+		reg = <ADC5_AMUX_THM3_100K_PU>;
 		label = "conn_therm";
 		qcom,ratiometric;
 		qcom,hw-settle-time = <200>;
@@ -449,31 +449,31 @@
 	};
 
 	chg_sbux {
-		reg = <ADC_SBUx>;
+		reg = <ADC5_SBUx>;
 		label = "chg_sbux";
 		qcom,pre-scaling = <1 3>;
 	};
 
 	mid_chg_div6 {
-		reg = <ADC_MID_CHG_DIV6>;
+		reg = <ADC5_MID_CHG_DIV6>;
 		label = "chg_mid";
 		qcom,pre-scaling = <1 6>;
 	};
 
 	usb_in_i_uv {
-		reg = <ADC_USB_IN_I>;
+		reg = <ADC5_USB_IN_I>;
 		label = "usb_in_i_uv";
 		qcom,pre-scaling = <1 1>;
 	};
 
 	usb_in_v_div_16 {
-		reg = <ADC_USB_IN_V_16>;
+		reg = <ADC5_USB_IN_V_16>;
 		label = "usb_in_v_div_16";
 		qcom,pre-scaling = <1 16>;
 	};
 
 	bat_id {
-		reg = <ADC_BAT_ID_PU2>;
+		reg = <ADC5_BAT_ID_100K_PU>;
 		label = "bat_id";
 		qcom,pre-scaling = <1 1>;
 	};
@@ -482,19 +482,19 @@
 
 &pm8150_vadc {
 	vph_pwr {
-		reg = <ADC_VPH_PWR>;
+		reg = <ADC5_VPH_PWR>;
 		label = "vph_pwr";
 		qcom,pre-scaling = <1 3>;
 	};
 
 	vcoin {
-		reg = <ADC_VCOIN>;
+		reg = <ADC5_VCOIN>;
 		label = "vcoin";
 		qcom,pre-scaling = <1 3>;
 	};
 
 	xo_therm {
-		reg = <ADC_XO_THERM_PU2>;
+		reg = <ADC5_XO_THERM_100K_PU>;
 		label = "xo_therm";
 		qcom,ratiometric;
 		qcom,hw-settle-time = <200>;
@@ -502,7 +502,7 @@
 	};
 
 	skin_therm {
-		reg = <ADC_AMUX_THM1_PU2>;
+		reg = <ADC5_AMUX_THM1_100K_PU>;
 		label = "skin_therm";
 		qcom,ratiometric;
 		qcom,hw-settle-time = <200>;
@@ -510,7 +510,7 @@
 	};
 
 	pa_therm0 {
-		reg = <ADC_AMUX_THM2_PU2>;
+		reg = <ADC5_AMUX_THM2_100K_PU>;
 		label = "pa_therm0";
 		qcom,ratiometric;
 		qcom,hw-settle-time = <200>;
@@ -521,13 +521,13 @@
 &pm8150l_vadc {
 	compatible = "qcom,spmi-adc5_pm8150l";
 	vph_pwr {
-		reg = <ADC_VPH_PWR>;
+		reg = <ADC5_VPH_PWR>;
 		label = "vph_pwr";
 		qcom,pre-scaling = <1 3>;
 	};
 
 	pa_therm1 {
-		reg = <ADC_AMUX_THM3_PU2>;
+		reg = <ADC5_AMUX_THM3_100K_PU>;
 		label = "pa_therm1";
 		qcom,ratiometric;
 		qcom,hw-settle-time = <200>;
@@ -535,7 +535,7 @@
 	};
 
 	pmic_hardware_id {
-		reg = <ADC_AMUX_THM1_PU2>;
+		reg = <ADC5_AMUX_THM1_100K_PU>;
 		label = "pmic_hardware_id";
 		qcom,ratiometric;
 		qcom,hw-settle-time = <100>;
@@ -543,7 +543,7 @@
 	};
 
 	usb_id {
-		reg = <ADC_AMUX_THM2>;
+		reg = <ADC5_AMUX_THM2>;
 		label = "usb_id";
 		qcom,pre-scaling = <1 1>;
 	};
@@ -551,7 +551,7 @@
 
 &pm8150b_adc_tm {
 	wp_therm {
-		reg = <ADC_AMUX_THM1_PU2>;
+		reg = <ADC5_AMUX_THM1_100K_PU>;
 		qcom,ratiometric;
 		qcom,hw-settle-time = <200>;
 	};
@@ -559,19 +559,19 @@
 
 &pm8150_adc_tm {
 	xo_therm {
-		reg = <ADC_XO_THERM_PU2>;
+		reg = <ADC5_XO_THERM_100K_PU>;
 		qcom,ratiometric;
 		qcom,hw-settle-time = <200>;
 	};
 
 	skin_therm {
-		reg = <ADC_AMUX_THM1_PU2>;
+		reg = <ADC5_AMUX_THM1_100K_PU>;
 		qcom,ratiometric;
 		qcom,hw-settle-time = <200>;
 	};
 
 	pa_therm0 {
-		reg = <ADC_AMUX_THM2_PU2>;
+		reg = <ADC5_AMUX_THM2_100K_PU>;
 		qcom,ratiometric;
 		qcom,hw-settle-time = <200>;
 	};
@@ -580,7 +580,7 @@
 
 &pm8150l_adc_tm {
 	pa_therm1 {
-		reg = <ADC_AMUX_THM3_PU2>;
+		reg = <ADC5_AMUX_THM3_100K_PU>;
 		qcom,ratiometric;
 		qcom,hw-settle-time = <200>;
 	};
@@ -698,7 +698,7 @@
 		polling-delay-passive = <0>;
 		polling-delay = <0>;
 		thermal-governor = "user_space";
-		thermal-sensors = <&pm8150b_adc_tm ADC_AMUX_THM1_PU2>;
+		thermal-sensors = <&pm8150b_adc_tm ADC5_AMUX_THM1_100K_PU>;
 		trips {
 			active-config0 {
 				temperature = <125000>;
@@ -712,7 +712,7 @@
 		polling-delay-passive = <0>;
 		polling-delay = <0>;
 		thermal-governor = "user_space";
-		thermal-sensors = <&pm8150_adc_tm ADC_XO_THERM_PU2>;
+		thermal-sensors = <&pm8150_adc_tm ADC5_XO_THERM_100K_PU>;
 		trips {
 			active-config0 {
 				temperature = <125000>;
@@ -726,7 +726,7 @@
 		polling-delay-passive = <0>;
 		polling-delay = <0>;
 		thermal-governor = "user_space";
-		thermal-sensors = <&pm8150_adc_tm ADC_AMUX_THM1_PU2>;
+		thermal-sensors = <&pm8150_adc_tm ADC5_AMUX_THM1_100K_PU>;
 		trips {
 			active-config0 {
 				temperature = <125000>;
@@ -740,7 +740,7 @@
 		polling-delay-passive = <0>;
 		polling-delay = <0>;
 		thermal-governor = "user_space";
-		thermal-sensors = <&pm8150_adc_tm ADC_AMUX_THM2_PU2>;
+		thermal-sensors = <&pm8150_adc_tm ADC5_AMUX_THM2_100K_PU>;
 		trips {
 			active-config0 {
 				temperature = <125000>;
@@ -754,7 +754,7 @@
 		polling-delay-passive = <0>;
 		polling-delay = <0>;
 		thermal-governor = "user_space";
-		thermal-sensors = <&pm8150l_adc_tm ADC_AMUX_THM3_PU2>;
+		thermal-sensors = <&pm8150l_adc_tm ADC5_AMUX_THM3_100K_PU>;
 		trips {
 			active-config0 {
 				temperature = <125000>;
