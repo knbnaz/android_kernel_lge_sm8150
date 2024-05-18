@@ -18,6 +18,9 @@
 #include "../../qcom/sm8150-thermal-overlay.dtsi"
 
 &qupv3_se4_i2c {
+#address-cells = <1>;
+#size-cells = <0>;
+
 #include "../../qcom/smb1355.dtsi"
 };
 
