@@ -20,8 +20,6 @@
 };
 
 &audio_apr {
-	/delete-node/ sound-pahu;
-	/delete-node/ snd_9360;
 	sound-tavil {
 		compatible = "qcom,sm8150-asoc-snd-tavil";
 		qcom,model = "sm8150-tavil-snd-card";
@@ -127,7 +125,6 @@
 };
 
 &soc {
-	/delete-node/ wcd9360_cdc;
 	qocm,wcd-dsp-glink {
 		compatible = "qcom,wcd-dsp-glink";
 		qcom,wdsp-channels = "g_glink_ctrl",
@@ -180,8 +177,6 @@
 };
 
 &slim_aud {
-	/delete-node/ wcd9360_cdc;
-	/delete-node/ pahu_codec;
 	/delete-node/ swr_master;
 	
 	msm_dai_slim {
