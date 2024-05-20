@@ -518,7 +518,7 @@
 #include "display/sm8150-sde.dtsi"
 #include "msm-rdbg.dtsi"
 
-#include "camera//sm8150-camera.dtsi"
+#include "camera/sm8150-camera.dtsi"
 
 #include "msm-qvr-external.dtsi"
 
