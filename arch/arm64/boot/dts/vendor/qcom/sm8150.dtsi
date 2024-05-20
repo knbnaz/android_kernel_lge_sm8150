@@ -1151,7 +1151,7 @@
 	};
 
 	clock_gcc: qcom,gcc {
-		compatible = "qcom,gcc-sm8150", "syscon";
+		compatible = "qcom,sm8150-gcc", "syscon";
 		reg = <0x100000 0x1f0000>;
 		reg-names = "cc_base";
 		vdd_cx-supply = <&VDD_CX_LEVEL>;
@@ -1162,7 +1162,7 @@
 	};
 
 	clock_videocc: qcom,videocc@ab00000 {
-		compatible = "qcom,videocc-sm8150", "syscon";
+		compatible = "qcom,sm8150-videocc", "syscon";
 		reg = <0xab00000 0x10000>;
 		reg-names = "cc_base";
 		vdd_mm-supply = <&VDD_MMCX_LEVEL>;
@@ -1173,7 +1173,7 @@
 	};
 
 	clock_camcc: qcom,camcc {
-		compatible = "qcom,camcc-sm8150", "syscon";
+		compatible = "qcom,sm8150-camcc", "syscon";
 		reg = <0xad00000 0x10000>;
 		reg-names = "cc_base";
 		vdd_mx-supply = <&VDD_MX_LEVEL>;
@@ -1205,7 +1205,7 @@
 	};
 
 	clock_dispcc: qcom,dispcc {
-		compatible = "qcom,dispcc-sm8150", "syscon";
+		compatible = "qcom,sm8150-dispcc", "syscon";
 		reg = <0xaf00000 0x20000>;
 		reg-names = "cc_base";
 		vdd_mm-supply = <&VDD_MMCX_LEVEL>;
@@ -1216,7 +1216,7 @@
 	};
 
 	clock_npucc: qcom,npucc {
-		compatible = "qcom,npucc-sm8150", "syscon";
+		compatible = "qcom,sm8150-npucc", "syscon";
 		reg = <0x9910000 0x10000>;
 		reg-names = "cc_base";
 		vdd_cx-supply = <&VDD_CX_LEVEL>;
@@ -1226,7 +1226,7 @@
 	};
 
 	clock_gpucc: qcom,gpucc {
-		compatible = "qcom,gpucc-sm8150", "syscon";
+		compatible = "qcom,sm8150-gpucc", "syscon";
 		reg = <0x2c90000 0x9000>;
 		reg-names = "cc_base";
 		vdd_cx-supply = <&VDD_CX_LEVEL>;
@@ -1237,7 +1237,7 @@
 	};
 
 	clock_scc: qcom,scc@2b10000 {
-		compatible = "qcom,scc-sm8150";
+		compatible = "qcom,sm8150-scc";
 		reg = <0x2b10000 0x30000>;
 		vdd_scc_cx-supply = <&pm8150_l8_level>;
 		#clock-cells = <1>;
@@ -1255,7 +1255,7 @@
 	};
 
 	clock_debugcc: qcom,cc-debug {
-		compatible = "qcom,debugcc-sm8150";
+		compatible = "qcom,sm8150-debugcc";
 		qcom,gcc = <&clock_gcc>;
 		qcom,videocc = <&clock_videocc>;
 		qcom,camcc = <&clock_camcc>;

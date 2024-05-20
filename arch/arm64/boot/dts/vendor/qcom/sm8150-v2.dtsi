@@ -52,10 +52,6 @@
 	};
 };
 
-&tmc_etr {
-	/delete-property/ qcom,smmu-s1-bypass;
-};
-
 &mdss_dsi0_pll {
 	compatible = "qcom,mdss_dsi_pll_7nm_v2";
 };
@@ -71,27 +67,27 @@
 };
 
 &clock_gcc {
-	compatible = "qcom,gcc-sm8150-v2", "syscon";
+	compatible = "qcom,sm8150-gcc-v2", "syscon";
 };
 
 &clock_camcc {
-	compatible = "qcom,camcc-sm8150-v2", "syscon";
+	compatible = "qcom,sm8150-camcc-v2", "syscon";
 };
 
 &clock_dispcc {
-	compatible = "qcom,dispcc-sm8150-v2", "syscon";
+	compatible = "qcom,sm8150-dispcc-v2", "syscon";
 };
 
 &clock_videocc {
-	compatible = "qcom,videocc-sm8150-v2", "syscon";
+	compatible = "qcom,sm8150-videocc-v2", "syscon";
 };
 
 &clock_npucc {
-	compatible = "qcom,npucc-sm8150-v2", "syscon";
+	compatible = "qcom,sm8150-npucc-v2", "syscon";
 };
 
 &clock_scc {
-	compatible = "qcom,scc-sm8150-v2";
+	compatible = "qcom,sm8150-scc-v2";
 };
 
 #include "msm-arm-smmu-sm8150-v2.dtsi"
