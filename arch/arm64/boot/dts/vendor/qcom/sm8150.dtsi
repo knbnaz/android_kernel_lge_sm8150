@@ -491,6 +491,10 @@
 		compatible = "simple-bus";
 	};
 
+	qcom-secure-buffer {
+		compatible = "qcom,secure-buffer";
+	};
+
 	clocks {
 		xo_board: xo-board {
 			compatible = "fixed-clock";
