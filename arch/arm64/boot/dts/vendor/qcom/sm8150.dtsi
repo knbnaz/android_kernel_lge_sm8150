@@ -2235,8 +2235,8 @@
 		};
 	};
 
-	apcs_glb: mailbox@17c00000 {
-		compatible = "qcom,sm8150-apcs-hmss-global";
+	apss_shared: mailbox@17c00000 {
+		compatible = "qcom,sm8150-apss-shared";
 		reg = <0x17c00000 0x1000>;
 
 		#mbox-cells = <1>;
@@ -2288,7 +2288,7 @@
 		glink_modem: modem {
 			qcom,remote-pid = <1>;
 			transport = "smem";
-			mboxes = <&apcs_glb 12>;
+			mboxes = <&apss_shared 12>;
 			mbox-names = "mpss_smem";
 			interrupts = <GIC_SPI 449 IRQ_TYPE_EDGE_RISING>;
 
@@ -2326,7 +2326,7 @@
 		glink_adsp: adsp {
 			qcom,remote-pid = <2>;
 			transport = "smem";
-			mboxes = <&apcs_glb 8>;
+			mboxes = <&apss_shared 8>;
 			mbox-names = "adsp_smem";
 			interrupts = <GIC_SPI 156 IRQ_TYPE_EDGE_RISING>;
 
@@ -2363,7 +2363,7 @@
 		glink_slpi: dsps {
 			qcom,remote-pid = <3>;
 			transport = "smem";
-			mboxes = <&apcs_glb 24>;
+			mboxes = <&apss_shared 24>;
 			mbox-names = "dsps_smem";
 			interrupts = <GIC_SPI 170 IRQ_TYPE_EDGE_RISING>;
 
@@ -2395,7 +2395,7 @@
 		glink_cdsp: cdsp {
 			qcom,remote-pid = <5>;
 			transport = "smem";
-			mboxes = <&apcs_glb 4>;
+			mboxes = <&apss_shared 4>;
 			mbox-names = "cdsp_smem";
 			interrupts = <GIC_SPI 574 IRQ_TYPE_EDGE_RISING>;
 
