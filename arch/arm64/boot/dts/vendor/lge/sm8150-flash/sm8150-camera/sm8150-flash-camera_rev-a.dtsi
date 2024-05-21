@@ -32,6 +32,9 @@
 };
 
 &soc {
+	#address-cells = <1>;
+	#size-cells = <1>;
+
 	camera_front_iovdd_ldo: gpio-regulator@9 {
 		compatible = "regulator-fixed";
 		reg = <0x09 0x00>;
@@ -132,6 +135,9 @@
 };
 
 &cam_cci0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
 	eeprom_vt: qcom,eeprom@1 {
 		cell-index = <1>;
 		reg = <0x1>;

@@ -7,6 +7,8 @@
 };
 
 &soc {
+	#address-cells = <1>;
+	#size-cells = <1>;
 	/* PIN CONTROL for gf3208 */
 
 	qupv3_se7_spi: spi@89c000 { /* QUP7 */

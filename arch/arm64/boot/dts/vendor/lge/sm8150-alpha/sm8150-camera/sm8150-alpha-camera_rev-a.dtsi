@@ -72,6 +72,9 @@
 };
 
 &cam_cci0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
 	eeprom_vt: qcom,eeprom@1 {
 		cell-index = <1>;
 		reg = <1>;

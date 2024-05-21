@@ -14,6 +14,9 @@
 #include "sm8150-beta-camera_common.dtsi"
 
 &soc {
+	#address-cells = <1>;
+	#size-cells = <1>;
+
 	camera_rear_t_afvdd_ldo: gpio-regulator@a {
 		compatible = "regulator-fixed";
 		reg = <0x0a 0x00>;

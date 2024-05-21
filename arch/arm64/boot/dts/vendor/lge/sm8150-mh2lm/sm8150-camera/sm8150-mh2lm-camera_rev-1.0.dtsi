@@ -44,6 +44,9 @@
 };
 
 &soc {
+	#address-cells = <1>;
+	#size-cells = <1>;
+
 	camera_rear_w_dvdd_ldo: gpio-regulator@5 {
 		compatible = "regulator-fixed";
 		reg = <0x05 0x00>;
@@ -74,6 +77,9 @@
 };
 
 &cam_cci0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
 	eeprom_vt: qcom,eeprom@1 {
 		cell-index = <1>;
 		reg = <0x1>;

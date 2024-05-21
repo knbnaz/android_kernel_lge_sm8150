@@ -11,6 +11,9 @@
  */
 
 &qupv3_se17_i2c {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
 	synaptics_s3706@20 {
 		status = "disable";
 		compatible = "synaptics,s3706";

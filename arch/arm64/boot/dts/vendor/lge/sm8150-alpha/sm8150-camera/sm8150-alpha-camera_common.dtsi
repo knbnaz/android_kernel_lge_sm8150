@@ -283,6 +283,9 @@
 };
 
 &soc {
+	#address-cells = <1>;
+	#size-cells = <1>;
+
 	led_flash_n: qcom,camera-flash@0 {
 		cell-index = <0>;
 		reg = <0x00 0x00>;
@@ -567,6 +570,9 @@
 };
 
 &cam_cci0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
 	qcom,cam-res-mgr {
 		compatible = "qcom,cam-res-mgr";
 		status = "ok";
