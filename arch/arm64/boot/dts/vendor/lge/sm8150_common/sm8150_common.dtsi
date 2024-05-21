@@ -14,6 +14,14 @@
 	pcie0: qcom,pcie@1c00000 {
 		status = "disabled";
 	};
+
+	mcd {
+		compatible = "qcom,mcd";
+		qcom,ce-hw-instance = <0>;
+		qcom,ce-device = <0>;
+		interrupts = <GIC_SPI 737 IRQ_TYPE_EDGE_RISING>;
+		interrupt-names = "mcd_irq";
+	};
 };
 
 &reserved_memory {
