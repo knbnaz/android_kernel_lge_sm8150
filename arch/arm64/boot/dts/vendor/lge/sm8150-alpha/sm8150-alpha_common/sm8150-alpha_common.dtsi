@@ -31,6 +31,8 @@
 };
 
 &reserved_memory {
+	#address-cells = <2>;
+	#size-cells = <2>;
 	/delete-node/ cdsp_regions;
 	/delete-node/ disp_rdump_region;
 	/delete-node/ cont_splash_region;

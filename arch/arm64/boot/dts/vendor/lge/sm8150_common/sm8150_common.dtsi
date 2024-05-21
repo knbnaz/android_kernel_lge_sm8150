@@ -17,6 +17,8 @@
 };
 
 &reserved_memory {
+	#address-cells = <2>;
+	#size-cells = <2>;
 	/delete-node/ qseecom_region;
 	/delete-node/ pil_adsp_region;
 	/delete-node/ modem_region;
@@ -30,9 +32,7 @@
 	ramoops: ramoops@b0000000 {
 		compatible = "ramoops";
 		reg = <0 0xb0000000 0 0x300000>;
-		mem-size = <0x280000>;
-		mem-address = <0xb0000000>;
-		record-size = <4096>;
+		record-size = <0x8000>;
 		console-size = <0x40000>;
 		ftrace-size = <0x40000>;
 		pmsg-size = <0x200000>;
