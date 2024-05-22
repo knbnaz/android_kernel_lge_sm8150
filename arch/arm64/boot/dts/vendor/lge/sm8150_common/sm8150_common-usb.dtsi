@@ -33,18 +33,4 @@
 			bias-disable;
 		};
 	};
-
-	/*
-	lge_sbu_switch_ovp_active: lge_sbu_switch_ovp_active {
-		mux {
-			pins = "gpio79";
-			function = "gpio";
-		};
-
-		config {
-			pins = "gpio79";
-			bias-pull-up;
-		};
-	};
-	*/
 };
