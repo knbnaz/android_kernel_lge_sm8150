@@ -11,9 +11,6 @@
  * GNU General Public License for more details.
  */
 
-#include "../sm8150-flash_common/sm8150-flash_common-nfc.dtsi"
-
-
 &qupv3_se9_i2c { /* QUP_9 (NFC) */
 	#address-cells = <1>;
 	#size-cells = <0>;
