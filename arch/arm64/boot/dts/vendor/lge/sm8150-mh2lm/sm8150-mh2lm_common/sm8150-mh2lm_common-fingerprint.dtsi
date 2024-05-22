@@ -11,8 +11,6 @@
  * GNU General Public License for more details.
  */
 
-#include "../../sm8150_common/sm8150_common-fingerprint.dtsi"
-
 &soc {
 	#address-cells = <1>;
 	#size-cells = <1>;

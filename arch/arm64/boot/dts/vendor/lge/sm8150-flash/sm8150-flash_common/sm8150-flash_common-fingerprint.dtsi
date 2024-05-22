@@ -11,8 +11,6 @@
  * GNU General Public License for more details.
  */
 
-#include "../../sm8150_common/sm8150_common-fingerprint.dtsi"
-
 &soc {
 	/* L7C pm8150l_l7 */
 	rpmh-regulator-ldoc7 {
