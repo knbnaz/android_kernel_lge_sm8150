@@ -21,6 +21,8 @@
 
 &qupv3_se8_spi { /* [Modified] QUP_BASE address for BLSP# QUP# (ref. AP datasheet, This model use BLSP-1 QUP7) */
 	/* [Modified] Ref. kernel/msm-4.14/arch/arm64/boot/dts/qcom/sm8150-qupv3.dtsi */
+	#address-cells = <1>;
+	#size-cells = <0>;
 
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&qupv3_se8_spibus_active &spi_tdmb_active>;
@@ -72,7 +74,7 @@
 		//ldo-en-gpio = <&tlmm ?? 0>;
 
 		/* [Modified] when use DMB_EN & LDO_EN same gpio, change below property to 1 */
-		dmb-en-lna-en-same-gpio = <1>;
+		dmb-en-lna-en-same-gpio = <&tlmm 1 0>;
 
 
 	/* [ANT Switch Information]

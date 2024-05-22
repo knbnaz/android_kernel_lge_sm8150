@@ -22,6 +22,7 @@
 			qcom,init-voltage = <3000000>;
 			regulator-always-on;
 		};
+	};
 
 	fingerprint@0 {
 		status = "ok";

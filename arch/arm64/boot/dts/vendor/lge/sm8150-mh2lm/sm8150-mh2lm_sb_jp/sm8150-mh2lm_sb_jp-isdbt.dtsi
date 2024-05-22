@@ -12,9 +12,12 @@
  */
 
 &soc {
+	#address-cells = <1>;
+	#size-cells = <1>;
 	qupv3_se1_i2c: i2c@884000 {
 		compatible = "qcom,i2c-geni";
 		reg = <0x884000 0x4000>;
+		interrupt-parent = <&tlmm>;
 		interrupts = <GIC_SPI 602 0>;
 		#address-cells = <1>;
 		#size-cells = <0>;

@@ -25,6 +25,9 @@
 };
 
 &qupv3_se0_i2c { /* QUPV3 SE0  */
+	#address-cells = <1>;
+	#size-cells = <0>;
+
 	status = "ok";
 	qcom,clk-freq-in  = <19200000>;
 	adsemicon_atmf04@5a {

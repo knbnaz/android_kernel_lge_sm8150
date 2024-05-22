@@ -840,3 +840,4 @@
 		clock-cntl-level = "turbo";
 		clock-rates = <19200000>;
 	};
+};

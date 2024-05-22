@@ -33,6 +33,8 @@
 
 // override sec app memory region for OIF
 &soc {
+	#address-cells = <1>;
+	#size-cells = <1>;
 	qcom_seecom: qseecom@87900000 {
 		reg = <0x87900000 0x2C00000>;
 	};

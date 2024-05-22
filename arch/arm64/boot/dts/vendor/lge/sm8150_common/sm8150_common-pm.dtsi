@@ -32,7 +32,7 @@
 		compatible = "lge,gpio-debug";
 		reg = <0x03100000 0x900000>;
 		reg-names = "tlmm-base";
-		lge,n-msm-gpio = <0xAF>;  /* SM8150 0 to 174 */
+		lge,n-msm-gpio = <&tlmm 0xaf 0>;  /* SM8150 0 to 174 */
 	};
 
 	lge,monitor-thermal {

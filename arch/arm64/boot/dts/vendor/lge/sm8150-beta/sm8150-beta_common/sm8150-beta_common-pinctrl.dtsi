@@ -14,7 +14,7 @@
 #include "../../sm8150_common/sm8150_common-pinctrl.dtsi"
 
 &tlmm {
-	lge,access-denied-gpios = <92 93 94 95 98 99 100 101>;
+	lge,access-denied-gpios = <&tlmm 92 93 94 95 98 99 100 101>;
 
 	sde_dp_aux_active:sde_dp_aux_active {
 		mux {

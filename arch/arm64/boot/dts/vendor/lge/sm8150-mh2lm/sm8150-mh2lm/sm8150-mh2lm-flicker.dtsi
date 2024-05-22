@@ -12,6 +12,9 @@
 
 
 &qupv3_se4_i2c { /* QUP_4 (Flicker) */
+	#address-cells = <1>;
+	#size-cells = <0>;
+
 	qcom,clk-freq-out = <400000>;
 	status = "ok";
 	tcs3407@39 {

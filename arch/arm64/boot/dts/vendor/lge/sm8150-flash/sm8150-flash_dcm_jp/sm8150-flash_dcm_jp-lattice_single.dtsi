@@ -10,6 +10,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
+ 
 &soc {
 	qupv3_se8_spi: spi@a80000 {	// [Modified] QUP_BASE address for BLSP# QUP# (ref. AP datasheet, This model use BLSP-1 QUP7)
 		/* [S][Modified] Ref. kernel/msm-4.14/arch/arm64/boot/dts/qcom/sm8150-qupv3.dtsi */
@@ -23,6 +24,9 @@
 };
 
 &qupv3_se8_spi {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
 	lattice@2 {
 		compatible = "lattice,ice40-fpga-mgr";
 		reg = <2>;
@@ -36,6 +40,9 @@
 };
 
 &qupv3_se10_i2c {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
 	latticei2c@58 {
 		compatible = "lattice,ice40-i2c";
 		reg = <0x58>;

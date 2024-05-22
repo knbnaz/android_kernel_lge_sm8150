@@ -69,6 +69,9 @@
 };
 
 &qupv3_se10_i2c {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
 	lp5521@32 {
 		compatible = "ti,lp5521";
 		status = "ok";
