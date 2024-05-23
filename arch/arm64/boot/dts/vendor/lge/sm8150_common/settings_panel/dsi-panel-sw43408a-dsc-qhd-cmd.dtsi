@@ -14,7 +14,6 @@
     dsi_sw43408a_dsc_qhd_cmd: qcom,mdss_dsi_sw43408a_dsc_qhd_cmd {
         qcom,mdss-dsi-panel-name = "SW43408A cmd mode dsc dsi panel";
 		qcom,mdss-dsi-panel-type = "dsi_cmd_mode";
-
 		qcom,mdss-dsi-virtual-channel-id = <0>;
 		qcom,mdss-dsi-stream = <0>;
 		qcom,mdss-dsi-t-clk-post = <0x23>;
@@ -23,6 +22,8 @@
 		qcom,mdss-dsi-color-order = "rgb_swap_rgb";
 		qcom,mdss-dsi-underflow-color = <0xff>;
 		qcom,mdss-dsi-border-color = <0>;
+		qcom,dsi-ctrl-num = <0>;
+		qcom,dsi-phy-num = <0>;
 		qcom,esd-check-enabled;
 		qcom,mdss-dsi-panel-status-check-mode = "te_signal_check";
 		qcom,mdss-dsi-traffic-mode = "burst_mode";

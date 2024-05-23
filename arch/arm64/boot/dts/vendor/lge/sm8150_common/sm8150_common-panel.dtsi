@@ -58,158 +58,14 @@
 			qcom,supply-post-on-sleep = <0>;
 		};
 	};
-	dsi_sw43408a_dsc_1440_3120_cmd_display: qcom,dsi-display@23 {
-		label = "dsi_sw43408a_dsc_1440_3120_cmd_display";
-		qcom,display-type = "primary";
-		qcom,dsi-ctrl-num = <0>;
-		qcom,dsi-phy-num = <0>;
-		qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
-		qcom,dsi-panel = <&dsi_sw43408a_dsc_qhd_cmd>;
-	};
-	dsi_rm69299_tianma_1080_2248_cmd_display: qcom,dsi-display@24 {
-		label = "dsi_rm69299_tianma_1080_2248_cmd_display";
-		qcom,display-type = "primary";
-		qcom,dsi-ctrl-num = <0>;
-		qcom,dsi-phy-num = <0>;
-		qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
-		qcom,dsi-panel = <&dsi_rm69299_tianma_fhd_cmd>;
-	};
-	dsi_rm69299_tovisdd_1080_2248_cmd_display: qcom,dsi-display@25 {
-		label = "dsi_rm69299_tovisdd_1080_2248_cmd_display";
-		qcom,display-type = "primary";
-		qcom,dsi-ctrl-num = <0>;
-		qcom,dsi-phy-num = <0>;
-		qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
-		qcom,dsi-panel = <&dsi_rm69299_tovisdd_fhd_cmd>;
-	};
-	dsi_sw43410_dsc_1440_3120_cmd_display_pxw: qcom,dsi-display@26 {
-		label = "dsi_sw43410_dsc_1440_3120_cmd_display_pxw";
-		qcom,display-type = "primary";
-		qcom,dsi-ctrl-num = <0>;
-		qcom,dsi-phy-num = <0>;
-		qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
-		qcom,dsi-panel = <&dsi_sw43410_dsc_qhd_cmd_pxw>;
-	};
-	dsi_sw43410_pp2_dsc_1440_3120_cmd_display: qcom,dsi-display@27 {
-		label = "dsi_sw43410_pp2_dsc_1440_3120_cmd_display";
-		qcom,display-type = "primary";
-		qcom,dsi-ctrl-num = <0>;
-		qcom,dsi-phy-num = <0>;
-		qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
-		qcom,dsi-panel = <&dsi_sw43410_pp2_dsc_qhd_cmd>;
-	};
-	dsi_sw43410_dv1_dsc_1440_3120_cmd_display: qcom,dsi-display@28 {
-		label = "dsi_sw43410_dv1_dsc_1440_3120_cmd_display";
-		qcom,display-type = "primary";
-		qcom,dsi-ctrl-num = <0>;
-		qcom,dsi-phy-num = <0>;
-		qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
-		qcom,dsi-panel = <&dsi_sw43410_dv1_dsc_qhd_cmd>;
-	};
-	dsi_sw43410_dv2_dsc_1440_3120_cmd_display: qcom,dsi-display@29 {
-		label = "dsi_sw43410_dv2_dsc_1440_3120_cmd_display";
-		qcom,display-type = "primary";
-		qcom,dsi-ctrl-num = <0>;
-		qcom,dsi-phy-num = <0>;
-		qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
-		qcom,dsi-panel = <&dsi_sw43410_dv2_dsc_qhd_cmd>;
-	};
-	dsi_sw43410_pv_dsc_1440_3120_cmd_display: qcom,dsi-display@30 {
-		label = "dsi_sw43410_pv_dsc_1440_3120_cmd_display";
-		qcom,display-type = "primary";
-		qcom,dsi-ctrl-num = <0>;
-		qcom,dsi-phy-num = <0>;
-		qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
-		qcom,dsi-panel = <&dsi_sw43410_pv_dsc_qhd_cmd>;
-	};
-	dsi_sw43410_dv2_gi_dsc_1440_3120_cmd_display: qcom,dsi-display@31 {
-		label = "dsi_sw43410_dv2_gi_dsc_1440_3120_cmd_display";
-		qcom,display-type = "primary";
-		qcom,dsi-ctrl-num = <0>;
-		qcom,dsi-phy-num = <0>;
-		qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
-		qcom,dsi-panel = <&dsi_sw43410_dv2_gi_dsc_qhd_cmd>;
-	};
-	dsi_sw43410_pv_gi_dsc_1440_3120_cmd_display: qcom,dsi-display@32 {
-		label = "dsi_sw43410_pv_gi_dsc_1440_3120_cmd_display";
-		qcom,display-type = "primary";
-		qcom,dsi-ctrl-num = <0>;
-		qcom,dsi-phy-num = <0>;
-		qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
-		qcom,dsi-panel = <&dsi_sw43410_pv_gi_dsc_qhd_cmd>;
-	};
-	dsi_sw43410_mp_dsc_1440_3120_cmd_display: qcom,dsi-display@33 {
-		label = "dsi_sw43410_mp_dsc_1440_3120_cmd_display";
-		qcom,display-type = "primary";
-		qcom,dsi-ctrl-num = <0>;
-		qcom,dsi-phy-num = <0>;
-		qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
-		qcom,dsi-panel = <&dsi_sw43410_mp_dsc_qhd_cmd>;
-	};
-	dsi_rm69299_tovismd_1080_2248_cmd_display: qcom,dsi-display@34 {
-		label = "dsi_rm69299_tovismd_1080_2248_cmd_display";
-		qcom,display-type = "primary";
-		qcom,dsi-ctrl-num = <0>;
-		qcom,dsi-phy-num = <0>;
-		qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
-		qcom,dsi-panel = <&dsi_rm69299_tovismd_fhd_cmd>;
-	};
-	dsi_rm69299_tovismd_dv1_1080_2248_cmd_display: qcom,dsi-display@35 {
-		label = "dsi_rm69299_tovismd_dv1_1080_2248_cmd_display";
-		qcom,display-type = "primary";
-		qcom,dsi-ctrl-num = <0>;
-		qcom,dsi-phy-num = <0>;
-		qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
-		qcom,dsi-panel = <&dsi_rm69299_tovismd_dv1_fhd_cmd>;
-	};
-	dsi_rm692A9_tovismd_pp1_1080_2340_cmd_display: qcom,dsi-display@36 {
-		label = "dsi_rm692A9_tovismd_pp1_1080_2340_cmd_display";
-		qcom,display-type = "primary";
-		qcom,dsi-ctrl-num = <0>;
-		qcom,dsi-phy-num = <0>;
-		qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
-		qcom,dsi-panel = <&dsi_rm692A9_tovismd_pp1_fhd_cmd>;
-	};
-	dsi_r66456_tianmamd_pp1_1080_2340_cmd_display: qcom,dsi-display@37 {
-		label = "dsi_r66456_tianmamd_pp1_1080_2340_cmd_display";
-		qcom,display-type = "primary";
-		qcom,dsi-ctrl-num = <0>;
-		qcom,dsi-phy-num = <0>;
-		qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
-		qcom,dsi-panel = <&dsi_r66456_tianmamd_pp1_fhd_cmd>;
-	};
-	dsi_r66456_tianmamd_dv1_1080_2340_cmd_display: qcom,dsi-display@38 {
-		label = "dsi_r66456_tianmamd_dv1_1080_2340_cmd_display";
-		qcom,display-type = "primary";
-		qcom,dsi-ctrl-num = <0>;
-		qcom,dsi-phy-num = <0>;
-		qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
-		qcom,dsi-panel = <&dsi_r66456_tianmamd_dv1_fhd_cmd>;
-	};
-	dsi_r66456_tianmamd_dv2_1080_2340_cmd_display: qcom,dsi-display@39 {
-		label = "dsi_r66456_tianmamd_dv2_1080_2340_cmd_display";
-		qcom,display-type = "primary";
-		qcom,dsi-ctrl-num = <0>;
-		qcom,dsi-phy-num = <0>;
-		qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
-		qcom,dsi-panel = <&dsi_r66456_tianmamd_dv2_fhd_cmd>;
-	};
-	dsi_r66456_tianmamd_pv_1080_2340_cmd_display: qcom,dsi-display@40 {
-		label = "dsi_r66456_tianmamd_pv_1080_2340_cmd_display";
-		qcom,display-type = "primary";
-		qcom,dsi-ctrl-num = <0>;
-		qcom,dsi-phy-num = <0>;
-		qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
-		qcom,dsi-panel = <&dsi_r66456_tianmamd_pv_fhd_cmd>;
-	};
 };
 
 &sde_dsi{
 		qcom,dsi-ctrl = <&mdss_dsi0>;
 		qcom,dsi-phy = <&mdss_dsi_phy0>;
 
-		clocks = <&mdss_dsi0_pll BYTECLK_MUX_0_CLK>,
-			 <&mdss_dsi0_pll PCLK_MUX_0_CLK>;
+		clocks = <&mdss_dsi_phy0 BYTECLK_MUX_0_CLK>,
+			 <&mdss_dsi_phy0 PCLK_MUX_0_CLK>;
 		clock-names = "mux_byte_clk0", "mux_pixel_clk0";
 
 		pinctrl-names = "panel_active", "panel_suspend";
@@ -219,26 +75,8 @@
 		vddi-supply = <&pm8150_l14>;
 		vpnl-supply = <&pm8150_l17>;
 
-		qcom,dsi-display-list =
-			<&dsi_sim_cmd_display
-			 &dsi_rm69299_tianma_1080_2248_cmd_display
-			 &dsi_rm69299_tovisdd_1080_2248_cmd_display
-			 &dsi_rm69299_tovismd_1080_2248_cmd_display
-			 &dsi_rm69299_tovismd_dv1_1080_2248_cmd_display
-			 &dsi_rm692A9_tovismd_pp1_1080_2340_cmd_display
-			 &dsi_r66456_tianmamd_pp1_1080_2340_cmd_display
-			 &dsi_r66456_tianmamd_dv1_1080_2340_cmd_display
-			 &dsi_r66456_tianmamd_dv2_1080_2340_cmd_display
-			 &dsi_r66456_tianmamd_pv_1080_2340_cmd_display
-			 &dsi_sw43408a_dsc_1440_3120_cmd_display
-			 &dsi_sw43410_dsc_1440_3120_cmd_display_pxw
-			 &dsi_sw43410_pp2_dsc_1440_3120_cmd_display
-			 &dsi_sw43410_dv1_dsc_1440_3120_cmd_display
-			 &dsi_sw43410_dv2_dsc_1440_3120_cmd_display
-			 &dsi_sw43410_pv_dsc_1440_3120_cmd_display
-			 &dsi_sw43410_dv2_gi_dsc_1440_3120_cmd_display
-			 &dsi_sw43410_pv_gi_dsc_1440_3120_cmd_display
-			 &dsi_sw43410_mp_dsc_1440_3120_cmd_display>;
+		qcom,mdp = <&mdss_mdp>;
+		qcom,dsi-default-panel = <&dsi_sim_cmd>;
 	};
 
 &sde_dp {
@@ -259,6 +97,7 @@
 };
 
 &dsi_sw43408a_dsc_qhd_cmd {
+	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_sm8150>;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <1>;
@@ -275,6 +114,7 @@
 };
 
 &dsi_sw43410_dsc_qhd_cmd_pxw {
+	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_sm8150>;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <1>;
@@ -291,6 +131,7 @@
 };
 
 &dsi_sw43410_pp2_dsc_qhd_cmd {
+	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_sm8150>;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <1>;
@@ -307,6 +148,7 @@
 };
 
 &dsi_sw43410_dv1_dsc_qhd_cmd {
+	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_sm8150>;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <1>;
@@ -323,6 +165,7 @@
 };
 
 &dsi_sw43410_dv2_dsc_qhd_cmd {
+	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_sm8150>;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <1>;
@@ -339,6 +182,7 @@
 };
 
 &dsi_sw43410_pv_dsc_qhd_cmd {
+	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_sm8150>;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <1>;
@@ -355,6 +199,7 @@
 };
 
 &dsi_sw43410_dv2_gi_dsc_qhd_cmd {
+	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_sm8150>;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <1>;
@@ -371,6 +216,7 @@
 };
 
 &dsi_sw43410_pv_gi_dsc_qhd_cmd {
+	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_sm8150>;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <1>;
@@ -387,6 +233,7 @@
 };
 
 &dsi_sw43410_mp_dsc_qhd_cmd {
+	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_sm8150>;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <1>;
@@ -403,6 +250,7 @@
 };
 
 &dsi_rm69299_tianma_fhd_cmd {
+	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_sm8150>;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <1>;
@@ -419,6 +267,7 @@
 };
 
 &dsi_rm69299_tovisdd_fhd_cmd {
+	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_sm8150>;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <1>;
@@ -435,6 +284,7 @@
 };
 
 &dsi_rm69299_tovismd_fhd_cmd {
+	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_sm8150>;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <1>;
@@ -451,6 +301,7 @@
 };
 
 &dsi_rm69299_tovismd_dv1_fhd_cmd {
+	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_sm8150>;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <1>;
@@ -467,6 +318,7 @@
 };
 
 &dsi_rm692A9_tovismd_pp1_fhd_cmd {
+	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_sm8150>;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <1>;
@@ -483,6 +335,7 @@
 };
 
 &dsi_r66456_tianmamd_pp1_fhd_cmd {
+	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_sm8150>;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <1>;
@@ -499,6 +352,7 @@
 };
 
 &dsi_r66456_tianmamd_dv1_fhd_cmd {
+	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_sm8150>;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <1>;
@@ -515,6 +369,7 @@
 };
 
 &dsi_r66456_tianmamd_dv2_fhd_cmd {
+	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_sm8150>;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <1>;
@@ -531,6 +386,7 @@
 };
 
 &dsi_r66456_tianmamd_pv_fhd_cmd {
+	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_sm8150>;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <1>;
@@ -544,10 +400,6 @@
 	lge,dcs-brightness-bigendian;
 	lge,default-brightness = <158>;
 	lge,reset-after-ddvd;
-};
-
-&dsi_sim_cmd_display {
-	qcom,dsi-display-active;
 };
 
 &dsi_sim_cmd {
