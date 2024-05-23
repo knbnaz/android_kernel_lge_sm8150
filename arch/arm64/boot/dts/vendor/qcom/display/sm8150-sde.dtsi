@@ -50,6 +50,9 @@
 
 		#power-domain-cells = <0>;
 
+		/* Enable thermal cooling device */
+		#cooling-cells = <2>;
+
 		/* hw blocks */
 		qcom,sde-off = <0x1000>;
 		qcom,sde-len = <0x45c>;
@@ -271,22 +274,6 @@
 				qcom,supply-disable-load = <0>;
 			};
 		};
-
-		smmu_sde_unsec: qcom,smmu_sde_unsec_cb {
-			compatible = "qcom,smmu_sde_unsec";
-			iommus = <&apps_smmu 0x800 0x420>;
-			qcom,iommu-dma-addr-pool = <0x00020000 0xfffe0000>;
-			qcom,iommu-faults = "non-fatal";
-			qcom,iommu-earlymap; /* for cont-splash */
-		};
-
-		smmu_sde_sec: qcom,smmu_sde_sec_cb {
-			compatible = "qcom,smmu_sde_sec";
-			iommus = <&apps_smmu 0x801 0x420>;
-			qcom,iommu-dma-addr-pool = <0x00020000 0xfffe0000>;
-			qcom,iommu-faults = "non-fatal";
-			qcom,iommu-vmid = <0xa>; /* VMID_CP_PIXEL */
-		};
 	};
 
 	sde_rscc: qcom,sde_rscc@af20000 {
@@ -476,8 +463,13 @@
 		compatible = "qcom,dsi-phy-v4.0";
 		label = "dsi-phy-0";
 		cell-index = <0>;
-		reg = <0xae94400 0x760>;
-		reg-names = "dsi_phy";
+		#clock-cells = <1>;
+		reg = <0xae94400 0x760>,
+			<0xae94900 0x260>,
+			<0xae94400 0x800>,
+			<0xaf03000 0x8>;
+		reg-names = "dsi_phy", "pll_base", "phy_base", "gdsc_base";
+		pll-label = "dsi_pll_5nm";
 		vdda-0p9-supply = <&pm8150_l5>;
 		qcom,platform-strength-ctrl = [55 03
 						55 03
@@ -490,6 +482,8 @@
 						00 00 0a 0a
 						00 00 8a 8a];
 		qcom,platform-regulator-settings = [1d 1d 1d 1d 1d];
+		qcom,dsi-pll-ssc-en;
+		qcom,dsi-pll-ssc-mode = "down-spread";
 		qcom,phy-supply-entries {
 			#address-cells = <1>;
 			#size-cells = <0>;
@@ -508,8 +502,13 @@
 		compatible = "qcom,dsi-phy-v4.0";
 		label = "dsi-phy-1";
 		cell-index = <1>;
-		reg = <0xae96400 0x760>;
-		reg-names = "dsi_phy";
+		#clock-cells = <1>;
+		reg = <0xae96400 0x760>,
+			<0xae96900 0x260>,
+			<0xae96400 0x800>,
+			<0xaf03000 0x8>;
+		reg-names = "dsi_phy", "pll_base", "phy_base", "gdsc_base";
+		pll-label = "dsi_pll_5nm";
 		vdda-0p9-supply = <&pm8150_l5>;
 		qcom,platform-strength-ctrl = [55 03
 						55 03
@@ -522,6 +521,8 @@
 						00 00 0a 0a
 						00 00 0a 0a
 						00 00 8a 8a];
+		qcom,dsi-pll-ssc-en;
+		qcom,dsi-pll-ssc-mode = "down-spread";
 		qcom,phy-supply-entries {
 			#address-cells = <1>;
 			#size-cells = <0>;
@@ -540,7 +541,7 @@
 		compatible = "qcom,dp-mst-sim";
 	};
 
-	sde_dp: qcom,dp_display@0{
+	sde_dp: qcom,dp_display@ae90000{
 		cell-index = <0>;
 		compatible = "qcom,dp-display";
 
@@ -569,6 +570,7 @@
 		interrupt-parent = <&mdss_mdp>;
 		interrupts = <12 IRQ_TYPE_LEVEL_HIGH>;
 
+		#clock-cells = <1>;
 		clocks =  <&clock_dispcc DISP_CC_MDSS_DP_AUX_CLK>,
 			 <&clock_rpmh RPMH_CXO_CLK>,
 			 <&clock_gcc GCC_USB3_PRIM_CLKREF_CLK>,
@@ -577,9 +579,9 @@
 			 <&clock_dispcc DISP_CC_MDSS_DP_LINK_INTF_CLK>,
 			 <&clock_dispcc DISP_CC_MDSS_DP_CRYPTO_CLK>,
 			 <&clock_dispcc DISP_CC_MDSS_DP_PIXEL_CLK_SRC>,
-			 <&mdss_dp_pll DP_VCO_DIVIDED_CLK_SRC_MUX>,
+			 <&sde_dp DP_VCO_DIVIDED_CLK_SRC_MUX>,
 			 <&clock_dispcc DISP_CC_MDSS_DP_PIXEL1_CLK_SRC>,
-			 <&mdss_dp_pll DP_VCO_DIVIDED_CLK_SRC_MUX>,
+			 <&sde_dp DP_VCO_DIVIDED_CLK_SRC_MUX>,
 			 <&clock_dispcc DISP_CC_MDSS_DP_PIXEL_CLK>,
 			 <&clock_dispcc DISP_CC_MDSS_DP_PIXEL1_CLK>,
 			 <&clock_dispcc DISP_CC_MDSS_DP_LINK_CLK_SRC>,
@@ -654,5 +656,21 @@
 				qcom,supply-disable-load = <0>;
 			};
 		};
+	};
+
+	smmu_sde_unsec: qcom,smmu_sde_unsec_cb {
+		compatible = "qcom,smmu_sde_unsec";
+		iommus = <&apps_smmu 0x800 0x420>;
+		qcom,iommu-dma-addr-pool = <0x00020000 0xfffe0000>;
+		qcom,iommu-faults = "non-fatal";
+		qcom,iommu-earlymap; /* for cont-splash */
+	};
+
+	smmu_sde_sec: qcom,smmu_sde_sec_cb {
+		compatible = "qcom,smmu_sde_sec";
+		iommus = <&apps_smmu 0x801 0x420>;
+		qcom,iommu-dma-addr-pool = <0x00020000 0xfffe0000>;
+		qcom,iommu-faults = "non-fatal";
+		qcom,iommu-vmid = <0xa>; /* VMID_CP_PIXEL */
 	};
 };
