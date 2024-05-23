@@ -19,6 +19,11 @@
 		status = "ok";
 	};
 
+	qcom,cam-sync {
+		compatible = "qcom,cam-sync";
+		status = "ok";
+	};
+
 	cam_csiphy0: qcom,csiphy@ac65000 {
 		cell-index = <0>;
 		compatible = "qcom,csiphy-v1.1", "qcom,csiphy";
