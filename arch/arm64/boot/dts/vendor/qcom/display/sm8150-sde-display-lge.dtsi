@@ -117,28 +117,6 @@
 		pintctrl-0 = <&display_panel_avdd_eldo_default>;
 	};
 
-	dsi_sim_vid_display: qcom,dsi-display@8 {
-		label = "dsi_sim_vid_display";
-		qcom,display-type = "primary";
-
-		qcom,dsi-ctrl-num = <0>;
-		qcom,dsi-phy-num = <0>;
-		qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
-
-		qcom,dsi-panel = <&dsi_sim_vid>;
-	};
-
-	dsi_sim_cmd_display: qcom,dsi-display@10 {
-		label = "dsi_sim_cmd_display";
-		qcom,display-type = "primary";
-
-		qcom,dsi-ctrl-num = <0>;
-		qcom,dsi-phy-num = <0>;
-		qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
-
-		qcom,dsi-panel = <&dsi_sim_cmd>;
-	};
-
 	sde_dsi: qcom,dsi-display-primary {
 		compatible = "qcom,dsi-display";
 		label = "primary";
@@ -146,14 +124,14 @@
 		qcom,dsi-ctrl = <&mdss_dsi0 &mdss_dsi1>;
 		qcom,dsi-phy = <&mdss_dsi_phy0 &mdss_dsi_phy1>;
 
-		clocks = <&mdss_dsi0_pll BYTECLK_MUX_0_CLK>,
-			 <&mdss_dsi0_pll PCLK_MUX_0_CLK>,
-			 <&mdss_dsi0_pll CPHY_BYTECLK_SRC_0_CLK>,
-			 <&mdss_dsi0_pll CPHY_PCLK_SRC_0_CLK>,
-			 <&mdss_dsi1_pll BYTECLK_MUX_1_CLK>,
-			 <&mdss_dsi1_pll PCLK_MUX_1_CLK>,
-			 <&mdss_dsi1_pll CPHY_BYTECLK_SRC_1_CLK>,
-			 <&mdss_dsi1_pll CPHY_PCLK_SRC_1_CLK>;
+		clocks = <&mdss_dsi_phy0 BYTECLK_MUX_0_CLK>,
+			 <&mdss_dsi_phy0 PCLK_MUX_0_CLK>,
+			 <&mdss_dsi_phy0 CPHY_BYTECLK_SRC_0_CLK>,
+			 <&mdss_dsi_phy0 CPHY_PCLK_SRC_0_CLK>,
+			 <&mdss_dsi_phy1 BYTECLK_MUX_1_CLK>,
+			 <&mdss_dsi_phy1 PCLK_MUX_1_CLK>,
+			 <&mdss_dsi_phy1 CPHY_BYTECLK_SRC_1_CLK>,
+			 <&mdss_dsi_phy1 CPHY_PCLK_SRC_1_CLK>;
 		clock-names = "mux_byte_clk0", "mux_pixel_clk0",
 			      "cphy_byte_clk0", "cphy_pixel_clk0",
 			      "mux_byte_clk1", "mux_pixel_clk1",
@@ -171,9 +149,7 @@
 		ibb-supply = <&lcdb_ncp_vreg>;
 		vdd-supply = <&display_panel_avdd_eldo>;
 
-		qcom,dsi-display-list =
-			<&dsi_sim_vid_display
-			&dsi_sim_cmd_display>;
+		qcom,mdp = <&mdss_mdp>;
 	};
 
 	sde_dsi1: qcom,dsi-display-secondary {
@@ -183,14 +159,14 @@
 		qcom,dsi-ctrl = <&mdss_dsi0 &mdss_dsi1>;
 		qcom,dsi-phy = <&mdss_dsi_phy0 &mdss_dsi_phy1>;
 
-		clocks = <&mdss_dsi0_pll BYTECLK_MUX_0_CLK>,
-			 <&mdss_dsi0_pll PCLK_MUX_0_CLK>,
-			 <&mdss_dsi0_pll CPHY_BYTECLK_SRC_0_CLK>,
-			 <&mdss_dsi0_pll CPHY_PCLK_SRC_0_CLK>,
-			 <&mdss_dsi1_pll BYTECLK_MUX_1_CLK>,
-			 <&mdss_dsi1_pll PCLK_MUX_1_CLK>,
-			 <&mdss_dsi1_pll CPHY_BYTECLK_SRC_1_CLK>,
-			 <&mdss_dsi1_pll CPHY_PCLK_SRC_1_CLK>;
+		clocks = <&mdss_dsi_phy0 BYTECLK_MUX_0_CLK>,
+			 <&mdss_dsi_phy0 PCLK_MUX_0_CLK>,
+			 <&mdss_dsi_phy0 CPHY_BYTECLK_SRC_0_CLK>,
+			 <&mdss_dsi_phy0 CPHY_PCLK_SRC_0_CLK>,
+			 <&mdss_dsi_phy1 BYTECLK_MUX_1_CLK>,
+			 <&mdss_dsi_phy1 PCLK_MUX_1_CLK>,
+			 <&mdss_dsi_phy1 CPHY_BYTECLK_SRC_1_CLK>,
+			 <&mdss_dsi_phy1 CPHY_PCLK_SRC_1_CLK>;
 		clock-names = "mux_byte_clk0", "mux_pixel_clk0",
 			      "cphy_byte_clk0", "cphy_pixel_clk0",
 			      "mux_byte_clk1", "mux_pixel_clk1",
@@ -207,6 +183,8 @@
 		lab-supply = <&lcdb_ldo_vreg>;
 		ibb-supply = <&lcdb_ncp_vreg>;
 		vdd-supply = <&display_panel_avdd_eldo>;
+		
+		qcom,mdp = <&mdss_mdp>;
 	};
 
 	sde_wb: qcom,wb-display@0 {
@@ -241,6 +219,7 @@
 };
 
 &dsi_sim_vid {
+	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
 	qcom,mdss-dsi-display-timings {
 		timing@0{
 			qcom,mdss-dsi-panel-phy-timings = [00 1c 08 07 23 22 07
@@ -253,6 +232,7 @@
 };
 
 &dsi_sim_cmd {
+	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
 	qcom,ulps-enabled;
 	qcom,mdss-dsi-display-timings {
 		timing@0{
