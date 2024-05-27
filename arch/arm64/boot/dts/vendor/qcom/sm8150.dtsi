@@ -1113,15 +1113,6 @@
 		operating-points-v2 = <&keepalive_opp_table>;
 	};
 
-	cdsp_keepalive: qcom,cdsp_keepalive {
-		compatible = "qcom,devbw";
-		governor = "powersave";
-		qcom,src-dst-ports = <154 10070>;
-		qcom,active-only;
-		status = "ok";
-		operating-points-v2 = <&keepalive_opp_table>;
-	};
-
 	clock_aop: qcom,aopclk {
 		compatible = "qcom,aop-qmp-clk";
 		#clock-cells = <1>;
