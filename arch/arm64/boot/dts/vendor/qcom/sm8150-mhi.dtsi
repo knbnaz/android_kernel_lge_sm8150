@@ -22,13 +22,22 @@
 		pci-ids = "17cb:0305", "17cb:0306", "17cb:0307", "17cb:0308";
 
 		/* controller specific configuration */
-		qcom,smmu-cfg = <0x3>;
+		qcom,iommu-group = <&mhi_0_iommu_group>;
 
 		/* mhi bus specific settings */
 		mhi,max-channels = <111>;
 		mhi,timeout = <2000>;
 		mhi,name = "esoc0";
 		mhi,buffer-len = <0x8000>;
+
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		mhi_0_iommu_group: mhi_0_iommu_group {
+			qcom,iommu-dma-addr-pool = <0x20000000 0x1fffffff>;
+			qcom,iommu-dma = "fastmap";
+			qcom,iommu-pagetable = "coherent";
+		};
 
 		mhi_channels {
 			#address-cells = <1>;
@@ -589,13 +598,19 @@
 		pci-ids = "17cb:0305", "17cb:0306", "17cb:0307", "17cb:0308";
 
 		/* controller specific configuration */
-		qcom,smmu-cfg = <0x3>;
+		qcom,iommu-group = <&mhi_1_iommu_group>;
 		interconnect-names = "mhi";
 		interconnects = 
 			<&aggre2_noc MASTER_PCIE_0 &mc_virt SLAVE_EBI1>;
 		qcom,mhi-bus-bw-cfg =
 			<0 0>,
 			<1200000000 650000000>;
+
+		mhi_1_iommu_group: mhi_1_iommu_group {
+			qcom,iommu-dma-addr-pool = <0x0x20000000 0x1fffffff>;
+			qcom,iommu-dma = "fastmap";
+			qcom,iommu-pagetable = "coherent";
+		};
 
 		/* mhi bus specific settings */
 		mhi,max-channels = <111>;
