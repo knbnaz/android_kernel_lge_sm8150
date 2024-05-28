@@ -1097,22 +1097,6 @@
 		clock-frequency = <32768>;
 	};
 
-	keepalive_opp_table: keepalive-opp-table {
-		compatible = "operating-points-v2";
-		opp-1 {
-			opp-hz = /bits/ 64 < 1 >;
-		};
-	};
-
-	snoc_cnoc_keepalive: qcom,snoc_cnoc_keepalive {
-		compatible = "qcom,devbw";
-		governor = "powersave";
-		qcom,src-dst-ports = <1 627>;
-		qcom,active-only;
-		status = "ok";
-		operating-points-v2 = <&keepalive_opp_table>;
-	};
-
 	clock_aop: qcom,aopclk {
 		compatible = "qcom,aop-qmp-clk";
 		#clock-cells = <1>;
@@ -1672,6 +1656,7 @@
 		reg = <0x1500000 0x7400>;
 		compatible = "qcom,sm8150-config_noc";
 		#interconnect-cells = <1>;
+		qcom,keepalive;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
@@ -1680,6 +1665,7 @@
 		reg = <0x1620000 0x19400>;
 		compatible = "qcom,sm8150-system_noc";
 		#interconnect-cells = <1>;
+		qcom,keepalive;
 		qcom,bcm-voter-names = "hlos";
 		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
