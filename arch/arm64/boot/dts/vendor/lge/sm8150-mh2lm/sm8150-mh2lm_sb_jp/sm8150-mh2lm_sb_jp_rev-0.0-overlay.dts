@@ -14,7 +14,7 @@
 /dts-v1/;
 /plugin/;
 
-#include "../../qcom/sm8150-mtp.dtsi"
+#include "../../../qcom/sm8150-mtp.dtsi"
 #include "sm8150-mh2lm_sb_jp.dtsi"
 #include "sm8150-mh2lm_sb_jp-sound.dtsi"
 #include "sm8150-mh2lm_sb_jp-fingerprint.dtsi"

@@ -14,7 +14,7 @@
 /dts-v1/;
 /plugin/;
 
-#include "../../qcom/sm8150-mtp.dtsi"
+#include "../../../qcom/sm8150-mtp.dtsi"
 #include "sm8150-beta.dtsi"
 #include "sm8150-beta-sound.dtsi"
 #include "../sm8150-camera/sm8150-beta-camera_rev-0.0.dtsi"

@@ -14,7 +14,7 @@
 /dts-v1/;
 /plugin/;
 
-#include "../../qcom/sm8150-mtp.dtsi"
+#include "../../../qcom/sm8150-mtp.dtsi"
 #include "sm8150-alpha_lao_com.dtsi"
 #include "sm8150-alpha_lao_com-sound_rev-b_kr.dtsi"
 #include "sm8150-alpha_lao_com-tdmb_rev-a.dtsi"
