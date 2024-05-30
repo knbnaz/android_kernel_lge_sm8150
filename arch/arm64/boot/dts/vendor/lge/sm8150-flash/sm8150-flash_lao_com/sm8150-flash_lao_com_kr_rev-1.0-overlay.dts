@@ -21,6 +21,7 @@
 #include "sm8150-flash_lao_com-lattice.dtsi"
 #include "sm8150-flash_lao_com-lattice_rev-b.dtsi"
 #include "../sm8150-camera/sm8150-flash-camera_rev-b.dtsi"
+#include "../../qcom/sm8150-mtp.dtsi"
 
 / {
 	model = "LG Electronics, flash_lao_kr, rev_1.0";

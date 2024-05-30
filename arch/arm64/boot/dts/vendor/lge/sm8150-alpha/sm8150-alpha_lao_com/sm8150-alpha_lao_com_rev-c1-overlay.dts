@@ -18,6 +18,7 @@
 #include "sm8150-alpha_lao_com-sound_rev-b.dtsi"
 #include "../sm8150-camera/sm8150-alpha-camera_rev-c.dtsi"
 #include "../sm8150-alpha_common/sm8150-alpha_common-sar-atmf04.dtsi"
+#include "../../qcom/sm8150-mtp.dtsi"
 
 / {
 	model = "LG Electronics, Alpha_lao, rev_c1";
