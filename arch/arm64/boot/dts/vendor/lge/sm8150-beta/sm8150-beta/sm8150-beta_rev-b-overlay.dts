@@ -14,11 +14,11 @@
 /dts-v1/;
 /plugin/;
 
+#include "../../qcom/sm8150-mtp.dtsi"
 #include "sm8150-beta.dtsi"
 #include "sm8150-beta-sound.dtsi"
 #include "../sm8150-camera/sm8150-beta-camera_rev-0.0.dtsi"
 #include "../sm8150-beta_common/sm8150-beta_common-sar-atmf04.dtsi"
-#include "../../qcom/sm8150-mtp.dtsi"
 
 / {
 	model = "LG Electronics, Beta, rev_b";

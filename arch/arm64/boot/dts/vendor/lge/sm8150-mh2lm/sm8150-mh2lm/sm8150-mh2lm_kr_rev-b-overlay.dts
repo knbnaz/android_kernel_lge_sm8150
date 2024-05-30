@@ -14,6 +14,7 @@
 /dts-v1/;
 /plugin/;
 
+#include "../../qcom/sm8150-mtp.dtsi"
 #include "sm8150-mh2lm.dtsi"
 #include "sm8150-mh2lm-5G_modem.dtsi"
 #include "sm8150-mh2lm-sound_kr_rev-b.dtsi"
@@ -21,7 +22,6 @@
 #include "sm8150-mh2lm-tdmb.dtsi"
 #include "../sm8150-camera/sm8150-mh2lm-camera_rev-b.dtsi"
 #include "sm8150-mh2lm_kr-pm.dtsi"
-#include "../../qcom/sm8150-mtp.dtsi"
 
 / {
 	model = "LG Electronics, mh2lm_kr, rev_b";

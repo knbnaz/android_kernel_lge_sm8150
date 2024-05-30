@@ -14,11 +14,11 @@
 /dts-v1/;
 /plugin/;
 
+#include "../../qcom/sm8150-mtp.dtsi"
 #include "sm8150-alpha_lao_com.dtsi"
 #include "sm8150-alpha_lao_com-sound_rev-b_kr.dtsi"
 #include "sm8150-alpha_lao_com-tdmb_rev-a.dtsi"
 #include "../sm8150-camera/sm8150-alpha-camera_rev-b.dtsi"
-#include "../../qcom/sm8150-mtp.dtsi"
 
 / {
 	model = "LG Electronics, Alpha_lao_kr, rev_b";

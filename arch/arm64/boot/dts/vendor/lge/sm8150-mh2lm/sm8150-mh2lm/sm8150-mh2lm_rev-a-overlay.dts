@@ -14,12 +14,12 @@
 /dts-v1/;
 /plugin/;
 
+#include "../../qcom/sm8150-mtp.dtsi"
 #include "sm8150-mh2lm.dtsi"
 #include "sm8150-mh2lm-sound.dtsi"
 #include "sm8150-mh2lm-fingerprint.dtsi"
 #include "sm8150-mh2lm-sar-atmf04.dtsi"
 #include "../sm8150-camera/sm8150-mh2lm-camera_rev-0.0.dtsi"
-#include "../../qcom/sm8150-mtp.dtsi"
 
 / {
 	model = "LG Electronics, mh2lm, rev_a";
