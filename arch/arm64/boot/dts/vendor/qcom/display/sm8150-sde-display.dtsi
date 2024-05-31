@@ -32,7 +32,7 @@
 #include "dsi-panel-sw43404-amoled-dsc-wqhd-video.dtsi"
 #include "dsi-panel-sw43404-amoled-dsc-fhd-plus-cmd.dtsi"
 #include "dsi-panel-nt36850-truly-dualmipi-wqhd-cmd.dtsi"
-#include "dsi-panel-rm69299-visionox-amoled-fhd-plus-video.dtsi"
+#include "dsi-panel-rm69299-visionox-fhd-plus-video.dtsi"
 #include <dt-bindings/clock/mdss-7nm-pll-clk.h>
 
 &tlmm {
