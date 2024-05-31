@@ -14,6 +14,10 @@
 /dts-v1/;
 /plugin/;
 
+#include <dt-bindings/clock/qcom,gcc-sm8150.h>
+#include <dt-bindings/clock/qcom,camcc-sm8150.h>
+#include <dt-bindings/clock/qcom,rpmh.h>
+#include <dt-bindings/interrupt-controller/arm-gic.h>
 #include "../../../qcom/sm8150-mtp.dtsi"
 #include "sm8150-alpha_lao_com.dtsi"
 #include "sm8150-alpha_lao_com-sound_rev-b.dtsi"
