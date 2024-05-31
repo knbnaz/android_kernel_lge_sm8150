@@ -14,16 +14,6 @@
 #include <dt-bindings/regulator/qcom,rpmh-regulator-levels.h>
 #include <dt-bindings/iio/qcom,spmi-vadc.h>
 
-#include "../../qcom/sm8150-pmic-overlay.dtsi"
-#include "../../qcom/sm8150-thermal-overlay.dtsi"
-
-&qupv3_se4_i2c {
-#address-cells = <1>;
-#size-cells = <0>;
-
-#include "../../qcom/smb1355.dtsi"
-};
-
 &soc {
 	#address-cells = <1>;
 	#size-cells = <1>;
