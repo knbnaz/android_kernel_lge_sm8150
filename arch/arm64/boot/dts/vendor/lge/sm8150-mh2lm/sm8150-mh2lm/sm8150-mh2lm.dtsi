@@ -16,7 +16,6 @@
 #include "sm8150-mh2lm-panel.dtsi"
 #include "sm8150-mh2lm-misc.dtsi"
 #include "sm8150-mh2lm-pm.dtsi"
-#include "sm8150-mh2lm-connectivity.dtsi"
 #include "sm8150-mh2lm-nfc.dtsi"
 #include "sm8150-mh2lm-mme.dtsi"
 #include "sm8150-mh2lm-touch.dtsi"
