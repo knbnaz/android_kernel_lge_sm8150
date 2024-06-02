@@ -14,7 +14,6 @@
 #include "../../sm8150_common/sm8150_common-usb.dtsi"
 
 &usb1 {
-	//extcon = <&extcon_usb1>;
 	status = "okay";
 	extcon = <&lge_usb_ds2>;
 	dpdm-supply = <&usb2_phy1>;

@@ -222,8 +222,7 @@
 		};
 	};
 
-	lge_batterydata: qcom,battery-data {
-		qcom,batt-id-range-pct = <15>;
+	mtp_batterydata: qcom,battery-data {
 		#include "../../battery_profile/LGE_BLT42_Tocad_4000mAh.dtsi"
 		#include "../../battery_profile/LGE_BLT42_LGC_4000mAh.dtsi"
 		#include "../../battery_profile/FLASH_QDM_Tocad_3250mAh.dtsi"

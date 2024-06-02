@@ -220,8 +220,7 @@
 		};
 	};
 
-	lge_batterydata: qcom,battery-data {
-		qcom,batt-id-range-pct = <15>;
+	mtp_batterydata: qcom,battery-data {
 		#include "../../battery_profile/LGE_BLT41_Tocad_3500mAh.dtsi"
 		#include "../../battery_profile/LGE_BLT41_LGC_3500mAh.dtsi"
 	};

@@ -13,10 +13,6 @@
 
 #include "../../sm8150_common/sm8150_common-usb.dtsi"
 
-&usb1 {
-	extcon = <&extcon_usb1>;
-};
-
 &pm8150b_pdphy {
 	lge,sbu-sel-gpio = <&tlmm 87 0>;
 	lge,uart-sbu-sel-gpio = <&tlmm 35 0>;

@@ -234,8 +234,7 @@
 		};
 	};
 
-	lge_batterydata: qcom,battery-data {
-		qcom,batt-id-range-pct = <15>;
+	mtp_batterydata: qcom,battery-data {
 		#include "../../battery_profile/LGE_BLT43_3550mAh.dtsi"
 	};
 
