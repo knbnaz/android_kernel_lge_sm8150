@@ -504,6 +504,12 @@
 	};
 };
 
+&firmware {
+	scm {
+		compatible = "qcom,scm";
+	};
+};
+
 #include "sm8150-gdsc.dtsi"
 
 #include "display/sm8150-sde.dtsi"
