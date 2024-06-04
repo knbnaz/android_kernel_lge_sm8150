@@ -642,13 +642,59 @@
 		      <&pm8150b_vadc ADC5_SBUx>,
 		      <&pm8150b_vadc ADC5_VPH_PWR>,
 		      <&pm8150b_vadc ADC5_CHG_TEMP>,
-		      <&pm8150b_vadc ADC5_USB_IN_V_16>;
+		      <&pm8150b_vadc ADC5_USB_IN_V_16>,
+		      <&pm8150b_fg PSY_IIO_RESISTANCE_ID>,
+		      <&pm8150b_fg PSY_IIO_VOLTAGE_NOW>,
+		      <&pm8150b_fg PSY_IIO_TEMP>,
+		      <&pm8150b_fg PSY_IIO_CAPACITY>,
+		      <&pm8150b_fg PSY_IIO_VOLTAGE_OCV>,
+		      <&pm8150b_fg PSY_IIO_VOLTAGE_AVG>,
+		      <&pm8150b_fg PSY_IIO_DEBUG_BATTERY>,
+		      <&pm8150b_fg PSY_IIO_REAL_CAPACITY>,
+		      <&pm8150b_fg PSY_IIO_CC_SOC>,
+		      <&pm8150b_fg PSY_IIO_CURRENT_NOW>,
+		      <&pm8150b_fg PSY_IIO_VOLTAGE_MAX>,
+		      <&pm8150b_fg PSY_IIO_CHARGE_FULL>,
+		      <&pm8150b_fg PSY_IIO_CHARGE_COUNTER>,
+		      <&pm8150b_fg PSY_IIO_CYCLE_COUNT>,
+		      <&pm8150b_fg PSY_IIO_CHARGE_FULL_DESIGN>,
+		      <&pm8150b_fg PSY_IIO_TIME_TO_FULL_NOW>,
+		      <&smb1390_charger PSY_IIO_PARALLEL_MODE>,
+		      <&smb1390_charger PSY_IIO_PARALLEL_OUTPUT_MODE>,
+		      <&smb1390_charger PSY_IIO_MIN_ICL>,
+		      <&smb1390_charger PSY_IIO_CP_SWITCHER_EN>,
+		      <&smb1390_charger PSY_IIO_CP_ENABLE>,
+		      <&smb1390_charger PSY_IIO_CP_ILIM>,
+		      <&smb1390_charger PSY_IIO_CP_DIE_TEMP>;
 	io-channel-names = "mid_voltage",
 			   "usb_in_current",
 			   "sbux_res",
 			   "vph_voltage",
 			   "chg_temp",
-			   "usb_in_voltage";
+			   "usb_in_voltage",
+			   "resistance_id",
+			   "voltage_now",
+			   "temp",
+			   "capacity",
+			   "voltage_ocv",
+			   "voltage_avg",
+			   "debug_battery",
+			   "real_capacity",
+			   "cc_soc",
+			   "current_now",
+			   "voltage_max",
+			   "charge_full",
+			   "charge_counter",
+			   "cycle_count",
+			   "charge_full_design",
+			   "time_to_full_now",
+			   "cp_parallel_mode",
+			   "cp_parallel_output_mode",
+			   "cp_min_icl",
+			   "cp_switcher_en",
+			   "cp_enable",
+			   "cp_ilim",
+			   "cp_die_temp";
 	qcom,battery-data = <&mtp_batterydata>;
 	qcom,step-charging-enable;
 	qcom,sw-jeita-enable;
@@ -665,8 +711,20 @@
 &smb1390_charger {
 	/delete-property/ compatible;
 	compatible = "qcom,smb1390-charger-psy";
-	io-channels = <&pm8150b_vadc ADC5_AMUX_THM2>;
-	io-channel-names = "cp_die_temp";
+	io-channels = <&pm8150b_vadc ADC5_AMUX_THM2>,
+				  <&pm8150b_charger PSY_IIO_USB_REAL_TYPE>,
+				  <&pm8150b_charger PSY_IIO_ADAPTER_CC_MODE>,
+				  <&pm8150b_charger PSY_IIO_PD_CURRENT_MAX>,
+				  <&pm8150b_charger PSY_IIO_USB_INPUT_CURRENT_SETTLED>,
+				  <&pm8150b_charger PSY_IIO_SMB_EN_MODE>,
+				  <&pm8150b_charger PSY_IIO_SMB_EN_REASON>;
+	io-channel-names = "cp_die_temp",
+					   "real_type",
+					   "adapter_cc_mode",
+					   "pd_current_max",
+					   "input_current_settled",
+					   "smb_en_mode",
+					   "smb_en_reason";
 	status = "ok";
 };
 
@@ -688,7 +746,19 @@
 };
 
 &smb1355_charger {
-	io-channels = <&pm8150b_vadc ADC5_AMUX_THM2>;
-	io-channel-names = "charger_temp";
+	io-channels = <&pm8150b_vadc ADC5_AMUX_THM2>,
+				  <&pm8150b_charger PSY_IIO_USB_REAL_TYPE>,
+				  <&pm8150b_charger PSY_IIO_ADAPTER_CC_MODE>,
+				  <&pm8150b_charger PSY_IIO_PD_CURRENT_MAX>,
+				  <&pm8150b_charger PSY_IIO_USB_INPUT_CURRENT_SETTLED>,
+				  <&pm8150b_charger PSY_IIO_SMB_EN_MODE>,
+				  <&pm8150b_charger PSY_IIO_SMB_EN_REASON>;
+	io-channel-names = "charger_temp",
+					   "real_type",
+					   "adapter_cc_mode",
+					   "pd_current_max",
+					   "input_current_settled",
+					   "smb_en_mode",
+					   "smb_en_reason";
 	status = "ok";
 };
