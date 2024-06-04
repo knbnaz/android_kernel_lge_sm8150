@@ -43,7 +43,6 @@
 
 #include "wm_adsp.h"
 #include "cs35l41.h"
-#include <sound/cs35l41.h>
 
 #ifdef CONFIG_SND_LGE_TX_NXP_LIB
 #include "../../../../../../../kernel/msm-4.14/drivers/extcon/extcon.h"
