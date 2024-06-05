@@ -73,11 +73,6 @@
 		};
 	};
 
-	mtp_batterydata: qcom,battery-data {
-		#include "../../battery_profile/LGE_BLT42_Tocad_4000mAh.dtsi"
-		#include "../../battery_profile/LGE_BLT42_LGC_4000mAh.dtsi"
-	};
-
 	lge-battery-supplement {
 		capacity-mah-min = <3880>;
 		capacity-raw-full = <247>;
@@ -129,6 +124,11 @@
 			qcom,ki-coeff-hi-chg = <400>;
 		};
 	};
+};
+
+&mtp_batterydata {
+	#include "../../battery_profile/LGE_BLT42_Tocad_4000mAh.dtsi"
+	#include "../../battery_profile/LGE_BLT42_LGC_4000mAh.dtsi"
 };
 
 &soc {
