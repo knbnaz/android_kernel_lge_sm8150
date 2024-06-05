@@ -41,13 +41,13 @@
 #ifdef CONFIG_MACH_LGE
 #include <linux/of_gpio.h>
 #include <linux/gpio.h>
-#include "../msm-cdc-pinctrl.h"
+#include "msm-cdc-pinctrl.h"
 #include <linux/platform_device.h>
 #include <linux/clk.h>
 #include <linux/regulator/consumer.h>
 #include <dsp/q6afe-v2.h>
 #include <sound/soc-dapm.h>
-#include "../../../../../../../kernel/msm-4.14/drivers/extcon/extcon.h"
+#include "../../../../../drivers/extcon/extcon.h"
 #endif
 
 #include "sma6101.h"
