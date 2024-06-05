@@ -155,6 +155,10 @@
 #define LGMQA_OUTPUTMODE        0x00009044
 #define LGMQA_PROPERTIES        0x00009045
 
+#ifndef __KERNEL__
+#include <stdint.h>
+#endif
+
 struct lgmqa_params {
     uint32_t    device;
     uint32_t    enable_flag;
