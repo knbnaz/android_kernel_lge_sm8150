@@ -6495,7 +6495,7 @@ static struct snd_soc_dai_link msm_common_misc_fe_dai_links[] = {
 		.ignore_suspend = 1,
 		.ignore_pmdown_time = 1,
 		.id = MSM_FRONTEND_DAI_MULTIMEDIA31,
-		SND_SOC_DAILINK_REG(multimedia31a),
+		SND_SOC_DAILINK_REG(multimedia31),
 	},
 };
 
@@ -6935,7 +6935,7 @@ static struct snd_soc_dai_link ext_disp_be_dai_link[] = {
 		.be_hw_params_fixup = msm_be_hw_params_fixup,
 		.ignore_pmdown_time = 1,
 		.ignore_suspend = 1,
-		SND_SOC_DAILINK_REG(display_port1a),
+		SND_SOC_DAILINK_REG(display_port1),
 	},
 };
 
@@ -7727,7 +7727,7 @@ static struct snd_soc_dai_link msm_stub_be_dai_links[] = {
 		.ignore_pmdown_time = 1, /* dai link has playback support */
 		.ignore_suspend = 1,
 		.ops = &msm_stub_be_ops,
-		SND_SOC_DAILINK_REG(slimbus_0_rxa),
+		SND_SOC_DAILINK_REG(slimbus_0_rx),
 	},
 	{
 		.name = LPASS_BE_SLIMBUS_0_TX,
@@ -7738,7 +7738,7 @@ static struct snd_soc_dai_link msm_stub_be_dai_links[] = {
 		.be_hw_params_fixup = msm_be_hw_params_fixup,
 		.ignore_suspend = 1,
 		.ops = &msm_stub_be_ops,
-		SND_SOC_DAILINK_REG(slimbus_0_txa),
+		SND_SOC_DAILINK_REG(slimbus_0_tx),
 	},
 };
 
