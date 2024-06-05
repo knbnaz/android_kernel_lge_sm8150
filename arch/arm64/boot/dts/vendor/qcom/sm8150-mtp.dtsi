@@ -638,6 +638,7 @@
 &pm8150b_charger {
 	qcom,sec-charger-config = <3>;
 	qcom,auto-recharge-soc = <98>;
+	#io-channel-cells = <1>;
 	io-channels = <&pm8150b_vadc ADC5_MID_CHG_DIV6>,
 		      <&pm8150b_vadc ADC5_USB_IN_I>,
 		      <&pm8150b_vadc ADC5_SBUx>,
@@ -712,6 +713,7 @@
 &smb1390_charger {
 	/delete-property/ compatible;
 	compatible = "qcom,smb1390-charger-psy";
+	#io-channel-cells = <1>;
 	io-channels = <&pm8150b_vadc ADC5_AMUX_THM2>,
 				  <&pm8150b_charger PSY_IIO_USB_REAL_TYPE>,
 				  <&pm8150b_charger PSY_IIO_ADAPTER_CC_MODE>,
@@ -747,6 +749,7 @@
 };
 
 &smb1355_charger {
+	#io-channel-cells = <1>;
 	io-channels = <&pm8150b_vadc ADC5_AMUX_THM2>,
 				  <&pm8150b_charger PSY_IIO_USB_REAL_TYPE>,
 				  <&pm8150b_charger PSY_IIO_ADAPTER_CC_MODE>,
