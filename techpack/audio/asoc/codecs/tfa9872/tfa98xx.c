@@ -234,7 +234,7 @@ tfa98xx_tfa_start(struct tfa98xx *tfa98xx, int next_profile, int *vstep)
 static int tfa98xx_input_open(struct input_dev *dev)
 {
 	struct tfa98xx *tfa98xx = input_get_drvdata(dev);
-	dev_dbg(tfa98xx->codec->dev, "opening device file\n");
+	dev_dbg(tfa98xx->component->dev, "opening device file\n");
 
 	/* note: open function is called only once by the framework.
 	 * No need to count number of open file instances.
@@ -258,7 +258,7 @@ static void tfa98xx_input_close(struct input_dev *dev)
 {
 	struct tfa98xx *tfa98xx = input_get_drvdata(dev);
 
-	dev_dbg(tfa98xx->codec->dev, "closing device file\n");
+	dev_dbg(tfa98xx->component->dev, "closing device file\n");
 
 	/* Note: close function is called if the device is unregistered */
 
@@ -276,7 +276,7 @@ static int tfa98xx_register_inputdev(struct tfa98xx *tfa98xx)
 	input = input_allocate_device();
 
 	if (!input) {
-		dev_err(tfa98xx->codec->dev,
+		dev_err(tfa98xx->component->dev,
 			"Unable to allocate input device\n");
 		return -ENOMEM;
 	}
@@ -303,12 +303,12 @@ static int tfa98xx_register_inputdev(struct tfa98xx *tfa98xx)
 
 	err = input_register_device(input);
 	if (err) {
-		dev_err(tfa98xx->codec->dev,
+		dev_err(tfa98xx->component->dev,
 			"Unable to register input device\n");
 		goto err_free_dev;
 	}
 
-	dev_dbg(tfa98xx->codec->dev,
+	dev_dbg(tfa98xx->component->dev,
 		"Input device for tap-detection registered: %s\n",
 		input->name);
 	tfa98xx->input = input;
@@ -335,7 +335,7 @@ __tfa98xx_inputdev_check_register(struct tfa98xx *tfa98xx,
 		if (strstr(tfa_cont_profile_name(tfa98xx->handle, i), ".tap")) {
 			tap_profile = true;
 			tfa98xx->tapdet_profiles |= 1 << i;
-			dev_info(tfa98xx->codec->dev,
+			dev_info(tfa98xx->component->dev,
 				"found a tap-detection profile (%d - %s)\n",
 				i, tfa_cont_profile_name(tfa98xx->handle, i));
 		}
@@ -358,7 +358,7 @@ __tfa98xx_inputdev_check_register(struct tfa98xx *tfa98xx,
 
 	/* input device required */
 	if (tfa98xx->input)
-		dev_info(tfa98xx->codec->dev,
+		dev_info(tfa98xx->component->dev,
 			"Input device already registered, skipping\n");
 	else
 		tfa98xx_register_inputdev(tfa98xx);
@@ -2331,7 +2331,7 @@ static int tfa98xx_create_controls(struct tfa98xx *tfa98xx)
 	for (prof = 0; prof < nprof; prof++) {
 		/* create an new empty profile */
 		bprofile = devm_kzalloc
-			(tfa98xx->codec->dev, sizeof(*bprofile), GFP_KERNEL);
+			(tfa98xx->component->dev, sizeof(*bprofile), GFP_KERNEL);
 		if (!bprofile)
 			return -ENOMEM;
 
@@ -2361,7 +2361,7 @@ static int tfa98xx_create_controls(struct tfa98xx *tfa98xx)
 
 			if (tfa_cont_get_max_vstep(tfa98xx->handle, prof)) {
 				name = devm_kzalloc
-					(tfa98xx->codec->dev, MAX_CONTROL_NAME,
+					(tfa98xx->component->dev, MAX_CONTROL_NAME,
 					GFP_KERNEL);
 				if (!name)
 					return -ENOMEM;
@@ -2445,7 +2445,7 @@ static int tfa98xx_create_controls(struct tfa98xx *tfa98xx)
 		mix_index++;
 	}
 
-	return snd_soc_add_component_controls(tfa98xx->componeent,
+	return snd_soc_add_component_controls(tfa98xx->component,
 		tfa98xx_controls, mix_index);
 }
 
@@ -2899,14 +2899,14 @@ static void tfa98xx_tapdet_check_update(struct tfa98xx *tfa98xx)
 						&tfa98xx->tapdet_work, HZ/10);
 		else
 			cancel_delayed_work_sync(&tfa98xx->tapdet_work);
-		dev_dbg(tfa98xx->codec->dev,
+		dev_dbg(tfa98xx->component->dev,
 			"Polling for tap-detection: %s (%d; 0x%x, %d)\n",
 			enable? "enabled":"disabled",
 			tfa98xx->tapdet_open, tfa98xx->tapdet_profiles,
 			tfa98xx_profile);
 
 	} else {
-		dev_dbg(tfa98xx->codec->dev,
+		dev_dbg(tfa98xx->component->dev,
 			"Interrupt for tap-detection: %s (%d; 0x%x, %d)\n",
 				enable? "enabled":"disabled",
 				tfa98xx->tapdet_open, tfa98xx->tapdet_profiles,
@@ -3210,7 +3210,7 @@ static void tfa98xx_monitor(struct work_struct *work)
 		 * check IC status bits: cold start
 		 * and DSP watch dog bit to re init
 		 */
-		val = snd_soc_read(tfa98xx->codec, TFA98XX_STATUS_FLAGS0);
+		val = snd_soc_component_read32(tfa98xx->component, TFA98XX_STATUS_FLAGS0);
 		pr_debug("STATUS_FLAG0: 0x%04x\n", val);
 
 		if (tfa98xx->pstream != 0) {
@@ -3229,8 +3229,8 @@ static void tfa98xx_monitor(struct work_struct *work)
 					val);
 
 			if (tfa98xx->flags & TFA98XX_FLAG_TDM_DEVICE) {
-					val = snd_soc_read
-						(tfa98xx->codec, TFA98XX_STATUS_FLAGS1);
+					val = snd_soc_component_read32
+						(tfa98xx->component, TFA98XX_STATUS_FLAGS1);
 				pr_debug("STATUS_FLAG1: 0x%04x\n", val);
 					if (val & TFA98XX_STATUS_FLAGS1_TDMERR)
 						pr_info("TDM status: 0x%x (ref. 0x1: synchronized)\n",
@@ -3243,17 +3243,17 @@ static void tfa98xx_monitor(struct work_struct *work)
 		}
 
 		// temporal debugging
-		val = snd_soc_read(tfa98xx->codec, TFA98XX_SYS_CONTROL0);
+		val = snd_soc_component_read32(tfa98xx->component, TFA98XX_SYS_CONTROL0);
 		pr_debug("SYS_CONTROL0: 0x%04x\n", val);
-		val = snd_soc_read(tfa98xx->codec, TFA98XX_SYS_CONTROL1);
+		val = snd_soc_component_read32(tfa98xx->component, TFA98XX_SYS_CONTROL1);
 		pr_debug("SYS_CONTROL1: 0x%04x\n", val);
-		val = snd_soc_read(tfa98xx->codec, TFA98XX_SYS_CONTROL2);
+		val = snd_soc_component_read32(tfa98xx->component, TFA98XX_SYS_CONTROL2);
 		pr_debug("SYS_CONTROL2: 0x%04x\n", val);
-		val = snd_soc_read(tfa98xx->codec, TFA98XX_CLOCK_CONTROL);
+		val = snd_soc_component_read32(tfa98xx->component, TFA98XX_CLOCK_CONTROL);
 		pr_debug("CLOCK_CONTROL: 0x%04x\n", val);
-		val = snd_soc_read(tfa98xx->codec, TFA98XX_STATUS_FLAGS4);
+		val = snd_soc_component_read32(tfa98xx->component, TFA98XX_STATUS_FLAGS4);
 		pr_debug("STATUS_FLAG4: 0x%04x\n", val);
-		val = snd_soc_read(tfa98xx->codec, TFA98XX_TDM_CONFIG0);
+		val = snd_soc_component_read32(tfa98xx->component, TFA98XX_TDM_CONFIG0);
 		pr_debug("TDM_CONFIG0: 0x%04x\n", val);
 	}
 
@@ -3393,7 +3393,7 @@ static void tfa98xx_interrupt(struct work_struct *work)
 				enum tfa98xx_error err;
 				/* Clock is lost. Set I2CR to remove POP noise */
 				pr_info("No clock detected. Resetting I2CR to avoid pop on 72!\n");
-				err = tfa98xx_tfa_start
+				err = (enum tfa98xx_error)tfa98xx_tfa_start
 					(tfa98xx, tfa98xx_profile,
 					tfa98xx_vsteps);
 				if (err != TFA98XX_ERROR_OK)
@@ -3575,12 +3575,12 @@ static int tfa98xx_startup(struct snd_pcm_substream *substream,
 			 */
 			sr = tfa98xx_get_profile_sr(tfa98xx->handle, prof);
 			if (!sr)
-				dev_info(codec->dev,
+				dev_info(component->dev,
 					"Unable to identify supported sample rate\n");
 
 			if (tfa98xx->rate_constraint.count
 				>= TFA98XX_NUM_RATES) {
-				dev_err(codec->dev, "too many sample rates\n");
+				dev_err(component->dev, "too many sample rates\n");
 			} else {
 				tfa98xx->rate_constraint_list[idx++] = sr;
 				tfa98xx->rate_constraint.count += 1;
@@ -3637,14 +3637,14 @@ static int tfa98xx_set_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 	case SND_SOC_DAIFMT_I2S:
 		if ((fmt & SND_SOC_DAIFMT_MASTER_MASK)
 			!= SND_SOC_DAIFMT_CBS_CFS) {
-			dev_err(codec->dev, "Invalid Codec master mode\n");
+			dev_err(component->dev, "Invalid Codec master mode\n");
 			return -EINVAL;
 		}
 		break;
 	case SND_SOC_DAIFMT_PDM:
 		break;
 	default:
-		dev_err(codec->dev, "Unsupported DAI format %d\n",
+		dev_err(component->dev, "Unsupported DAI format %d\n",
 					fmt & SND_SOC_DAIFMT_FORMAT_MASK);
 		return -EINVAL;
 	}
@@ -3669,7 +3669,7 @@ static int tfa98xx_hw_params(struct snd_pcm_substream *substream,
 	struct snd_soc_dai *dai)
 {
 	struct snd_soc_component *component = dai->component;
-	struct tfa98xx *tfa98xx = snd_soc_codec_get_drvdata(component);
+	struct tfa98xx *tfa98xx = snd_soc_component_get_drvdata(component);
 	unsigned int rate;
 	int prof_idx;
 
@@ -3923,6 +3923,8 @@ static int tfa98xx_probe(struct snd_soc_component *component)
 	struct tfa98xx *tfa98xx = snd_soc_component_get_drvdata(component);
 	int ret;
 
+	snd_soc_component_init_regmap(component, tfa98xx->regmap);
+
 	pr_debug("\n");
 
 	/* setup work queue, will be used to initial DSP on first boot up */
@@ -3937,7 +3939,7 @@ static int tfa98xx_probe(struct snd_soc_component *component)
 	INIT_DELAYED_WORK(&tfa98xx->tapdet_work, tfa98xx_tapdet_work);
 #endif
 
-	tfa98xx->codec = codec;
+	tfa98xx->component = component;
 
 	ret = tfa98xx_load_container(tfa98xx);
 	pr_debug("Container loading requested: %d\n", ret);
@@ -3975,7 +3977,7 @@ static int tfa98xx_probe(struct snd_soc_component *component)
 	return ret;
 }
 
-static int tfa98xx_remove(struct snd_soc_component *component)
+static void tfa98xx_remove(struct snd_soc_component *component)
 {
 	struct tfa98xx *tfa98xx = snd_soc_component_get_drvdata(component);
 #if defined(TFADSP_DSP_BUFFER_POOL)
@@ -4004,20 +4006,11 @@ static int tfa98xx_remove(struct snd_soc_component *component)
 	for (index = 0; index < POOL_MAX_INDEX; index++)
 		tfa_buffer_pool(index, 0, POOL_FREE);
 #endif
-
-	return 0;
 }
 
-struct regmap *tfa98xx_get_regmap(struct device *dev)
-{
-	struct tfa98xx *tfa98xx = dev_get_drvdata(dev);
-
-	return tfa98xx->regmap;
-}
 static struct snd_soc_component_driver soc_codec_dev_tfa98xx = {
 	.probe =	tfa98xx_probe,
 	.remove =	tfa98xx_remove,
-	.get_regmap = tfa98xx_get_regmap,
 #if defined(TFA_EXCEPTION_AT_TRANSITION)
 	.controls = tfa98xx_ext_snd_controls,
 	.num_controls = ARRAY_SIZE(tfa98xx_ext_snd_controls),
@@ -4390,7 +4383,7 @@ static int tfa98xx_i2c_probe(struct i2c_client *i2c,
 				dai,
 				ARRAY_SIZE(tfa98xx_dai));
 
-	ret = snd_soc_register_codec(&i2c->dev,
+	ret = snd_soc_register_component(&i2c->dev,
 				&soc_codec_dev_tfa98xx, dai,
 				ARRAY_SIZE(tfa98xx_dai));
 
@@ -4465,7 +4458,7 @@ static int tfa98xx_i2c_remove(struct i2c_client *i2c)
 
 	tfa98xx_unregister_dsp(tfa98xx);
 
-	snd_soc_unregister_codec(&i2c->dev);
+	snd_soc_unregister_component(&i2c->dev);
 
 	if (gpio_is_valid(tfa98xx->irq_gpio))
 		devm_gpio_free(&i2c->dev, tfa98xx->irq_gpio);

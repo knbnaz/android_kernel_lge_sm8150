@@ -814,10 +814,10 @@ void wcd_mbhc_report_plug(struct wcd_mbhc *mbhc, int insertion,
 
 #ifdef CONFIG_SND_USE_MBHC_EXTN_CABLE
 		pr_debug("[LGE MBHC] %s : mbhc->micbias_enable[%d]\n", __func__, mbhc->micbias_enable);
-		if (!mbhc->micbias_enable && (snd_soc_read(mbhc->codec, 0x0623) & 0x3f) == 0x22) {
+		if (!mbhc->micbias_enable && (snd_soc_component_read32(mbhc->component, 0x0623) & 0x3f) == 0x22) {
 			pr_debug("[LGE MBHC] %s : restore micbais to default.(2.7->2.1v) \n", __func__);
 			if (mbhc->mbhc_cb->mbhc_micb_ctrl_thr_mic)
-				mbhc->mbhc_cb->mbhc_micb_ctrl_thr_mic(codec, MIC_BIAS_2, false);
+				mbhc->mbhc_cb->mbhc_micb_ctrl_thr_mic(component, MIC_BIAS_2, false);
 		}
 #endif
 
@@ -2174,7 +2174,8 @@ int wcd_mbhc_init(struct wcd_mbhc *mbhc, struct snd_soc_component *component,
 #ifdef CONFIG_SND_USE_MBHC_EXTN_CABLE
 	ret = of_property_read_u32(card->dev->of_node, lge_extn_cable, &lge_extn_cable_flag);
 	if (ret) {
-		dev_dbg("%s: missing %s in dt node\n", __func__, lge_extn_cable);
+		dev_dbg(card->dev,
+			"%s: missing %s in dt node\n", __func__, lge_extn_cable);
 	}
 #endif
 
@@ -2284,17 +2285,17 @@ int wcd_mbhc_init(struct wcd_mbhc *mbhc, struct snd_soc_component *component,
 
 #ifdef CONFIG_MACH_LGE
 	mbhc->LGE_HIGH_HPH_HEADSET = false;
-	mbhc->edev = devm_extcon_dev_allocate(codec->dev, mbhc_cable);
+	mbhc->edev = devm_extcon_dev_allocate(component->dev, mbhc_cable);
 	if (IS_ERR(mbhc->edev)) {
-		dev_err(codec->dev, "failed to allocate extcon device\n");
+		dev_err(component->dev, "failed to allocate extcon device\n");
 		return -ENOMEM;
 	}
 
 	strcpy(mbhc->edev_name,"h2w");
 	mbhc->edev->name = mbhc->edev_name;
-	ret = devm_extcon_dev_register(codec->dev, mbhc->edev);
+	ret = devm_extcon_dev_register(component->dev, mbhc->edev);
 	if (ret < 0) {
-		dev_err(codec->dev, "extcon_dev_register() failed: %d\n",
+		dev_err(component->dev, "extcon_dev_register() failed: %d\n",
 			ret);
 		return ret;
 	}

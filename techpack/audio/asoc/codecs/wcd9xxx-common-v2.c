@@ -243,6 +243,10 @@ ret:
 	return imped_index[i].index;
 }
 
+#ifdef CONFIG_MACH_LGE
+extern bool lge_get_factory_boot(void);
+#endif /*CONFIG_MACH_LGE*/
+
 /*
  * Function: wcd_clsh_imped_config
  * Params: component, imped, reset
@@ -275,7 +279,7 @@ void wcd_clsh_imped_config(struct snd_soc_component *component, int imped,
 			if ((imped_table_ptr[index][i].reg != RX1_DIG_VOL_REG) &&
 			    (imped_table_ptr[index][i].reg != RX2_DIG_VOL_REG)){ //WA-SR#03804646
 				pr_debug("%s, codec_reg: 0x%x\n", __func__, imped_table_ptr[index][i].reg);
-				snd_soc_update_bits(component,
+				snd_soc_component_update_bits(component,
 					imped_table_ptr[index][i].reg,
 					imped_table_ptr[index][i].mask, 0);
 			}

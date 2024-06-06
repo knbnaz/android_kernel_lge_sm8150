@@ -414,7 +414,7 @@ static int cs35l41_fast_switch_file_put(struct snd_kcontrol *kcontrol,
 	soc_enum = (struct soc_enum *)kcontrol->private_value;
 
 	if (i >= soc_enum->items) {
-		dev_err(codec->dev, "Invalid mixer input (%u)\n", i);
+		dev_err(component->dev, "Invalid mixer input (%u)\n", i);
 		return -EINVAL;
 	}
 
@@ -1086,7 +1086,7 @@ static int cs35l41_main_amp_event(struct snd_soc_dapm_widget *w,
 					ARRAY_SIZE(cs35l41_pdn_patch));
 		break;
 	default:
-		dev_err(codec->dev, "Invalid event = 0x%x\n", event);
+		dev_err(component->dev, "Invalid event = 0x%x\n", event);
 		ret = -EINVAL;
 	}
 	return ret;
@@ -1403,7 +1403,7 @@ static int cs35l41_pcm_hw_params(struct snd_pcm_substream *substream,
 				 struct snd_pcm_hw_params *params,
 				 struct snd_soc_dai *dai)
 {
-	struct cs35l41_private *cs35l41 = snd_soc_codec_get_drvdata(dai->component);
+	struct cs35l41_private *cs35l41 = snd_soc_component_get_drvdata(dai->component);
 	int i;
 	unsigned int rate = params_rate(params);
 	u8 asp_width, asp_wl;
@@ -1834,7 +1834,7 @@ static int cs35l41_codec_probe(struct snd_soc_component *component)
 					CS35L41_CH_WKFET_THLD_SHIFT);
 	}
 
-	wm_adsp2_codec_probe(&cs35l41->dsp, codec);
+	wm_adsp2_component_probe(&cs35l41->dsp, component);
 
 	/* Add run-time mixer control for fast use case switch */
 	kcontrol = kzalloc(sizeof(*kcontrol), GFP_KERNEL);
@@ -1849,7 +1849,7 @@ static int cs35l41_codec_probe(struct snd_soc_component *component)
 	kcontrol->get	= cs35l41_fast_switch_file_get;
 	kcontrol->put	= cs35l41_fast_switch_file_put;
 	kcontrol->private_value	= (unsigned long)&cs35l41->fast_switch_enum;
-	ret = snd_soc_add_codec_controls(codec, kcontrol, 1);
+	ret = snd_soc_add_component_controls(component, kcontrol, 1);
 	if (ret < 0)
 		dev_err(cs35l41->dev,
 			"snd_soc_add_codec_controls failed (%d)\n", ret);
@@ -1912,12 +1912,11 @@ static int cs35l41_irq_gpio_config(struct cs35l41_private *cs35l41)
 	return irq_pol;
 }
 
-static int cs35l41_codec_remove(struct snd_soc_component *component)
+static void cs35l41_codec_remove(struct snd_soc_component *component)
 {
 	struct cs35l41_private *cs35l41 = snd_soc_component_get_drvdata(component);
 
 	wm_adsp2_component_remove(&cs35l41->dsp, component);
-	return 0;
 }
 
 static const struct snd_soc_dai_ops cs35l41_ops = {
@@ -1963,7 +1962,7 @@ static struct snd_soc_component_driver soc_codec_dev_cs35l41 = {
 	.num_controls = ARRAY_SIZE(cs35l41_aud_controls),
 
 	.set_sysclk = cs35l41_codec_set_sysclk,
-	.ignore_pmdown_time = true,
+	.use_pmdown_time = false,
 };
 
 
@@ -2437,7 +2436,7 @@ int cs35l41_probe(struct cs35l41_private *cs35l41,
 			CS35L41_DSP1_CCM_CORE_CTRL, 0);
 	cs35l41_dsp_init(cs35l41);
 
-	ret =  snd_soc_register_codec(cs35l41->dev, &soc_codec_dev_cs35l41,
+	ret =  snd_soc_register_component(cs35l41->dev, &soc_codec_dev_cs35l41,
 					cs35l41_dai, ARRAY_SIZE(cs35l41_dai));
 	if (ret < 0) {
 		dev_err(cs35l41->dev, "%s: Register codec failed\n", __func__);

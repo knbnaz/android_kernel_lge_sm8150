@@ -2131,7 +2131,7 @@ static int tdm_get_sample_rate(int value)
 		break;
 	case 3:
 		sample_rate = SAMPLING_RATE_48KHZ;
-		break
+		break;
 #ifdef CONFIG_MACH_LGE
 	case 4:
 		sample_rate = SAMPLING_RATE_96KHZ;
@@ -5899,7 +5899,7 @@ static void msm_mi2s_snd_shutdown(struct snd_pcm_substream *substream)
 				pr_err("%s: MI2S TLMM pinctrl set failed with %d\n",
 					__func__, ret_pinctrl);
 		}
-#enif
+#endif
 	}
 	mutex_unlock(&mi2s_intf_conf[index].lock);
 }
@@ -6688,7 +6688,11 @@ static struct snd_soc_dai_link msm_common_be_dai_links[] = {
 		.no_pcm = 1,
 		.dpcm_playback = 1,
 		.id = MSM_BACKEND_DAI_QUAT_TDM_RX_0,
+#ifdef CONFIG_MACH_LGE
+		.be_hw_params_fixup = msm_be_hw_params_fixup,
+#else
 		.be_hw_params_fixup = msm_tdm_be_hw_params_fixup,
+#endif
 		.ops = &sm8150_tdm_be_ops,
 		.ignore_suspend = 1,
 #ifndef CONFIG_MACH_LGE
@@ -6988,7 +6992,7 @@ static struct snd_soc_dai_link msm_mi2s_be_dai_links[] = {
 		SND_SOC_DAILINK_REG(sec_mi2s_tx),
 	},
 #endif
-#if !(defined(CONFIG_SND_SOC_ES9218P)
+#if !defined(CONFIG_SND_SOC_ES9218P)
 	{
 		.name = LPASS_BE_TERT_MI2S_RX,
 		.stream_name = "Tertiary MI2S Playback",
@@ -7209,9 +7213,8 @@ static struct snd_soc_dapm_route cs35l41_audio_paths[] = {
 static int cs35l41_codec_init(struct snd_soc_pcm_runtime *rtd)
 {
 	int ret = 0;
-	struct snd_soc_codec *codec = rtd->codec;
-	struct snd_soc_dapm_context *dapm = snd_soc_codec_get_dapm(codec);
-	struct snd_soc_component *component = NULL;
+	struct snd_soc_component *component = rtd->codec_dai->component;
+	struct snd_soc_dapm_context *dapm = snd_soc_component_get_dapm(component);
 	struct snd_soc_card *card = rtd->card;
 	char *dapm_widget_str = NULL;
 	int prefix_len = 0;

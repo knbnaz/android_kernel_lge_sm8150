@@ -592,7 +592,7 @@ static int bytes_ext_put(struct snd_kcontrol *kcontrol,
 	for (i = 0; i < params->max; i++) {
 		ret = regmap_write(sma6101->regmap, reg + i, *(val + i));
 		if (ret) {
-			dev_err(codec->dev,
+			dev_err(component->dev,
 				"configuration fail, register: %x ret: %d\n",
 				reg + i, ret);
 			kfree(data);
@@ -626,9 +626,9 @@ static int power_up_down_control_put(struct snd_kcontrol *kcontrol,
 		return -EINVAL;
 
 	if (sel && !(sma6101->force_amp_power_down))
-		sma6101_startup(codec);
+		sma6101_startup(component);
 	else
-		sma6101_shutdown(codec);
+		sma6101_shutdown(component);
 
 	return 0;
 }
@@ -647,16 +647,16 @@ static int power_down_control_get(struct snd_kcontrol *kcontrol,
 static int power_down_control_put(struct snd_kcontrol *kcontrol,
 		struct snd_ctl_elem_value *ucontrol)
 {
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct sma6101_priv *sma6101 = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 
 	sma6101->force_amp_power_down = ucontrol->value.integer.value[0];
 
 	if (sma6101->force_amp_power_down) {
-		dev_info(codec->dev, "%s\n", "Force AMP power down mode");
-		sma6101_shutdown(codec);
+		dev_info(component->dev, "%s\n", "Force AMP power down mode");
+		sma6101_shutdown(component);
 	} else
-		dev_info(codec->dev, "%s\n",
+		dev_info(component->dev, "%s\n",
 				"Force AMP power down out of mode");
 
 	return 0;
@@ -2013,7 +2013,7 @@ static int sma6101_trm_vref_put(struct snd_kcontrol *kcontrol,
 		regmap_update_bits(sma6101->regmap, SMA6101_93_BOOST_CTRL0,
 			0xF0, (sel << 4));
 	} else  {
-		dev_info(codec->dev, "Trimming of VBG reference does not change on REV3 and above\n");
+		dev_info(component->dev, "Trimming of VBG reference does not change on REV3 and above\n");
 	}
 
 	return 0;
@@ -2051,7 +2051,7 @@ static int sma6101_trm_vbst1_put(struct snd_kcontrol *kcontrol,
 		return -EINVAL;
 
 	if (sma6101->rev_num < REV_NUM_REV3) {
-		dev_info(codec->dev, "%s : Trimming of boost output voltage %dV\n",
+		dev_info(component->dev, "%s : Trimming of boost output voltage %dV\n",
 					__func__, (sel + 6));
 #if defined(CONFIG_MACH_LGE)
 		sma6101->trm_vbst1 = sel;
@@ -2063,7 +2063,7 @@ static int sma6101_trm_vbst1_put(struct snd_kcontrol *kcontrol,
 				0x0F, sel);
 #endif
 	} else {
-		dev_info(codec->dev, "Trimming of boost output voltage does not change on REV3 and above\n");
+		dev_info(component->dev, "Trimming of boost output voltage does not change on REV3 and above\n");
 	}
 
 	return 0;
@@ -3207,7 +3207,7 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_component *com
 			switch (sma6101->voice_music_class_h_mode_for_volume_boost) {
 			case SMA6101_CLASS_H_VOICE_MODE:
 			/* FDPEC gain & Boost voltage in voice scenario */
-			dev_info(codec->dev, "%s : FDPEC gain 6 & Boost 14V in voice scenario\n",
+			dev_info(component->dev, "%s : FDPEC gain 6 & Boost 14V in voice scenario\n",
 					__func__);
 			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x6);
 
@@ -3218,7 +3218,7 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_component *com
 
 			case SMA6101_CLASS_H_MUSIC_MODE:
 			/* FDPEC gain & Boost voltage in music scenario */
-			dev_info(codec->dev, "%s : FDPEC gain 8 & Boost 17V in music scenario\n",
+			dev_info(component->dev, "%s : FDPEC gain 8 & Boost 17V in music scenario\n",
 					__func__);
 			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x8);
 
@@ -3228,7 +3228,7 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_component *com
 			break;
 
 			default:
-			dev_info(codec->dev, "%s : FDPEC gain 6 & Boost 14V default\n",
+			dev_info(component->dev, "%s : FDPEC gain 6 & Boost 14V default\n",
 					__func__);
 			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x6);
 
@@ -3243,7 +3243,7 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_component *com
 			/* FDPEC gain & Boost voltage in
 			 * voice scenario
 			 */
-			dev_info(codec->dev, "%s : FDPEC gain 6 & Boost 15V in voice scenario\n",
+			dev_info(component->dev, "%s : FDPEC gain 6 & Boost 15V in voice scenario\n",
 					__func__);
 			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x6);
 
@@ -3256,7 +3256,7 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_component *com
 			/* FDPEC gain & Boost voltage in
 			 * music scenario
 			 */
-			dev_info(codec->dev, "%s : FDPEC gain 8 & Boost 15V in music scenario\n",
+			dev_info(component->dev, "%s : FDPEC gain 8 & Boost 15V in music scenario\n",
 					__func__);
 			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x8);
 
@@ -3269,7 +3269,7 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_component *com
 			/* FDPEC gain & Boost voltage in
 			 * low noise voice scenario
 			 */
-			dev_info(codec->dev, "%s : FDPEC gain 4 & Boost 10V in Low Noise voice scenario\n",
+			dev_info(component->dev, "%s : FDPEC gain 4 & Boost 10V in Low Noise voice scenario\n",
 					__func__);
 			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x4);
 
@@ -3282,7 +3282,7 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_component *com
 			/* FDPEC gain & Boost voltage in
 			 * ultra low noise voice scenario
 			 */
-			dev_info(codec->dev,
+			dev_info(component->dev,
 				"%s : FDPEC gain 2.6 & Boost 7V in Ultra Low Noise voice scenario\n",
 					__func__);
 			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x2P6);
@@ -3293,7 +3293,7 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_component *com
 			break;
 
 			default:
-			dev_info(codec->dev, "%s : FDPEC gain 6 & Boost 15V default\n",
+			dev_info(component->dev, "%s : FDPEC gain 6 & Boost 15V default\n",
 					__func__);
 			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x6);
 
@@ -3362,7 +3362,7 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_component *com
 
 			case SMA6101_CLASS_H_MUSIC_MODE:
 			/* FDPEC gain & Boost voltage in music scenario */
-			dev_info(codec->dev, "%s : FDPEC gain 8 & Boost 17V in music scenario\n",
+			dev_info(component->dev, "%s : FDPEC gain 8 & Boost 17V in music scenario\n",
 					__func__);
 			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x8);
 
@@ -3372,7 +3372,7 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_component *com
 			break;
 
 			default:
-			dev_info(codec->dev, "%s : FDPEC gain 6 & Boost 14V default\n",
+			dev_info(component->dev, "%s : FDPEC gain 6 & Boost 14V default\n",
 					__func__);
 			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x6);
 
@@ -3387,7 +3387,7 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_component *com
 			/* FDPEC gain & Boost voltage in
 			 * voice scenario
 			 */
-			dev_info(codec->dev, "%s : FDPEC gain 6 & Boost 15V in voice scenario\n",
+			dev_info(component->dev, "%s : FDPEC gain 6 & Boost 15V in voice scenario\n",
 					__func__);
 			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x6);
 
@@ -3400,7 +3400,7 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_component *com
 			/* FDPEC gain & Boost voltage in
 			 * music scenario
 			 */
-			dev_info(codec->dev, "%s : FDPEC gain 8 & Boost 15V in music scenario\n",
+			dev_info(component->dev, "%s : FDPEC gain 8 & Boost 15V in music scenario\n",
 					__func__);
 			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x8);
 
@@ -3413,7 +3413,7 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_component *com
 			/* FDPEC gain & Boost voltage in
 			 * low noise voice scenario
 			 */
-			dev_info(codec->dev, "%s : FDPEC gain 4 & Boost 10V in Low Noise voice scenario\n",
+			dev_info(component->dev, "%s : FDPEC gain 4 & Boost 10V in Low Noise voice scenario\n",
 					__func__);
 			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x4);
 
@@ -3426,7 +3426,7 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_component *com
 			/* FDPEC gain & Boost voltage in
 			 * ultra low noise voice scenario
 			 */
-			dev_info(codec->dev,
+			dev_info(component->dev,
 				"%s : FDPEC gain 2.6 & Boost 7V in Ultra Low Noise voice scenario\n",
 					__func__);
 			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x2P6);
@@ -3437,7 +3437,7 @@ static int set_voice_class_h_mode_for_volume_boost(struct snd_soc_component *com
 			break;
 
 			default:
-			dev_info(codec->dev, "%s : FDPEC gain 6 & Boost 15V default\n",
+			dev_info(component->dev, "%s : FDPEC gain 6 & Boost 15V default\n",
 					__func__);
 			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x6);
 
@@ -3498,7 +3498,7 @@ static int voice_music_class_h_mode_for_volume_boost_put(struct snd_kcontrol *kc
 
 	dev_info(component->dev, "%s : boost_enable %d\n", 	__func__,boost_enable);
 
-	set_voice_class_h_mode_for_volume_boost(codec,boost_enable);
+	set_voice_class_h_mode_for_volume_boost(component,boost_enable);
 	return 0;
 }
 #endif
@@ -3537,7 +3537,7 @@ static int voice_music_class_h_mode_put(struct snd_kcontrol *kcontrol,
 		switch (sma6101->voice_music_class_h_mode) {
 		case SMA6101_CLASS_H_VOICE_MODE:
 			/* Class-H operation Level in voice scenario */
-			dev_info(codec->dev, "%s : Class-H operation Level in voice scenario\n",
+			dev_info(component->dev, "%s : Class-H operation Level in voice scenario\n",
 					__func__);
 			regmap_write(sma6101->regmap,
 				SMA6101_0D_CLASS_H_CTRL_LVL3, 0xAA);
@@ -3551,7 +3551,7 @@ static int voice_music_class_h_mode_put(struct snd_kcontrol *kcontrol,
 
 		case SMA6101_CLASS_H_MUSIC_MODE:
 			/* Class-H operation Level in music scenario */
-			dev_info(codec->dev, "%s : Class-H operation Level in music scenario\n",
+			dev_info(component->dev, "%s : Class-H operation Level in music scenario\n",
 					__func__);
 			regmap_write(sma6101->regmap,
 				SMA6101_0D_CLASS_H_CTRL_LVL3, 0xFA);
@@ -3564,7 +3564,7 @@ static int voice_music_class_h_mode_put(struct snd_kcontrol *kcontrol,
 			break;
 
 		default:
-			dev_info(codec->dev, "%s : Class-H operation Level off\n",
+			dev_info(component->dev, "%s : Class-H operation Level off\n",
 					__func__);
 			regmap_write(sma6101->regmap,
 				SMA6101_0D_CLASS_H_CTRL_LVL3, 0xFA);
@@ -4128,7 +4128,7 @@ static int sma6101_startup(struct snd_soc_component *component)
 		/* Changed gain to reduce pop noise */
 		if (sma6101->voice_music_class_h_mode ==
 				SMA6101_CLASS_H_MUSIC_MODE) {
-			sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x2P6);
+			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x2P6);
 		}
 
 		if (sma6101->voice_music_class_h_mode ==
@@ -4180,15 +4180,15 @@ static int sma6101_startup(struct snd_soc_component *component)
 
 	if (sma6101->voice_music_class_h_mode ==
 			SMA6101_CLASS_H_MUSIC_MODE)
-		sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x8);
+		sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x8);
 	else if (sma6101->voice_music_class_h_mode ==
 			SMA6101_CLASS_H_LN_VOICE_MODE)
-		sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x4);
+		sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x4);
 	else if (sma6101->voice_music_class_h_mode ==
 			SMA6101_CLASS_H_ULN_VOICE_MODE)
-		sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x2P6);
+		sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x2P6);
 	else
-		sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x6);
+		sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x6);
 
 	if (sma6101->check_thermal_vbat_enable) {
 		if ((sma6101->voice_music_class_h_mode ==
@@ -4271,7 +4271,7 @@ static int sma6101_shutdown(struct snd_soc_component *component)
 				SMA6101_13_FDPEC_CTRL1,
 				FDPEC_GAIN_MASK, FDPEC_GAIN_6);
 		} else if (sma6101->rev_num == REV_NUM_REV4) {
-			sma6101_setup_fdpec_gain(codec, FDPEC_GAIN_x2P6);
+			sma6101_setup_fdpec_gain(component, FDPEC_GAIN_x2P6);
 		}
 	}
 
@@ -4580,7 +4580,7 @@ static int sma6101_dai_hw_params_amp(struct snd_pcm_substream *substream,
 	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 	unsigned int input_format = 0;
 
-	dev_info(codec->dev, "%s : rate = %d : bit size = %d\n",
+	dev_info(component->dev, "%s : rate = %d : bit size = %d\n",
 		__func__, params_rate(params), params_width(params));
 
 	if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK) {
@@ -4655,7 +4655,7 @@ static int sma6101_dai_hw_params_amp(struct snd_pcm_substream *substream,
 		switch (params_format(params)) {
 
 		case SNDRV_PCM_FORMAT_S16_LE:
-			dev_info(componeny->dev,
+			dev_info(component->dev,
 				"%s set format SNDRV_PCM_FORMAT_S16_LE\n",
 				__func__);
 			regmap_update_bits(sma6101->regmap,
@@ -4896,7 +4896,7 @@ static int sma6101_set_bias_level(struct snd_soc_component *component,
 
 	case SND_SOC_BIAS_OFF:
 
-		dev_info(codec->dev, "%s\n", "SND_SOC_BIAS_OFF");
+		dev_info(component->dev, "%s\n", "SND_SOC_BIAS_OFF");
 		sma6101_shutdown(component);
 
 		break;
@@ -5317,18 +5317,18 @@ static int sma6101_thermal_compensation(struct sma6101_priv *sma6101,
 }
 
 #ifdef CONFIG_PM
-static int sma6101_suspend(struct snd_soc_codec *codec)
+static int sma6101_suspend(struct snd_soc_component *component)
 {
 
-	dev_info(codec->dev, "%s\n", __func__);
+	dev_info(component->dev, "%s\n", __func__);
 
 	return 0;
 }
 
-static int sma6101_resume(struct snd_soc_codec *codec)
+static int sma6101_resume(struct snd_soc_component *component)
 {
 
-	dev_info(codec->dev, "%s\n", __func__);
+	dev_info(component->dev, "%s\n", __func__);
 
 	return 0;
 }
@@ -6138,7 +6138,7 @@ static int sma6101_probe(struct snd_soc_component *component)
 	return ret;
 }
 
-static int sma6101_remove(struct snd_soc_component *component)
+static void sma6101_remove(struct snd_soc_component *component)
 {
 	struct sma6101_priv *sma6101 = snd_soc_component_get_drvdata(component);
 #if defined(CONFIG_MACH_LGE)
@@ -6154,8 +6154,6 @@ static int sma6101_remove(struct snd_soc_component *component)
 	devm_kfree(sma6101->dev, sma6101);
 
 	kfifo_free(&sma6101->data_fifo);
-
-	return 0;
 }
 
 static struct snd_soc_component_driver soc_codec_dev_sma6101 = {
@@ -6169,7 +6167,7 @@ static struct snd_soc_component_driver soc_codec_dev_sma6101 = {
 	.num_dapm_widgets = ARRAY_SIZE(sma6101_dapm_widgets),
 	.dapm_routes = sma6101_audio_map,
 	.num_dapm_routes = ARRAY_SIZE(sma6101_audio_map),
-	.idle_bias_off = true,
+	.idle_bias_on = false,
 };
 
 const struct regmap_config sma_i2c_regmap = {
@@ -6409,7 +6407,7 @@ static int sma6101_i2c_probe(struct i2c_client *client,
 	sma6101->voice_music_class_h_mode_for_volume_boost = 0;
 #endif
 
-	ret = snd_soc_register_codec(&client->dev,
+	ret = snd_soc_register_component(&client->dev,
 		&soc_codec_dev_sma6101, sma6101_dai, ARRAY_SIZE(sma6101_dai));
 
 	/* Create sma6101 sysfs attributes */
@@ -6439,7 +6437,7 @@ static int sma6101_i2c_remove(struct i2c_client *client)
 		devm_kfree(&client->dev, sma6101);
 	}
 
-	snd_soc_unregister_codec(&client->dev);
+	snd_soc_unregister_component(&client->dev);
 
 	return 0;
 }

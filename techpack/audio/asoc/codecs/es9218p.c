@@ -32,10 +32,6 @@
 #include    <linux/fs.h>
 #include    <linux/string.h>
 
-#if defined(CONFIG_ARCH_SM8150)
-#include    <linux/pm_qos.h>
-#endif
-
 //#define     USE_CONTROL_EXTERNAL_LDO_FOR_DVDD // control a external LDO drained from PMIC
 //#ifdef USE_CONTROL_EXTERNAL_LDO_FOR_DVDD
 #include    <linux/regulator/consumer.h>
@@ -103,10 +99,6 @@ struct es9218_reg {
 
 struct wakeup_source *wl_sleep;
 struct wakeup_source *wl_shutdown;
-
-#if defined(CONFIG_ARCH_SM8150)
-struct pm_qos_request req;
-#endif
 
 /*
  *  We only include the analogue supplies here; the digital supplies
@@ -1698,12 +1690,6 @@ static int __es9218_sabre_headphone_on(void)
         call_common_init_registers = 1;
 
         cancel_delayed_work_sync(&g_es9218_priv->sleep_work);
-#if defined(CONFIG_ARCH_SM8150)
-        if(pm_qos_request_active(&req)) {
-            pr_info("%s(): pm qos active state. so, remove pm qos request", __func__);
-            pm_qos_remove_request(&req);
-        }
-#endif
         // guanrantee engough time to check impedance of headphone before entering to hifi mode, which means
         // that es9218p_sabre_bypass2hifi() is invoked after some delay like 250ms.
         schedule_delayed_work(&g_es9218_priv->hifi_in_standby_work, msecs_to_jiffies(250));
@@ -1985,12 +1971,6 @@ static void es9218_sabre_sleep_work (struct work_struct *work)
     }
 
     es9218_is_amp_on = 0;
-#if defined(CONFIG_ARCH_SM8150)
-    if(pm_qos_request_active(&req)) {
-        pr_info("%s(): pm qos active state. so, remove pm qos request", __func__);
-        pm_qos_remove_request(&req);
-    }
-#endif
     mutex_unlock(&g_es9218_priv->power_lock);
     return;
 }
@@ -2659,6 +2639,7 @@ static int es9218_chip_state_put(struct snd_kcontrol *kcontrol,
     return 0;
 }
 
+#ifdef CONFIG_LGE_USB_FACTORY
 static int chargerlogo_chipstate_get(void)
 {
     int ret ;
@@ -2725,6 +2706,7 @@ static int chargerlogo_chipstate_get(void)
     pr_debug("%s(): leave, es9218_power_state=%s.\n", __func__, power_state[es9218_power_state]);
     return 0;
 }
+#endif
 
 static int es9218_sabre_wcdon2bypass_get(struct snd_kcontrol *kcontrol,
         struct snd_ctl_elem_value *ucontrol)
@@ -2767,12 +2749,6 @@ static int es9218_sabre_wcdon2bypass_put(struct snd_kcontrol *kcontrol,
     //  if ( es9218_power_state == ESS_PS_IDLE ) {
             pr_info("%s() : state = %s : WCD On State HiFi -> ByPass !!\n", __func__, power_state[es9218_power_state]);
             cancel_delayed_work_sync(&g_es9218_priv->sleep_work);
-#if defined(CONFIG_ARCH_SM8150)
-            if(pm_qos_request_active(&req)) {
-                pr_info("%s(): pm qos active state. so, remove pm qos request", __func__);
-                pm_qos_remove_request(&req);
-            }
-#endif
             es9218p_sabre_hifi2lpb();
         }  else {
             pr_info("%s() : Invalid state = %s !!\n", __func__, power_state[es9218_power_state]);
@@ -3276,12 +3252,6 @@ static int es9218_startup(struct snd_pcm_substream *substream,
     call_common_init_registers = 1;
 
     cancel_delayed_work_sync(&g_es9218_priv->sleep_work);
-#if defined(CONFIG_ARCH_SM8150)
-    if(pm_qos_request_active(&req)) {
-        pr_info("%s(): pm qos active state. so, remove pm qos request", __func__);
-        pm_qos_remove_request(&req);
-    }
-#endif
     if ( es9218_power_state == ESS_PS_IDLE ) {
         pr_info("%s() : state = %s : Audio Active !!\n", __func__, power_state[es9218_power_state]);
         // check if DoP64 <-> DoP128
@@ -3359,27 +3329,15 @@ static void es9218_shutdown(struct snd_pcm_substream *substream,
 
     mutex_lock(&g_es9218_priv->power_lock);
 
-    dev_info(codec->dev, "%s(): entry\n", __func__);
+    dev_info(component->dev, "%s(): entry\n", __func__);
 
     es9218_sabre_audio_idle();
-
-#if defined(CONFIG_ARCH_SM8150)
-    req.type = PM_QOS_REQ_AFFINE_CORES;
-    req.irq = -1;
-    cpumask_copy(&req.cpus_affine, cpu_present_mask);
-#endif
 
 #ifdef ES9218P_DEBUG
 	__pm_wakeup_event(wl_shutdown, jiffies_to_msecs(10));
     schedule_delayed_work(&g_es9218_priv->sleep_work, msecs_to_jiffies(10));      //  3 Sec
 #else
     __pm_wakeup_event(wl_shutdown, jiffies_to_msecs(5000));
-#if defined(CONFIG_ARCH_SM8150)
-    if(!pm_qos_request_active(&req)) {
-        pr_info("%s(): pm qos nonactive state. so, pm_qos_add_request", __func__);
-        pm_qos_add_request(&req, PM_QOS_CPU_DMA_LATENCY, 0);
-    }
-#endif
 #ifdef CONFIG_MACH_SM6150_MH3_LAO_KR
     schedule_delayed_work(&g_es9218_priv->sleep_work, msecs_to_jiffies(3000));      //  3 Sec
 #else
@@ -3394,11 +3352,11 @@ static void es9218_shutdown(struct snd_pcm_substream *substream,
 static int es9218_hw_free(struct snd_pcm_substream *substream,
                struct snd_soc_dai *dai)
 {
-    struct snd_soc_component *codec = dai->component;
+    struct snd_soc_component *component = dai->component;
 #ifndef CONFIG_MACH_SM6150_MH3_LAO_KR
     mdelay(20);
 #endif
-    dev_info(codec->dev, "%s(): entry\n", __func__);
+    dev_info(component->dev, "%s(): entry\n", __func__);
 
     return 0;
 }
@@ -3442,25 +3400,23 @@ static  int es9218_codec_probe(struct snd_soc_component *component)
     pr_notice("%s(): entry\n", __func__);
 
     if (priv)
-        priv->codec = codec;
+        priv->component = component;
     else
         pr_err("%s(): fail !!!!!!!!!!\n", __func__);
 
-    component->control_data = snd_soc_component_get_drvdata(component);
 	wl_sleep = wakeup_source_register(NULL, "sleep_lock");
 	wl_shutdown = wakeup_source_register(NULL, "shutdown_lock");
-    es9218_set_bias_level(codec, SND_SOC_BIAS_STANDBY);
+    es9218_set_bias_level(component, SND_SOC_BIAS_STANDBY);
 
     pr_notice("%s(): exit \n", __func__);
     return 0;
 }
 
-static int  es9218_codec_remove(struct snd_soc_component *component)
+static void es9218_codec_remove(struct snd_soc_component *component)
 {
     es9218_set_bias_level(component, SND_SOC_BIAS_OFF);
     wakeup_source_unregister(wl_sleep);
     wakeup_source_unregister(wl_shutdown);
-    return 0;
 }
 
 static struct snd_soc_component_driver soc_codec_dev_es9218 = {
@@ -3604,10 +3560,12 @@ static int es9218_probe(struct i2c_client *client,const struct i2c_device_id *id
 #ifdef ES9218P_SYSFS
     ret = sysfs_create_group(&client->dev.kobj, &es9218_attr_group);
 #endif
+#ifdef CONFIG_LGE_USB_FACTORY
     if(lge_get_boot_mode() == LGE_BOOT_MODE_CHARGERLOGO){
        pr_info("%s chargerlogo mode call chargerlogo_chipstate_get function\n",__func__);
        chargerlogo_chipstate_get();
     }
+#endif
     pr_info("%s: snd_soc_register_component ret = %d\n",__func__, ret);
     return ret;
 

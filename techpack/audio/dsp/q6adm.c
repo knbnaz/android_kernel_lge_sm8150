@@ -1557,14 +1557,6 @@ static int adm_process_get_param_response(u32 opcode, u32 idx, u32 *payload,
 		data_size = v6_rsp->param_hdr.param_size;
 		param_data = v6_rsp->param_data;
 		break;
-#if defined(CONFIG_SND_LGE_TX_NXP_LIB)
-        case ADM_RAM_STATUS:
-            pr_debug("%s, copp_idx %d, payload[0](status)=%d\n", __func__, copp_idx, payload[0]);
-
-            ram_status = payload[0];
-            schedule_delayed_work(&ram_standby_work, msecs_to_jiffies(10));
-            break;
-#endif
 	default:
 		pr_err("%s: Invalid opcode %d\n", __func__, opcode);
 		return -EINVAL;
@@ -2066,6 +2058,14 @@ static int32_t adm_callback(struct apr_client_data *data, void *priv)
 			}
 			kfree(pp_event_package);
 			break;
+#if defined(CONFIG_SND_LGE_TX_NXP_LIB)
+        case ADM_RAM_STATUS:
+            pr_debug("%s, copp_idx %d, payload[0](status)=%d\n", __func__, copp_idx, payload[0]);
+
+            ram_status = payload[0];
+            schedule_delayed_work(&ram_standby_work, msecs_to_jiffies(10));
+            break;
+#endif
 		default:
 			pr_err("%s: Unknown cmd:0x%x\n", __func__,
 				data->opcode);
