@@ -1641,12 +1641,8 @@ static void tfa98xx_debug_remove(struct tfa98xx *tfa98xx)
 static int tfa98xx_get_vstep(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)
 {
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3,16,0)
-	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
-#else
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-#endif
-	struct tfa98xx *tfa98xx = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct tfa98xx *tfa98xx = snd_soc_component_get_drvdata(component);
 	int mixer_profile = kcontrol->private_value;
 	int profile, vstep;
 
@@ -1667,12 +1663,8 @@ static int tfa98xx_get_vstep(struct snd_kcontrol *kcontrol,
 static int tfa98xx_set_vstep(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)
 {
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3,16,0)
-	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
-#else
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-#endif
-	struct tfa98xx *tfa98xx = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct tfa98xx *tfa98xx = snd_soc_component_get_drvdata(component);
 	int mixer_profile = kcontrol->private_value;
 	int value = ucontrol->value.integer.value[0];
 	int profile, vstep, vsteps;
@@ -1737,12 +1729,8 @@ static int tfa98xx_set_vstep(struct snd_kcontrol *kcontrol,
 static int tfa98xx_info_vstep(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_info *uinfo)
 {
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3,16,0)
-	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
-#else
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-#endif
-	struct tfa98xx *tfa98xx = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct tfa98xx *tfa98xx = snd_soc_component_get_drvdata(component);
 	int mixer_profile = kcontrol->private_value;
 	int profile = get_profile_id_for_sr(mixer_profile, tfa98xx->rate);
 	if (profile < 0) {
@@ -1774,12 +1762,8 @@ static int tfa98xx_get_profile(struct snd_kcontrol *kcontrol,
 static int tfa98xx_set_profile(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)
 {
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3,16,0)
-	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
-#else
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-#endif
-	struct tfa98xx *tfa98xx = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct tfa98xx *tfa98xx = snd_soc_component_get_drvdata(component);
 
 	int profile_count = tfa98xx_mixer_profiles;
 	int profile = tfa98xx_mixer_profile;
@@ -2090,12 +2074,8 @@ static int tfa98xx_get_stop_ctl(struct snd_kcontrol *kcontrol,
 static int tfa98xx_set_stop_ctl(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)
 {
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3,16,0)
-	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
-#else
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-#endif
-	struct tfa98xx *tfa98xx = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct tfa98xx *tfa98xx = snd_soc_component_get_drvdata(component);
 	int ready = 0;
 
 	pr_debug("%ld\n", ucontrol->value.integer.value[0]);
@@ -2133,12 +2113,8 @@ static int tfa98xx_info_cal_ctl(struct snd_kcontrol *kcontrol,
 static int tfa98xx_set_cal_ctl(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)
 {
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3,16,0)
-	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
-#else
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-#endif
-	struct tfa98xx *tfa98xx = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct tfa98xx *tfa98xx = snd_soc_component_get_drvdata(component);
 	enum tfa98xx_error err;
 	int status = 0;
 
@@ -2165,12 +2141,8 @@ static int tfa98xx_set_cal_ctl(struct snd_kcontrol *kcontrol,
 static int tfa98xx_get_cal_ctl(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)
 {
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3,16,0)
-	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
-#else
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-#endif
-	struct tfa98xx *tfa98xx = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct tfa98xx *tfa98xx = snd_soc_component_get_drvdata(component);
 	uint16_t cal_data;
 
 	tfa98xx_open(tfa98xx->handle);
@@ -2195,12 +2167,8 @@ static int tfa98xx_info_saam_ctl(struct snd_kcontrol *kcontrol,
 static int tfa98xx_set_saam_ctl(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)
 {
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3,16,0)
-	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
-#else
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-#endif
-	struct tfa98xx *tfa98xx = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct tfa98xx *tfa98xx = snd_soc_component_get_drvdata(component);
 
 	int saam_select = ucontrol->value.integer.value[0];
 
@@ -2244,12 +2212,8 @@ static int tfa98xx_set_saam_ctl(struct snd_kcontrol *kcontrol,
 static int tfa98xx_get_saam_ctl(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)
 {
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3,16,0)
-	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
-#else
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-#endif
-	struct tfa98xx *tfa98xx = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct tfa98xx *tfa98xx = snd_soc_component_get_drvdata(component);
 
 	ucontrol->value.integer.value[0] = tfa98xx->samstream;
 	return 0;
@@ -2270,8 +2234,8 @@ static int tfa9872_status_control_put(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
 	int ret = 0;
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct tfa98xx *tfa98xx = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct tfa98xx *tfa98xx = snd_soc_component_get_drvdata(component);
 
 	tfa98xx->status = (int)ucontrol->value.integer.value[0];
 
@@ -2289,8 +2253,8 @@ static int tfa9872_status_control_get(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
 	int ret = 0;
-	struct snd_soc_codec *codec = snd_soc_kcontrol_codec(kcontrol);
-	struct tfa98xx *tfa98xx = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = snd_soc_kcontrol_component(kcontrol);
+	struct tfa98xx *tfa98xx = snd_soc_component_get_drvdata(component);
 
 	pr_info("%s : value %d\n",__func__,tfa98xx->status);
 
@@ -2320,7 +2284,7 @@ static int tfa98xx_create_controls(struct tfa98xx *tfa98xx)
 	 */
 #if defined(CONFIG_SND_SOC_SMA6101)
 	int ret = 0;
-	ret = snd_soc_add_codec_controls(tfa98xx->codec, tfa98xx_status_snd_controls,ARRAY_SIZE(tfa98xx_status_snd_controls));
+	ret = snd_soc_add_component_controls(tfa98xx->component, tfa98xx_status_snd_controls,ARRAY_SIZE(tfa98xx_status_snd_controls));
 	if (ret < 0) {
 		pr_err("%s : add tfa98xx_status_snd_controls failed %d\n", __func__,ret);
 		return ret;
@@ -2345,13 +2309,13 @@ static int tfa98xx_create_controls(struct tfa98xx *tfa98xx)
 			nr_controls++; /* Playback Volume control */
 	}
 
-	tfa98xx_controls = devm_kzalloc(tfa98xx->codec->dev,
+	tfa98xx_controls = devm_kzalloc(tfa98xx->component->dev,
 			nr_controls * sizeof(tfa98xx_controls[0]), GFP_KERNEL);
 	if (!tfa98xx_controls)
 		return -ENOMEM;
 
 	/* Create a mixer item for selecting the active profile */
-	name = devm_kzalloc(tfa98xx->codec->dev, MAX_CONTROL_NAME, GFP_KERNEL);
+	name = devm_kzalloc(tfa98xx->component->dev, MAX_CONTROL_NAME, GFP_KERNEL);
 	if (!name)
 		return -ENOMEM;
 	scnprintf(name, MAX_CONTROL_NAME, "%s Profile", tfa98xx->fw.name);
@@ -2433,7 +2397,7 @@ static int tfa98xx_create_controls(struct tfa98xx *tfa98xx)
 
 	if (tfa98xx_dev_family(tfa98xx->handle) == 1) {
 		/* Create a mixer item for stop control on TFA1 */
-		name = devm_kzalloc(tfa98xx->codec->dev, MAX_CONTROL_NAME,
+		name = devm_kzalloc(tfa98xx->component->dev, MAX_CONTROL_NAME,
 			GFP_KERNEL);
 		if (!name)
 			return -ENOMEM;
@@ -2448,7 +2412,7 @@ static int tfa98xx_create_controls(struct tfa98xx *tfa98xx)
 	}
 
 	if (tfa98xx->flags & TFA98XX_FLAG_CALIBRATION_CTL) {
-		name = devm_kzalloc(tfa98xx->codec->dev, MAX_CONTROL_NAME,
+		name = devm_kzalloc(tfa98xx->component->dev, MAX_CONTROL_NAME,
 			GFP_KERNEL);
 		if (!name)
 			return -ENOMEM;
@@ -2466,7 +2430,7 @@ static int tfa98xx_create_controls(struct tfa98xx *tfa98xx)
 	/* Create a mixer item to enable amplifier for RaM / SaM */
 	if (tfa98xx->flags & TFA98XX_FLAG_SAAM_AVAILABLE) {
 		name = devm_kzalloc
-			(tfa98xx->codec->dev, MAX_CONTROL_NAME, GFP_KERNEL);
+			(tfa98xx->component->dev, MAX_CONTROL_NAME, GFP_KERNEL);
 		if (!name)
 			return -ENOMEM;
 
@@ -2481,7 +2445,7 @@ static int tfa98xx_create_controls(struct tfa98xx *tfa98xx)
 		mix_index++;
 	}
 
-	return snd_soc_add_codec_controls(tfa98xx->codec,
+	return snd_soc_add_component_controls(tfa98xx->componeent,
 		tfa98xx_controls, mix_index);
 }
 
@@ -2600,12 +2564,8 @@ static const struct snd_soc_dapm_route tfa9888_input_dapm_routes[] = {
 
 static void tfa98xx_add_widgets(struct tfa98xx *tfa98xx)
 {
-#if LINUX_VERSION_CODE < KERNEL_VERSION(4,2,0)
-	struct snd_soc_dapm_context *dapm = &tfa98xx->codec->dapm;
-#else
 	struct snd_soc_dapm_context *dapm
-		= snd_soc_codec_get_dapm(tfa98xx->codec);
-#endif
+		= snd_soc_component_get_dapm(tfa98xx->component);
 	struct snd_soc_dapm_widget *widgets;
 	unsigned int num_dapm_widgets =
 		ARRAY_SIZE(tfa98xx_dapm_widgets_common);
@@ -3088,7 +3048,7 @@ tfa98xx_container_loaded(const struct firmware *cont,	void *context)
 	tfa98xx->dsp_fw_state = TFA98XX_DSP_FW_OK;
 
 #if defined(TFA_DBGFS_CHECK_MTPEX)
-	value = snd_soc_read(tfa98xx->codec, TFA98XX_KEY2_PROTECTED_MTP0);
+	value = snd_soc_component_read32(tfa98xx->component, TFA98XX_KEY2_PROTECTED_MTP0);
 
 	if (value != -1) {
 		tfa98xx->calibrate_done =
@@ -3540,8 +3500,8 @@ static void tfa98xx_interrupt(struct work_struct *work)
 static int tfa98xx_startup(struct snd_pcm_substream *substream,
 						struct snd_soc_dai *dai)
 {
-	struct snd_soc_codec *codec = dai->codec;
-	struct tfa98xx *tfa98xx = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = dai->component;
+	struct tfa98xx *tfa98xx = snd_soc_component_get_drvdata(component);
 	int idx = 0;
 #if !defined(TFA_FULL_RATE_SUPPORT_WITH_POST_CONVERSION)
 	unsigned int sr;
@@ -3652,7 +3612,7 @@ static int tfa98xx_startup(struct snd_pcm_substream *substream,
 static int tfa98xx_set_dai_sysclk(struct snd_soc_dai *codec_dai,
 	int clk_id, unsigned int freq, int dir)
 {
-	struct tfa98xx *tfa98xx = snd_soc_codec_get_drvdata(codec_dai->codec);
+	struct tfa98xx *tfa98xx = snd_soc_component_get_drvdata(codec_dai->component);
 
 	tfa98xx->sysclk = freq;
 	return 0;
@@ -3667,8 +3627,8 @@ static int tfa98xx_set_tdm_slot(struct snd_soc_dai *dai, unsigned int tx_mask,
 
 static int tfa98xx_set_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 {
-	struct tfa98xx *tfa98xx = snd_soc_codec_get_drvdata(dai->codec);
-	struct snd_soc_codec *codec = dai->codec;
+	struct tfa98xx *tfa98xx = snd_soc_component_get_drvdata(dai->component);
+	struct snd_soc_component *component = dai->component;
 
 	pr_debug("fmt=0x%x\n", fmt);
 
@@ -3708,8 +3668,8 @@ static int tfa98xx_hw_params(struct snd_pcm_substream *substream,
 	struct snd_pcm_hw_params *params,
 	struct snd_soc_dai *dai)
 {
-	struct snd_soc_codec *codec = dai->codec;
-	struct tfa98xx *tfa98xx = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = dai->component;
+	struct tfa98xx *tfa98xx = snd_soc_codec_get_drvdata(component);
 	unsigned int rate;
 	int prof_idx;
 
@@ -3748,8 +3708,8 @@ static int tfa98xx_hw_params(struct snd_pcm_substream *substream,
 
 static int tfa98xx_mute(struct snd_soc_dai *dai, int mute, int stream)
 {
-	struct snd_soc_codec *codec = dai->codec;
-	struct tfa98xx *tfa98xx = snd_soc_codec_get_drvdata(codec);
+	struct snd_soc_component *component = dai->component;
+	struct tfa98xx *tfa98xx = snd_soc_component_get_drvdata(component);
 
 	dev_dbg(&tfa98xx->i2c->dev,
 		"%s: state: %d (stream = %d)\n", __func__, mute, stream);
@@ -3953,16 +3913,14 @@ static struct snd_soc_dai_driver tfa98xx_dai[] = {
 		},
 		.ops = &tfa98xx_dai_ops,
 		.symmetric_rates = 1,
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,14,0)
 		.symmetric_channels = 1,
 		.symmetric_samplebits = 0,
-#endif
 	},
 };
 
-static int tfa98xx_probe(struct snd_soc_codec *codec)
+static int tfa98xx_probe(struct snd_soc_component *component)
 {
-	struct tfa98xx *tfa98xx = snd_soc_codec_get_drvdata(codec);
+	struct tfa98xx *tfa98xx = snd_soc_component_get_drvdata(component);
 	int ret;
 
 	pr_debug("\n");
@@ -3984,14 +3942,6 @@ static int tfa98xx_probe(struct snd_soc_codec *codec)
 	ret = tfa98xx_load_container(tfa98xx);
 	pr_debug("Container loading requested: %d\n", ret);
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3,16,0)
-	codec->control_data = tfa98xx->regmap;
-	ret = snd_soc_codec_set_cache_io(codec, 8, 16, SND_SOC_REGMAP);
-	if (ret != 0) {
-		dev_err(codec->dev, "Failed to set cache I/O: %d\n", ret);
-		return ret;
-	}
-#endif
 	tfa98xx_add_widgets(tfa98xx);
 
 #if defined(TFA_EXCEPTION_AT_TRANSITION)
@@ -4002,32 +3952,32 @@ static int tfa98xx_probe(struct snd_soc_codec *codec)
 	// 0x34 : speaker, 0x35 : receiver,
 	// RaM is working on reciever, so don't need to register extcon devices twice.
 	if (tfa98xx->i2c->addr == 0x34) {
-		edev = devm_extcon_dev_allocate(codec->dev, tfa98xx_cable);
+		edev = devm_extcon_dev_allocate(component->dev, tfa98xx_cable);
 		if (IS_ERR(edev)) {
-			dev_err(codec->dev, "failed to allocate extcon device\n");
+			dev_err(component->dev, "failed to allocate extcon device\n");
 			return -ENOMEM;
 		}
 
 		strcpy(tfa98xx->edev_name,"ram_status");
 		edev->name = tfa98xx->edev_name;
-		ret = devm_extcon_dev_register(codec->dev, edev);
+		ret = devm_extcon_dev_register(component->dev, edev);
 		if (ret < 0) {
-			dev_err(codec->dev, "extcon_dev_register() failed: %d\n",
+			dev_err(component->dev, "extcon_dev_register() failed: %d\n",
 				ret);
 			return ret;
 		}
 		pr_info("%s register excon device on i2c addr 0x%x\n", __func__, tfa98xx->i2c->addr);
 	}
 #endif
-	dev_info(codec->dev, "tfa98xx codec registered (%s)",
+	dev_info(component->dev, "tfa98xx codec registered (%s)",
 							tfa98xx->fw.name);
 
 	return ret;
 }
 
-static int tfa98xx_remove(struct snd_soc_codec *codec)
+static int tfa98xx_remove(struct snd_soc_component *component)
 {
-	struct tfa98xx *tfa98xx = snd_soc_codec_get_drvdata(codec);
+	struct tfa98xx *tfa98xx = snd_soc_component_get_drvdata(component);
 #if defined(TFADSP_DSP_BUFFER_POOL)
 	int index = 0;
 #endif
@@ -4058,25 +4008,19 @@ static int tfa98xx_remove(struct snd_soc_codec *codec)
 	return 0;
 }
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,16,0)
 struct regmap *tfa98xx_get_regmap(struct device *dev)
 {
 	struct tfa98xx *tfa98xx = dev_get_drvdata(dev);
 
 	return tfa98xx->regmap;
 }
-#endif
-static struct snd_soc_codec_driver soc_codec_dev_tfa98xx = {
+static struct snd_soc_component_driver soc_codec_dev_tfa98xx = {
 	.probe =	tfa98xx_probe,
 	.remove =	tfa98xx_remove,
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,16,0)
 	.get_regmap = tfa98xx_get_regmap,
-#endif
 #if defined(TFA_EXCEPTION_AT_TRANSITION)
-	.component_driver = {
-		.controls = tfa98xx_ext_snd_controls,
-		.num_controls = ARRAY_SIZE(tfa98xx_ext_snd_controls),
-	}
+	.controls = tfa98xx_ext_snd_controls,
+	.num_controls = ARRAY_SIZE(tfa98xx_ext_snd_controls),
 #endif
 };
 
