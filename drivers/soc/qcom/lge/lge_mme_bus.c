@@ -30,7 +30,6 @@
 #include <linux/types.h>
 #include <linux/clk.h>
 #include <linux/qseecom.h>
-#include <soc/qcom/scm.h>
 #include <soc/qcom/socinfo.h>
 #include <linux/msm-bus.h>
 #include <linux/msm-bus-board.h>

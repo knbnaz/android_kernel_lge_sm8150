@@ -25,7 +25,6 @@
 #include <linux/of.h>
 #include <linux/cpu.h>
 #include <linux/platform_device.h>
-#include <soc/qcom/scm.h>
 #include <soc/qcom/memory_dump.h>
 
 #include <soc/qcom/lge/board_lge.h>
