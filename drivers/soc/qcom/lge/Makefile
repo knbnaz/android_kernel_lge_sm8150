@@ -1,4 +1,6 @@
-ccflags-y := -Iinclude/drm -Idrivers/gpu/drm/msm -Idrivers/soc/qcom/lge/power
+ccflags-y := -I$(srctree)/techpack/display/include -I$(srctree)/techpack/display/include/uapi/display
+ccflags-y += -I$(srctree)/techpack/display/msm -I$(srctree)/techpack/display/msm/sde
+ccflags-y += -I$(srctree)/drivers/soc/qcom/lge/power
 
 obj-$(CONFIG_MACH_LGE) += devices_lge.o
 obj-$(CONFIG_LGE_PM) += lge_gpio_debug.o
