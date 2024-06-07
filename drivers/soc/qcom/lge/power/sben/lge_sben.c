@@ -14,7 +14,7 @@
 
 #include <linux/device.h>
 #include <linux/mutex.h>
-#include <uapi/drm/sde_drm.h>
+#include <drm/sde_drm.h>
 
 #include "lge_sben.h"
 

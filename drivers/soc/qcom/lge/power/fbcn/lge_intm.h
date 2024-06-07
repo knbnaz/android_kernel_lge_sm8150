@@ -19,7 +19,7 @@
 #include <linux/slab.h>
 #include <linux/types.h>
 #include <linux/err.h>
-#include <uapi/drm/sde_drm.h>
+#include <drm/sde_drm.h>
 
 #include "../main/lge_prm.h"
 

@@ -13,7 +13,7 @@
  */
 #include <linux/sysfs.h>
 #include <linux/device.h>
-#include <uapi/drm/sde_drm.h>
+#include <drm/sde_drm.h>
 #include <linux/platform_device.h>
 #include <linux/of.h>
 
