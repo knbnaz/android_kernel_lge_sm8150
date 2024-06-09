@@ -21,6 +21,11 @@
 
 #include "thermal_core.h"
 
+#ifdef CONFIG_LGE_PM
+#include <soc/qcom/lge/board_lge.h>
+enum lge_sku_carrier_type carrier = HW_SKU_MAX;
+#endif
+
 /***   Private data structures to represent thermal device tree data ***/
 
 /**
@@ -1460,6 +1465,13 @@ static int thermal_of_populate_trip(struct device_node *np,
 	}
 	trip->temperature = prop;
 
+#ifdef CONFIG_LGE_PM
+	if (!strncmp(np->name, "sdx50m-sub6", 11) && carrier == HW_SKU_NA_CDMA_VZW)
+		trip->temperature = 120000;
+	else if (!strncmp(np->name, "sdx50m-mmw", 10) && carrier != HW_SKU_NA_CDMA_VZW)
+		trip->temperature = 120000;
+#endif
+
 	ret = of_property_read_u32(np, "hysteresis", &prop);
 	if (ret < 0) {
 		pr_err("missing hysteresis property\n");
@@ -1827,6 +1839,12 @@ int __init of_parse_thermal_zones(void)
 	struct device_node *np, *child;
 	struct __thermal_zone *tz;
 	struct thermal_zone_device_ops *ops;
+
+#ifdef CONFIG_LGE_PM
+	carrier = lge_get_sku_carrier();
+	pr_info("operator is %s\n",
+		carrier == HW_SKU_NA_CDMA_VZW ? "VZW" : "Non-VZW");
+#endif
 
 	np = of_find_node_by_name(NULL, "thermal-zones");
 	if (!np) {
