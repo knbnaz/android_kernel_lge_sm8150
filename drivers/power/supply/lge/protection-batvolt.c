@@ -65,13 +65,13 @@ static void protection_batvolt_work(struct work_struct *work) {
 			goto done;
 		}
 
-		if (chg_now != POWER_SUPPLY_CHARGE_TYPE_TAPER
+		if (chg_now != POWER_SUPPLY_CHARGE_TYPE_ADAPTIVE
 				&& icap_now <= bvp_me.threshold_ibat_rated) {
 			pr_batvolt(VERBOSE, "Under C-rate (%d)\n", icap_now);
 			goto done;
 		}
 
-		if (chg_now == POWER_SUPPLY_CHARGE_TYPE_TAPER
+		if (chg_now == POWER_SUPPLY_CHARGE_TYPE_ADAPTIVE
 				&& icap_now <= bvp_me.threshold_cv_ibat_rated) {
 			pr_batvolt(VERBOSE, "Under C-rate (%d) on CV\n", icap_now);
 			goto done;

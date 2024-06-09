@@ -826,7 +826,7 @@ static void taper_confirm_work(struct work_struct *work)
 		return;
 	}
 
-	if (chg_type.intval == POWER_SUPPLY_CHARGE_TYPE_TAPER) {
+	if (chg_type.intval == POWER_SUPPLY_CHARGE_TYPE_ADAPTIVE) {
 		if (get_qps() == QPS_IN_RUNTIME
 			&& ext_qnovo.locked_fcc > ext_dt.qni_step_min_fcc) {
 
@@ -989,7 +989,7 @@ static int override_qnovo5_update_status(struct qnovo *chip)
 		if (get_qps() < QPS_PRE_DEFINED_WLC)
 			goto out;
 
-		if (chg_type.intval == POWER_SUPPLY_CHARGE_TYPE_TAPER) {
+		if (chg_type.intval == POWER_SUPPLY_CHARGE_TYPE_ADAPTIVE) {
 			schedule_delayed_work(&ext_qnovo.taper_confirm_work,
 				msecs_to_jiffies(TAPER_CONFIRM_TIME));
 		}
