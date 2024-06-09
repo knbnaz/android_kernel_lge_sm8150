@@ -31,7 +31,7 @@ static int pr_debugmask;
 
 static struct protection_battemp {
 	struct delayed_work	battemp_dwork;
-	struct wakeup_source	battemp_wakelock;
+	struct wakeup_source *battemp_wakelock;
 
 	// processed in external
 	bool (*get_protection_battemp)(bool* charging, int* temperature, int* mvoltage);
@@ -360,15 +360,15 @@ static void polling_status_work(struct work_struct* work) {
 		warning_wo_charging = health_jeita == POWER_SUPPLY_HEALTH_HOT;
 
 		if (warning_at_charging || warning_wo_charging) {
-			if (!battemp_me.battemp_wakelock.active) {
+			if (!battemp_me.battemp_wakelock->active) {
 				pr_battemp(UPDATE, "Acquiring wake lock\n");
-				__pm_stay_awake(&battemp_me.battemp_wakelock);
+				__pm_stay_awake(battemp_me.battemp_wakelock);
 			}
 		}
 		else {
-			if (battemp_me.battemp_wakelock.active) {
+			if (battemp_me.battemp_wakelock->active) {
 				pr_battemp(UPDATE, "Releasing wake lock\n");
-				__pm_relax(&battemp_me.battemp_wakelock);
+				__pm_relax(battemp_me.battemp_wakelock);
 			}
 		}
 
@@ -482,7 +482,7 @@ static bool battemp_create_preset(bool (*feed_protection_battemp)(bool* charging
 		return false;
 	}
 
-	wakeup_source_init(&battemp_me.battemp_wakelock,
+	battemp_me.battemp_wakelock = wakeup_source_register(NULL,
 		BATTEMP_WAKELOCK);
 
 	INIT_DELAYED_WORK(&battemp_me.battemp_dwork,
@@ -526,7 +526,7 @@ destroy:
 }
 
 void protection_battemp_destroy(void) {
-	wakeup_source_trash(&battemp_me.battemp_wakelock);
+	wakeup_source_unregister(battemp_me.battemp_wakelock);
 	cancel_delayed_work_sync(&battemp_me.battemp_dwork);
 
 	veneer_voter_unregister(&battemp_me.voter_ichilly);

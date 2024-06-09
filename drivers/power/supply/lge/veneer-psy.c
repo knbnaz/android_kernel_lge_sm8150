@@ -43,7 +43,7 @@ struct veneer {
 /* module descripters */
 	struct device*		veneer_dev;
 	struct power_supply*	veneer_psy;
-	struct wakeup_source	veneer_wakelock;
+	struct wakeup_source*	veneer_wakelock;
 	enum charging_supplier	veneer_supplier;
 	int			veneer_exception;
 	// delayed works
@@ -242,9 +242,9 @@ static enum charging_supplier supplier_wireless(
 
 static bool charging_wakelock_acquire(struct veneer* veneer_me)
 {
-	if (veneer_me && !veneer_me->veneer_wakelock.active) {
+	if (veneer_me && !veneer_me->veneer_wakelock->active) {
 		pr_veneer("%s\n", VENEER_WAKELOCK);
-		__pm_stay_awake(&veneer_me->veneer_wakelock);
+		__pm_stay_awake(veneer_me->veneer_wakelock);
 		add_pm_qos_request(veneer_me);
 		return true;
 	}
@@ -253,9 +253,9 @@ static bool charging_wakelock_acquire(struct veneer* veneer_me)
 
 static bool charging_wakelock_release(struct veneer* veneer_me)
 {
-	if (veneer_me && veneer_me->veneer_wakelock.active) {
+	if (veneer_me && veneer_me->veneer_wakelock->active) {
 		pr_veneer("%s\n", VENEER_WAKELOCK);
-		__pm_relax(&veneer_me->veneer_wakelock);
+		__pm_relax(veneer_me->veneer_wakelock);
 		pm_wakeup_event(veneer_me->veneer_dev, 1000);
 		remove_pm_qos_request(veneer_me);
 		return true;
@@ -1303,7 +1303,7 @@ static bool probe_preset(struct device* veneer_dev, struct veneer* veneer_me)
 	veneer_me->veneer_dev = veneer_dev;
 	veneer_me->veneer_supplier = CHARGING_SUPPLY_TYPE_UNKNOWN;
 	mutex_init(&veneer_me->veneer_lock);
-	wakeup_source_init(&veneer_me->veneer_wakelock, VENEER_WAKELOCK);
+	veneer_me->veneer_wakelock = wakeup_source_register(&veneer_me->veneer_dev, VENEER_WAKELOCK);
 	INIT_DELAYED_WORK(&veneer_me->dwork_logger, psy_external_logging);
 	INIT_DELAYED_WORK(&veneer_me->dwork_slowchg, detect_slowchg_timer);
 	if (of_property_read_u32(veneer_supp, "capacity-mah-min",
@@ -1397,7 +1397,7 @@ static void veneer_clear(struct veneer* veneer_me)
 
 	veneer_voter_destroy();
 	if (veneer_me) {
-		wakeup_source_trash(&veneer_me->veneer_wakelock);
+		wakeup_source_unregister(veneer_me->veneer_wakelock);
 		cancel_delayed_work(&veneer_me->dwork_logger);
 		cancel_delayed_work(&veneer_me->dwork_slowchg);
 		if(veneer_me->veneer_psy)
