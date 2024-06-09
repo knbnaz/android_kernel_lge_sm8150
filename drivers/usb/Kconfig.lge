@@ -5,7 +5,7 @@
 if USB_GADGET
 
 config LGE_USB_GADGET
-	boolean "LGE USB Gadget Support"
+	bool "LGE USB Gadget Support"
 	depends on USB_GADGET
 	select LGE_USB_GADGET_MULTI_CONFIG
 	select USB_CONFIGFS_NCM
@@ -21,13 +21,13 @@ config LGE_USB_GADGET
 	  LGE United PC host USB driver.
 
 config LGE_USB_GADGET_MULTI_CONFIG
-	boolean "LGE USB Multiple Configuration"
+	bool "LGE USB Multiple Configuration"
 	depends on LGE_USB_GADGET
 	help
 	  Support multiple configuration.
 
 config LGE_USB_GADGET_AUTORUN
-	boolean "Common autorun support in LGE Android"
+	bool "Common autorun support in LGE Android"
 	depends on LGE_USB_GADGET
 	select LGE_USB_GADGET_CDROM_MAC_SUPPORT
 	help
@@ -36,14 +36,14 @@ config LGE_USB_GADGET_AUTORUN
 	  virtual-cdrom device is provided on LGE Android powered device.
 
 config LGE_USB_GADGET_AUTORUN_VZW
-	boolean "VZW specific autorun support in LGE Android"
+	bool "VZW specific autorun support in LGE Android"
 	select LGE_USB_GADGET_AUTORUN
 	help
 	  It supports VZW specific autorun feature. note that this
 	  must be used in VZW devices.
 
 config LGE_USB_GADGET_CDROM_MAC_SUPPORT
-	boolean "USB CDROM support patch of LGE Android on Mac OS-X"
+	bool "USB CDROM support patch of LGE Android on Mac OS-X"
 	depends on LGE_USB_GADGET_AUTORUN
 	help
 	  This feature is based on Roger Quadros' patch as following;
@@ -65,13 +65,13 @@ config LGE_USB_GADGET_CDROM_MAC_SUPPORT
 	  gadget use the new helper function.
 
 config LGE_USB_F_LAF
-	boolean "LGE specific LAF support in LGE Android"
+	bool "LGE specific LAF support in LGE Android"
 	depends on LGE_USB_GADGET
 	help
 	  It supports LGE specific LAF feature.
 
 config LGE_USB_CONFIGFS_LAF
-	boolean "LGE specific configfs LAF support in LGE Android"
+	bool "LGE specific configfs LAF support in LGE Android"
 	depends on USB_CONFIGFS
 	depends on LGE_USB_GADGET
 	select LGE_USB_F_LAF
@@ -79,51 +79,51 @@ config LGE_USB_CONFIGFS_LAF
 	  It supports LGE specific configfs LAF feature.
 
 config LGE_USB_FACTORY
-	boolean "Force full speed support if pif is connected in LGE Android"
+	bool "Force full speed support if pif is connected in LGE Android"
 	depends on LGE_USB_GADGET
 	help
 	   This feature is that USB set forcely full speed if pif cable is
 	   connected. It is only for PIF cable, not normal USB cable.
 
 config LGE_USB_DEBUGGER
-	boolean "USB UART debugger support"
+	bool "USB UART debugger support"
 	default n
 	help
 		Support USB type UART debugger cable
 
 config LGE_USB_EMBEDDED_BATTERY
 	depends on LGE_USB_FACTORY
-	boolean "power cycle when factory cable is connected"
+	bool "power cycle when factory cable is connected"
 	help
 	  In case of the phone with embedded battery, power cycle is implemented
 	  when factory cable is connected.
 
 config LGE_USB_DIAG_LOCK
-	boolean "feature for usb diag access lock"
+	bool "feature for usb diag access lock"
 	depends on LGE_USB_GADGET
 	help
 	  this feature should be applied to meet usb diag lock requirement
 
 config LGE_USB_DIAG_LOCK_SPR
-	boolean "feature for usb diag access lock"
+	bool "feature for usb diag access lock"
 	depends on LGE_USB_DIAG_LOCK
 	help
 	  this feature should be applied to meet SPR requirement
 
 config LGE_USB_DIAG_LOCK_SPR_DEBUG
-	boolean "feature for usb diag access lock"
+	bool "feature for usb diag access lock"
 	depends on LGE_USB_DIAG_LOCK_SPR
 	help
 	  this feature should be applied to meet SPR requirement
 
 config LGE_USB_DIAG_LOCK_TRF
-	boolean "feature for usb diag access lock"
+	bool "feature for usb diag access lock"
 	depends on LGE_USB_DIAG_LOCK
 	help
 	  this feature should be applied to meet TRF requirement
 
 config LGE_USB_DIAG_LOCK_VZW
-        boolean "feature for usb diag access lock"
+        bool "feature for usb diag access lock"
         depends on LGE_USB_DIAG_LOCK
         help
           this feature should be applied to meet VZW requirement
@@ -145,7 +145,7 @@ choice
 	default LGE_USB_LGMD_LEGACY
 
 config LGE_USB_LGMD_LEGACY
-	boolean "LGE USB Legacy Moisture Detector"
+	bool "LGE USB Legacy Moisture Detector"
 	help
 	  Support legacy moisture deteator.
 endchoice
@@ -180,7 +180,7 @@ config LGE_USB_COMPLIANCE_TEST
 endif # USB_GADGET
 
 config LGE_USB
-	boolean "Support for Host-side LGE USB"
+	bool "Support for Host-side LGE USB"
 	select USB
 	select LGE_USB_SUPPORT_LIST_HID
 	select LGE_USB_SUPPORT_LIST_NETWORK
