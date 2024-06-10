@@ -70,7 +70,5 @@ config LGE_TOUCH_MODULE_FT3518
 	If you want to test touch module for 2nd input driver, yes 'm' here
 
 source "drivers/input/touchscreen/lge/lgsic/Kconfig"
-source "drivers/input/touchscreen/lge/stm/Kconfig"
 source "drivers/input/touchscreen/lge/synaptics/Kconfig"
-source "drivers/input/touchscreen/lge/focaltech/Kconfig"
 endif

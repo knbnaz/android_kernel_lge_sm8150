@@ -4,12 +4,6 @@
 
 # Each configuration option enables a list of files.
 
-ifdef CONFIG_LGE_TOUCH_CORE_MTK
-	subdir-ccflags-y += -Werror
-	subdir-ccflags-y += -I$(srctree)/drivers/misc/mediatek/include/mt-plat/$(MTK_PLATFORM)/include
-	subdir-ccflags-y += -I$(srctree)/drivers/misc/mediatek/include/mt-plat/
-endif
-
 # Touch Core Driver Common Header Code..!!
 ccflags-y += -I$(srctree)/drivers/input/touchscreen/lge/
 
@@ -26,8 +20,6 @@ obj-$(CONFIG_LGE_TOUCH_CORE_QCT)	+= touch_hwif.o
 obj-$(CONFIG_LGE_TOUCH_CORE_MTK)	+= touch_hwif_mtk.o
 
 obj-$(CONFIG_LGE_TOUCH_CORE_BASE)	+= lgsic/
-obj-$(CONFIG_LGE_TOUCH_CORE_BASE)	+= stm/
 obj-$(CONFIG_LGE_TOUCH_CORE_BASE)	+= synaptics/
-obj-$(CONFIG_LGE_TOUCH_CORE_BASE)	+= focaltech/
 
 obj-$(CONFIG_LGE_TOUCH_CORE_BASE)	+= module/
