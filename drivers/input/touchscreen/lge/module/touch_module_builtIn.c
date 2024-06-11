@@ -42,7 +42,7 @@ void module_write_file(struct device *dev, char *data, int write_time)
 	int fd = 0;
 	char *fname = NULL;
 	char time_string[64] = {0};
-	struct timespec my_time = {0, };
+	struct timespec64 my_time;
 	struct tm my_date = {0, };
 	mm_segment_t old_fs = get_fs();
 	int boot_mode = TOUCH_NORMAL_BOOT;
@@ -84,8 +84,8 @@ void module_write_file(struct device *dev, char *data, int write_time)
 
 	if (fd >= 0) {
 		if (write_time == TIME_INFO_WRITE) {
-			my_time = __current_kernel_time();
-			time_to_tm(my_time.tv_sec,
+			ktime_get_coarse_real_ts64(&my_time);
+			time64_to_tm(my_time.tv_sec,
 					sys_tz.tz_minuteswest * 60 * (-1),
 					&my_date);
 			snprintf(time_string, 64,
