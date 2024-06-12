@@ -4,6 +4,8 @@ ccflags-y += -I$(srctree)/techpack/display/msm/sde
 ccflags-y += -I$(srctree)/techpack/display/rotator
 ccflags-y += -I$(srctree)/techpack/display/hdcp
 ccflags-y += -I$(srctree)/drivers/clk/qcom/
+ccflags-y += -I$(srctree)/techpack/display/lge
+ccflags-$(CONFIG_LGE_PM_PRM) += -I$(srctree)/drivers/soc/qcom/lge/power
 
 msm_drm-$(CONFIG_DRM_MSM_DP) += dp/dp_altmode.o \
 	dp/dp_parser.o \
@@ -140,6 +142,8 @@ msm_drm-$(CONFIG_DRM_MSM) += \
 	msm_smmu.o \
 	msm_cooling_device.o \
 	msm_prop.o
+
+obj-$(CONFIG_LGE_DISPLAY_COMMON) += lge/
 
 msm_drm-$(CONFIG_HDCP_QSEECOM) += ../hdcp/msm_hdcp.o \
 
