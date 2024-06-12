@@ -1,6 +1,8 @@
-ccflags-y += -Iinclude/drm -I$(src)/../ -I$(src)/../dsi-staging/
-ccflags-y += -Idrivers/gpu/drm/msm/sde
-ccflags-y += -Idrivers/gpu/drm/msm/dp
+# SPDX-License-Identifier: GPL-2.0
+ccflags-y := -I$(srctree)/include/drm -I$(srctree)/techpack/display/msm -I$(srctree)/techpack/display/msm/dsi -I$(srctree)/techpack/display/msm/dp
+ccflags-y += -I$(srctree)/techpack/display/msm/sde
+ccflags-y += -I$(srctree)/techpack/display/rotator
+ccflags-y += -I$(srctree)/drivers/clk/qcom/
 
 lge_display_common-objs := lge_dsi_panel.o
 lge_display_common-objs += lge_panel_reg.o
