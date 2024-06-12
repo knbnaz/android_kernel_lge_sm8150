@@ -146,22 +146,6 @@ struct touch_attribute {
 
 static struct i2c_driver touch_module_driver;
 
-static inline void write_file(struct device *dev, char *data, int write_time)
-{
-	struct module_data *md = to_module(dev);
-
-	if (md->m_driver.write_file)
-		md->m_driver.write_file(dev, data, write_time);
-}
-
-static inline void log_file_size_check(struct device *dev)
-{
-	struct module_data *md = to_module(dev);
-
-	if (md->m_driver.log_file_size_check)
-		md->m_driver.log_file_size_check(dev);
-}
-
 static inline int touch_check_boot_mode(struct device *dev)
 {
 	struct module_data *md = to_module(dev);

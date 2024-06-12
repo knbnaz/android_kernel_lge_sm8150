@@ -329,8 +329,6 @@ static int firmware_version_log(struct device *dev)
 			d->prd_info.inspect_date[0], d->prd_info.inspect_date[1], d->prd_info.inspect_date[2],
 			d->prd_info.inspect_time[0], d->prd_info.inspect_time[1], d->prd_info.inspect_time[2]);
 
-	write_file(dev, buffer, TIME_INFO_SKIP);
-
 	return 0;
 }
 
@@ -484,8 +482,6 @@ static ssize_t show_sd(struct device *dev, char *buf)
 	module_interrupt_control(md->dev, MODULE_INTERRUPT_DISABLE);
 
 	/* file create , time log */
-	write_file(dev, "\nShow_sd Test Start", TIME_INFO_SKIP);
-	write_file(dev, "\n", TIME_INFO_WRITE);
 	TOUCH_I("Show_sd Test Start\n");
 
 	fw_ver_ret = firmware_version_log(dev);
@@ -528,10 +524,7 @@ static ssize_t show_sd(struct device *dev, char *buf)
 
 exit:
 	print_sd_log(buf);
-	write_file(dev, buf, TIME_INFO_SKIP);
-	write_file(dev, "\nShow_sd Test End\n\n", TIME_INFO_WRITE);
 	TOUCH_I("Show_sd Test End\n");
-	log_file_size_check(dev);
 	module_interrupt_control(md->dev, MODULE_INTERRUPT_ENABLE);
 	mutex_unlock(&md->lock);
 
@@ -696,10 +689,7 @@ static ssize_t show_noise(struct device *dev, char *buf)
 	}
 
 	print_sd_log(buf);
-	write_file(dev, buf, TIME_INFO_SKIP);
-	write_file(dev, "\nShow_noise Test End\n\n", TIME_INFO_WRITE);
 	TOUCH_I("Show_noise Test End\n");
-	log_file_size_check(dev);
 
 exit:
 	retval = module_initialize(dev);
@@ -977,8 +967,6 @@ static ssize_t show_lpwg_sd(struct device *dev, char *buf)
 	module_interrupt_control(md->dev, MODULE_INTERRUPT_DISABLE);
 
 	/* file create , time log */
-	write_file(dev, "\nShow_lpwg_sd Test Start", TIME_INFO_SKIP);
-	write_file(dev, "\n", TIME_INFO_WRITE);
 	TOUCH_I("Show_lpwg_sd Test Start\n");
 
 	fw_ver_ret = firmware_version_log(dev);
@@ -1015,10 +1003,7 @@ static ssize_t show_lpwg_sd(struct device *dev, char *buf)
 
 exit:
 	print_sd_log(buf);
-	write_file(dev, buf, TIME_INFO_SKIP);
-	write_file(dev, "\nShow_lpwg_sd Test End\n", TIME_INFO_WRITE);
 	TOUCH_I("Show_lpwg_sd Test End\n");
-	log_file_size_check(dev);
 
 	module_interrupt_control(md->dev, MODULE_INTERRUPT_ENABLE);
 	mutex_unlock(&md->lock);

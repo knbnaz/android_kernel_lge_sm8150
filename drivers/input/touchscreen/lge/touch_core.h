@@ -678,8 +678,6 @@ static inline struct touch_core_data *to_touch_core(struct device *dev)
 	return dev ? (struct touch_core_data *)dev_get_drvdata(dev) : NULL;
 }
 
-extern void module_write_file(struct device *dev, char *data, int write_time);
-extern void module_log_file_size_check(struct device *dev);
 extern int module_touch_check_boot_mode(struct device *dev);
 extern irqreturn_t touch_irq_handler(int irq, void *dev_id);
 extern irqreturn_t touch_irq_thread(int irq, void *dev_id);

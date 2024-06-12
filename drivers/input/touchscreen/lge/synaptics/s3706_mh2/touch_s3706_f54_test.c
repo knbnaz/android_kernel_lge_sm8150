@@ -551,7 +551,6 @@ static int CompareImageReport(struct device *dev)
 						i, j, ImagepF[i][j]);
 				if (f54len > (BUF_SIZE / 2)) {
 					print_sd_log(f54buf);
-					write_file(dev, f54buf, TIME_INFO_SKIP);
 					memset(f54buf, 0, BUF_SIZE);
 					f54len = 0;
 				}
@@ -603,7 +602,6 @@ static int CompareHighResistance(struct device *dev)
 						i, j, ImagepF[i][j]);
 				if (f54len > (BUF_SIZE / 2)) {
 					print_sd_log(f54buf);
-					write_file(dev, f54buf, TIME_INFO_SKIP);
 					memset(f54buf, 0, BUF_SIZE);
 					f54len = 0;
 				}
@@ -638,7 +636,6 @@ static int CompareHybridAbsRawReport(struct device *dev)
 					"\nFail [%2d] = %6d", i, HybridAbsData[k]);
 			if (f54len > (BUF_SIZE / 2)) {
 				print_sd_log(f54buf);
-				write_file(dev, f54buf, TIME_INFO_SKIP);
 				memset(f54buf, 0, BUF_SIZE);
 				f54len = 0;
 			}
@@ -654,7 +651,6 @@ static int CompareHybridAbsRawReport(struct device *dev)
 					"\nFail [%2d] = %6d", i, HybridAbsData[k]);
 			if (f54len > (BUF_SIZE / 2)) {
 				print_sd_log(f54buf);
-				write_file(dev, f54buf, TIME_INFO_SKIP);
 				memset(f54buf, 0, BUF_SIZE);
 				f54len = 0;
 			}
@@ -738,7 +734,6 @@ static int CompareTRexShortTestReport(struct device *dev)
 						"Fail [%d] = %#x\n", i, Data[i]);
 			if (f54len > (BUF_SIZE / 2)) {
 				print_sd_log(f54buf);
-				write_file(dev, f54buf, TIME_INFO_SKIP);
 				memset(f54buf, 0, BUF_SIZE);
 				f54len = 0;
 			}
@@ -753,7 +748,6 @@ static int CompareTRexShortTestReport(struct device *dev)
 						"Fail, TRX[%d]\n", ((i * 8) + j));
 				if (f54len > (BUF_SIZE / 2)) {
 					print_sd_log(f54buf);
-					write_file(dev, f54buf, TIME_INFO_SKIP);
 					memset(f54buf, 0, BUF_SIZE);
 					f54len = 0;
 				}
@@ -796,7 +790,6 @@ static void print_noise_report(struct device *dev, short (*data)[TRX_MAX])
 	f54len += touch_snprintf(f54buf + f54len, sizeof(f54buf) - f54len, "\n");
 
 	print_sd_log(f54buf);
-	write_file(dev, f54buf, TIME_INFO_SKIP);
 	memset(f54buf, 0, BUF_SIZE);
 	f54len = 0;
 
@@ -852,7 +845,6 @@ static int CompareNoiseReport(struct device *dev)
 
 				if (f54len > (BUF_SIZE / 2)) {
 					print_sd_log(f54buf);
-					write_file(dev, f54buf, TIME_INFO_SKIP);
 					memset(f54buf, 0, BUF_SIZE);
 					f54len = 0;
 				}
@@ -879,7 +871,6 @@ static int CompareNoiseReport(struct device *dev)
 	}
 
 	print_sd_log(f54buf);
-	write_file(dev, f54buf, TIME_INFO_SKIP);
 
 	return (result) ? 1 : 0;
 }
@@ -900,7 +891,6 @@ static int CompareTransRxShortReport(struct device *dev)
 					i, TransRxShortData[i]);
 			if (f54len > (BUF_SIZE / 2)) {
 				print_sd_log(f54buf);
-				write_file(dev, f54buf, TIME_INFO_SKIP);
 				memset(f54buf, 0, BUF_SIZE);
 				f54len = 0;
 			}
@@ -978,7 +968,6 @@ static int ReadImageReport(struct device *dev)
 	ret = CompareImageReport(dev);
 
 	print_sd_log(f54buf);
-	write_file(dev, f54buf, TIME_INFO_SKIP);
 
 	Reset(dev);
 
@@ -1177,7 +1166,6 @@ static int ReadHighResistanceReport(struct device *dev)
 	ret = CompareHighResistance(dev);
 
 	print_sd_log(f54buf);
-	write_file(dev, f54buf, TIME_INFO_SKIP);
 
 	Reset(dev);
 
@@ -1254,7 +1242,6 @@ static int ReadHybridAbsRawReport(struct device *dev)
 	ret = CompareHybridAbsRawReport(dev);
 
 	print_sd_log(f54buf);
-	write_file(dev, f54buf, TIME_INFO_SKIP);
 
 	Reset(dev);
 
@@ -1289,7 +1276,6 @@ static int ReadTRexShortReport(struct device *dev)
 	ret = CompareTRexShortTestReport(dev);
 
 	print_sd_log(f54buf);
-	write_file(dev, f54buf, TIME_INFO_SKIP);
 
 	Reset(dev);
 
@@ -1339,7 +1325,6 @@ static int ReadTransRxShortReport(struct device *dev)
 	ret = CompareTransRxShortReport(dev);
 
 	print_sd_log(f54buf);
-	write_file(dev, f54buf, TIME_INFO_SKIP);
 
 	Reset(dev);
 
@@ -2918,7 +2903,6 @@ static int ExtendedTRXShortRT100Test(struct device *dev, int mode, char *buf)
 		GetMaxRx(delta, maxRX, logical_pin);
 
 		print_sd_log(f54buf);
-		write_file(dev, f54buf, TIME_INFO_SKIP);
 
 		f54len = 0;
 		memset(f54buf, 0, BUF_SIZE);
@@ -2969,7 +2953,6 @@ static int ExtendedTRXShortRT100Test(struct device *dev, int mode, char *buf)
 	result = short_ret & ext_short_ret;
 
 	print_sd_log(f54buf);
-	write_file(dev, f54buf, TIME_INFO_SKIP);
 
 	Reset(dev);
 

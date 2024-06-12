@@ -85,8 +85,6 @@ struct p_driver {
 	int (*lpwg)(struct device *dev, u32 code, void *param);
 	int (*ta_connect)(struct device *dev);
 	int (*register_sysfs)(struct device *dev);
-	void (*write_file)(struct device *dev, char *data, int write_time);
-	void (*log_file_size_check)(struct device *dev);
 	int (*touch_check_boot_mode)(struct device *dev);
 };
 

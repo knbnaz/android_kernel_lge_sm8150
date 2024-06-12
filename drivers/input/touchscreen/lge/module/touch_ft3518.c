@@ -1602,7 +1602,6 @@ static ssize_t show_sysnode_test(struct device *dev, char *buf)
 
 	ret += snprintf(buf + ret, PAGE_SIZE - ret, "show_module_sysnode_test file write, TIME_INFO_SKIP\n");
 	ret += snprintf(buf + ret, PAGE_SIZE - ret, "show_module_sysnode_test file write, TIME_INFO_WRITE\n");
-	write_file(dev, buf, TIME_INFO_WRITE);
 
 	return ret;
 }

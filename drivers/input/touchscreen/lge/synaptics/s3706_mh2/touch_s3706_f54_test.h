@@ -125,7 +125,6 @@ extern unsigned char TxChannelCount;
 
 extern void SCAN_PDT(struct device *dev);
 extern int F54Test(struct device *dev, u16 input, int mode, char *buf);
-extern void write_file(struct device *dev, char *data, int write_time);
 extern int Read8BitRegisters(struct device *dev, unsigned short regAddr,
 		void *data, int length);
 extern int Write8BitRegisters(struct device *dev, unsigned short regAddr,

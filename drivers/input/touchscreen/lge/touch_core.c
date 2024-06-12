@@ -1178,8 +1178,6 @@ static int touch_core_probe_normal(struct platform_device *pdev)
 		}
 
 		md->m_driver.notify = module_notify_func;
-		md->m_driver.write_file = module_write_file;
-		md->m_driver.log_file_size_check = module_log_file_size_check;
 		md->m_driver.touch_check_boot_mode = module_touch_check_boot_mode;
 		md->m_driver.probe(md->dev);
 		if (pdev->id == 3)

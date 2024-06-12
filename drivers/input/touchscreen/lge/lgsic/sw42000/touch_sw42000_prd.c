@@ -127,159 +127,6 @@ static void prd_param_set(struct device *dev)
 	param->u3_m2_self = (0x1091);
 }
 
-static void log_file_size_check(struct device *dev)
-{
-	char *fname = NULL;
-	struct file *file = NULL;
-	loff_t file_size = 0;
-	int i = 0;
-	char buf1[128] = {0};
-	char buf2[128] = {0};
-	mm_segment_t old_fs = get_fs();
-	int ret = 0;
-	int boot_mode = TOUCH_NORMAL_BOOT;
-
-	set_fs(KERNEL_DS);
-
-	boot_mode = touch_check_boot_mode(dev);
-
-	switch (boot_mode) {
-	case TOUCH_NORMAL_BOOT:
-		fname = "/data/vendor/touch/touch_self_test.txt";
-		break;
-	case TOUCH_MINIOS_AAT:
-		fname = "/data/touch/touch_self_test.txt";
-		break;
-	case TOUCH_MINIOS_MFTS_FOLDER:
-	case TOUCH_MINIOS_MFTS_FLAT:
-	case TOUCH_MINIOS_MFTS_CURVED:
-		fname = "/data/touch/touch_self_mfts.txt";
-		break;
-	default:
-		TOUCH_I("%s : not support mode\n", __func__);
-		break;
-	}
-
-
-	if (fname) {
-		file = filp_open(fname, O_RDONLY, 0666);
-		sys_chmod(fname, 0666);
-	} else {
-		TOUCH_E("%s : fname is NULL, can not open FILE\n", __func__);
-		goto error;
-	}
-
-	if (IS_ERR(file)) {
-		TOUCH_I("%s : ERR(%ld) Open file error [%s]\n", __func__, PTR_ERR(file), fname);
-		goto error;
-	}
-
-	file_size = vfs_llseek(file, 0, SEEK_END);
-	TOUCH_I("%s : [%s] file_size = %lld\n", __func__, fname, file_size);
-
-	filp_close(file, 0);
-
-	if (file_size > MAX_LOG_FILE_SIZE) {
-		TOUCH_I("%s : [%s] file_size(%lld) > MAX_LOG_FILE_SIZE(%d)\n", __func__, fname, file_size, MAX_LOG_FILE_SIZE);
-
-		for (i = MAX_LOG_FILE_COUNT - 1; i >= 0; i--) {
-			if (i == 0)
-				snprintf(buf1, sizeof(buf1), "%s", fname);
-			else
-				snprintf(buf1, sizeof(buf1), "%s.%d", fname, i);
-
-			ret = sys_access(buf1, 0);
-
-			if (ret == 0) {
-				TOUCH_I("%s : file [%s] exist\n", __func__, buf1);
-
-				if (i == (MAX_LOG_FILE_COUNT - 1)) {
-					if (sys_unlink(buf1) < 0) {
-						TOUCH_E("%s : failed to remove file [%s]\n", __func__, buf1);
-						goto error;
-					}
-
-					TOUCH_I("%s : remove file [%s]\n", __func__, buf1);
-				} else {
-					snprintf(buf2, sizeof(buf2), "%s.%d", fname, (i + 1));
-					if (sys_rename(buf1, buf2) < 0) {
-						TOUCH_E("%s : failed to rename file [%s] -> [%s]\n", __func__, buf1, buf2);
-						goto error;
-					}
-					TOUCH_I("%s : rename file [%s] -> [%s]\n", __func__, buf1, buf2);
-				}
-			} else {
-				TOUCH_I("%s : file [%s] does not exist (ret = %d)\n", __func__, buf1, ret);
-			}
-		}
-	}
-
-error:
-	set_fs(old_fs);
-}
-
-static void write_file(struct device *dev, char *data, int write_time)
-{
-	int fd = 0;
-	char *fname = NULL;
-	char time_string[TIME_STR_LEN] = {0};
-	struct timespec64 my_time;
-	struct tm my_date = {0, };
-	int boot_mode = TOUCH_NORMAL_BOOT;
-	mm_segment_t old_fs = get_fs();
-
-	set_fs(KERNEL_DS);
-
-	boot_mode = touch_check_boot_mode(dev);
-
-	switch (boot_mode) {
-	case TOUCH_NORMAL_BOOT:
-		fname = "/data/vendor/touch/touch_self_test.txt";
-		break;
-	case TOUCH_MINIOS_AAT:
-		fname = "/data/touch/touch_self_test.txt";
-		break;
-	case TOUCH_MINIOS_MFTS_FOLDER:
-	case TOUCH_MINIOS_MFTS_FLAT:
-	case TOUCH_MINIOS_MFTS_CURVED:
-		fname = "/data/touch/touch_self_mfts.txt";
-		break;
-	default:
-		TOUCH_I("%s : not support mode\n", __func__);
-		break;
-	}
-
-
-	if (fname) {
-		fd = sys_open(fname, O_WRONLY|O_CREAT|O_APPEND, 0666);
-		sys_chmod(fname, 0666);
-	} else {
-		TOUCH_E("%s : fname is NULL, can not open FILE\n", __func__);
-		set_fs(old_fs);
-		return;
-	}
-
-	if (fd >= 0) {
-		if (write_time == TIME_INFO_WRITE) {
-			ktime_get_coarse_real_ts64(&my_time);
-			time64_to_tm(my_time.tv_sec, sys_tz.tz_minuteswest * 60 * (-1), &my_date);
-			snprintf(time_string, TIME_STR_LEN,
-					"\n[%02d-%02d %02d:%02d:%02d.%03lu]\n",
-					my_date.tm_mon + 1,
-					my_date.tm_mday, my_date.tm_hour,
-					my_date.tm_min, my_date.tm_sec,
-					(unsigned long) my_time.tv_nsec / 1000000);
-			sys_write(fd, time_string, strlen(time_string));
-
-		}
-		sys_write(fd, data, strlen(data));
-		sys_close(fd);
-	} else {
-		TOUCH_I("File open failed\n");
-	}
-	set_fs(old_fs);
-}
-
 static int write_test_mode(struct device *dev, u32 type)
 {
 	u32 testmode = 0;
@@ -438,7 +285,6 @@ static int prd_read_self_print(struct device *dev, int offset, int row, int col,
 	TOUCH_I("%s\n", log_buf);
 
 	ret += snprintf(w_buf + ret, PAGE_SIZE - ret, "\n");
-	write_file(dev, w_buf, TIME_INFO_SKIP);
 	memset(w_buf, 0, BUF_SIZE);
 
 	return ret;
@@ -493,7 +339,6 @@ static int prd_read_print_frame(struct device *dev, int offset, int row, int col
 	}
 
 	ret += snprintf(w_buf + ret, PAGE_SIZE - ret, "\n");
-	write_file(dev, w_buf, TIME_INFO_SKIP);
 	memset(w_buf, 0, BUF_SIZE);
 
 	return ret;
@@ -561,22 +406,18 @@ static int __used prd_os_xline_result_read(struct device *dev, int type)
 	switch (type) {
 	case OPEN_RX_NODE_TEST:
 		TOUCH_I("[OPEN RX NODE DATA]\n");
-		write_file(dev, "[OPEN RX NODE DATA]\n", TIME_INFO_SKIP);
 		prd_open_result_get(dev, param->frame.open_rx_frame);
 		break;
 	case OPEN_TX_NODE_TEST:
 		TOUCH_I("[OPEN TX NODE DATA]\n");
-		write_file(dev, "[OPEN TX NODE DATA]\n", TIME_INFO_SKIP);
 		prd_open_result_get(dev, param->frame.open_tx_frame);
 		break;
 	case SHORT_RX_NODE_TEST:
 		TOUCH_I("[SHORT RX NODE DATA]\n");
-		write_file(dev, "[SHORT RX NODE DATA]\n", TIME_INFO_SKIP);
 		prd_short_result_get(dev, param->frame.short_rx_frame);
 		break;
 	case SHORT_TX_NODE_TEST:
 		TOUCH_I("[SHORT TX NODE DATA]\n");
-		write_file(dev, "[SHORT TX NODE DATA]\n", TIME_INFO_SKIP);
 		prd_short_result_get(dev, param->frame.short_tx_frame);
 		break;
 	}
@@ -586,63 +427,9 @@ static int __used prd_os_xline_result_read(struct device *dev, int type)
 		/* rawdata compare result(pass : 0 fail : 1) */
 		prd_compare_rawdata(dev, type, &result);
 		TOUCH_I("compare result(pass : 0 fail : 1) = %d\n", result);
-
-		write_file(dev, w_buf, TIME_INFO_SKIP);
 	}
 
 	return result;
-}
-
-static int sdcard_spec_file_read(struct device *dev)
-{
-	struct sw42000_data *d = to_sw42000_data(dev);
-	struct siw_hal_prd_data *prd = (struct siw_hal_prd_data *)d->prd;
-	struct prd_test_param *param = &prd->prd_param;
-	int ret = 0;
-	int fd = 0;
-	int size = 0;
-	char *path[2] = {param->spec_file_path, param->mfts_spec_file_path};
-	int boot_mode = TOUCH_NORMAL_BOOT;
-	int path_idx = 0;
-	mm_segment_t old_fs = get_fs();
-
-	boot_mode = touch_check_boot_mode(dev);
-
-	if ((boot_mode == TOUCH_MINIOS_MFTS_FOLDER)
-			|| (boot_mode == TOUCH_MINIOS_MFTS_FLAT)
-			|| (boot_mode == TOUCH_MINIOS_MFTS_CURVED))
-		path_idx = 1;
-	else
-		path_idx = 0;
-	set_fs(KERNEL_DS);
-	fd = sys_open(path[path_idx], O_RDONLY, 0);
-	if (fd >= 0) {
-		size = sys_lseek(fd, 0, SEEK_END);
-
-		if (line) {
-			TOUCH_I("%s: line is already allocated. kfree line\n",
-					__func__);
-			kfree(line);
-			line = NULL;
-		}
-
-		line = kzalloc(size, GFP_KERNEL);
-		if (line == NULL) {
-			TOUCH_E("failed to kzalloc line\n");
-			sys_close(fd);
-			set_fs(old_fs);
-			return -ENOMEM;
-		}
-
-		sys_lseek(fd, 0, SEEK_SET);
-		sys_read(fd, line, sizeof(line));
-		sys_close(fd);
-		TOUCH_I("%s file existing\n", path[path_idx]);
-		ret = 1;
-	}
-	set_fs(old_fs);
-
-	return ret;
 }
 
 static int spec_file_read(struct device *dev)
@@ -977,7 +764,6 @@ static int flash_pt_info_check_test(struct device *dev)
 		ret += snprintf(w_buf + ret, BUF_SIZE - ret, "\n[PT_INFO_CHECK] : Pass\n");
 		TOUCH_I("PT_INFO_CHECK : Pass\n");
 	}
-	write_file(dev, w_buf, TIME_INFO_SKIP);
 
 	return write_test_mode_result;
 }
@@ -1001,7 +787,6 @@ static int prd_open_short_test(struct device *dev)
 
 	/* Test Type Write */
 	TOUCH_I("[OPEN_TEST]\n");
-	write_file(dev, "\n[OPEN_TEST]\n", TIME_INFO_SKIP);
 
 	result_addr = TC_STS + PT_TEST_PF_RESULT_OFT;
 
@@ -1031,7 +816,6 @@ static int prd_open_short_test(struct device *dev)
 
 	/* Test Type Write */
 	TOUCH_I("[SHORT_TEST]\n");
-	write_file(dev, "\n[SHORT_TEST]\n", TIME_INFO_SKIP);
 
 	/* 2. short_test */
 	type = SHORT_NODE_TEST;
@@ -1065,8 +849,6 @@ static int prd_open_short_test(struct device *dev)
 		ret += snprintf(w_buf + ret, BUF_SIZE - ret, "\nOPEN_SHORT_ALL_TEST : Pass\n");
 		TOUCH_I("OPEN_SHORT_ALL_TEST : Pass\n");
 	}
-
-	write_file(dev, w_buf, TIME_INFO_SKIP);
 
 	return openshort_all_result;
 }
@@ -1265,7 +1047,6 @@ static int prd_compare_rawdata(struct device *dev, u8 type, int *result)
 				}
 
 				if (ret > (BUF_SIZE / 2)) {
-					write_file(dev, w_buf, TIME_INFO_SKIP);
 					memset(w_buf, 0, BUF_SIZE);
 					ret = 0;
 				}
@@ -1354,7 +1135,6 @@ static void tune_display(struct device *dev, struct tune_data_sel *sel, int type
 	case U3_M1_RAWDATA_TEST:
 		offset += snprintf(log_buf+offset, tc_tune_code_size-offset, "U3 M1 tune: ");
 		offset += tune_u8_print(LOFT_CH_NUM, sel->m1.m1_tune_sel_code, log_buf, offset);
-		write_file(dev, log_buf, TIME_INFO_SKIP);
 		TOUCH_I("%s\n", log_buf);
 		break;
 	//case U2_M1_RAWDATA_TEST:
@@ -1362,32 +1142,27 @@ static void tune_display(struct device *dev, struct tune_data_sel *sel, int type
 	case U0_M1_RAWDATA_TEST:
 		offset += snprintf(log_buf+offset, tc_tune_code_size-offset, "U0 M1 tune: ");
 		offset += tune_u8_print(LOFT_CH_NUM, sel->m1.m1_tune_sel_code, log_buf, offset);
-		write_file(dev, log_buf, TIME_INFO_SKIP);
 		TOUCH_I("%s\n", log_buf);
 		break;
 	case U3_M2_RAWDATA_TEST:
 	case U3_M2_RAW_SELF_TEST:
 		offset += snprintf(log_buf+offset, tc_tune_code_size-offset, "U3 M2 tune high: ");
 		offset += tune_u8_print(LOFT_CH_NUM, sel->m2.m2_tune_high_sel_code, log_buf, offset);
-		write_file(dev, log_buf, TIME_INFO_SKIP);
 		TOUCH_I("%s\n", log_buf);
 
 		offset = 0;
 		offset += snprintf(log_buf+offset, tc_tune_code_size-offset, "U3 M2 tune low: ");
 		offset += tune_u8_print(LOFT_CH_NUM, sel->m2.m2_tune_low_sel_code, log_buf, offset);
-		write_file(dev, log_buf, TIME_INFO_SKIP);
 		TOUCH_I("%s\n", log_buf);
 
 		offset = 0;
 		offset += snprintf(log_buf+offset, tc_tune_code_size-offset, "U3 M2 tune self1: ");
 		offset += tune_u8_print(LOFT_CH_NUM, sel->m2.self1_tune_sel_code, log_buf, offset);
-		write_file(dev, log_buf, TIME_INFO_SKIP);
 		TOUCH_I("%s\n", log_buf);
 
 		offset = 0;
 		offset += snprintf(log_buf+offset, tc_tune_code_size-offset, "U3 M2 tune self2: ");
 		offset += tune_u8_print(LOFT_CH_NUM, sel->m2.self2_tune_sel_code, log_buf, offset);
-		write_file(dev, log_buf, TIME_INFO_SKIP);
 		TOUCH_I("%s\n", log_buf);
 		break;
 	//case U2_M2_RAWDATA_TEST:
@@ -1395,25 +1170,21 @@ static void tune_display(struct device *dev, struct tune_data_sel *sel, int type
 	case U0_M2_RAWDATA_TEST:
 		offset += snprintf(log_buf+offset, tc_tune_code_size-offset, "U0 M2 tune high: ");
 		offset += tune_u8_print(LOFT_CH_NUM, sel->m2.m2_tune_high_sel_code, log_buf, offset);
-		write_file(dev, log_buf, TIME_INFO_SKIP);
 		TOUCH_I("%s\n", log_buf);
 
 		offset = 0;
 		offset += snprintf(log_buf+offset, tc_tune_code_size-offset, "U0 M2 tune low: ");
 		offset += tune_u8_print(LOFT_CH_NUM, sel->m2.m2_tune_low_sel_code, log_buf, offset);
-		write_file(dev, log_buf, TIME_INFO_SKIP);
 		TOUCH_I("%s\n", log_buf);
 
 		offset = 0;
 		offset += snprintf(log_buf+offset, tc_tune_code_size-offset, "U0 M2 tune self1: ");
 		offset += tune_u8_print(LOFT_CH_NUM, sel->m2.self1_tune_sel_code, log_buf, offset);
-		write_file(dev, log_buf, TIME_INFO_SKIP);
 		TOUCH_I("%s\n", log_buf);
 
 		offset = 0;
 		offset += snprintf(log_buf+offset, tc_tune_code_size-offset, "U0 M2 tune self2: ");
 		offset += tune_u8_print(LOFT_CH_NUM, sel->m2.self2_tune_sel_code, log_buf, offset);
-		write_file(dev, log_buf, TIME_INFO_SKIP);
 		TOUCH_I("%s\n", log_buf);
 		break;
 	default:
@@ -1474,7 +1245,6 @@ static void __used read_tune_code(struct device *dev, u8 type)
 		return;
 	}
 
-	write_file(dev, "\n[Read Tune Code]\n", TIME_INFO_SKIP);
 	TOUCH_I("\n");
 	TOUCH_I("[Read Tune Code]\n");
 
@@ -1486,8 +1256,6 @@ static void __used read_tune_code(struct device *dev, u8 type)
 	TOUCH_I("&sel:%x, &sel.m1:%x, &sel.m2:%x\n", &sel, &sel.m1, &sel.m2);
 */
 	tune_display(dev, &sel, type);
-	write_file(dev, "\n", TIME_INFO_SKIP);
-
 }
 
 static int prd_rawdata_test(struct device *dev, u8 type)
@@ -1506,7 +1274,6 @@ static int prd_rawdata_test(struct device *dev, u8 type)
 	}
 
 	/* Test Type Write */
-	write_file(dev, test_type, TIME_INFO_SKIP);
 
 	write_test_mode_result = write_test_mode(dev, type);
 	if (write_test_mode_result == 0) {
@@ -1528,7 +1295,6 @@ static int prd_rawdata_test(struct device *dev, u8 type)
 		ret += snprintf(w_buf + ret, BUF_SIZE - ret, "%s : Pass\n", test_name_str[type]);
 		TOUCH_I("%s : Pass\n", test_name_str[type]);
 	}
-	write_file(dev, w_buf, TIME_INFO_SKIP);
 
 	/* tune code ok - 20180604
 	 * test sequence
@@ -1580,8 +1346,6 @@ static void firmware_version_log(struct device *dev)
 
 	offset += snprintf(buf + offset, LOG_BUF_SIZE - offset,
 			"======================================================\n");
-
-	write_file(dev, buf, TIME_INFO_SKIP);
 }
 
 static ssize_t show_sd(struct device *dev, char *buf)
@@ -1602,11 +1366,8 @@ static ssize_t show_sd(struct device *dev, char *buf)
 	int u3_m2_jitter_self_ret = 0;
 	int flash_pt_info_check = 0;
 	int ret = 0;
-	int file_exist = 0;
 
 	/* file create , time log */
-	write_file(dev, "\nShow_sd Test Start", TIME_INFO_SKIP);
-	write_file(dev, "\n", TIME_INFO_WRITE);
 	TOUCH_I("Show_sd Test Start\n");
 
 	/* LCD mode check */
@@ -1620,13 +1381,9 @@ static ssize_t show_sd(struct device *dev, char *buf)
 
 	firmware_version_log(dev);
 
-	file_exist = sdcard_spec_file_read(dev);
-
-	if (!file_exist) {
-		ret = spec_file_read(dev);
-		if (ret == -1)
-			goto out;
-	}
+	ret = spec_file_read(dev);
+	if (ret == -1)
+		goto out;
 
 	/* Test enter */
 	pt_command = (0x3 << 8) + U3_PT_TEST;
@@ -1763,15 +1520,11 @@ static ssize_t show_sd(struct device *dev, char *buf)
 			"=====================\n");
 	TOUCH_I("=====================\n");
 
-	write_file(dev, buf, TIME_INFO_SKIP);
-
 	sw42000_reset_ctrl(dev, HW_RESET_SYNC);
 out:
 	kfree(line);
 	line = NULL;
 	mutex_unlock(&ts->lock);
-	write_file(dev, "Show_sd Test End\n", TIME_INFO_WRITE);
-	log_file_size_check(dev);
 	TOUCH_I("Show_sd Test End\n");
 
 	return ret;
@@ -2298,11 +2051,8 @@ static ssize_t show_lpwg_sd(struct device *dev, char *buf)
 	int m1_jitter_ret = 0;
 	int m2_jitter_ret = 0;
 	int ret = 0;
-	int file_exist = 0;
 
 	/* file create , time log */
-	write_file(dev, "\nShow_lpwg_sd Test Start", TIME_INFO_SKIP);
-	write_file(dev, "\n", TIME_INFO_WRITE);
 	TOUCH_I("Show_lpwg_sd Test Start\n");
 
 	/* LCD mode check */
@@ -2328,13 +2078,9 @@ static ssize_t show_lpwg_sd(struct device *dev, char *buf)
 
 	firmware_version_log(dev);
 
-	file_exist = sdcard_spec_file_read(dev);
-
-	if (!file_exist) {
-		ret = spec_file_read(dev);
-		if (ret == -1)
-			goto out;
-	}
+	ret = spec_file_read(dev);
+	if (ret == -1)
+		goto out;
 
 	touch_interrupt_control(ts->dev, INTERRUPT_DISABLE);
 
@@ -2408,15 +2154,11 @@ static ssize_t show_lpwg_sd(struct device *dev, char *buf)
 	ret += snprintf(buf + ret, PAGE_SIZE, "=====================\n");
 	TOUCH_I("=====================\n");
 
-	write_file(dev, buf, TIME_INFO_SKIP);
-
 	sw42000_reset_ctrl(dev, HW_RESET_SYNC);
 out:
 	kfree(line);
 	line = NULL;
 	mutex_unlock(&ts->lock);
-	write_file(dev, "Show_lpwg_sd Test End\n", TIME_INFO_WRITE);
-	log_file_size_check(dev);
 	TOUCH_I("Show_lpwg_sd Test End\n");
 
 	return ret;

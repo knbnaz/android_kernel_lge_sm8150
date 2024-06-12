@@ -246,169 +246,6 @@ void print_sd_log(char *buf)
 	}
 }
 #endif
-static void log_file_size_check(struct device *dev)
-{
-	char *fname = NULL;
-	struct file *file = NULL;
-	loff_t file_size = 0;
-	int i = 0;
-	char buf1[FILE_STR_LEN] = {0};
-	char buf2[FILE_STR_LEN] = {0};
-	int ret = 0;
-	int boot_mode = TOUCH_NORMAL_BOOT;
-	mm_segment_t old_fs = get_fs();
-
-	TOUCH_TRACE();
-
-	set_fs(KERNEL_DS);
-
-	boot_mode = touch_check_boot_mode(dev);
-
-	switch (boot_mode) {
-	case TOUCH_NORMAL_BOOT:
-		fname = "/data/vendor/touch/touch_self_test.txt";
-		break;
-	case TOUCH_MINIOS_AAT:
-		fname = "/data/touch/touch_self_test.txt";
-		break;
-	case TOUCH_MINIOS_MFTS_FOLDER:
-	case TOUCH_MINIOS_MFTS_FLAT:
-	case TOUCH_MINIOS_MFTS_CURVED:
-		fname = "/data/touch/touch_self_mfts.txt";
-		break;
-	default:
-		TOUCH_I("%s : not support mode\n", __func__);
-		break;
-	}
-
-	if (fname) {
-		file = filp_open(fname, O_RDONLY, 0666);
-		sys_chmod(fname, 0666);
-	} else {
-		TOUCH_E("fname is NULL, can not open FILE\n");
-		goto error;
-	}
-
-	if (IS_ERR(file)) {
-		TOUCH_I("%s : ERR(%ld) Open file error [%s]\n",
-				__func__, PTR_ERR(file), fname);
-		goto error;
-	}
-
-	file_size = vfs_llseek(file, 0, SEEK_END);
-	TOUCH_I("%s : [%s] file_size = %lld\n", __func__, fname, file_size);
-
-	filp_close(file, 0);
-
-	if (file_size > MAX_LOG_FILE_SIZE) {
-		TOUCH_I("%s : [%s] file_size(%lld) > MAX_LOG_FILE_SIZE(%d)\n",
-				__func__, fname, file_size, MAX_LOG_FILE_SIZE);
-
-		for (i = MAX_LOG_FILE_COUNT - 1; i >= 0; i--) {
-			if (i == 0)
-				touch_snprintf(buf1, sizeof(buf1), "%s", fname);
-			else
-				touch_snprintf(buf1, sizeof(buf1), "%s.%d", fname, i);
-
-			ret = sys_access(buf1, 0);
-
-			if (ret == 0) {
-				TOUCH_I("%s : file [%s] exist\n", __func__, buf1);
-
-				if (i == (MAX_LOG_FILE_COUNT - 1)) {
-					if (sys_unlink(buf1) < 0) {
-						TOUCH_E("failed to remove file [%s]\n", buf1);
-						goto error;
-					}
-
-					TOUCH_I("%s : remove file [%s]\n", __func__, buf1);
-				} else {
-					touch_snprintf(buf2, sizeof(buf2), "%s.%d", fname, (i + 1));
-
-					if (sys_rename(buf1, buf2) < 0) {
-						TOUCH_E("failed to rename file [%s] -> [%s]\n",
-								buf1, buf2);
-						goto error;
-					}
-
-					TOUCH_I("%s : rename file [%s] -> [%s]\n",
-							__func__, buf1, buf2);
-				}
-			} else {
-				TOUCH_I("%s : file [%s] does not exist (ret = %d)\n",
-						__func__, buf1, ret);
-			}
-		}
-	}
-
-error:
-	set_fs(old_fs);
-}
-
-static void write_file(struct device *dev, char *data, int write_time)
-{
-	int fd = 0;
-	char *fname = NULL;
-	char time_string[64] = {0};
-	struct timespec64 my_time;
-	struct tm my_date = {0, };
-	mm_segment_t old_fs = get_fs();
-	int boot_mode = TOUCH_NORMAL_BOOT;
-
-	TOUCH_TRACE();
-
-	set_fs(KERNEL_DS);
-	boot_mode = touch_check_boot_mode(dev);
-
-	switch (boot_mode) {
-	case TOUCH_NORMAL_BOOT:
-		fname = "/data/vendor/touch/touch_self_test.txt";
-		break;
-	case TOUCH_MINIOS_AAT:
-		fname = "/data/touch/touch_self_test.txt";
-		break;
-	case TOUCH_MINIOS_MFTS_FOLDER:
-	case TOUCH_MINIOS_MFTS_FLAT:
-	case TOUCH_MINIOS_MFTS_CURVED:
-		fname = "/data/touch/touch_self_mfts.txt";
-		break;
-	default:
-		TOUCH_I("%s : not support mode\n", __func__);
-		break;
-	}
-
-
-	if (fname) {
-		fd = sys_open(fname, O_WRONLY|O_CREAT|O_APPEND, 0666);
-		sys_chmod(fname, 0666);
-	} else {
-		TOUCH_E("fname is NULL, can not open FILE\n");
-		set_fs(old_fs);
-		return;
-	}
-
-	if (fd >= 0) {
-		if (write_time == TIME_INFO_WRITE) {
-			ktime_get_coarse_real_ts64(&my_time);
-			time64_to_tm(my_time.tv_sec,
-					sys_tz.tz_minuteswest * 60 * (-1),
-					&my_date);
-			touch_snprintf(time_string, 64,
-				"\n[%02d-%02d %02d:%02d:%02d.%03lu]\n",
-				my_date.tm_mon + 1,
-				my_date.tm_mday, my_date.tm_hour,
-				my_date.tm_min, my_date.tm_sec,
-				(unsigned long) my_time.tv_nsec / 1000000);
-			sys_write(fd, time_string, strlen(time_string));
-		}
-		sys_write(fd, data, strlen(data));
-		sys_close(fd);
-	} else {
-		TOUCH_E("File open failed (fd: %d)\n", fd);
-	}
-	set_fs(old_fs);
-}
-
 static int firmware_version_log(struct device *dev)
 {
 	struct s3618_data *d = to_s3618_data(dev);
@@ -468,9 +305,6 @@ static int firmware_version_log(struct device *dev)
 	ret += touch_snprintf(buffer + ret, LOG_BUF_SIZE - ret, "Time : 20%d/%d/%d - %dh %dm %ds\n\n",
 			d->prd_info.inspect_date[0], d->prd_info.inspect_date[1], d->prd_info.inspect_date[2],
 			d->prd_info.inspect_time[0], d->prd_info.inspect_time[1], d->prd_info.inspect_time[2]);
-
-	if(testing_hcd->need_write)
-		write_file(dev, buffer, TIME_INFO_SKIP);
 
 	return 0;
 }
@@ -578,10 +412,6 @@ static ssize_t show_sd(struct device *dev, char *buf)
 
 	testing_hcd->need_write = true;
 	/* file create , time log */
-	if(testing_hcd->need_write) {
-		write_file(dev, "\nShow_sd Test Start", TIME_INFO_SKIP);
-		write_file(dev, "\n", TIME_INFO_WRITE);
-	}
 	TOUCH_I("Show_sd Test Start\n");
 
 	fw_ver_ret = firmware_version_log(dev);
@@ -603,11 +433,8 @@ static ssize_t show_sd(struct device *dev, char *buf)
 exit:
 //	print_sd_log(buf);
 	if(testing_hcd->need_write) {
-		write_file(dev, buf, TIME_INFO_SKIP);
-		write_file(dev, "\nShow_sd Test End\n\n", TIME_INFO_WRITE);
 	}
 	TOUCH_I("Show_sd Test End\n");
-	log_file_size_check(dev);
 //	touch_interrupt_control(ts->dev, INTERRUPT_ENABLE);
 	mutex_unlock(&ts->lock);
 
@@ -686,10 +513,6 @@ static ssize_t show_lpwg_sd(struct device *dev, char *buf)
 	testing_hcd->need_write = true;
 
 	/* file create , time log */
-	if(testing_hcd->need_write) {
-		write_file(dev, "\nShow_lpwg_sd Test Start", TIME_INFO_SKIP);
-		write_file(dev, "\n", TIME_INFO_WRITE);
-	}
 	TOUCH_I("Show_lpwg_sd Test Start\n");
 
 	fw_ver_ret = firmware_version_log(dev);
@@ -707,12 +530,7 @@ static ssize_t show_lpwg_sd(struct device *dev, char *buf)
 
 exit:
 //	print_sd_log(buf);
-	if(testing_hcd->need_write) {
-		write_file(dev, buf, TIME_INFO_SKIP);
-		write_file(dev, "\nShow_lpwg_sd Test End\n", TIME_INFO_WRITE);
-	}
 	TOUCH_I("Show_lpwg_sd Test End\n");
-	log_file_size_check(dev);
 
 	testing_hcd->need_write = false;
 	mutex_unlock(&ts->lock);
@@ -1513,7 +1331,6 @@ static int testing_noise(struct device *dev) {
 						row, col, testing_hcd->noise_max[i], noise_limits[row][col]);
 
 				if (size > (BUF_SIZE / 2)) {
-					write_file(dev, w_buf, TIME_INFO_SKIP);
 					memset(w_buf, 0, BUF_SIZE);
 					size = 0;
 				}
@@ -1531,9 +1348,6 @@ static int testing_noise(struct device *dev) {
 
 		size += touch_snprintf(w_buf + size, sizeof(w_buf) - size,
 			"\nResult = %s\n\n", (testing_hcd->result)?"pass":"fail");
-	if(testing_hcd->need_write) {
-		write_file(dev, w_buf, TIME_INFO_SKIP);
-	}
 	TOUCH_I("Result = %s\n", (testing_hcd->result)?"pass":"fail");
 
 
@@ -1683,7 +1497,6 @@ static int testing_full_raw(struct device *dev)
 					pt5_full_raw_hi_limits[row][col]);
 
 				if (size > (BUF_SIZE / 2)) {
-					write_file(dev, w_buf, TIME_INFO_SKIP);
 					memset(w_buf, 0, BUF_SIZE);
 					size = 0;
 				}
@@ -1698,8 +1511,6 @@ static int testing_full_raw(struct device *dev)
 
 	size += touch_snprintf(w_buf + size, sizeof(w_buf) - size,
 			"Result = %s\n\n", (testing_hcd->result)?"pass":"fail");
-	if(testing_hcd->need_write)
-		write_file(dev, w_buf, TIME_INFO_SKIP);
 	TOUCH_I("Result = %s\n", (testing_hcd->result)?"pass":"fail");
 
 exit:
@@ -1864,7 +1675,6 @@ static int testing_hybrid_abs_raw(struct device *dev)
 					hybrid_abs_rx_hi_limits[col]);
 
 			if (size > (BUF_SIZE / 2)) {
-				write_file(dev, w_buf, TIME_INFO_SKIP);
 				memset(w_buf, 0, BUF_SIZE);
 				size = 0;
 			}
@@ -1887,7 +1697,6 @@ static int testing_hybrid_abs_raw(struct device *dev)
 					hybrid_abs_tx_hi_limits[row]);
 
 			if (size > (BUF_SIZE / 2)) {
-				write_file(dev, w_buf, TIME_INFO_SKIP);
 				memset(w_buf, 0, BUF_SIZE);
 				size = 0;
 			}
@@ -1902,8 +1711,6 @@ static int testing_hybrid_abs_raw(struct device *dev)
 
 	size += touch_snprintf(w_buf + size, sizeof(w_buf) - size,
 			"Result = %s\n\n", (testing_hcd->result)?"pass":"fail");
-	if(testing_hcd->need_write)
-		write_file(dev, w_buf, TIME_INFO_SKIP);
 	TOUCH_I("Result = %s\n", (testing_hcd->result)?"pass":"fail");
 
 exit:
@@ -2066,7 +1873,6 @@ static int testing_high_resistance(struct device *dev)
 					col, data, pt8_high_resistance_rxroe_limit);
 
 			if (size > (BUF_SIZE / 2)) {
-				write_file(dev, w_buf, TIME_INFO_SKIP);
 				memset(w_buf, 0, BUF_SIZE);
 				size = 0;
 			}
@@ -2086,7 +1892,6 @@ static int testing_high_resistance(struct device *dev)
 					row, data, pt8_high_resistance_txroe_limit);
 
 			if (size > (BUF_SIZE / 2)) {
-				write_file(dev, w_buf, TIME_INFO_SKIP);
 				memset(w_buf, 0, BUF_SIZE);
 				size = 0;
 			}
@@ -2112,7 +1917,6 @@ static int testing_high_resistance(struct device *dev)
 						row, col, data, pt8_high_resistance_tixwl_limit);
 
 				if (size > (BUF_SIZE / 2)) {
-					write_file(dev, w_buf, TIME_INFO_SKIP);
 					memset(w_buf, 0, BUF_SIZE);
 					size = 0;
 				}
@@ -2126,8 +1930,6 @@ static int testing_high_resistance(struct device *dev)
 
 	size += touch_snprintf(w_buf + size, sizeof(w_buf) - size,
 			"Result = %s\n\n", (testing_hcd->result)?"pass":"fail");
-	if(testing_hcd->need_write)
-		write_file(dev, w_buf, TIME_INFO_SKIP);
 	TOUCH_I("Result = %s\n", (testing_hcd->result)?"pass":"fail");
 
 exit:
@@ -2506,7 +2308,6 @@ static int testing_pt1(struct device *dev)
 									"pin-%2d : fail (byte %d)\n", phy_pin, i);
 
 							if (size > (BUF_SIZE / 2)) {
-								write_file(dev, w_buf, TIME_INFO_SKIP);
 								memset(w_buf, 0, BUF_SIZE);
 								size = 0;
 							}
@@ -2519,7 +2320,6 @@ static int testing_pt1(struct device *dev)
 									"pin-%2d : fail (byte %d)\n", phy_pin, i);
 
 						if (size > (BUF_SIZE / 2)) {
-							write_file(dev, w_buf, TIME_INFO_SKIP);
 							memset(w_buf, 0, BUF_SIZE);
 							size = 0;
 						}
@@ -2544,8 +2344,6 @@ static int testing_pt1(struct device *dev)
 
 	size += touch_snprintf(w_buf + size, sizeof(w_buf) - size,
 			"Result = %s\n\n", (testing_hcd->result)?"pass":"fail");
-	if(testing_hcd->need_write)
-		write_file(dev, w_buf, TIME_INFO_SKIP);
 	TOUCH_I("Result = %s\n", (testing_hcd->result)?"pass":"fail");
 
 exit:
@@ -2667,7 +2465,6 @@ static int testing_trx_ground(struct device *dev)
 							"pin-%2d : fail\n", phy_pin);
 
 					if (size > (BUF_SIZE / 2)) {
-						write_file(dev, w_buf, TIME_INFO_SKIP);
 						memset(w_buf, 0, BUF_SIZE);
 						size = 0;
 					}
@@ -2691,8 +2488,6 @@ static int testing_trx_ground(struct device *dev)
 
 	size += touch_snprintf(w_buf + size, sizeof(w_buf) - size,
 			"Result = %s\n\n", (testing_hcd->result)?"pass":"fail");
-	if(testing_hcd->need_write)
-		write_file(dev, w_buf, TIME_INFO_SKIP);
 	TOUCH_I("Result = %s\n", (testing_hcd->result)?"pass":"fail");
 
 exit:
@@ -2990,7 +2785,6 @@ static int testing_discrete_ex_trx_short(struct device *dev)
 							extend[pin], logical_pin, min_rx[i], max_rx[i]);
 
 					if (size > (BUF_SIZE / 2)) {
-						write_file(dev, w_buf, TIME_INFO_SKIP);
 						memset(w_buf, 0, BUF_SIZE);
 						size = 0;
 					}
@@ -3008,7 +2802,6 @@ static int testing_discrete_ex_trx_short(struct device *dev)
 							i, min_rx[i], max_rx[i]);
 
 					if (size > (BUF_SIZE / 2)) {
-						write_file(dev, w_buf, TIME_INFO_SKIP);
 						memset(w_buf, 0, BUF_SIZE);
 						size = 0;
 					}
@@ -3019,8 +2812,6 @@ static int testing_discrete_ex_trx_short(struct device *dev)
 		}
 		size += touch_snprintf(w_buf + size, sizeof(w_buf) - size, "\n");
 
-		if(testing_hcd->need_write)
-			write_file(dev, w_buf, TIME_INFO_SKIP);
 		memset(w_buf, 0x00, sizeof(w_buf));
 		size = 0;
 	}
@@ -3037,8 +2828,6 @@ static int testing_discrete_ex_trx_short(struct device *dev)
 
 	size += touch_snprintf(w_buf + size, sizeof(w_buf) - size,
 			"Result = %s\n\n", (testing_hcd->result)?"pass":"fail");
-	if(testing_hcd->need_write)
-		write_file(dev, w_buf, TIME_INFO_SKIP);
 
 	TOUCH_I("Result = %s\n", (testing_hcd->result)?"pass":"fail");
 
@@ -3119,9 +2908,6 @@ static int testing_reset_open(struct device *dev)
 
 	size += touch_snprintf(w_buf + size, sizeof(w_buf) - size,
 			"Result = %s\n\n", (testing_hcd->result)?"pass":"fail");
-
-	if (testing_hcd->need_write)
-		write_file(dev, w_buf, TIME_INFO_SKIP);
 
 
 	TOUCH_I("Result = %s\n", (testing_hcd->result)?"pass":"fail");
