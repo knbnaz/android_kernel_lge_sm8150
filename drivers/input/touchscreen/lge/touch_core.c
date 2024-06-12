@@ -1246,7 +1246,7 @@ static int touch_core_probe_normal(struct platform_device *pdev)
 	}
 
 	touch_disable_irq(ts->irq);
-	touch_init_pm(ts);
+	//touch_init_pm(ts);
 
 	touch_init_notify(ts);
 
@@ -1301,7 +1301,7 @@ static int touch_core_probe_etc(struct platform_device *pdev)
 		return ret;
 	}
 
-	touch_init_pm(ts);
+	//touch_init_pm(ts);
 	touch_init_notify(ts);
 
 	return ret;
