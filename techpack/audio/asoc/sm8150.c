@@ -32,6 +32,7 @@
 #include "codecs/wsa881x.h"
 #include <asoc/wcd-mbhc-v2.h>
 #include "msm_dailink.h"
+#include <soc/soundwire.h>
 
 #define DRV_NAME "sm8150-asoc-snd"
 
@@ -7930,6 +7931,48 @@ static int msm_wsa881x_init(struct snd_soc_pcm_runtime *rtd)
 						      component);
 	}
 
+		/* If current platform has more than two WSA */
+	if (pdata->wsa_max_devs > 2) {
+			component = snd_soc_rtdcom_lookup(rtd, "wsa-codec.3");
+		if (!component) {
+			pr_err("%s: wsa-codec.3 component is NULL\n", __func__);
+			return -EINVAL;
+		}
+
+		dapm = snd_soc_component_get_dapm(component);
+
+		wsa881x_set_channel_map(component, &spkleft_ports[0],
+				WSA881X_MAX_SWR_PORTS, &ch_mask[0],
+				&ch_rate[0], NULL);
+		if (dapm->component) {
+			snd_soc_dapm_ignore_suspend(dapm, "SpkrLeft IN");
+			snd_soc_dapm_ignore_suspend(dapm, "SpkrLeft SPKR");
+		}
+		wsa881x_codec_info_create_codec_entry(pdata->codec_root,
+						      component);
+	}
+
+	/* If current platform has more than three WSA */
+	if (pdata->wsa_max_devs > 3) {
+			component = snd_soc_rtdcom_lookup(rtd, "wsa-codec.4");
+		if (!component) {
+			pr_err("%s: wsa-codec.4 component is NULL\n", __func__);
+			return -EINVAL;
+		}
+
+		dapm = snd_soc_component_get_dapm(component);
+
+		wsa881x_set_channel_map(component, &spkright_ports[0],
+				WSA881X_MAX_SWR_PORTS, &ch_mask[0],
+				&ch_rate[0], NULL);
+		if (dapm->component) {
+			snd_soc_dapm_ignore_suspend(dapm, "SpkrRight IN");
+			snd_soc_dapm_ignore_suspend(dapm, "SpkrRight SPKR");
+		}
+		wsa881x_codec_info_create_codec_entry(pdata->codec_root,
+						      component);
+	}
+
 	return 0;
 }
 
@@ -8079,8 +8122,8 @@ static int msm_asoc_machine_probe(struct platform_device *pdev)
 #endif
 
 	/* Get maximum WSA device count for this platform */
-		ret = of_property_read_u32(pdev->dev.of_node,
-				"qcom,wsa-max-devs", &pdata->wsa_max_devs);
+	ret = of_property_read_u32(pdev->dev.of_node,
+			"qcom,wsa-max-devs", &pdata->wsa_max_devs);
 	if (ret) {
 		dev_info(&pdev->dev,
 			"%s: wsa-max-devs property missing in DT %s, ret = %d\n",
