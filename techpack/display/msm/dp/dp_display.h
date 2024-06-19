@@ -14,6 +14,16 @@
 #include "dp_panel.h"
 #include "dp_parser.h"
 
+#if IS_ENABLED(CONFIG_LGE_COVER_DISPLAY)
+#include <linux/usb/usbpd.h>
+#include <linux/hall_ic.h>
+#include <linux/extcon-provider.h>
+#define EXT_DD_MAX_COUNT 2
+#endif
+
+#ifdef CONFIG_LGE_DISPLAY_COMMON
+#include "../lge/dp/lge_dp_def.h"
+#endif
 #define DP_MST_SIM_MAX_PORTS	8
 #define MAX_DP_ACTIVE_DISPLAY	8
 
@@ -87,6 +97,9 @@ struct dp_display {
 	u32 max_mixer_count;
 	u32 max_dsc_count;
 
+#if IS_ENABLED(CONFIG_LGE_COVER_DISPLAY)
+	struct extcon_dev *dd_extcon_sdev[EXT_DD_MAX_COUNT];
+#endif
 	int (*enable)(struct dp_display *dp_display, void *panel);
 	int (*post_enable)(struct dp_display *dp_display, void *panel);
 
@@ -148,6 +161,9 @@ struct dp_display {
 	int (*mst_get_fixed_topology_display_type)(struct dp_display *dp_display,
 			u32 strm_id, const char **display_type);
 	int (*edp_detect)(struct dp_display *dp_display);
+#ifdef CONFIG_LGE_DISPLAY_COMMON
+	struct lge_dp_display lge_dp;
+#endif
 };
 
 #if IS_ENABLED(CONFIG_DRM_MSM_DP)
@@ -178,4 +194,12 @@ static inline int dp_connector_update_pps(struct drm_connector *connector,
 	return 0;
 }
 #endif /* CONFIG_DRM_MSM_DP */
+#ifdef CONFIG_LGE_COVER_DISPLAY
+bool is_dd_connected(void);
+extern void hallic_register_svid_handler(struct usbpd_svid_handler *hdlr);
+#endif
+#ifdef CONFIG_LGE_DISPLAY_COMMON
+int dp_display_external_block(struct lge_dp_display *lge_dp, int block);
+int dp_display_send_id_event(struct lge_dp_display *lge_dp);
+#endif
 #endif /* _DP_DISPLAY_H_ */

@@ -62,6 +62,10 @@
 	catalog->write(catalog, io_data, x, y); \
 })
 
+#ifdef CONFIG_LGE_COVER_DISPLAY
+extern bool is_dd_connected(void);
+#endif
+
 static u8 const vm_pre_emphasis[4][4] = {
 	{0x00, 0x0B, 0x12, 0xFF},       /* pe0, 0 db */
 	{0x00, 0x0A, 0x12, 0xFF},       /* pe1, 3.5 db */
@@ -361,6 +365,23 @@ static void dp_catalog_aux_enable(struct dp_catalog_aux *aux, bool enable)
 		dp_write(DP_AUX_CTRL, aux_ctrl);
 	}
 }
+
+#if defined(CONFIG_LGE_DISPLAY_COMMON)
+static void dp_catalog_aux_cfg_change(struct dp_catalog_aux *aux,
+		struct dp_aux_cfg *cfg, enum dp_phy_aux_config_type type, u32 index)
+{
+	struct dp_catalog_private *catalog;
+	struct dp_io_data *io_data;
+
+	catalog = dp_catalog_get_priv(aux);
+
+	io_data = catalog->io.dp_phy;
+
+	DP_DEBUG("Force set aux cfg#%d index to %d(0x%08x)\n", type, index, cfg[type].lut[index]);
+	dp_write(catalog->exe_mode, io_data, cfg[type].offset,
+			cfg[type].lut[index]);
+}
+#endif
 
 static void dp_catalog_aux_update_cfg(struct dp_catalog_aux *aux,
 		struct dp_aux_cfg *cfg, enum dp_phy_aux_config_type type)
@@ -1398,6 +1419,10 @@ static void dp_catalog_ctrl_set_pattern(struct dp_catalog_ctrl *ctrl,
 		DP_ERR("set link_train=%d failed\n", pattern);
 }
 
+#if IS_ENABLED(CONFIG_LGE_COVER_DISPLAY)
+extern void is_dd_usb_restart(void);
+#endif
+
 static void dp_catalog_ctrl_usb_reset(struct dp_catalog_ctrl *ctrl, bool flip)
 {
 	struct dp_catalog_private *catalog;
@@ -1407,6 +1432,11 @@ static void dp_catalog_ctrl_usb_reset(struct dp_catalog_ctrl *ctrl, bool flip)
 		DP_ERR("invalid input\n");
 		return;
 	}
+
+#if IS_ENABLED(CONFIG_LGE_COVER_DISPLAY)
+	DP_DEBUG("USB_DD is_dd_usb_restart %s: flip=%d\n", __func__, flip);
+	is_dd_usb_restart();
+#endif
 
 	catalog = dp_catalog_get_priv(ctrl);
 
@@ -2882,6 +2912,9 @@ struct dp_catalog *dp_catalog_get(struct device *dev, struct dp_parser *parser)
 		.setup         = dp_catalog_aux_setup,
 		.get_irq       = dp_catalog_aux_get_irq,
 		.clear_hw_interrupts = dp_catalog_aux_clear_hw_interrupts,
+#if defined(CONFIG_LGE_DISPLAY_COMMON)
+		.change_aux_cfg = dp_catalog_aux_cfg_change,
+#endif
 	};
 	struct dp_catalog_ctrl ctrl = {
 		.state_ctrl     = dp_catalog_ctrl_state_ctrl,

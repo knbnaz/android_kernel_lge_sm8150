@@ -264,6 +264,9 @@ struct dp_parser {
 	bool has_widebus;
 	bool gpio_aux_switch;
 	bool lphw_hpd;
+#ifdef CONFIG_LGE_DISPLAY_COMMON
+	bool lge_dp_use;
+#endif
 	u32 mst_fixed_port[MAX_DP_MST_STREAMS];
 	u32 pixel_base_off[MAX_DP_MST_STREAMS];
 	const char *mst_fixed_display_type[MAX_DP_MST_STREAMS];

@@ -9,6 +9,10 @@
 #include <linux/types.h>
 #include "dp_hpd.h"
 
+#ifdef CONFIG_LGE_COVER_DISPLAY
+#include "../lge/dp/lge_dp_def.h"
+#endif
+
 struct device;
 
 /**
@@ -72,4 +76,7 @@ static inline void dp_usbpd_put(struct dp_hpd *pd)
 {
 }
 #endif /* CONFIG_DRM_MSM_DP_USBPD_LEGACY */
+#ifdef CONFIG_LGE_COVER_DISPLAY
+extern void hallic_register_svid_handler(struct usbpd_svid_handler *hdlr);
+#endif
 #endif /* _DP_USBPD_H_ */

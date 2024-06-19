@@ -430,6 +430,9 @@ struct dsi_mode_info {
 	struct msm_display_vdc_info *vdc;
 	struct msm_ratio pclk_scale;
 	struct msm_roi_caps roi_caps;
+#if IS_ENABLED(CONFIG_LGE_DISPLAY_COMMON)
+	u32 refresh_rate_div;
+#endif
 };
 
 /**
