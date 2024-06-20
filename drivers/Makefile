@@ -187,6 +187,3 @@ obj-$(CONFIG_SIOX)		+= siox/
 obj-$(CONFIG_GNSS)		+= gnss/
 obj-$(CONFIG_INTERCONNECT)	+= interconnect/
 obj-$(CONFIG_COUNTER)		+= counter/
-
-# Mobicore
-obj-$(CONFIG_TRUSTONIC_TEE) += gud/
