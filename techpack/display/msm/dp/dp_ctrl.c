@@ -405,16 +405,16 @@ static int dp_ctrl_link_training_1(struct dp_ctrl_private *ctrl)
 		if (ret)
 			break;
 
-+#if defined(CONFIG_LGE_COVER_DISPLAY)
-+		if (is_dd_connected()) {
-+			DP_DEBUG("Force set to 0x102: 0x00 -> 0x21\n");
-+			if (dp_ctrl_update_sink_pattern(ctrl, 0x00) <= 0)
-+				pr_err_ratelimited("Fail to set 0x102=0x00\n");
-+			if (dp_ctrl_update_sink_pattern(ctrl, DP_TRAINING_PATTERN_1 |
-+						DP_LINK_SCRAMBLING_DISABLE) <= 0)
-+				pr_err_ratelimited("Fail to set 0x102=0x21\n");
-+		}
-+#endif
+#if defined(CONFIG_LGE_COVER_DISPLAY)
+		if (is_dd_connected()) {
+			DP_DEBUG("Force set to 0x102: 0x00 -> 0x21\n");
+			if (dp_ctrl_update_sink_pattern(ctrl, 0x00) <= 0)
+				pr_err_ratelimited("Fail to set 0x102=0x00\n");
+			if (dp_ctrl_update_sink_pattern(ctrl, DP_TRAINING_PATTERN_1 |
+						DP_LINK_SCRAMBLING_DISABLE) <= 0)
+				pr_err_ratelimited("Fail to set 0x102=0x21\n");
+		}
+#endif
 
 		drm_dp_link_train_clock_recovery_delay(ctrl->panel->dpcd);
 
