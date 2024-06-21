@@ -941,17 +941,17 @@ static int set_pps_cmds_sw43410(struct dsi_panel *panel, enum lge_ddic_dsi_cmd_s
 		pps_height = (panel->lge.aod_area.h >= panel->cur_mode->timing.v_active)?
 				panel->cur_mode->timing.v_active:panel->lge.aod_area.h;
 		pr_info("LP2: pic_height : %d -> %d\n",
-				dsc->pic_height,
+				dsc->config.pic_height,
 				pps_height);
-		panel->lge.pps_orig = dsc->pic_height;
-		dsc->pic_height = pps_height;
+		panel->lge.pps_orig = dsc->config.pic_height;
+		dsc->config.pic_height = pps_height;
 		break;
 	case LGE_DDIC_DSI_SET_NOLP:
 		pr_info("NOLP: pic_height : %d -> %d\n",
-				dsc->pic_height,
+				dsc->config.pic_height,
 				panel->cur_mode->timing.v_active);
-		panel->lge.pps_orig = dsc->pic_height;
-		dsc->pic_height = panel->cur_mode->timing.v_active;
+		panel->lge.pps_orig = dsc->config.pic_height;
+		dsc->config.pic_height = panel->cur_mode->timing.v_active;
 		break;
 	default:
 		pr_warn("WARNING: not supported type\n");
@@ -982,9 +982,9 @@ static int unset_pps_cmds_sw43410(struct dsi_panel *panel, enum lge_ddic_dsi_cmd
 	case LGE_DDIC_DSI_AOD_AREA:
 	case LGE_DDIC_DSI_SET_NOLP:
 		pr_info("pic_height : %d -> %d\n",
-				dsc->pic_height,
+				dsc->config.pic_height,
 				panel->lge.pps_orig);
-		dsc->pic_height = panel->lge.pps_orig;
+		dsc->config.pic_height = panel->lge.pps_orig;
 		break;
 	default:
 		pr_warn("WARNING: not supported type\n");
