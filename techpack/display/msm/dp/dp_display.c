@@ -1404,9 +1404,6 @@ static void dp_display_host_deinit(struct dp_display_private *dp)
 		return;
 	}
 
-#if IS_ENABLED(CONFIG_LGE_DISPLAY_COMMON)
-	dp->is_ready = false;
-#endif
 	dp_display_abort_hdcp(dp, true);
 	dp->ctrl->deinit(dp->ctrl);
 	dp->hpd->host_deinit(dp->hpd, &dp->catalog->hpd);
@@ -1667,8 +1664,10 @@ static int dp_display_init_aux_switch(struct dp_display_private *dp)
 {
 	int rc = 0;
 	struct notifier_block nb;
+#if !defined(CONFIG_LGE_DISPLAY_COMMON)
 	const u32 max_retries = 50;
 	u32 retry;
+#endif
 
 	if (dp->aux_switch_ready)
 		return rc;
@@ -4448,10 +4447,11 @@ struct lge_dp_display *get_lge_dp(void)
 {
 	struct dp_display* dp_display;
 
-	if (!g_dp_display)
+	dp_display = g_dp_display[MAX_DP_ACTIVE_DISPLAY];
+
+	if (!dp_display)
 		return ERR_PTR(-EINVAL);
 
-	dp_display = g_dp_display;
 	return &dp_display->lge_dp;
 }
 #endif
@@ -4542,12 +4542,12 @@ int dp_display_external_block(struct lge_dp_display *lge_dp, int block)
 {
 	struct dp_display_private *dp = NULL;
 
-	if (!g_dp_display || !lge_dp) {
+	if (!g_dp_display[MAX_DP_ACTIVE_DISPLAY] || !lge_dp) {
 		DP_ERR("dp display not initialized\n");
 		return -EINVAL;
 	}
 
-	dp = container_of(g_dp_display, struct dp_display_private, dp_display);
+	dp = container_of(g_dp_display[MAX_DP_ACTIVE_DISPLAY], struct dp_display_private, dp_display);
 	if (!dp || !dp_display_is_ready(dp)) {
 		DP_ERR("dp display not ready\n");
 		return -EINVAL;
@@ -4555,9 +4555,9 @@ int dp_display_external_block(struct lge_dp_display *lge_dp, int block)
 
 	lge_dp->block_state = block;
 	if (lge_dp->block_state == 1)
-		dp_display_audio_enable(dp, false);
+		dp_audio_enable(dp, false);
 	else {
-		dp_display_audio_enable(dp, true);
+		dp_audio_enable(dp, true);
 	}
 
 	return 0;
@@ -4571,12 +4571,12 @@ int dp_display_send_id_event(struct lge_dp_display *lge_dp)
 	char id[HPD_STRING_SIZE];
 	char *envp[2];
 
-	if (!g_dp_display || !lge_dp) {
+	if (!g_dp_display[MAX_DP_ACTIVE_DISPLAY] || !lge_dp) {
 		DP_ERR("invalid value\n");
 		return -EINVAL;
 	}
 
-	dp = container_of(g_dp_display, struct dp_display_private, dp_display);
+	dp = container_of(g_dp_display[MAX_DP_ACTIVE_DISPLAY], struct dp_display_private, dp_display);
 	if (!dp) {
 		DP_ERR("dp is nullptr\n");
 		return -EINVAL;

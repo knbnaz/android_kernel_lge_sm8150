@@ -3124,7 +3124,7 @@ static void sde_encoder_vblank_callback(struct drm_encoder *drm_enc,
 #ifdef CONFIG_LGE_PM_PRM
 	{
 		int div = (sde_enc->crtc != NULL && sde_enc->crtc->state != NULL)?(sde_enc->crtc->state->adjusted_mode.vrefresh / sde_enc->crtc->mode.vrefresh):0;
-		if (sde_enc->disp_info.is_primary) {
+		if (sde_enc->disp_info.display_type == SDE_CONNECTOR_PRIMARY) {
 			// ignore vfps
 			//if (!lge_vfps_check_internal())
 			if (div < 2 || atomic_read(&phy_enc->vsync_cnt)%div==0)
@@ -4749,7 +4749,7 @@ static int sde_encoder_late_register(struct drm_encoder *encoder)
 #ifdef CONFIG_LGE_PM_PRM
 	if (encoder) {
 		struct sde_encoder_virt *sde_enc = to_sde_encoder_virt(encoder);
-		if (sde_enc->disp_info.is_primary) {
+		if (sde_enc->disp_info.display_type == SDE_CONNECTOR_PRIMARY) {
 			lge_vfps_set_encoder(encoder);
 		}
 	}

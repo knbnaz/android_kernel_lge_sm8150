@@ -497,7 +497,7 @@ int dsi_pwr_set_regulator(struct dsi_regulator_info *regs, int mode)
 	struct dsi_vreg *vreg;
 
 	if (!regs->vregs) {
-		DSI_ERR"Invalid params\n");
+		DSI_ERR("Invalid params\n");
 		return -EINVAL;
 	}
 
