@@ -258,11 +258,12 @@
 
 		reg = <0x02ca0000 0x10000>;
 		
-		clocks =<&clock_gcc GCC_GPU_CFG_AHB_CLK>,
-			<&clock_gcc GCC_DDRSS_GPU_AXI_CLK>,
-			<&clock_gcc GCC_GPU_MEMNOC_GFX_CLK>;
-
-		clock-names = "iface_clk", "mem_clk", "mem_iface_clk";
+		clocks = <&clock_gcc GCC_GPU_MEMNOC_GFX_CLK>,
+			<&clock_gcc GCC_GPU_SNOC_DVM_GFX_CLK>,
+			<&clock_gpucc GPU_CC_AHB_CLK>;
+		clock-names = "gcc_gpu_memnoc_gfx",
+			"gcc_gpu_snoc_dvm_gfx",
+			"gpu_cc_ahb";
 
 		gfx3d_user: gfx3d_user {
 			compatible = "qcom,smmu-kgsl-cb";
