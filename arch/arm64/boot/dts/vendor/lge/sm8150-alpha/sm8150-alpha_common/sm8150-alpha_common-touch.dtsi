@@ -11,6 +11,4 @@
  * GNU General Public License for more details.
  */
 
-#include "../sm8150-alpha-touch-stm-ftm4.dtsi"
-#include "../sm8150-alpha-touch-synaptics-s3707.dtsi"
 #include "../sm8150-alpha-touch-sic-sw42000.dtsi"
