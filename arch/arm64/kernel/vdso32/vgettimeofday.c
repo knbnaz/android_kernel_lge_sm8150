@@ -30,7 +30,7 @@ int __vdso_clock_getres(clockid_t clock_id,
 	return __cvdso_clock_getres_time32(clock_id, res);
 }
 
-time_t __vdso_time(time_t *time)
+__kernel_old_time_t __vdso_time(__kernel_old_time_t *time)
 {
 	return __cvdso_time(time);
 }
