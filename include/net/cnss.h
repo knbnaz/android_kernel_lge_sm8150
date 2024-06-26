@@ -228,7 +228,7 @@ void cnss_pm_wake_lock_timeout(struct wakeup_source *ws, ulong msec);
 void cnss_pm_wake_lock_release(struct wakeup_source *ws);
 void cnss_pm_wake_lock_destroy(struct wakeup_source *ws);
 void cnss_get_monotonic_boottime(struct timespec64 *ts);
-void cnss_get_boottime(struct timespec *ts);
+void cnss_get_boottime(struct timespec64 *ts);
 void cnss_init_delayed_work(struct delayed_work *work, work_func_t func);
 int cnss_vendor_cmd_reply(struct sk_buff *skb);
 int cnss_set_cpus_allowed_ptr(struct task_struct *task, ulong cpu);

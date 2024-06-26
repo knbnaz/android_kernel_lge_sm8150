@@ -218,9 +218,9 @@ void cnss_get_monotonic_boottime(struct timespec64 *ts)
 }
 EXPORT_SYMBOL(cnss_get_monotonic_boottime);
 
-void cnss_get_boottime(struct timespec *ts)
+void cnss_get_boottime(struct timespec64 *ts)
 {
-	ktime_get_ts(ts);
+	ktime_get_ts64(ts);
 }
 EXPORT_SYMBOL(cnss_get_boottime);
 

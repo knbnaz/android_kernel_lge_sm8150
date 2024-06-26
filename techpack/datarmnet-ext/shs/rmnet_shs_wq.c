@@ -87,9 +87,9 @@ INIT_LIST_HEAD(&DATARMNETe70783182f->DATARMNET742867e97a);trace_rmnet_shs_wq_low
 DATARMNET0bfc2b2c85,(0x16e8+787-0xc0c),(0x16e8+787-0xc0c),(0x16e8+787-0xc0c),
 DATARMNETe70783182f,NULL);DATARMNET36e5e526fa(DATARMNETe70783182f);return 
 DATARMNETe70783182f;}void DATARMNET350f55bfca(struct DATARMNET63d7680df2*node_p)
-{struct timespec time;if(!node_p){DATARMNET68d84e7b98[DATARMNETac729c3d29]++;
+{struct timespec64 time;if(!node_p){DATARMNET68d84e7b98[DATARMNETac729c3d29]++;
 return;}node_p->DATARMNET341ea38662=DATARMNETb062995420();if(node_p->
-DATARMNET341ea38662!=NULL){(void)getnstimeofday(&time);node_p->
+DATARMNET341ea38662!=NULL){(void)ktime_get_real_ts64(&time);node_p->
 DATARMNET341ea38662->hash=node_p->hash;node_p->DATARMNET341ea38662->
 DATARMNET1e9d25d9ff=node_p->DATARMNET1e9d25d9ff;node_p->DATARMNET341ea38662->
 DATARMNET7c894c2f8f=node_p->map_cpu;node_p->DATARMNET341ea38662->
@@ -720,8 +720,8 @@ DATARMNET421230d879=DATARMNETd2a694d52a->DATARMNET7c894c2f8f;DATARMNET2d482e7d9f
 DATARMNET7c894c2f8f;if(DATARMNETc790ff30fc>=DATARMNETc6782fed88||
 DATARMNETc790ff30fc<(0xd2d+202-0xdf7)){continue;}if(DATARMNETd2a694d52a->
 DATARMNET87636d0152>(0xd2d+202-0xdf7)){DATARMNET0997c5650d[DATARMNETc790ff30fc].
-seg++;}}}void DATARMNETcd6e26f0ad(void){struct timespec time;struct 
-DATARMNET6c78e47d24*DATARMNETd2a694d52a=NULL;(void)getnstimeofday(&time);
+seg++;}}}void DATARMNETcd6e26f0ad(void){struct timespec64 time;struct 
+DATARMNET6c78e47d24*DATARMNETd2a694d52a=NULL;(void)ktime_get_real_ts64(&time);
 DATARMNETb3a4036d6d=DATARMNETe6671dbf38(time.tv_sec)+time.tv_nsec;
 DATARMNET039ac6d55d();DATARMNETe46c480d71();list_for_each_entry(
 DATARMNETd2a694d52a,&DATARMNET9825511866,DATARMNET6de26f0feb){if(

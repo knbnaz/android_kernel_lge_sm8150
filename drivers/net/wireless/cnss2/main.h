@@ -532,9 +532,9 @@ static inline u64 cnss_get_host_timestamp(struct cnss_plat_data *plat_priv)
 #else
 static inline u64 cnss_get_host_timestamp(struct cnss_plat_data *plat_priv)
 {
-	struct timespec ts;
+	struct timespec64 ts;
 
-	ktime_get_ts(&ts);
+	ktime_get_ts64(&ts);
 
 	return ((u64)ts.tv_sec * 1000000) + (ts.tv_nsec / 1000);
 }

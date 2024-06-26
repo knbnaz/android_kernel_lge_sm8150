@@ -1728,9 +1728,9 @@ static inline int pt_proximity_release(struct device *dev) { return 0; }
 static inline unsigned int pt_get_time_stamp(void)
 {
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0))
-	struct timespec ts;
+	struct timespec64 ts;
 
-	getnstimeofday(&ts);
+	ktime_get_real_ts64(&ts);
 	return (ts.tv_sec*1000 + ts.tv_nsec/1000000);
 #else
 	struct timeval tv;

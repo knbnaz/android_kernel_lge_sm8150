@@ -132,9 +132,9 @@ unsigned int get_system_time(void)
  *	return u32_timer;
  */
 	#if (KERNEL_VERSION(5, 0, 0) <= LINUX_VERSION_CODE)
-	struct timespec ts;
+	struct timespec64 ts;
 
-	getnstimeofday(&ts);
+	ktime_get_real_ts64(&ts);
 	return (ts.tv_sec*1000 + ts.tv_nsec/1000000);
 	#else
 	struct timeval tv;

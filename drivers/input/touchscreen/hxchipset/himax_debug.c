@@ -41,7 +41,7 @@ int g_min_mutual = 0xFFFF;
 int g_max_self;
 int g_min_self = 0xFFFF;
 
-struct timespec timeStart, timeEnd, timeDelta;
+struct timespec64 timeStart, timeEnd, timeDelta;
 int g_switch_mode;
 
 #ifdef HX_TP_PROC_2T2R
@@ -1033,13 +1033,13 @@ void himax_log_touch_event(struct himax_ts_data *ts, int start)
 void himax_log_touch_int_devation(int touched)
 {
 	if (touched == HX_FINGER_ON) {
-		getnstimeofday(&timeStart);
+		ktime_get_real_ts64(&timeStart);
 		/*
 		 * I(" Irq start time = %ld.%06ld s\n",
 		 *	timeStart.tv_sec, timeStart.tv_nsec/1000);
 		 */
 	} else if (touched == HX_FINGER_LEAVE) {
-		getnstimeofday(&timeEnd);
+		ktime_get_real_ts64(&timeEnd);
 		timeDelta.tv_nsec = (timeEnd.tv_sec * 1000000000 + timeEnd.tv_nsec) - (timeStart.tv_sec * 1000000000 + timeStart.tv_nsec);
 		/*
 		 * I("Irq finish time = %ld.%06ld s\n",

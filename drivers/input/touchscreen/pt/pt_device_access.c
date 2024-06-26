@@ -2028,9 +2028,9 @@ static int save_header(char *out_buf, int index, struct result *result)
 	char time_buf[100] = {0};
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0))
-	struct timespec ts;
+	struct timespec64 ts;
 
-	getnstimeofday(&ts);
+	ktime_get_real_ts64(&ts);
 	rtc_time_to_tm(ts.tv_sec, &tm);
 #else
 	struct timex txc;
