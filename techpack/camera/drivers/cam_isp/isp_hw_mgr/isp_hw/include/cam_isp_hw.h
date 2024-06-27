@@ -23,12 +23,10 @@
  * struct cam_isp_timestamp:
  *
  * @mono_time:          Monotonic boot time
- * @vt_time:            AV Timer time
  * @ticks:              Qtimer ticks
  */
 struct cam_isp_timestamp {
-	struct timeval          mono_time;
-	struct timeval          vt_time;
+	struct timespec64       mono_time;
 	uint64_t                ticks;
 };
 
