@@ -696,10 +696,6 @@ inline void update_log_ctxt(u32 sid, u32 session_type, u32 fourcc)
 }
 
 /* Mock all the missing parts for successful compilation starts here */
-void do_gettimeofday(struct timeval *__ddl_tv)
-{
-}
-
 #ifndef CONFIG_VIDEOBUF2_CORE
 void vb2_queue_release(struct vb2_queue *q)
 {
