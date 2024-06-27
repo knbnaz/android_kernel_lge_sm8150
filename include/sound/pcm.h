@@ -71,8 +71,6 @@ struct snd_pcm_ops {
 			struct snd_pcm_audio_tstamp_report *audio_tstamp_report);
 #ifdef CONFIG_AUDIO_QGKI
 	int (*delay_blk)(struct snd_pcm_substream *substream);
-	int (*wall_clock)(struct snd_pcm_substream *substream,
-			struct timespec *audio_ts);
 #endif
 	int (*fill_silence)(struct snd_pcm_substream *substream, int channel,
 			    unsigned long pos, unsigned long bytes);
