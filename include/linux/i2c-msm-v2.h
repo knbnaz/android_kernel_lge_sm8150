@@ -500,22 +500,6 @@ struct i2c_msm_xfer_buf {
 #define I2C_MSM_PROF_MAX_EVNTS   (16)
 #endif
 
-/*
- * i2c_msm_prof_event: profiling event
- *
- * @data Additional data about the event. The interpretation of the data is
- *       dependent on the type field.
- * @type event type (see enum i2c_msm_prof_event_type)
- */
-struct i2c_msm_prof_event {
-	struct timespec time;
-	u64             data0;
-	u32             data1;
-	u32             data2;
-	u8              type;
-	u8              dump_func_id;
-};
-
 enum i2c_msm_err {
 	I2C_MSM_NO_ERR = 0,
 	I2C_MSM_ERR_NACK,
