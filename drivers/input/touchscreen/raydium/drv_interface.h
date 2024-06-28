@@ -45,7 +45,6 @@
 
 
 extern unsigned char g_u8_m_buf[2][128];
-extern struct timeval timer;
 extern unsigned char g_rad_fw_flash[32768], g_rad_testfw_flash[32768];
 extern unsigned char g_u8_ini_flash[0x400];
 extern unsigned long g_u32_save_config[64];

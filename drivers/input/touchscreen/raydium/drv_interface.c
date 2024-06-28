@@ -29,7 +29,6 @@
 #include "raydium_driver.h"
 #include "chip_raydium/f303_ic_control.h"
 
-struct timeval timer;
 unsigned char g_u8_m_buf[2][128];
 unsigned char g_u8_ini_flash[0x400];
 struct raydium_ts_data *ts;
