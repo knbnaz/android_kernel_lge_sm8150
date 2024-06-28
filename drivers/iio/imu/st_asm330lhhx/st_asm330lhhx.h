@@ -781,17 +781,9 @@ st_asm330lhhx_set_page_access(struct st_asm330lhhx_hw *hw,
 	return err;
 }
 
-static inline void get_monotonic_boottime(struct timespec *ts)
-{
-	*ts = ktime_to_timespec(ktime_get_boottime());
-}
-
 static inline s64 st_asm330lhhx_get_time_ns(void)
 {
-	struct timespec ts;
-
-	get_monotonic_boottime(&ts);
-	return timespec_to_ns(&ts);
+	return ktime_to_ns(ktime_get_boottime());
 }
 
 static inline int

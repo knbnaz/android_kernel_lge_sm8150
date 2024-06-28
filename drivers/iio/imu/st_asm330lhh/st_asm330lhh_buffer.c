@@ -41,21 +41,13 @@ static inline u64 qtimertime(void)
 
 	return mul_u64_u32_div(qtcount, QTIMER_MUL, QTIMER_DIV);
 }
-static inline void get_monotonic_boottime(struct timespec *ts)
-{
-	*ts = ktime_to_timespec(ktime_get_boottime());
-}
-
 static inline s64 st_asm330lhh_get_time_ns(void)
 {
-	struct timespec ts;
-
 	/* if enabled, use qtimer instead of monotonic timestamp */
 	if (asm330_use_qtimer)
 		return (s64)qtimertime();
 
-	get_monotonic_boottime(&ts);
-	return timespec_to_ns(&ts);
+	return ktime_to_ns(ktime_get_boottime());
 }
 
 /* Timestamp convergence filter parameter */
@@ -270,16 +262,16 @@ static void store_acc_gyro_boot_sample(struct iio_dev *iio_dev,
 	y = iio_buf[3]<<8|iio_buf[2];
 	z = iio_buf[5]<<8|iio_buf[4];
 
-	if (ktime_to_timespec(sensor->timestamp).tv_sec
+	if (ktime_to_timespec64(sensor->timestamp).tv_sec
 			<  sensor->max_buffer_time) {
 		if (sensor->bufsample_cnt < ASM_MAXSAMPLE) {
 			sensor->asm_samplist[sensor->bufsample_cnt]->xyz[0] = x;
 			sensor->asm_samplist[sensor->bufsample_cnt]->xyz[1] = y;
 			sensor->asm_samplist[sensor->bufsample_cnt]->xyz[2] = z;
 			sensor->asm_samplist[sensor->bufsample_cnt]->tsec =
-				ktime_to_timespec(sensor->timestamp).tv_sec;
+				ktime_to_timespec64(sensor->timestamp).tv_sec;
 			sensor->asm_samplist[sensor->bufsample_cnt]->tnsec =
-				ktime_to_timespec(sensor->timestamp).tv_nsec;
+				ktime_to_timespec64(sensor->timestamp).tv_nsec;
 			sensor->bufsample_cnt++;
 		}
 	} else {

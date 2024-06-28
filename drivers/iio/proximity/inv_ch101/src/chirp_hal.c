@@ -271,22 +271,9 @@ void os_delay_ms(const uint16_t ms)
 	msleep(ms);
 }
 
-static inline void get_monotonic_boottime(struct timespec *ts)
-{
-	*ts = ktime_to_timespec(ktime_get_boottime());
-}
-
-u64 os_timestamp_ns(void)
-{
-	struct timespec ts;
-
-	get_monotonic_boottime(&ts);
-	return timespec_to_ns(&ts);
-}
-
 u64 os_timestamp_ms(void)
 {
-	u64 ns = os_timestamp_ns();
+	u64 ns = ktime_to_ns(ktime_get_boottime());
 	u32 div = 1e6;
 
 	return div64_ul(ns, div);

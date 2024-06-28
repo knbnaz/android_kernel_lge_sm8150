@@ -17,44 +17,15 @@
 #endif
 #include <linux/export.h>
 
+
+s64 get_time_ns(void)
+{
 #ifdef CONFIG_RTC_INTF_ALARM
-s64 get_time_ns(void)
-{
-	struct timespec ts;
-
-	/* get_monotonic_boottime(&ts); */
-
-	/* Workaround for some platform on which monotonic clock and
-	 * Android SystemClock has a gap.
-	 * Use ktime_to_timespec(alarm_get_elapsed_realtime()) instead of
-	 * get_monotonic_boottime() for these platform
-	 */
-
-	ts = ktime_to_timespec(alarm_get_elapsed_realtime());
-
-	return timespec_to_ns(&ts);
-}
-
+	return ktime_to_ns(alarm_get_elapsed_realtime());
 #else
-static inline void get_monotonic_boottime(struct timespec *ts)
-{
-	*ts = ktime_to_timespec(ktime_get_boottime());
-}
-
-s64 get_time_ns(void)
-{
-	struct timespec ts;
-
-	get_monotonic_boottime(&ts);
-
-	/* Workaround for some platform on which monotonic clock and
-	 * Android SystemClock has a gap.
-	 * Use ktime_to_timespec(alarm_get_elapsed_realtime()) instead of
-	 * get_monotonic_boottime() for these platform
-	 */
-	return timespec_to_ns(&ts);
-}
+	return ktime_to_ns(ktime_get_boottime());
 #endif
+}
 
 #ifdef ACCEL_BIAS_TEST
 int inv_get_3axis_average(s16 src[], s16 dst[], s16 reset)
