@@ -7,6 +7,7 @@ do {							\
 		pr_debug(fmt, ##__VA_ARGS__);		\
 } while (0)
 
+#include <linux/ktime.h>
 #include <linux/of.h>
 #include <linux/slab.h>
 #include "veneer-primitives.h"
@@ -218,7 +219,7 @@ static void chgtime_evaluate(long eoc)
 int charging_time_remains(int rawsoc)
 {
 	long now;
-	struct timespec tspec;
+	struct timespec64 tspec;
 
 	// Simple check
 	if ( !(0 < time_me.profile_power && 0 <= rawsoc && rawsoc < PROFILE_SLOT_COUNT) ) {
@@ -228,7 +229,7 @@ int charging_time_remains(int rawsoc)
 
 	// This calling may NOT be bound with SoC changing
 	if (time_me.rawsoc_now != rawsoc) {
-		get_monotonic_boottime(&tspec);
+		ktime_get_boottime_ts64(&tspec);
 		now = tspec.tv_sec;
 
 		if (time_me.starttime_of_charging == EMPTY) {
