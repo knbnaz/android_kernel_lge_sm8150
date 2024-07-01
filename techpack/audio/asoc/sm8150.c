@@ -7539,9 +7539,6 @@ static int msm_populate_dai_link_component_of_node(
 	struct device *cdev = card->dev;
 	struct snd_soc_dai_link *dai_link = card->dai_link;
 	struct device_node *np;
-#if defined(CONFIG_SND_SOC_SMA6101) || defined(CONFIG_SND_SOC_TFA9872_STEREO)||defined(CONFIG_SND_SOC_CS35L41)
-	int j;
-#endif
 
 	if (!cdev) {
 		pr_err("%s: Sound card device memory NULL\n", __func__);
@@ -7615,28 +7612,6 @@ static int msm_populate_dai_link_component_of_node(
 			dai_link[i].codecs->of_node = np;
 			dai_link[i].codecs->name = NULL;
 		}
-#if defined(CONFIG_SND_SOC_SMA6101) || defined(CONFIG_SND_SOC_TFA9872_STEREO)||defined(CONFIG_SND_SOC_CS35L41)
-		if (dai_link[i].codecs && (dai_link[i].num_codecs > 0)) {
-			for (j = 0; j < dai_link[i].num_codecs; j++) {
-				pr_info("dai_link[%d].codecs[%d].name = %s\n",i, j, dai_link[i].codecs[j].name);
-				index = of_property_match_string(cdev->of_node,
-						 "asoc-codec-names",
-						 dai_link[i].codecs[j].name);
-				if (index < 0)
-					continue;
-				np = of_parse_phandle(cdev->of_node, "asoc-codec",
-					      index);
-				if (!np) {
-					pr_err("%s: retrieving phandle for codec %s failed\n",
-						__func__, dai_link[i].codecs[j].name);
-					ret = -ENODEV;
-					goto err;
-				}
-				dai_link[i].codecs[j].of_node = np;
-				dai_link[i].codecs[j].name = NULL;
-			}
-		}
-#endif
 	}
 
 err:
