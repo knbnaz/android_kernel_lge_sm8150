@@ -20,7 +20,8 @@
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include "../../../qcom/sm8150-mtp.dtsi"
 #include "sm8150-mh2lm.dtsi"
-#include "sm8150-mh2lm-5G_modem.dtsi"
+#include "../../../qcom/sdx5xm-external-soc.dtsi"
+#include "../../../qcom/sm8150-sdx50m.dtsi"
 #include "sm8150-mh2lm-sound_kr_rev-b.dtsi"
 #include "sm8150-mh2lm-fingerprint.dtsi"
 #include "sm8150-mh2lm-tdmb.dtsi"

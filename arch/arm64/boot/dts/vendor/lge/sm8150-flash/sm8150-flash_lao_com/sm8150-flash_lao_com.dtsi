@@ -21,4 +21,5 @@
 #include "sm8150-flash_lao_com-touch.dtsi"
 #include "sm8150-flash_lao_com-usb.dtsi"
 #include "sm8150-flash_lao_com-storage.dtsi"
-#include "sm8150-flash_lao_com-5G_modem.dtsi"
+#include "../../../qcom/sdx5xm-external-soc.dtsi"
+#include "../../../qcom/sm8150-sdx50m.dtsi"
