@@ -1,1 +1,1 @@
-obj-y += core/
+obj-$(CONFIG_ARCH_QCOM) += core/
