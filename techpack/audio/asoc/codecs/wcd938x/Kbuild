@@ -20,12 +20,10 @@ ifeq ($(KERNEL_BUILD), 0)
 	endif
 	ifeq ($(CONFIG_ARCH_LITO), y)
 		include $(AUDIO_ROOT)/config/litoauto.conf
-		export
 		INCS    +=  -include $(AUDIO_ROOT)/config/litoautoconf.h
 	endif
 	ifeq ($(CONFIG_ARCH_LAHAINA), y)
 		include $(AUDIO_ROOT)/config/lahainaauto.conf
-		export
 		INCS    +=  -include $(AUDIO_ROOT)/config/lahainaautoconf.h
 	endif
 
