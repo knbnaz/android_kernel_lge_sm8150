@@ -4083,11 +4083,12 @@ static int sm8150_notifier_service_cb(struct notifier_block *this,
 			goto err;
 		}
 		codec_dai = rtd->codec_dai;
-		if (!strcmp(dev_name(codec_dai->dev), "tavil_codec"))
+		pdata = snd_soc_card_get_drvdata(card);		
+		if (!strcmp(dev_name(codec_dai->dev), "tavil_codec")) {
 			component = snd_soc_rtdcom_lookup(rtd, "tavil_codec");
-
-		pdata = snd_soc_card_get_drvdata(card);
-		pdata->component = component;
+			pdata->component = component;
+		}
+		
 		schedule_work(&pdata->adsp_power_up_work);
 		break;
 	default:
