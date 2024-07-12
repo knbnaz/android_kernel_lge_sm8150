@@ -2342,8 +2342,8 @@ static int stmmac_napi_check(struct stmmac_priv *priv, u32 chan)
 
 	if (priv->rx_queue[chan].skip_sw && (status & handle_rx))
 		ethqos_ipa_offload_event_handler(&chan, EV_IPA_HANDLE_RX_INTR);
-		if (priv->tx_queue[chan].skip_sw && (status & handle_tx))
-			ethqos_ipa_offload_event_handler(&chan, EV_IPA_HANDLE_TX_INTR);
+	if (priv->tx_queue[chan].skip_sw && (status & handle_tx))
+		ethqos_ipa_offload_event_handler(&chan, EV_IPA_HANDLE_TX_INTR);
 
 	if (!priv->tx_queue[chan].skip_sw) {
 		if ((status & handle_rx) && chan < priv->plat->rx_queues_to_use) {
