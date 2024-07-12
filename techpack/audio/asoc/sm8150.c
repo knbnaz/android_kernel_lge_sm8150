@@ -6873,32 +6873,35 @@ static int msm_wsa881x_init(struct snd_soc_pcm_runtime *rtd)
 	struct msm_asoc_mach_data *pdata = 
                 snd_soc_card_get_drvdata(rtd->card);
 	struct snd_soc_dapm_context *dapm = NULL;
+	int wsa_active_devs = 0;
 
 	if (pdata->wsa_max_devs > 0) {
 			component = snd_soc_rtdcom_lookup(rtd, "wsa-codec.1");
-		if (!component) {
-			pr_err("%s: wsa-codec.1 component is NULL\n", __func__);
-			return -EINVAL;
-		}
+		if (component) {
+			dapm = snd_soc_component_get_dapm(component);
 
-		dapm = snd_soc_component_get_dapm(component);
-
-		wsa881x_set_channel_map(component, &spkleft_ports[0],
-				WSA881X_MAX_SWR_PORTS, &ch_mask[0],
-				&ch_rate[0], NULL);
-		if (dapm->component) {
-			snd_soc_dapm_ignore_suspend(dapm, "SpkrLeft IN");
-			snd_soc_dapm_ignore_suspend(dapm, "SpkrLeft SPKR");
+			wsa881x_set_channel_map(component, &spkleft_ports[0],
+					WSA881X_MAX_SWR_PORTS, &ch_mask[0],
+					&ch_rate[0], NULL);
+			if (dapm->component) {
+				snd_soc_dapm_ignore_suspend(dapm, "SpkrLeft IN");
+				snd_soc_dapm_ignore_suspend(dapm, "SpkrLeft SPKR");
+			}
+			wsa881x_codec_info_create_codec_entry(pdata->codec_root,
+								component);
+			wsa_active_devs++;
+		} else {
+			pr_info("%s: wsa-codec.1 component is NULL\n", __func__);
 		}
-		wsa881x_codec_info_create_codec_entry(pdata->codec_root,
-						      component);
 	}
 
 	/* If current platform has more than one WSA */
-	if (pdata->wsa_max_devs > 1) {
+	if (pdata->wsa_max_devs > wsa_active_devs) {
 			component = snd_soc_rtdcom_lookup(rtd, "wsa-codec.2");
 		if (!component) {
 			pr_err("%s: wsa-codec.2 component is NULL\n", __func__);
+			pr_err("%s: %d WSA is found. Expect %d WSA.",
+				__func__, wsa_active_devs, pdata->wsa_max_devs);
 			return -EINVAL;
 		}
 
