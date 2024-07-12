@@ -3376,11 +3376,16 @@ int aqt_codec_info_create_codec_entry(struct snd_info_entry *codec_root,
 		return -EINVAL;
 	}
 	card = component->card;
-	aqt->entry = snd_info_create_subdir(codec_root->module,
+	aqt->entry = snd_info_create_module_entry(codec_root->module,
 					   "aqt1000", codec_root);
 	if (!aqt->entry) {
 		dev_dbg(component->dev, "%s: failed to create aqt1000 entry\n",
 			__func__);
+		return -ENOMEM;
+	}
+	aqt->entry->mode = S_IFDIR | 0555;
+	if (snd_info_register(aqt->entry) < 0) {
+		snd_info_free_entry(aqt->entry);
 		return -ENOMEM;
 	}
 
@@ -3390,6 +3395,7 @@ int aqt_codec_info_create_codec_entry(struct snd_info_entry *codec_root,
 	if (!version_entry) {
 		dev_dbg(component->dev, "%s: failed to create aqt1000 version entry\n",
 			__func__);
+		snd_info_free_entry(aqt->entry);
 		return -ENOMEM;
 	}
 
@@ -3400,6 +3406,7 @@ int aqt_codec_info_create_codec_entry(struct snd_info_entry *codec_root,
 
 	if (snd_info_register(version_entry) < 0) {
 		snd_info_free_entry(version_entry);
+		snd_info_free_entry(aqt->entry);
 		return -ENOMEM;
 	}
 	aqt->version_entry = version_entry;

@@ -6063,6 +6063,23 @@ static struct notifier_block service_nb = {
 	.priority = -INT_MAX,
 };
 
+static struct snd_info_entry *msm_snd_info_create_subdir(struct module *mod,
+				const char *name,
+				struct snd_info_entry *parent)
+{
+	struct snd_info_entry *entry;
+
+	entry = snd_info_create_module_entry(mod, name, parent);
+	if (!entry)
+		return NULL;
+	entry->mode = S_IFDIR | 0555;
+	if (snd_info_register(entry) < 0) {
+		snd_info_free_entry(entry);
+		return NULL;
+	}
+	return entry;
+}
+
 static int msm_audrx_init(struct snd_soc_pcm_runtime *rtd)
 {
 	int ret = 0;
@@ -6143,7 +6160,7 @@ static int msm_audrx_init(struct snd_soc_pcm_runtime *rtd)
 
 	card = rtd->card->snd_card;
 	if (!pdata->codec_root)
-		pdata->codec_root = snd_info_create_subdir(card->module,
+		pdata->codec_root = msm_snd_info_create_subdir(card->module,
 					"codecs", card->proc_root);
 	if (!pdata->codec_root) {
 		dev_dbg(codec->dev, "%s: Cannot create codecs module entry\n",
@@ -6202,7 +6219,7 @@ static int msm_va_cdc_dma_init(struct snd_soc_pcm_runtime *rtd)
 
 	card = rtd->card->snd_card;
 	if (!pdata->codec_root)
-		pdata->codec_root = snd_info_create_subdir(card->module,
+		pdata->codec_root = msm_snd_info_create_subdir(card->module,
 					"codecs", card->proc_root);
 	if (!pdata->codec_root) {
 		dev_dbg(codec->dev, "%s: Cannot create codecs module entry\n",
@@ -6271,7 +6288,7 @@ static int msm_wsa_cdc_dma_init(struct snd_soc_pcm_runtime *rtd)
 	}
 	card = rtd->card->snd_card;
 	if (!pdata->codec_root)
-		pdata->codec_root = snd_info_create_subdir(card->module,
+		pdata->codec_root = msm_snd_info_create_subdir(card->module,
 					"codecs", card->proc_root);
 	if (!pdata->codec_root) {
 		dev_dbg(component->dev, "%s: Cannot create codecs module entry\n",
