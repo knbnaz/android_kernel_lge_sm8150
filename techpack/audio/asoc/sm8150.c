@@ -67,6 +67,7 @@
 
 #define TDM_MAX_SLOTS		8
 #define TDM_SLOT_WIDTH_BITS	32
+#define TDM_SLOT_WIDTH_BYTES TDM_SLOT_WIDTH_BITS/8
 
 enum {
 	SLIM_RX_0 = 0,
@@ -165,6 +166,7 @@ struct msm_asoc_mach_data {
 	struct snd_soc_component *component;
 	struct work_struct adsp_power_up_work;
 	u32 wsa_max_devs;
+	u32 tdm_max_slots; /* Max TDM slots used */
 };
 
 struct msm_asoc_wcd93xx_codec {
@@ -2306,6 +2308,9 @@ static int tdm_slot_map_put(struct snd_kcontrol *kcontrol,
 	int channel = ucontrol->value.integer.value[1];
 	unsigned int offset_val;
 	unsigned int *slot_offset;
+	unsigned int max_slot_offset = 0;
+	struct msm_asoc_mach_data *pdata = NULL;
+	struct snd_soc_component *component = NULL;
 
 	if (interface < 0  || interface >= (TDM_INTERFACE_MAX * 2)) {
 		pr_err("%s: incorrect interface = %d", __func__, interface);
@@ -2316,20 +2321,28 @@ static int tdm_slot_map_put(struct snd_kcontrol *kcontrol,
 		return -EINVAL;
 	}
 
+	component = snd_soc_kcontrol_component(kcontrol);
+	pdata = snd_soc_card_get_drvdata(component->card);
 	pr_debug("%s: interface = %d, channel = %d", __func__,
 		interface, channel);
 
 	slot_offset = tdm_cfg[interface][channel].tdm_slot_offset;
+	if (!slot_offset) {
+		pr_err("%s: slot offset is NULL\n", __func__);
+		return -EINVAL;
+	}
+
+	max_slot_offset = TDM_SLOT_WIDTH_BYTES * (pdata->tdm_max_slots - 1);
 
 	/* Currenly can configure only two slots */
 	offset_val = ucontrol->value.integer.value[2];
-	/* Offset value can only be 0, 4, 8, ..28 */
-	if (offset_val % 4 == 0 && offset_val <= 28)
+	/* Offset value can only be 0, 4, 8, .. */
+	if (offset_val % 4 == 0 && offset_val <= max_slot_offset)
 		slot_offset[0] = offset_val;
 	pr_debug("%s: slot offset[0] = %d\n", __func__, slot_offset[0]);
 
 	offset_val = ucontrol->value.integer.value[3];
-	if (offset_val % 4 == 0 && offset_val <= 28)
+	if (offset_val % 4 == 0 && offset_val <= max_slot_offset)
 		slot_offset[1] = offset_val;
 	pr_debug("%s: slot offset[1] = %d\n", __func__, slot_offset[1]);
 
@@ -4784,14 +4797,16 @@ static int sm8150_tdm_snd_hw_params(struct snd_pcm_substream *substream,
 	struct snd_soc_dai *cpu_dai = rtd->cpu_dai;
 	int ret = 0;
 	int slot_width = TDM_SLOT_WIDTH_BITS;
-	int channels, slots = TDM_MAX_SLOTS;
+	int channels, slots;
 	unsigned int slot_mask, rate, clk_freq;
 	unsigned int *slot_offset;
 	unsigned int path_dir = 0, interface = 0, channel_interface = 0;
-
+	struct msm_asoc_mach_data *pdata = NULL;
 
 	pr_debug("%s: dai id = 0x%x\n", __func__, cpu_dai->id);
 
+	pdata = snd_soc_card_get_drvdata(rtd->card);
+	slots = pdata->tdm_max_slots;
 	if (cpu_dai->id < AFE_PORT_ID_TDM_PORT_RANGE_START) {
 		pr_err("%s: dai id 0x%x not supported\n",
 			__func__, cpu_dai->id);
@@ -4815,6 +4830,10 @@ static int sm8150_tdm_snd_hw_params(struct snd_pcm_substream *substream,
 
 	slot_offset = tdm_cfg[(interface * 2) + path_dir][channel_interface]
 			.tdm_slot_offset;
+	if (!slot_offset) {
+		pr_err("%s: slot offset is NULL\n", __func__);
+		return -EINVAL;
+	}
 
 	if (path_dir)
 		channels = tdm_tx_cfg[interface][channel_interface].channels;
@@ -6987,6 +7006,19 @@ static int msm_asoc_machine_probe(struct platform_device *pdev)
 	}
 	dev_info(&pdev->dev, "Sound card %s registered\n", card->name);
 	spdev = pdev;
+
+	ret = of_property_read_u32(pdev->dev.of_node, "qcom,tdm-max-slots",
+				   &pdata->tdm_max_slots);
+	if (ret) {
+		dev_err(&pdev->dev, "%s: No DT match for tdm max slots\n",
+			__func__);
+	}
+	if ((pdata->tdm_max_slots <= 0) || (pdata->tdm_max_slots >
+	    TDM_MAX_SLOTS)) {
+		pdata->tdm_max_slots = TDM_MAX_SLOTS;
+		dev_err(&pdev->dev, "%s: Using default tdm max slot: %d\n",
+			__func__, pdata->tdm_max_slots);
+	}
 
 	INIT_WORK(&pdata->adsp_power_up_work, msm_adsp_power_up_config_work);
 
