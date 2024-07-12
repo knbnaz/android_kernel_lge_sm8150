@@ -1372,7 +1372,6 @@ out_module:
 static int msm_11ad_remove(struct platform_device *pdev)
 {
 	struct msm11ad_ctx *ctx = platform_get_drvdata(pdev);
-	struct device *dev = &pdev->dev;
 
 	msm_pcie_deregister_event(&ctx->pci_event);
 	msm_11ad_ssr_deinit(ctx);
