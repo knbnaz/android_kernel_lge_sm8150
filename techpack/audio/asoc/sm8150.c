@@ -167,6 +167,7 @@ struct msm_asoc_mach_data {
 	struct work_struct adsp_power_up_work;
 	u32 wsa_max_devs;
 	u32 tdm_max_slots; /* Max TDM slots used */
+	int wcd_disabled;
 };
 
 struct msm_asoc_wcd93xx_codec {
@@ -4143,6 +4144,12 @@ static int msm_audrx_init(struct snd_soc_pcm_runtime *rtd)
 					      134, 135, 136, 137, 138, 139,
 					      140, 141, 142, 143};
 
+	if(!pdata)
+		return -EINVAL;
+
+	if (pdata->wcd_disabled)
+		return 0;
+
 	pr_debug("%s: dev_name:%s\n", __func__, dev_name(cpu_dai->dev));
 
 	rtd->pmdown_time = 0;
@@ -6432,9 +6439,18 @@ static int msm_snd_card_tavil_late_probe(struct snd_soc_card *card)
 {
 	const char *be_dl_name = LPASS_BE_SLIMBUS_0_RX;
 	struct snd_soc_pcm_runtime *rtd;
+	struct msm_asoc_mach_data *pdata;
 	struct snd_soc_component *component;
 	int ret = 0;
 	void *mbhc_calibration;
+
+
+	pdata = snd_soc_card_get_drvdata(card);
+	if (!pdata)
+		return -EINVAL;
+
+	if (pdata->wcd_disabled)
+		return 0;
 
 	rtd = snd_soc_get_pcm_runtime(card, be_dl_name);
 	if (!rtd) {
@@ -6954,6 +6970,10 @@ static int msm_asoc_machine_probe(struct platform_device *pdev)
 			sizeof(struct msm_asoc_mach_data), GFP_KERNEL);
 	if (!pdata)
 		return -ENOMEM;
+
+	of_property_read_u32(pdev->dev.of_node,
+				"qcom,wcd-disabled",
+				&pdata->wcd_disabled);
 
 	card = populate_snd_card_dailinks(&pdev->dev);
 	if (!card) {
