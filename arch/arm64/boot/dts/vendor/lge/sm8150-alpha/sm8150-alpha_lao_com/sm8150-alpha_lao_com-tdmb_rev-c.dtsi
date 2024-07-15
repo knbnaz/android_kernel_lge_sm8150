@@ -75,7 +75,7 @@
 		ldo-en-gpio = <&tlmm 166 0>;
 
 		/* [Modified] when use DMB_EN & LDO_EN same gpio, change below property to 1 */
-		dmb-en-lna-en-same-gpio = <0>;
+		dmb-en-lna-en-same-gpio-bool = <0>;
 
 
 	/* [ANT Switch Information]
