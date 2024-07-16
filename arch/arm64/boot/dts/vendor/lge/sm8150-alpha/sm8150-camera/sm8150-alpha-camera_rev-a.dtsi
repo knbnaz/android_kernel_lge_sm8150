@@ -631,14 +631,14 @@
 			};
 		};
 	};
-};
 
-&cam_cci0 {
 	qcom,cam-res-mgr {
 		compatible = "qcom,cam-res-mgr";
 		status = "ok";
 	};
+};
 
+&cam_cci0 {
 	ois_normal: qcom,ois@0 {
 		cell-index = <0>;
 		reg = <0x0>;
@@ -863,7 +863,9 @@
 		clock-cntl-level = "turbo";
 		clock-rates = <24000000>;
 	};
+};
 
+&cam_cci1 {
 	eeprom_wide: qcom,eeprom@2 {
 		cell-index = <2>;
 		reg = <0x2>;

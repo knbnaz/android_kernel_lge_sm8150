@@ -374,6 +374,11 @@
 		pinctrl-0 = <&camera_front_iovdd_default>;
 		vin-supply = <&pm8150_s5>;
 	};
+
+	qcom,cam-res-mgr {
+		compatible = "qcom,cam-res-mgr";
+		status = "ok";
+	};
 /*
 	qcom,cam_smmu {
 		msm_cam_smmu_icp {
@@ -421,11 +426,6 @@
 };
 
 &cam_cci0 {
-	qcom,cam-res-mgr {
-		compatible = "qcom,cam-res-mgr";
-		status = "ok";
-	};
-
 	ois_normal: qcom,ois@0 {
 		cell-index = <0>;
 		reg = <0x0>;
@@ -613,7 +613,9 @@
 		clock-cntl-level = "turbo";
 		clock-rates = <19200000>;
 	};
+};
 
+&cam_cci1 {
 	qcom,cam-sensor@3 {
 		cell-index = <3>;
 		compatible = "qcom,cam-sensor";

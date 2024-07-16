@@ -631,25 +631,14 @@
 			};
 		};
 	};
-};
 
-&cam_cci1 {
-	pinctrl-0 = <&cci2_active>;
-	pinctrl-1 = <&cci2_suspend>;
-	gpios = <&tlmm 31 0>,
-		<&tlmm 32 0>;
-	gpio-req-tbl-num = <0 1>;
-	gpio-req-tbl-flags = <1 1>;
-	gpio-req-tbl-label = "CCI_I2C_DATA2",
-			"CCI_I2C_CLK2";
-};
-
-&cam_cci0 {
 	qcom,cam-res-mgr {
 		compatible = "qcom,cam-res-mgr";
 		status = "ok";
 	};
+};
 
+&cam_cci0 {
 	ois_normal: qcom,ois@0 {
 		cell-index = <0>;
 		reg = <0x0>;
@@ -874,6 +863,17 @@
 		clock-cntl-level = "turbo";
 		clock-rates = <24000000>;
 	};
+};
+
+&cam_cci1 {
+	pinctrl-0 = <&cci2_active>;
+	pinctrl-1 = <&cci2_suspend>;
+	gpios = <&tlmm 31 0>,
+		<&tlmm 32 0>;
+	gpio-req-tbl-num = <0 1>;
+	gpio-req-tbl-flags = <1 1>;
+	gpio-req-tbl-label = "CCI_I2C_DATA2",
+			"CCI_I2C_CLK2";
 
 	eeprom_wide: qcom,eeprom@2 {
 		cell-index = <2>;
