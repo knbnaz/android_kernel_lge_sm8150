@@ -290,6 +290,10 @@
 		};
 	};
 
+	qcom_msmhdcp: qcom,msm_hdcp {
+		compatible = "qcom,msm-hdcp";
+	};
+
 	sde_rscc: qcom,sde_rscc@af20000 {
 		cell-index = <0>;
 		compatible = "qcom,sde-rsc";
