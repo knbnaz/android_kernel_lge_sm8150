@@ -1336,6 +1336,11 @@
 		qcom,bcm-voters = <&apps_bcm_voter>, <&disp_bcm_voter>;
 	};
 
+	ssc_sensors: qcom,msm-ssc-sensors {
+		compatible = "qcom,msm-ssc-sensors";
+		status = "ok";
+		qcom,firmware-name = "slpi";
+	};
 
 	ufsphy_mem: ufsphy_mem@1d87000 {
 		reg = <0x1d87000 0xda8>,
