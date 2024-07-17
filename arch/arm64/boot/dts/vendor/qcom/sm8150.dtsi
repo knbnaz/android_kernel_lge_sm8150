@@ -2915,6 +2915,49 @@
 		};
 	};
 
+	slim_aud: slim@171c0000 {
+		cell-index = <1>;
+		compatible = "qcom,slim-ngd";
+		reg = <0x171c0000 0x2c000>,
+			<0x17184000 0x2c000>;
+		reg-names = "slimbus_physical", "slimbus_bam_physical";
+		interrupts = <GIC_SPI 163 IRQ_TYPE_LEVEL_HIGH>, 
+					 <GIC_SPI 164 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "slimbus_irq", "slimbus_bam_irq";
+		qcom,apps-ch-pipes = <0x780000>;
+		qcom,ea-pc = <0x2a0>;
+		iommus = <&apps_smmu 0x1b46 0x8>,
+				 <&apps_smmu 0x1b4d 0x2>,
+				 <&apps_smmu 0x1b50 0x1>;
+		qcom,iommu-dma-addr-pool = <0x40000000 0xc0000000>;
+		qcom,iommu-dma = "bypass";
+		qcom,iommu-s1-bypass;
+	};
+
+	slim_qca: slim@17240000 {
+		status = "ok";
+		cell-index = <3>;
+		compatible = "qcom,slim-ngd";
+		reg = <0x17240000 0x2c000>,
+			<0x17204000 0x20000>;
+		reg-names = "slimbus_physical", "slimbus_bam_physical";
+		interrupts = <GIC_SPI 291 IRQ_TYPE_LEVEL_HIGH>, 
+					 <GIC_SPI 292 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "slimbus_irq", "slimbus_bam_irq";
+		iommus = <&apps_smmu 0x1b53 0x0>;
+		qcom,iommu-dma-addr-pool = <0x40000000 0xc0000000>;
+		qcom,iommu-dma = "bypass";
+		qcom,iommu-s1-bypass;
+
+		/* Slimbus Slave DT for WCN3990 */
+		btfmslim_codec: wcn3990 {
+			compatible = "qcom,btfmslim_slave";
+			elemental-addr = [00 01 20 02 17 02];
+			qcom,btfm-slim-ifd = "btfmslim_slave_ifd";
+			qcom,btfm-slim-ifd-elemental-addr = [00 00 20 02 17 02];
+		};
+	};
+
 	qcom_tzlog: tz-log@146bf720 {
 		compatible = "qcom,tz-log";
 		reg = <0x146bf720 0x3000>;
