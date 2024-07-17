@@ -3211,6 +3211,12 @@
 		qcom,pil-force-shutdown;
 		memory-region = <&pil_ipa_fw_mem>;
 	};
+
+	aop-msg-client {
+		compatible = "qcom,debugfs-qmp-client";
+		mboxes = <&qmp_aop 0>;
+		mbox-names = "aop";
+	};
 };
 
 &firmware {
