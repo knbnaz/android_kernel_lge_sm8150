@@ -824,7 +824,7 @@
 				&osm_l3 SLAVE_OSM_L3_CLUSTER1>;
 	};
 
-	cpu4_cpu_l3_tbl: qcom,cpu4_cpu_l3_tbl {
+	cpu4_cpu_l3_tbl: qcom,cpu4-cpu-l3-tbl {
 		qcom,core-dev-table =
 			<  300000  300000000 >,
 			<  768000  576000000 >,
@@ -869,7 +869,7 @@
 				&osm_l3 SLAVE_OSM_L3_CLUSTER2>;
 	};
 
-	cpu7_cpu_l3_tbl: qcom,cpu7_cpu_l3_tbl {
+	cpu7_cpu_l3_tbl: qcom,cpu7-cpu-l3-tbl {
 		qcom,core-dev-table =
 			<  300000  300000000 >,
 			<  768000  576000000 >,
