@@ -24,6 +24,12 @@
 	qcom,spss-prod-firmware-name = "spss2p";  /* 8 chars max */
 };
 
+&mdss_mdp {
+	qcom,fullsize-va-map;
+	qcom,sde-min-core-ib-kbps = <0>;
+	qcom,sde-min-llcc-ib-kbps = <0>;
+};
+
 &mdss_rotator {
 	smmu_rot_unsec: qcom,smmu_rot_unsec_cb {
 		compatible = "qcom,smmu_sde_rot_unsec";
