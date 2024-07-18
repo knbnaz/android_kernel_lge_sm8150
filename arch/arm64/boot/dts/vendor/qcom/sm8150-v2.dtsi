@@ -868,5 +868,21 @@
 		< 3000000 MHZ_TO_MBPS(1000, 16) >;
 };
 
+/* qcedev override */
+&qcom_cedev {
+	qcom_cedev_ns_cb {
+		iommus = <&apps_smmu 0x512 0>,
+			 <&apps_smmu 0x518 0>,
+			 <&apps_smmu 0x519 0>,
+			 <&apps_smmu 0x51f 0>;
+	};
+
+	qcom_cedev_s_cb {
+		iommus = <&apps_smmu 0x513 0>,
+			 <&apps_smmu 0x51c 0>,
+			 <&apps_smmu 0x51d 0>,
+			 <&apps_smmu 0x51e 0>;
+	};
+};
 
 #include "camera/sm8150-v2-camera.dtsi"
