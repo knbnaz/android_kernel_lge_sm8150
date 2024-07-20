@@ -593,10 +593,10 @@
 					node-name = "level3-rt0-rd-wr-sum";
 					traffic-merge-type =
 					<CAM_CPAS_TRAFFIC_MERGE_SUM>;
-					qcom,axi-port-name = "cam_hf_1";
+					qcom,axi-port-name = "cam_hf_0";
 					ib-bw-voting-needed;
 					qcom,axi-port-mnoc {
-						qcom,msm-bus,name = "cam_hf_1_mnoc";
+						qcom,msm-bus,name = "cam_hf_0_mnoc";
 						qcom,msm-bus-vector-dyn-vote;
 						qcom,msm-bus,num-cases = <2>;
 						qcom,msm-bus,num-paths = <1>;
@@ -613,10 +613,10 @@
 					node-name = "level3-rt1-rd-wr-sum";
 					traffic-merge-type =
 					<CAM_CPAS_TRAFFIC_MERGE_SUM>;
-					qcom,axi-port-name = "cam_hf_2";
+					qcom,axi-port-name = "cam_hf_1";
 					ib-bw-voting-needed;
 					qcom,axi-port-mnoc {
-						qcom,msm-bus,name = "cam_hf_2_mnoc";
+						qcom,msm-bus,name = "cam_hf_1_mnoc";
 						qcom,msm-bus-vector-dyn-vote;
 						qcom,msm-bus,num-cases = <2>;
 						qcom,msm-bus,num-paths = <1>;
@@ -633,9 +633,9 @@
 					node-name = "level3-nrt0-rd-wr-sum";
 					traffic-merge-type =
 					<CAM_CPAS_TRAFFIC_MERGE_SUM>;
-					qcom,axi-port-name = "cam_sf_1";
+					qcom,axi-port-name = "cam_sf_0";
 					qcom,axi-port-mnoc {
-						qcom,msm-bus,name = "cam_sf_1_mnoc";
+						qcom,msm-bus,name = "cam_sf_0_mnoc";
 						qcom,msm-bus-vector-dyn-vote;
 						qcom,msm-bus,num-cases = <2>;
 						qcom,msm-bus,num-paths = <1>;
