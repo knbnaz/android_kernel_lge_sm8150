@@ -179,7 +179,7 @@
 				<&apps_smmu 0xE40 0x620>,
 				<&apps_smmu 0xE60 0x620>;
 			qcom,iommu-dma-addr-pool = <0x7400000 0xd8c00000>;
-			label = "ife";
+			cam-smmu-label = "ife";
 			ife_iova_mem_map: iova-mem-map {
 				/* IO region is approximately 3.4 GB */
 				iova-mem-region-io {
@@ -197,7 +197,7 @@
 			iommus = <&apps_smmu 0x2180 0x20>,
 				<&apps_smmu 0x21A0 0x20>;
 			qcom,iommu-dma-addr-pool = <0x7400000 0xd8c00000>;
-			label = "jpeg";
+			cam-smmu-label = "jpeg";
 			jpeg_iova_mem_map: iova-mem-map {
 				/* IO region is approximately 3.4 GB */
 				iova-mem-region-io {
@@ -212,7 +212,7 @@
 
 		msm_cam_icp_fw {
 			compatible = "qcom,msm-cam-smmu-fw-dev";
-			label="icp";
+			cam-smmu-label="icp";
 			memory-region = <&pil_camera_mem>;
 		};
 
@@ -225,7 +225,7 @@
 				<&apps_smmu 0x2120 0x20>,
 				<&apps_smmu 0x20C0 0x0>,
 				<&apps_smmu 0x2140 0x0>;
-			label = "icp";
+			cam-smmu-label = "icp";
 			qcom,iommu-dma-addr-pool = <0x10c00000 0xcf300000>;
 			icp_iova_mem_map: iova-mem-map {
 				iova-mem-region-firmware {
@@ -280,7 +280,7 @@
 			compatible = "qcom,msm-cam-smmu-cb";
 			iommus = <&apps_smmu 0x2000 0x0>;
 			qcom,iommu-dma-addr-pool = <0x7400000 0xd8c00000>;
-			label = "cpas-cdm0";
+			cam-smmu-label = "cpas-cdm0";
 			cpas_cdm_iova_mem_map: iova-mem-map {
 				iova-mem-region-io {
 					/* IO region is approximately 3.4 GB */
@@ -295,7 +295,7 @@
 
 		msm_cam_smmu_secure {
 			compatible = "qcom,msm-cam-smmu-cb";
-			label = "cam-secure";
+			cam-smmu-label = "cam-secure";
 			qcom,secure-cb;
 		};
 
@@ -304,7 +304,7 @@
 			iommus = <&apps_smmu 0x21C0 0x20>,
 				<&apps_smmu 0x21E0 0x20>;
 			qcom,iommu-dma-addr-pool = <0x7400000 0xd8c00000>;
-			label = "fd";
+			cam-smmu-label = "fd";
 			fd_iova_mem_map: iova-mem-map {
 				iova-mem-region-io {
 					/* IO region is approximately 3.4 GB */
@@ -322,7 +322,7 @@
 			iommus = <&apps_smmu 0x20e0 0x0>,
 				<&apps_smmu 0x2160 0x0>;
 			qcom,iommu-dma-addr-pool = <0xd800000 0xd2800000>;
-			label = "lrme";
+			cam-smmu-label = "lrme";
 			lrme_iova_mem_map: iova-mem-map {
 				iova-mem-region-shared {
 					/* Shared region is 100MB long */
