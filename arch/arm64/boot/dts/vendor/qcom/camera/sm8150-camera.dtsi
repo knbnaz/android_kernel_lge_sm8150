@@ -380,7 +380,7 @@
 				<&apps_smmu 0x10C0 0x0>,
 				<&apps_smmu 0x1140 0x0>;
 			label = "icp";
-			qcom,iommu-dma-addr-pool = <0x10c00000 0xcf300000>;
+			qcom,iommu-dma-addr-pool = <0xda00000 0xace00000>;
 			icp_iova_mem_map: iova-mem-map {
 				iova-mem-region-firmware {
 					/* Firmware region is 5MB */
@@ -476,7 +476,7 @@
 			iommus = <&apps_smmu 0x10e0 0x0>,
 				<&apps_smmu 0x1160 0x0>;
 			label = "lrme";
-			qcom,iommu-dma-addr-pool = <0x7400000 0xd8c00000>;
+			qcom,iommu-dma-addr-pool = <0xd800000 0xd2800000>;
 			lrme_iova_mem_map: iova-mem-map {
 				iova-mem-region-shared {
 					/* Shared region is 100MB long */

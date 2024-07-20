@@ -259,7 +259,7 @@
 					/* IO region is approximately 3.3 GB */
 					iova-region-name = "io";
 					iova-region-start = <0x10C00000>;
-					iova-region-len = <0xCF300000>;
+					iova-region-len = <0xcf300000>;
 					iova-region-id = <0x3>;
 					status = "ok";
 				};
@@ -321,7 +321,7 @@
 			compatible = "qcom,msm-cam-smmu-cb";
 			iommus = <&apps_smmu 0x20e0 0x0>,
 				<&apps_smmu 0x2160 0x0>;
-			qcom,iommu-dma-addr-pool = <0x7400000 0xd8c00000>;
+			qcom,iommu-dma-addr-pool = <0xd800000 0xd2800000>;
 			label = "lrme";
 			lrme_iova_mem_map: iova-mem-map {
 				iova-mem-region-shared {
