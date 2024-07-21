@@ -326,25 +326,14 @@
 
 		/* data and reg bus scale settings */
 		qcom,sde-data-bus {
-			qcom,msm-bus,name = "disp_rsc_mnoc";
+			qcom,msm-bus,name = "disp_rsc_mnoc_llcc";
 			qcom,msm-bus,active-only;
 			qcom,msm-bus,num-cases = <3>;
 			qcom,msm-bus,num-paths = <2>;
 			qcom,msm-bus,vectors-KBps =
-			    <20003 20515 0 0>, <20004 20515 0 0>,
-			    <20003 20515 0 6400000>, <20004 20515 0 6400000>,
-			    <20003 20515 0 6400000>, <20004 20515 0 6400000>;
-		};
-
-		qcom,sde-llcc-bus {
-			qcom,msm-bus,name = "disp_rsc_llcc";
-			qcom,msm-bus,active-only;
-			qcom,msm-bus,num-cases = <3>;
-			qcom,msm-bus,num-paths = <1>;
-			qcom,msm-bus,vectors-KBps =
-			    <20001 20513 0 0>,
-			    <20001 20513 0 6400000>,
-			    <20001 20513 0 6400000>;
+			    <20003 20513 0 0>, <20004 20513 0 0>,
+			    <20003 20513 0 6400000>, <20004 20513 0 6400000>,
+			    <20003 20513 0 6400000>, <20004 20513 0 6400000>;
 		};
 
 		qcom,sde-ebi-bus {
