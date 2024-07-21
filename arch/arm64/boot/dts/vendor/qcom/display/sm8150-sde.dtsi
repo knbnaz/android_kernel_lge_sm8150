@@ -310,9 +310,6 @@
 
 		qcom,sde-dram-channels = <2>;
 
-		mboxes = <&disp_rsc 0>;
-		mbox-names = "disp_rsc";
-
 		interconnects =
 			<&mmss_noc MASTER_MDP0_DISP &gem_noc SLAVE_LLCC_DISP>,
 			<&mc_virt MASTER_LLCC_DISP &mc_virt SLAVE_EBI1_DISP>;
