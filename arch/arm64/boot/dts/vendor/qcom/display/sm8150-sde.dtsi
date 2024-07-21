@@ -368,9 +368,6 @@
 
 		qcom,mdss-sbuf-headroom = <20>;
 
-		cache-slice-names = "rotator";
-		cache-slices = <&llcc 4>;
-
 		smmu_rot_unsec: qcom,smmu_rot_unsec_cb {
 			compatible = "qcom,smmu_sde_rot_unsec";
 			iommus = <&apps_smmu 0x1040 0x0>;
