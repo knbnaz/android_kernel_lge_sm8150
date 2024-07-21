@@ -523,7 +523,6 @@
 };
 
 #include "display/sm8150-sde.dtsi"
-#include "display/sm8150-sde-pll.dtsi"
 #include "msm-rdbg.dtsi"
 
 &soc {
