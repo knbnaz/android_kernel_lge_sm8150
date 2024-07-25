@@ -23,7 +23,6 @@
 #include "sm8150-beta-panel.dtsi"
 #include "sm8150-beta-misc.dtsi"
 #include "sm8150-beta-pm.dtsi"
-#include "sm8150-beta-connectivity.dtsi"
 #include "sm8150-beta-nfc.dtsi"
 #include "sm8150-beta-mme.dtsi"
 #include "sm8150-beta-touch.dtsi"

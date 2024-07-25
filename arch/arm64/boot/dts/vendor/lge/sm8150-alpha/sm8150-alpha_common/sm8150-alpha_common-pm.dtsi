@@ -220,12 +220,6 @@
 		};
 	};
 
-	lge_batterydata: qcom,battery-data {
-		qcom,batt-id-range-pct = <15>;
-		#include "../../battery_profile/LGE_BLT41_Tocad_3500mAh.dtsi"
-		#include "../../battery_profile/LGE_BLT41_LGC_3500mAh.dtsi"
-	};
-
 	lge-battery-supplement {
 		capacity-mah-min = <3400>;
 		capacity-raw-full = <247>;
@@ -274,6 +268,11 @@
 			qcom,ki-coeff-hi-chg = <200>;
 		};
 	};
+};
+
+&mtp_batterydata {
+	#include "../../battery_profile/LGE_BLT41_Tocad_3500mAh.dtsi"
+	#include "../../battery_profile/LGE_BLT41_LGC_3500mAh.dtsi"
 };
 
 &pm8150b_charger {

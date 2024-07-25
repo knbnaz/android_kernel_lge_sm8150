@@ -23,7 +23,6 @@
 #include "sm8150-mh2lm_sb_jp-panel.dtsi"
 #include "sm8150-mh2lm_sb_jp-misc.dtsi"
 #include "sm8150-mh2lm_sb_jp-pm.dtsi"
-#include "sm8150-mh2lm_sb_jp-connectivity.dtsi"
 #include "sm8150-mh2lm_sb_jp-nfc.dtsi"
 #include "sm8150-mh2lm_sb_jp-mme.dtsi"
 #include "sm8150-mh2lm_sb_jp-touch.dtsi"

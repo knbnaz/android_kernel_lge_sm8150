@@ -11,9 +11,6 @@
  * GNU General Public License for more details.
  */
 
-#include "../sm8150-alpha_common/sm8150-alpha_common-nfc.dtsi"
-
-
 &qupv3_se9_i2c { /* QUP_9 (NFC) */
 	qcom,clk-freq-out = <1000000>;
 	status = "ok";

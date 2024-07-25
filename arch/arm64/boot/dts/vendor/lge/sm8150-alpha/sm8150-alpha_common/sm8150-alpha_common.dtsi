@@ -113,10 +113,6 @@
 	reg = <0x0 0xa4c00000 0x0 0x4000000>;
 };
 
-&mhi_0 {
-	mhi,fw-name = "debug.mbn";
-};
-
 &usb1 {
         status = "disabled";
 };

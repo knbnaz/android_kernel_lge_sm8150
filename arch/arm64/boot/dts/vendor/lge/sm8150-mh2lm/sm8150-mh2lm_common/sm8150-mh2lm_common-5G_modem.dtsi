@@ -13,7 +13,3 @@
 
 #include "../../../qcom/sdx5xm-external-soc.dtsi"
 #include "../../../qcom/sm8150-sdx50m.dtsi"
-
-&mhi_0 {
-	mhi,fw-name = "debug.mbn";
-};

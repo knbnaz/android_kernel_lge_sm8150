@@ -23,7 +23,6 @@
 #include "sm8150-alpha_lao_com-panel.dtsi"
 #include "sm8150-alpha_lao_com-misc.dtsi"
 #include "sm8150-alpha_lao_com-pm.dtsi"
-#include "sm8150-alpha_lao_com-connectivity.dtsi"
 #include "sm8150-alpha_lao_com-nfc.dtsi"
 #include "sm8150-alpha_lao_com-mme.dtsi"
 #include "sm8150-alpha_lao_com-touch.dtsi"

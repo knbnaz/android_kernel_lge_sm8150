@@ -11,22 +11,6 @@
  * GNU General Public License for more details.
  */
 
-&qupv3_se12_2uart {
-	status = "ok";
-};
-
-&qupv3_se13_4uart {
-	status = "ok";
-};
-
-&qupv3_se3_spi {
-	status = "ok";
-};
-
-&qupv3_se4_i2c {
-	status = "ok";
-};
-
 &tlmm {
 	lge,access-denied-list = <4 5 6 7 83 84 85 86 92 93 94 95 98 99 100 101>;
 

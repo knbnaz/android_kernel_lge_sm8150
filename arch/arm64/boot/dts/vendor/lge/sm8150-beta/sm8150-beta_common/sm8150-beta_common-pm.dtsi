@@ -234,11 +234,6 @@
 		};
 	};
 
-	lge_batterydata: qcom,battery-data {
-		qcom,batt-id-range-pct = <15>;
-		#include "../../battery_profile/LGE_BLT43_3550mAh.dtsi"
-	};
-
 	lge-battery-supplement {
 		capacity-mah-min = <3450>;
 		capacity-raw-full = <247>;
@@ -279,6 +274,10 @@
 			qcom,ki-coeff-hi-chg = <250>;
 		};
 	};
+};
+
+&mtp_batterydata {
+	#include "../../battery_profile/LGE_BLT43_3550mAh.dtsi"
 };
 
 &pm8150b_charger {
