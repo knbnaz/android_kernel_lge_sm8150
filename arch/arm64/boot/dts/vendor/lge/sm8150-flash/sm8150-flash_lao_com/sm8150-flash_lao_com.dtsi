@@ -18,6 +18,7 @@
 #include <dt-bindings/clock/qcom,rpmh.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 
+#include "../../../qcom/sm8150-mtp.dtsi"
 #include "../sm8150-flash_common/sm8150-flash_common.dtsi"
 #include "sm8150-flash_lao_com-pinctrl.dtsi"
 #include "sm8150-flash_lao_com-panel.dtsi"
