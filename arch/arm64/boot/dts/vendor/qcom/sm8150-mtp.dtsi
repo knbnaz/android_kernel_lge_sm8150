@@ -481,10 +481,6 @@
 	status = "ok";
 };
 
-&mhi_0 {
-	mhi,fw-name = "debug.mbn";
-};
-
 &pm8150b_adc_tm {
 	wp_therm {
 		reg = <ADC5_AMUX_THM1_100K_PU>;
@@ -539,7 +535,6 @@
 		polling-delay = <0>;
 		thermal-governor = "user_space";
 		thermal-sensors = <&pm8150b_adc_tm ADC5_AMUX_THM1_100K_PU>;
-		wake-capable-sensor;
 		trips {
 			active-config0 {
 				temperature = <125000>;
@@ -554,7 +549,6 @@
 		polling-delay = <0>;
 		thermal-governor = "user_space";
 		thermal-sensors = <&pm8150_adc_tm ADC5_XO_THERM_100K_PU>;
-		wake-capable-sensor;
 		trips {
 			active-config0 {
 				temperature = <125000>;
@@ -569,7 +563,6 @@
 		polling-delay = <0>;
 		thermal-governor = "user_space";
 		thermal-sensors = <&pm8150_adc_tm ADC5_AMUX_THM1_100K_PU>;
-		wake-capable-sensor;
 		trips {
 			active-config0 {
 				temperature = <125000>;
@@ -584,7 +577,6 @@
 		polling-delay = <0>;
 		thermal-governor = "user_space";
 		thermal-sensors = <&pm8150_adc_tm ADC5_AMUX_THM2_100K_PU>;
-		wake-capable-sensor;
 		trips {
 			active-config0 {
 				temperature = <125000>;
@@ -599,7 +591,6 @@
 		polling-delay = <0>;
 		thermal-governor = "user_space";
 		thermal-sensors = <&pm8150l_adc_tm ADC5_AMUX_THM1_100K_PU>;
-		wake-capable-sensor;
 		trips {
 			active-config0 {
 				temperature = <125000>;
@@ -614,7 +605,6 @@
 		polling-delay = <0>;
 		thermal-governor = "user_space";
 		thermal-sensors = <&pm8150l_adc_tm ADC5_AMUX_THM2_100K_PU>;
-		wake-capable-sensor;
 		trips {
 			active-config0 {
 				temperature = <125000>;
@@ -629,7 +619,6 @@
 		polling-delay = <0>;
 		thermal-governor = "user_space";
 		thermal-sensors = <&pm8150l_adc_tm ADC5_AMUX_THM3_100K_PU>;
-		wake-capable-sensor;
 		trips {
 			active-config0 {
 				temperature = <125000>;
