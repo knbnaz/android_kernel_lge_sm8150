@@ -14,6 +14,9 @@
     dsi_sw43410_dv2_gi_dsc_qhd_cmd: qcom,mdss_dsi_sw43410_dv2_gi_dsc_qhd_cmd {
         qcom,mdss-dsi-panel-name = "SW43410 cmd mode dsc dsi panel";
 		qcom,mdss-dsi-panel-type = "dsi_cmd_mode";
+		qcom,dsi-ctrl-num = <0>;
+		qcom,dsi-phy-num = <0>;
+
 		qcom,mdss-dsi-panel-physical-type = "oled";
 		qcom,mdss-dsi-virtual-channel-id = <0>;
 		qcom,mdss-dsi-stream = <0>;
