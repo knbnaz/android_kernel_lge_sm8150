@@ -155,6 +155,7 @@
 		      pinctrl-names = "aud_active", "aud_sleep";
 		      pinctrl-0 = <&hph_en0_wcd_active>;
 		      pinctrl-1 = <&hph_en0_wcd_sleep>;
+		      #gpio-cells = <0>;
 		};
 
 		tavil_hph_en1: msm_cdc_pinctrl_hph_en1 {
@@ -162,6 +163,7 @@
 		      pinctrl-names = "aud_active", "aud_sleep";
 		      pinctrl-0 = <&hph_en1_wcd_active>;
 		      pinctrl-1 = <&hph_en1_wcd_sleep>;
+		      #gpio-cells = <0>;
 		};
 	};
 };
