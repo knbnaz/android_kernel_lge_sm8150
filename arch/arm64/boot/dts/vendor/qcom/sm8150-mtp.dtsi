@@ -29,35 +29,6 @@
 	status = "ok";
 };
 
-&vendor {
-	bluetooth: bt_wcn3990 {
-		compatible = "qcom,wcn3990";
-		qcom,bt-vdd-core-supply = <&pm8150_l7>;
-		qcom,bt-vdd-pa-supply = <&pm8150l_l2>;
-		qcom,bt-vdd-ldo-supply = <&pm8150l_l11>;
-
-		qcom,bt-vdd-core-config = <1800000 1800000 0 0>;
-		qcom,bt-vdd-pa-config = <1304000 1304000 0 0>;
-		qcom,bt-vdd-ldo-config = <3312000 3312000 0 0>;
-	};
-
-	mtp_batterydata: qcom,battery-data {
-		qcom,batt-id-range-pct = <15>;
-	};
-
-	extcon_usb1: extcon_usb1 {
-		compatible = "linux,extcon-usb-gpio";
-		vbus-gpio = <&pm8150_gpios 10 GPIO_ACTIVE_HIGH>;
-		id-gpio = <&tlmm 101 GPIO_ACTIVE_HIGH>;
-		vbus-out-gpio = <&pm8150_gpios 9 GPIO_ACTIVE_HIGH>;
-
-		pinctrl-names = "default";
-		pinctrl-0 = <&usb2_vbus_det_default
-			     &usb2_id_det_default
-			     &usb2_vbus_boost_default>;
-	};
-};
-
 &qupv3_se13_4uart {
 	status = "ok";
 };
@@ -97,6 +68,33 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&key_home_default>;
 		qcom,finger-detect-gpio = <&pm8150_gpios 1 0>;
+	};
+
+	bluetooth: bt_wcn3990 {
+		compatible = "qcom,wcn3990";
+		qcom,bt-vdd-core-supply = <&pm8150_l7>;
+		qcom,bt-vdd-pa-supply = <&pm8150l_l2>;
+		qcom,bt-vdd-ldo-supply = <&pm8150l_l11>;
+
+		qcom,bt-vdd-core-config = <1800000 1800000 0 0>;
+		qcom,bt-vdd-pa-config = <1304000 1304000 0 0>;
+		qcom,bt-vdd-ldo-config = <3312000 3312000 0 0>;
+	};
+
+	mtp_batterydata: qcom,battery-data {
+		qcom,batt-id-range-pct = <15>;
+	};
+
+	extcon_usb1: extcon_usb1 {
+		compatible = "linux,extcon-usb-gpio";
+		vbus-gpio = <&pm8150_gpios 10 GPIO_ACTIVE_HIGH>;
+		id-gpio = <&tlmm 101 GPIO_ACTIVE_HIGH>;
+		vbus-out-gpio = <&pm8150_gpios 9 GPIO_ACTIVE_HIGH>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&usb2_vbus_det_default
+			     &usb2_id_det_default
+			     &usb2_vbus_boost_default>;
 	};
 };
 
