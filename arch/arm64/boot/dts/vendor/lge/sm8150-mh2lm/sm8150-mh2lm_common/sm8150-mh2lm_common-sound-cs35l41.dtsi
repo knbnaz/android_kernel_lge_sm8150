@@ -13,7 +13,7 @@
 
 &audio_apr {
 	sound-tavil {
-		lge,3rd-spk-amp = <1>;
+		qcom,wsa-max-devs = <0>;
 	};
 };
 
