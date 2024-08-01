@@ -21,6 +21,8 @@
 	qcom,mi2s-audio-intf = <1>;
 	qcom,auxpcm-audio-intf = <1>;
 	qcom,msm-mi2s-master = <1>, <1>, <1>, <1>, <1>;
+	qcom,tdm-max-slots = <8>;
+	qcom,wcd-disabled = <0>;
 
 	qcom,audio-routing =
 		"AIF4 VI", "MCLK",
@@ -59,15 +61,13 @@
 	qcom,hph-en1-gpio = <&tavil_hph_en1>;
 	qcom,tavil-mclk-clk-freq = <9600000>;
 
-	asoc-codec = <&stub_codec>, <&ext_disp_audio_codec>;
+	asoc-codec = <&stub_codec>, <&wsa881x_70211>,
+				 <&wsa881x_70212>, <&ext_disp_audio_codec>;
 	asoc-codec-names = "msm-stub-codec.1",
-			   "msm-ext-disp-audio-codec-rx";
+			   "wsa-codec1", "wsa-codec2",
+				"msm-ext-disp-audio-codec-rx";
 
 	qcom,wsa-max-devs = <2>;
-	qcom,wsa-devs = <&wsa881x_70211>, <&wsa881x_70212>,
-			<&wsa881x_70213>, <&wsa881x_70214>;
-	qcom,wsa-aux-dev-prefix = "SpkrLeft", "SpkrRight",
-				  "SpkrLeft", "SpkrRight";
 };
 
 &soc {
