@@ -25,6 +25,7 @@
 		qcom,use-pdc-interrupts;
 
 		USB3_GDSC-supply = <&usb30_prim_gdsc>;
+		dpdm-supply = <&usb2_phy0>;
 		clocks = <&gcc GCC_USB30_PRIM_MASTER_CLK>,
 			<&gcc GCC_CFG_NOC_USB3_PRIM_AXI_CLK>,
 			<&gcc GCC_AGGRE_USB3_PRIM_AXI_CLK>,
@@ -44,12 +45,22 @@
 
 		qcom,core-clk-rate = <200000000>;
 		qcom,core-clk-rate-hs = <66666667>;
+		qcom,num-gsi-evt-buffs = <0x3>;
+		qcom,gsi-reg-offset =
+			<0x0fc /* GSI_GENERAL_CFG */
+			 0x110 /* GSI_DBL_ADDR_L */
+			 0x120 /* GSI_DBL_ADDR_H */
+			 0x130 /* GSI_RING_BASE_ADDR_L */
+			 0x144 /* GSI_RING_BASE_ADDR_H */
+			 0x1a4>; /* GSI_IF_STS */
 		qcom,dwc-usb3-msm-tx-fifo-size = <27696>;
-		qcom,ignore-wakeup-src-in-hostmode;
 
-		interconnect-names = "usb-ddr", "ddr-usb";
+		interconnect-names = "usb-ddr", "usb-ipa", "ddr-usb";
 		interconnects = <&aggre1_noc MASTER_USB3_0 &mc_virt SLAVE_EBI1>,
+				<&aggre1_noc MASTER_USB3_0 &config_noc SLAVE_IPA_CFG>,
 				<&gem_noc MASTER_APPSS_PROC &config_noc SLAVE_USB3_0>;
+
+		qcom,usb-charger;
 
 		dwc3@a600000 {
 			compatible = "snps,dwc3";
@@ -60,8 +71,11 @@
 			snps,disable-clk-gating;
 			snps,has-lpm-erratum;
 			snps,hird-threshold = /bits/ 8 <0x0>;
-			snps,is-utmi-l1-suspend;
-			maximum-speed = "high-speed";
+			snps,ssp-u3-u0-quirk;
+			snps,dis-u1-entry-quirk;
+			snps,dis-u2-entry-quirk;
+			tx-fifo-resize;
+			maximum-speed = "super-speed-plus";
 			dr_mode = "otg";
 		};
 
@@ -116,8 +130,188 @@
 		qcom,param-override-seq = <0x43 0x70
 					   0x01 0xb0>;
 		qcom,rcal-mask = <0x1e00000>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&usb2phy_ac_en1_default>;
+	};
+
+	/* Primary USB port related QMP USB DP Combo PHY */
+	usb_qmp_dp_phy: ssphy@88e8000 {
+		compatible = "qcom,usb-ssphy-qmp-dp-combo";
+		reg = <0x88e8000 0x3000>;
+		reg-names = "qmp_phy_base";
+
+		vdd-supply = <&pm8150_l5>;
+		qcom,vdd-voltage-level = <0 880000 880000>;
+		qcom,vdd-max-load-uA = <47000>;
+		core-supply = <&pm8150l_l3>;
+		qcom,qmp-phy-init-seq =
+		    /* <reg_offset, value, delay> */
+		    <USB3_DP_QSERDES_COM_SSC_EN_CENTER 0x01 0
+		     USB3_DP_QSERDES_COM_SSC_PER1 0x31 0
+		     USB3_DP_QSERDES_COM_SSC_PER2 0x01 0
+		     USB3_DP_QSERDES_COM_SSC_STEP_SIZE1_MODE0 0xde 0
+		     USB3_DP_QSERDES_COM_SSC_STEP_SIZE2_MODE0 0x07 0
+		     USB3_DP_QSERDES_COM_SSC_STEP_SIZE1_MODE1 0xde 0
+		     USB3_DP_QSERDES_COM_SSC_STEP_SIZE2_MODE1 0x07 0
+		     USB3_DP_QSERDES_COM_SYSCLK_BUF_ENABLE 0x0a 0
+		     USB3_DP_QSERDES_COM_CP_CTRL_MODE0 0x06 0
+		     USB3_DP_QSERDES_COM_CP_CTRL_MODE1 0x06 0
+		     USB3_DP_QSERDES_COM_PLL_RCTRL_MODE0 0x16 0
+		     USB3_DP_QSERDES_COM_PLL_RCTRL_MODE1 0x16 0
+		     USB3_DP_QSERDES_COM_PLL_CCTRL_MODE0 0x36 0
+		     USB3_DP_QSERDES_COM_PLL_CCTRL_MODE1 0x36 0
+		     USB3_DP_QSERDES_COM_SYSCLK_EN_SEL 0x1a 0
+		     USB3_DP_QSERDES_COM_LOCK_CMP_EN 0x04 0
+		     USB3_DP_QSERDES_COM_LOCK_CMP1_MODE0 0x14 0
+		     USB3_DP_QSERDES_COM_LOCK_CMP2_MODE0 0x34 0
+		     USB3_DP_QSERDES_COM_LOCK_CMP1_MODE1 0x34 0
+		     USB3_DP_QSERDES_COM_LOCK_CMP2_MODE1 0x82 0
+		     USB3_DP_QSERDES_COM_DEC_START_MODE0 0x82 0
+		     USB3_DP_QSERDES_COM_DEC_START_MODE1 0x82 0
+		     USB3_DP_QSERDES_COM_DIV_FRAC_START1_MODE0 0xab 0
+		     USB3_DP_QSERDES_COM_DIV_FRAC_START2_MODE0 0xea 0
+		     USB3_DP_QSERDES_COM_DIV_FRAC_START3_MODE0 0x02 0
+		     USB3_DP_QSERDES_COM_DIV_FRAC_START1_MODE1 0xab 0
+		     USB3_DP_QSERDES_COM_DIV_FRAC_START2_MODE1 0xea 0
+		     USB3_DP_QSERDES_COM_DIV_FRAC_START3_MODE1 0x02 0
+		     USB3_DP_QSERDES_COM_VCO_TUNE1_MODE0 0x24 0
+		     USB3_DP_QSERDES_COM_VCO_TUNE1_MODE1 0x24 0
+		     USB3_DP_QSERDES_COM_VCO_TUNE2_MODE1 0x02 0
+		     USB3_DP_QSERDES_COM_HSCLK_SEL 0x01 0
+		     USB3_DP_QSERDES_COM_CORECLK_DIV_MODE1 0x08 0
+		     USB3_DP_QSERDES_COM_SVS_MODE_CLK_SEL 0x5 0
+		     USB3_DP_QSERDES_COM_BIN_VCOCAL_CMP_CODE1_MODE0 0xca 0
+		     USB3_DP_QSERDES_COM_BIN_VCOCAL_CMP_CODE2_MODE0 0x1e 0
+		     USB3_DP_QSERDES_COM_BIN_VCOCAL_CMP_CODE1_MODE1 0xca 0
+		     USB3_DP_QSERDES_COM_BIN_VCOCAL_CMP_CODE2_MODE1 0x1e 0
+		     USB3_DP_QSERDES_COM_BIN_VCOCAL_HSCLK_SEL 0x11 0
+		     USB3_DP_QSERDES_COM_VCO_TUNE_MAP 0x02 0
+		     USB3_DP_QSERDES_COM_CMN_IPTRIM 0x20 0
+		     USB3_DP_QSERDES_TXA_LANE_MODE_1 0x05 0
+		     USB3_DP_QSERDES_TXA_RCV_DETECT_LVL_2 0x12 0
+		     USB3_DP_QSERDES_TXA_RES_CODE_LANE_TX 0xe4 0
+		     USB3_DP_QSERDES_TXA_RES_CODE_LANE_RX 0xd0 0
+		     USB3_DP_QSERDES_RXA_UCDR_SO_GAIN 0x04 0
+		     USB3_DP_QSERDES_RXA_UCDR_FASTLOCK_FO_GAIN 0x2f 0
+		     USB3_DP_QSERDES_RXA_UCDR_SO_SATURATION_AND_ENABLE 0x7f 0
+		     USB3_DP_QSERDES_RXA_UCDR_FASTLOCK_COUNT_LOW 0xff 0
+		     USB3_DP_QSERDES_RXA_UCDR_FASTLOCK_COUNT_HIGH 0x0f 0
+		     USB3_DP_QSERDES_RXA_UCDR_PI_CONTROLS 0x99 0
+		     USB3_DP_QSERDES_RXA_UCDR_SB2_THRESH1 0x04 0
+		     USB3_DP_QSERDES_RXA_UCDR_SB2_THRESH2 0x08 0
+		     USB3_DP_QSERDES_RXA_UCDR_SB2_GAIN1 0x05 0
+		     USB3_DP_QSERDES_RXA_UCDR_SB2_GAIN2 0x05 0
+		     USB3_DP_QSERDES_RXA_VGA_CAL_CNTRL1 0x54 0
+		     USB3_DP_QSERDES_RXA_VGA_CAL_CNTRL2 0x08 0
+		     USB3_DP_QSERDES_RXA_GM_CAL 0x1f 0
+		     USB3_DP_QSERDES_RXA_RX_EQU_ADAPTOR_CNTRL2 0x0f 0
+		     USB3_DP_QSERDES_RXA_RX_EQU_ADAPTOR_CNTRL3 0x4a 0
+		     USB3_DP_QSERDES_RXA_RX_EQU_ADAPTOR_CNTRL4 0x0a 0
+		     USB3_DP_QSERDES_RXA_RX_IDAC_TSETTLE_LOW 0xc0 0
+		     USB3_DP_QSERDES_RXA_RX_IDAC_TSETTLE_HIGH 0x00 0
+		     USB3_DP_QSERDES_RXA_RX_EQ_OFFSET_ADAPTOR_CNTRL1 0x77 0
+		     USB3_DP_QSERDES_RXA_RX_OFFSET_ADAPTOR_CNTRL2 0x80 0
+		     USB3_DP_QSERDES_RXA_SIGDET_CNTRL 0x04 0
+		     USB3_DP_QSERDES_RXA_SIGDET_DEGLITCH_CNTRL 0x0e 0
+		     USB3_DP_QSERDES_RXA_RX_MODE_00_LOW 0x3f 0
+		     USB3_DP_QSERDES_RXA_RX_MODE_00_HIGH 0x7f 0
+		     USB3_DP_QSERDES_RXA_RX_MODE_00_HIGH2 0x7f 0
+		     USB3_DP_QSERDES_RXA_RX_MODE_00_HIGH3 0x3f 0
+		     USB3_DP_QSERDES_RXA_RX_MODE_00_HIGH4 0xa4 0
+		     USB3_DP_QSERDES_RXA_RX_MODE_01_LOW 0xdc 0
+		     USB3_DP_QSERDES_RXA_RX_MODE_01_HIGH 0xdc 0
+		     USB3_DP_QSERDES_RXA_RX_MODE_01_HIGH2 0x5c 0
+		     USB3_DP_QSERDES_RXA_RX_MODE_01_HIGH3 0x0b 0
+		     USB3_DP_QSERDES_RXA_RX_MODE_01_HIGH4 0xb3 0
+		     USB3_DP_QSERDES_RXA_DFE_EN_TIMER 0x04 0
+		     USB3_DP_QSERDES_RXA_DFE_CTLE_POST_CAL_OFFSET 0x30 0
+		     USB3_DP_QSERDES_TXB_LANE_MODE_1 0x05 0
+		     USB3_DP_QSERDES_TXB_RCV_DETECT_LVL_2 0x12 0
+		     USB3_DP_QSERDES_TXB_RES_CODE_LANE_TX 0xe4 0
+		     USB3_DP_QSERDES_TXB_RES_CODE_LANE_RX 0xd0 0
+		     USB3_DP_QSERDES_RXB_UCDR_SO_GAIN 0x04 0
+		     USB3_DP_QSERDES_RXB_UCDR_FASTLOCK_FO_GAIN 0x2f 0
+		     USB3_DP_QSERDES_RXB_UCDR_SO_SATURATION_AND_ENABLE 0x7f 0
+		     USB3_DP_QSERDES_RXB_UCDR_FASTLOCK_COUNT_LOW 0xff 0
+		     USB3_DP_QSERDES_RXB_UCDR_FASTLOCK_COUNT_HIGH 0x0f 0
+		     USB3_DP_QSERDES_RXB_UCDR_PI_CONTROLS 0x99 0
+		     USB3_DP_QSERDES_RXB_UCDR_SB2_THRESH1 0x04 0
+		     USB3_DP_QSERDES_RXB_UCDR_SB2_THRESH2 0x08 0
+		     USB3_DP_QSERDES_RXB_UCDR_SB2_GAIN1 0x05 0
+		     USB3_DP_QSERDES_RXB_UCDR_SB2_GAIN2 0x05 0
+		     USB3_DP_QSERDES_RXB_VGA_CAL_CNTRL1 0x54 0
+		     USB3_DP_QSERDES_RXB_VGA_CAL_CNTRL2 0x08 0
+		     USB3_DP_QSERDES_RXB_GM_CAL 0x1f 0
+		     USB3_DP_QSERDES_RXB_RX_EQU_ADAPTOR_CNTRL2 0x0f 0
+		     USB3_DP_QSERDES_RXB_RX_EQU_ADAPTOR_CNTRL3 0x4a 0
+		     USB3_DP_QSERDES_RXB_RX_EQU_ADAPTOR_CNTRL4 0x0a 0
+		     USB3_DP_QSERDES_RXB_RX_IDAC_TSETTLE_LOW 0xc0 0
+		     USB3_DP_QSERDES_RXB_RX_IDAC_TSETTLE_HIGH 0x00 0
+		     USB3_DP_QSERDES_RXB_RX_EQ_OFFSET_ADAPTOR_CNTRL1 0x77 0
+		     USB3_DP_QSERDES_RXB_RX_OFFSET_ADAPTOR_CNTRL2 0x80 0
+		     USB3_DP_QSERDES_RXB_SIGDET_CNTRL 0x04 0
+		     USB3_DP_QSERDES_RXB_SIGDET_DEGLITCH_CNTRL 0x0e 0
+		     USB3_DP_QSERDES_RXB_RX_MODE_00_LOW 0x3f 0
+		     USB3_DP_QSERDES_RXB_RX_MODE_00_HIGH 0x7f 0
+		     USB3_DP_QSERDES_RXB_RX_MODE_00_HIGH2 0x7f 0
+		     USB3_DP_QSERDES_RXB_RX_MODE_00_HIGH3 0x3f 0
+		     USB3_DP_QSERDES_RXB_RX_MODE_00_HIGH4 0xa4 0
+		     USB3_DP_QSERDES_RXB_RX_MODE_01_LOW 0xdc 0
+		     USB3_DP_QSERDES_RXB_RX_MODE_01_HIGH 0xdc 0
+		     USB3_DP_QSERDES_RXB_RX_MODE_01_HIGH2 0x5c 0
+		     USB3_DP_QSERDES_RXB_RX_MODE_01_HIGH3 0x0b 0
+		     USB3_DP_QSERDES_RXB_RX_MODE_01_HIGH4 0xb3 0
+		     USB3_DP_QSERDES_RXB_DFE_EN_TIMER 0x04 0
+		     USB3_DP_QSERDES_RXB_DFE_CTLE_POST_CAL_OFFSET 0x30 0
+		     USB3_DP_PCS_LOCK_DETECT_CONFIG1 0xd0 0
+		     USB3_DP_PCS_LOCK_DETECT_CONFIG2 0x17 0
+		     USB3_DP_PCS_LOCK_DETECT_CONFIG3 0x20 0
+		     USB3_DP_PCS_RX_SIGDET_LVL 0xaa 0
+		     USB3_DP_PCS_ALIGN_DETECT_CONFIG1 0x88 0
+		     USB3_DP_PCS_ALIGN_DETECT_CONFIG2 0x13 0
+		     USB3_DP_PCS_EQ_CONFIG1 0x0d 0
+		     USB3_DP_PCS_USB3_LFPS_DET_HIGH_COUNT_VAL 0xf8 0
+		     USB3_DP_PCS_USB3_RXEQTRAINING_DFE_TIME_S2 0x07 0
+		     USB3_DP_PCS_EQ_CONFIG5 0x02 0
+		     0xffffffff 0xffffffff 0x00>;
+
+		qcom,qmp-phy-reg-offset =
+			<USB3_DP_PCS_PCS_STATUS1
+			 USB3_DP_PCS_USB3_AUTONOMOUS_MODE_CTRL
+			 USB3_DP_PCS_USB3_LFPS_RXTERM_IRQ_CLEAR
+			 USB3_DP_PCS_POWER_DOWN_CONTROL
+			 USB3_DP_PCS_SW_RESET
+			 USB3_DP_PCS_START_CONTROL
+			 0xffff /* USB3_PHY_PCS_MISC_TYPEC_CTRL */
+			 0x2a18 /* USB3_DP_DP_PHY_PD_CTL */
+			 USB3_DP_COM_POWER_DOWN_CTRL
+			 USB3_DP_COM_SW_RESET
+			 USB3_DP_COM_RESET_OVRD_CTRL
+			 USB3_DP_COM_PHY_MODE_CTRL
+			 USB3_DP_COM_TYPEC_CTRL
+			 USB3_DP_COM_SWI_CTRL
+			 USB3_DP_PCS_CLAMP_ENABLE
+			 USB3_DP_PCS_PCS_STATUS2
+			 USB3_DP_PCS_INSIG_SW_CTRL3
+			 USB3_DP_PCS_INSIG_MX_CTRL3>;
+
+		clocks = <&gcc GCC_USB3_PRIM_PHY_AUX_CLK>,
+			<&gcc GCC_USB3_PRIM_PHY_PIPE_CLK>,
+			<&rpmhcc RPMH_CXO_CLK>,
+			<&gcc GCC_USB3_PRIM_CLKREF_CLK>,
+			<&gcc GCC_USB3_PRIM_PHY_COM_AUX_CLK>;
+		clock-names = "aux_clk", "pipe_clk", "ref_clk_src",
+				"ref_clk", "com_aux_clk";
+
+		resets = <&gcc GCC_USB3_DP_PHY_PRIM_BCR>,
+			<&gcc GCC_USB3_PHY_PRIM_BCR>;
+		reset-names = "global_phy_reset", "phy_reset";
+	};
+
+	usb_audio_qmi_dev {
+		compatible = "qcom,usb-audio-qmi-dev";
+		iommus = <&apps_smmu 0x1b2f 0x0>;
+		qcom,iommu-dma = "disabled";
+		qcom,usb-audio-stream-id = <0xf>;
+		qcom,usb-audio-intr-num = <2>;
 	};
 
 	usb_nop_phy: usb_nop_phy {
@@ -139,13 +333,12 @@
 		dma-ranges;
 
 		interrupts-extended = <&pdc 11 IRQ_TYPE_EDGE_RISING>,
+				 <&intc GIC_SPI 135 IRQ_TYPE_LEVEL_HIGH>,
 				 <&pdc 7 IRQ_TYPE_LEVEL_HIGH>,
 				 <&pdc 10 IRQ_TYPE_EDGE_RISING>;
-		interrupt-names = "dp_hs_phy_irq",
+		interrupt-names = "dp_hs_phy_irq", "pwr_event_irq",
 				"ss_phy_irq", "dm_hs_phy_irq";
 		qcom,use-pdc-interrupts;
-		qcom,default-mode-host;
-		qcom,ignore-wakeup-src-in-hostmode;
 
 		USB3_GDSC-supply = <&usb30_sec_gdsc>;
 		clocks = <&gcc GCC_USB30_SEC_MASTER_CLK>,
@@ -162,11 +355,22 @@
 
 		qcom,core-clk-rate = <200000000>;
 		qcom,core-clk-rate-hs = <66666667>;
+		qcom,num-gsi-evt-buffs = <0x3>;
+		qcom,gsi-reg-offset =
+			<0x0fc /* GSI_GENERAL_CFG */
+			 0x110 /* GSI_DBL_ADDR_L */
+			 0x120 /* GSI_DBL_ADDR_H */
+			 0x130 /* GSI_RING_BASE_ADDR_L */
+			 0x144 /* GSI_RING_BASE_ADDR_H */
+			 0x1a4>; /* GSI_IF_STS */
 		qcom,dwc-usb3-msm-tx-fifo-size = <27696>;
 
-		interconnect-names = "usb-ddr", "ddr-usb";
+		interconnect-names = "usb-ddr", "usb-ipa", "ddr-usb";
 		interconnects = <&aggre1_noc MASTER_USB3_1 &mc_virt SLAVE_EBI1>,
+				<&aggre1_noc MASTER_USB3_1 &config_noc SLAVE_IPA_CFG>,
 				<&gem_noc MASTER_APPSS_PROC &config_noc SLAVE_USB3_1>;
+
+		status = "disabled";
 
 		dwc3@a800000 {
 			compatible = "snps,dwc3";
@@ -178,10 +382,8 @@
 			snps,has-lpm-erratum;
 			snps,hird-threshold = /bits/ 8 <0x0>;
 			snps,ssp-u3-u0-quirk;
-			snps,is-utmi-l1-suspend;
 			snps,dis-u1-entry-quirk;
 			snps,dis-u2-entry-quirk;
-			snps,dis_u3_susphy_quirk;
 			tx-fifo-resize;
 			maximum-speed = "super-speed-plus";
 			dr_mode = "otg";
@@ -209,8 +411,8 @@
 		qcom,param-override-seq = <0x43 0x70
 					   0x01 0xb0>;
 		qcom,rcal-mask = <0x1e00000>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&usb2phy_ac_en2_default>;
+		
+		status = "disabled";
 	};
 
 	/* Secondary USB port related QMP PHY */
@@ -346,5 +548,7 @@
 		resets = <&gcc GCC_USB3_PHY_SEC_BCR>,
 			 <&gcc GCC_USB3PHY_PHY_SEC_BCR>;
 		reset-names = "phy_reset", "phy_phy_reset";
+		
+		status = "disabled";
 	};
 };
