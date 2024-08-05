@@ -3356,30 +3356,6 @@
 					  "qcom,smp2p-early-crash-ind";
 		};
 	};
-
-	wil6210: qcom,wil6210 {
-		compatible = "qcom,wil6210";
-		qcom,pcie-parent = <&pcie1>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&wil6210_refclk3_en_pin>;
-		qcom,wigig-en = <&tlmm 131 0>;
-		qcom,11ad-bus-bw,name = "wil6210";
-		qcom,11ad-bus-bw,num-cases = <2>;
-		qcom,11ad-bus-bw,num-paths = <1>;
-		qcom,11ad-bus-bw,vectors-KBps =
-			<100 512 0 0>,
-			<100 512 600000 800000>; /* ~4.6Gbps (MCS12) */
-		qcom,use-ext-supply;
-		vddio-supply= <&pm8150_s5>;
-		qcom,use-ext-clocks;
-		clocks = <&clock_rpmh RPMH_RF_CLK3>;
-		clock-names = "rf_clk";
-		qcom,iommu-dma-addr-pool = <0x20000000 0xe0000000>;
-		qcom,iommu-dma = "fastmap";
-		dma-coherent;
-		qcom,keep-radio-on-during-sleep;
-		status = "disabled";
-	};
 };
 
 &firmware {
