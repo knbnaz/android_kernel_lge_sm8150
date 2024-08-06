@@ -287,7 +287,7 @@
 
 &pm8150b_vadc {
 	mmw-pa2-lge {
-		reg = <ADC_AMUX_THM1_PU2>;
+		reg = <ADC5_AMUX_THM1_100K_PU>;
 		label = "mmw-pa2-lge";
 		qcom,ratiometic;
 		qcom,hw-settle-time = <200>;
@@ -324,7 +324,7 @@
 		polling-delay-passive = <2000>;
 		polling-delay = <0>;
 		thermal-governor = "step_wise";
-		thermal-sensors = <&pm8150b_adc_tm ADC_AMUX_THM1_PU2>;
+		thermal-sensors = <&pm8150b_adc_tm ADC5_AMUX_THM1_100K_PU>;
 		trips {
 			mmw_pa2_trip0: mmw-pa2-trip0 {
 				temperature = <90000>;
