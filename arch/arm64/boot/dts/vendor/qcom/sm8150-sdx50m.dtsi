@@ -26,11 +26,19 @@
 &mhi_0 {
 	esoc-names = "mdm";
 	esoc-0 = <&mdm3>;
-	qcom,smmu-cfg = <0>;
 	memory-region = <&mhi_mem>;
 	mhi,use-bb;
 	mhi,allow-m1; /* use legacy mode for suspends */
-	qcom,addr-win = <0x0 0xa0000000 0x0 0xa4bfffff>;
+	qcom,iommu-group = <&mhi_0_iommu_group>;
+
+	#address-cells = <1>;
+	#size-cells = <1>;
+
+	mhi_0_iommu_group: mhi_0_iommu_group {
+		qcom,iommu-dma-addr-pool = <0xa0000000 0x4bfffff>;
+		qcom,iommu-dma = "bypass";
+		qcom,iommu-pagetable = "coherent";
+	};
 
 	mhi_channels {
 		mhi_chan@1 {
@@ -297,13 +305,6 @@
 
 	iommu-map = <0x0 &apps_smmu 0x1e00 0x1>,
 		<0x100 &apps_smmu 0x1e7f 0x1>;
-
-	qcom,msm-bus,name = "pcie1";
-	qcom,msm-bus,num-cases = <2>;
-	qcom,msm-bus,num-paths = <1>;
-	qcom,msm-bus,vectors-KBps =
-		<100 512 0 0>,
-		<100 512 4500000 0>;
 };
 
 &soc {
@@ -425,7 +426,6 @@
 		polling-delay = <0>;
 		thermal-governor = "user_space";
 		thermal-sensors = <&qmi_sensor 0>;
-		wake-capable-sensor;
 		trips {
 			active-config0 {
 				temperature = <125000>;
@@ -440,7 +440,6 @@
 		polling-delay = <0>;
 		thermal-governor = "user_space";
 		thermal-sensors = <&qmi_sensor 1>;
-		wake-capable-sensor;
 		trips {
 			active-config0 {
 				temperature = <125000>;
@@ -470,7 +469,6 @@
 		polling-delay = <0>;
 		thermal-governor = "user_space";
 		thermal-sensors = <&qmi_sensor 101>;
-		wake-capable-sensor;
 		trips {
 			active-config0 {
 				temperature = <125000>;
@@ -485,7 +483,6 @@
 		polling-delay = <0>;
 		thermal-governor = "user_space";
 		thermal-sensors = <&qmi_sensor 104>;
-		wake-capable-sensor;
 		trips {
 			active-config0 {
 				temperature = <125000>;
@@ -500,7 +497,6 @@
 		polling-delay = <0>;
 		thermal-governor = "user_space";
 		thermal-sensors = <&qmi_sensor 105>;
-		wake-capable-sensor;
 		trips {
 			active-config0 {
 				temperature = <125000>;
@@ -515,7 +511,6 @@
 		polling-delay = <0>;
 		thermal-governor = "user_space";
 		thermal-sensors = <&qmi_sensor 106>;
-		wake-capable-sensor;
 		trips {
 			active-config0 {
 				temperature = <125000>;
@@ -530,7 +525,6 @@
 		polling-delay = <0>;
 		thermal-governor = "user_space";
 		thermal-sensors = <&qmi_sensor 107>;
-		wake-capable-sensor;
 		trips {
 			active-config0 {
 				temperature = <125000>;
@@ -545,7 +539,6 @@
 		polling-delay = <0>;
 		thermal-governor = "user_space";
 		thermal-sensors = <&qmi_sensor 108>;
-		wake-capable-sensor;
 		trips {
 			active-config0 {
 				temperature = <125000>;
@@ -560,7 +553,6 @@
 		polling-delay = <0>;
 		thermal-governor = "user_space";
 		thermal-sensors = <&qmi_sensor 109>;
-		wake-capable-sensor;
 		trips {
 			active-config0 {
 				temperature = <125000>;
@@ -575,7 +567,6 @@
 		polling-delay = <0>;
 		thermal-governor = "user_space";
 		thermal-sensors = <&qmi_sensor 110>;
-		wake-capable-sensor;
 		trips {
 			active-config0 {
 				temperature = <125000>;
@@ -590,7 +581,6 @@
 		polling-delay = <0>;
 		thermal-governor = "user_space";
 		thermal-sensors = <&qmi_sensor 111>;
-		wake-capable-sensor;
 		trips {
 			active-config0 {
 				temperature = <125000>;
@@ -605,7 +595,6 @@
 		polling-delay = <0>;
 		thermal-governor = "user_space";
 		thermal-sensors = <&qmi_sensor 112>;
-		wake-capable-sensor;
 		trips {
 			active-config0 {
 				temperature = <125000>;
@@ -620,7 +609,6 @@
 		polling-delay = <0>;
 		thermal-governor = "user_space";
 		thermal-sensors = <&qmi_sensor 102>;
-		wake-capable-sensor;
 		trips {
 			active-config0 {
 				temperature = <125000>;
@@ -636,13 +624,11 @@
 	#size-cells = <2>;
 
 	pil_buffer_p2_mem: pil_buffer_p2_region@a0000000 {
-		compatible = "removed-dma-pool";
 		no-map;
 		reg = <0x0 0xa0000000 0x0 0x01000000>;
 	};
 
 	pil_buffer_p1_mem: pil_buffer_p1_region@0a1000000 {
-		compatible = "removed-dma-pool";
 		no-map;
 		reg = <0x0 0xa1000000 0x0 0x02c00000>;
 	};
