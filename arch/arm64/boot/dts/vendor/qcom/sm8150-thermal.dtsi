@@ -591,7 +591,25 @@
 				trip = <&pop_trip>;
 				cooling-device =
 					<&CPU4 THERMAL_NO_LIMIT
-						THERMAL_NO_LIMIT>;
+						(THERMAL_MAX_LIMIT-1)>;
+			};
+			pop_cdev5 {
+				trip = <&pop_trip>;
+				cooling-device =
+					<&CPU5 THERMAL_NO_LIMIT
+						(THERMAL_MAX_LIMIT-1)>;
+			};
+			pop_cdev6 {
+				trip = <&pop_trip>;
+				cooling-device =
+					<&CPU6 THERMAL_NO_LIMIT
+						(THERMAL_MAX_LIMIT-1)>;
+			};
+			pop_cdev7 {
+				trip = <&pop_trip>;
+				cooling-device =
+					<&CPU7 THERMAL_NO_LIMIT
+						(THERMAL_MAX_LIMIT-1)>;
 			};
 		};
 	};
