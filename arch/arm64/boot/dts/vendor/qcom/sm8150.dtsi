@@ -3341,6 +3341,7 @@
 			     <GIC_SPI 425 IRQ_TYPE_LEVEL_HIGH /* CE11 */ >;
 		qcom,iommu-dma = "fastmap";
 		qcom,iommu-faults = "stall-disable", "HUPCF", "non-fatal";
+		qcom,wlan-msa-memory = <0x100000>;
 		qcom,wlan-msa-fixed-region = <&pil_wlan_fw_mem>;
 		qcom,iommu-dma-addr-pool = <0xa0000000 0x10000000>;
 		vdd-cx-mx-supply = <&pm8150_l1>;
