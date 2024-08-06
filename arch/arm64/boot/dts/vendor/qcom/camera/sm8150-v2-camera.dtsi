@@ -29,9 +29,9 @@
 			"ife_clk",
 			"ife_axi_clk";
 		clocks =
-			<&clock_camcc CAM_CC_IFE_0_CLK_SRC>,
-			<&clock_camcc CAM_CC_IFE_0_CLK>,
-			<&clock_camcc CAM_CC_IFE_0_AXI_CLK>;
+			<&camcc CAM_CC_IFE_0_CLK_SRC>,
+			<&camcc CAM_CC_IFE_0_CLK>,
+			<&camcc CAM_CC_IFE_0_AXI_CLK>;
 		clock-rates =
 			<400000000 0 0>,
 			<558000000 0 0>,
@@ -43,7 +43,7 @@
 		src-clock-name = "ife_clk_src";
 		clock-control-debugfs = "true";
 		clock-names-option =  "ife_dsp_clk";
-		clocks-option = <&clock_camcc CAM_CC_IFE_0_DSP_CLK>;
+		clocks-option = <&camcc CAM_CC_IFE_0_DSP_CLK>;
 		clock-rates-option = <760000000>;
 		status = "ok";
 	};
@@ -68,13 +68,13 @@
 			"ife_clk",
 			"ife_axi_clk";
 		clocks =
-			<&clock_camcc CAM_CC_IFE_0_CSID_CLK_SRC>,
-			<&clock_camcc CAM_CC_IFE_0_CSID_CLK>,
-			<&clock_camcc CAM_CC_CPHY_RX_CLK_SRC>,
-			<&clock_camcc CAM_CC_IFE_0_CPHY_RX_CLK>,
-			<&clock_camcc CAM_CC_IFE_0_CLK_SRC>,
-			<&clock_camcc CAM_CC_IFE_0_CLK>,
-			<&clock_camcc CAM_CC_IFE_0_AXI_CLK>;
+			<&camcc CAM_CC_IFE_0_CSID_CLK_SRC>,
+			<&camcc CAM_CC_IFE_0_CSID_CLK>,
+			<&camcc CAM_CC_CPHY_RX_CLK_SRC>,
+			<&camcc CAM_CC_IFE_0_CPHY_RX_CLK>,
+			<&camcc CAM_CC_IFE_0_CLK_SRC>,
+			<&camcc CAM_CC_IFE_0_CLK>,
+			<&camcc CAM_CC_IFE_0_AXI_CLK>;
 		clock-rates =
 			<400000000 0 0 0 400000000 0 0>,
 			<400000000 0 0 0 558000000 0 0>,
@@ -105,9 +105,9 @@
 			"ife_clk",
 			"ife_axi_clk";
 		clocks =
-			<&clock_camcc CAM_CC_IFE_1_CLK_SRC>,
-			<&clock_camcc CAM_CC_IFE_1_CLK>,
-			<&clock_camcc CAM_CC_IFE_1_AXI_CLK>;
+			<&camcc CAM_CC_IFE_1_CLK_SRC>,
+			<&camcc CAM_CC_IFE_1_CLK>,
+			<&camcc CAM_CC_IFE_1_AXI_CLK>;
 		clock-rates =
 			<400000000 0 0>,
 			<558000000 0 0>,
@@ -119,7 +119,7 @@
 		src-clock-name = "ife_clk_src";
 		clock-control-debugfs = "true";
 		clock-names-option =  "ife_dsp_clk";
-		clocks-option = <&clock_camcc CAM_CC_IFE_1_DSP_CLK>;
+		clocks-option = <&camcc CAM_CC_IFE_1_DSP_CLK>;
 		clock-rates-option = <760000000>;
 		status = "ok";
 	};
@@ -144,13 +144,13 @@
 			"ife_clk",
 			"ife_axi_clk";
 		clocks =
-			<&clock_camcc CAM_CC_IFE_1_CSID_CLK_SRC>,
-			<&clock_camcc CAM_CC_IFE_1_CSID_CLK>,
-			<&clock_camcc CAM_CC_CPHY_RX_CLK_SRC>,
-			<&clock_camcc CAM_CC_IFE_1_CPHY_RX_CLK>,
-			<&clock_camcc CAM_CC_IFE_1_CLK_SRC>,
-			<&clock_camcc CAM_CC_IFE_1_CLK>,
-			<&clock_camcc CAM_CC_IFE_1_AXI_CLK>;
+			<&camcc CAM_CC_IFE_1_CSID_CLK_SRC>,
+			<&camcc CAM_CC_IFE_1_CSID_CLK>,
+			<&camcc CAM_CC_CPHY_RX_CLK_SRC>,
+			<&camcc CAM_CC_IFE_1_CPHY_RX_CLK>,
+			<&camcc CAM_CC_IFE_1_CLK_SRC>,
+			<&camcc CAM_CC_IFE_1_CLK>,
+			<&camcc CAM_CC_IFE_1_AXI_CLK>;
 		clock-rates =
 			<400000000 0 0 0 400000000 0 0>,
 			<400000000 0 0 0 558000000 0 0>,
