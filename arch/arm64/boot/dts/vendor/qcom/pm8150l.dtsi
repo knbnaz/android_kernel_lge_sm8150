@@ -79,19 +79,19 @@
 
 			/* Channel node */
 			ref_gnd@0 {
-				reg = <ADC_REF_GND>;
+				reg = <ADC5_REF_GND>;
 				label = "ref_gnd";
 				qcom,pre-scaling = <1 1>;
 			};
 
 			vref_1p25@1 {
-				reg = <ADC_1P25VREF>;
+				reg = <ADC5_1P25VREF>;
 				label = "vref_1p25";
 				qcom,pre-scaling = <1 1>;
 			};
 
 			die_temp@2 {
-				reg = <ADC_DIE_TEMP>;
+				reg = <ADC5_DIE_TEMP>;
 				label = "die_temp";
 				qcom,pre-scaling = <1 1>;
 			};
