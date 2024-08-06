@@ -124,7 +124,7 @@
 		compatible = "qcom,audio-ref-clk";
 		qcom,codec-ext-clk-src = <1>;
 		clock-names = "osr_clk";
-		clocks = <&clock_rpmh RPMH_LN_BB_CLK2>;
+		clocks = <&rpmhcc RPMH_LN_BB_CLK2>;
 		#clock-cells = <1>;
 	};
 };

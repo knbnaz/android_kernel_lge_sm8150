@@ -40,7 +40,7 @@
 			#clock-cells = <1>;
 			qcom,num-clkdivs = <1>;
 			clock-output-names = "pm8150l_div_clk1";
-			clocks = <&clock_rpmh RPMH_CXO_CLK>;
+			clocks = <&rpmhcc RPMH_CXO_CLK>;
 			clock-names = "xo";
 		};
 
