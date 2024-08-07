@@ -909,6 +909,20 @@
 };
 
 &soc {
+	/* Stub regulators */
+
+	/*
+	 * RPMh does not provide support for PM8150 S4 because it is always-on
+	 * at 1.8 V in auto mode.  Therefore, use a stub regulator for S4.
+	 */
+	S4A: pm8150_s4: regulator-pm8150-s4 {
+		compatible = "qcom,stub-regulator";
+		regulator-name = "pm8150_s4";
+		qcom,hpm-min-load = <100000>;
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+	};
+
 	refgen: refgen-regulator@88e7000 {
 		compatible = "qcom,refgen-regulator";
 		reg = <0x88e7000 0x60>;
