@@ -18,10 +18,6 @@
 	status = "ok";
 };
 
-&soc {
-	/delete-node/ wil6210;
-};
-
 &qupv3_se8_spi { /* [Modified] QUP_BASE address for BLSP# QUP# (ref. AP datasheet, This model use BLSP-1 QUP7) */
 	/* [Modified] Ref. kernel/msm-4.14/arch/arm64/boot/dts/qcom/sm8150-qupv3.dtsi */
 	#address-cells = <1>;
