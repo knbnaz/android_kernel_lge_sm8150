@@ -44,6 +44,8 @@
 };
 
 &qupv3_se4_i2c{ /* QUPV3 SE4  */
+	#address-cells = <1>;
+	#size-cells = <0>;
 	es9218-codec@48{
 		compatible = "dac,es9218-codec";
 		status = "ok";

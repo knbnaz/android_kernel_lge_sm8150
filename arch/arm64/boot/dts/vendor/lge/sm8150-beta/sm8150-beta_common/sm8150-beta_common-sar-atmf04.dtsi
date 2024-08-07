@@ -12,6 +12,8 @@
     */
 
 &qupv3_se0_i2c {
+	#address-cells = <1>;
+	#size-cells = <0>;
 	status = "ok";
 	qcom,clk-freq-out = <100000>;
 	qcom,clk-freq-in  = <19200000>;

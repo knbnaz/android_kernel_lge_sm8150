@@ -12,6 +12,8 @@
  */
 
 &qupv3_se9_i2c { /* QUP_9 (NFC) */
+	#address-cells = <1>;
+	#size-cells = <0>;
         qcom,clk-freq-out = <400000>;
         status = "ok";
         nq@28 {

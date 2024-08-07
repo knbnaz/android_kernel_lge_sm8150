@@ -344,6 +344,8 @@
 };
 
 &soc {
+	#address-cells = <1>;
+	#size-cells = <1>;
 	led_flash_n: qcom,camera-flash@0 {
 		cell-index = <0>;
 		reg = <0x00 0x00>;
@@ -634,6 +636,9 @@
 };
 
 &cam_cci0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
 	ois_normal: qcom,ois@0 {
 		cell-index = <0>;
 		reg = <0x0>;
@@ -913,6 +918,9 @@
 };
 
 &cam_cci1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
 	actuator_tele: qcom,actuator@3 {
 		cell-index = <3>;
 		reg = <0x3>;

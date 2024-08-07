@@ -13,6 +13,8 @@
 
 /* ~ Rev0.1 */
 &qupv3_se0_i2c{ /* QUPV3 SE0  */
+	#address-cells = <1>;
+	#size-cells = <0>;
 	status = "ok";
 	dw7912_se0@59 {
 		compatible = "dwanatech,dw7912";
@@ -25,6 +27,8 @@
 
 /* RevA */
 &qupv3_se4_i2c{ /* QUPV3 SE4  */
+	#address-cells = <1>;
+	#size-cells = <0>;
 	status = "ok";
 	dw7912_se4@59 {
 		compatible = "dwanatech,dw7912";
@@ -37,6 +41,8 @@
 
 /* RevB ~ */
 &qupv3_se4_i2c{ /* QUPV3 SE4  */
+	#address-cells = <1>;
+	#size-cells = <0>;
 	dw7800_se4@59 {
 		compatible = "dongwoon,dw7800";
 		reg = <0x59>;

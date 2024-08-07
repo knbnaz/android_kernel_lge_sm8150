@@ -20,11 +20,14 @@
 };
 
 &soc {
+	#address-cells = <1>;
+	#size-cells = <1>;
+
 	lge,gpio-debug {
 		compatible = "lge,gpio-debug";
 		reg = <0x03100000 0x900000>;
 		reg-names = "tlmm-base";
-		lge,n-msm-gpio = <0xAF>;  /* SM8150 0 to 174 */
+		lge,n-gpio-msm = <0xAF>;  /* SM8150 0 to 174 */
 	};
 
 	lge,monitor-thermal {
@@ -666,6 +669,8 @@
 };
 
 &qupv3_se0_i2c {
+	#address-cells = <1>;
+	#size-cells = <0>;
 	status = "ok";
 	idtp9222-charger@61 {				// Slave driver and slave Address
 		compatible ="idt,p9222-charger";	// Manufacture, model

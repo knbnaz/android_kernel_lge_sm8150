@@ -11,6 +11,8 @@
  */
 
 &qupv3_se17_i2c {
+	#address-cells = <1>;
+	#size-cells = <0>;
 	sw42000@28 {
 		status = "disable";
 		compatible = "lge,sw42000";

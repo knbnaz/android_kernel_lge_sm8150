@@ -12,6 +12,8 @@
 
 
 &qupv3_se17_i2c {
+	#address-cells = <1>;
+	#size-cells = <0>;
 	status = "okay";
 
 	synaptics_common@20 {
