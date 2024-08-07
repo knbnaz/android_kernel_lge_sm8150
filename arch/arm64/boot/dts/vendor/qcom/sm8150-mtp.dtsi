@@ -469,10 +469,6 @@
 	};
 };
 
-&wil6210 {
-	status = "ok";
-};
-
 &pm8150b_adc_tm {
 	wp_therm {
 		reg = <ADC5_AMUX_THM1_100K_PU>;
