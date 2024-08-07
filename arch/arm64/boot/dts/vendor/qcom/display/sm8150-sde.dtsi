@@ -570,6 +570,7 @@
 		interrupt-parent = <&mdss_mdp>;
 		interrupts = <12 0>;
 
+		#clock-cells = <1>;
 		clocks =  <&dispcc DISP_CC_MDSS_DP_AUX_CLK>,
 			 <&rpmhcc RPMH_CXO_CLK>,
 			 <&gcc GCC_USB3_PRIM_CLKREF_CLK>,
