@@ -117,14 +117,12 @@
 	};
 };
 
-&vendor {
-       extcon_usb1 {
-       compatible = "linux,extcon-usb-gpio";
-       status = "disabled";
-       };
-};
-
 &soc {
+	extcon_usb1 {
+		compatible = "linux,extcon-usb-gpio";
+		status = "disabled";
+	};
+
 	qocm,wcd-dsp-glink {
 		compatible = "qcom,wcd-dsp-glink";
 		qcom,wdsp-channels = "g_glink_ctrl",

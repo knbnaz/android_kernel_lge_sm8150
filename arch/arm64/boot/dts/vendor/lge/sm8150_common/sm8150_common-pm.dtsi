@@ -45,48 +45,7 @@
 		def_max_voltage    = <4000000>;
 		lrmc_bob_vreg-supply = <&pm8150l_bob>;
 	};
-};
 
-&spmi_bus {
-	qcom,pm8150@0 {
-		qcom,power-on@800 {
-			qcom,s3-debounce = <32>;
-			qcom,s3-src = "kpdpwr-and-resin";
-
-			qcom,pon_1 {
-				/* KPD_PWR_N */
-				status = "ok";
-				qcom,support-reset = <0>;
-			};
-
-			qcom,pon_2 {
-				/* RESIN_N */
-				status = "ok";
-				qcom,support-reset = <0>;
-			};
-
-			qcom,pon_3 {
-				/* KPD_PWR_N AND RESIN_N */
-				status = "ok";
-				qcom,support-reset = <1>;
-				qcom,pon-type = <PON_POWER_ON_TYPE_KPDPWR_RESIN>;
-				qcom,pull-up = <1>;
-				qcom,s1-timer = <6720>;
-				qcom,s2-timer = <2000>;
-				qcom,s2-type = <PON_POWER_OFF_TYPE_DVDD_HARD_RESET>;
-			};
-		};
-	};
-
-	qcom,pm8150b@2 {
-		qcom,power-on@800 {
-			qcom,s3-debounce = <128>;
-			qcom,s3-src = "kpdpwr-and-resin";
-		};
-	};
-};
-
-&vendor {
 	lge-veneer-psy {
 		compatible = "lge,veneer-psy";
 		status = "ok";
@@ -342,6 +301,45 @@
 			"psfeature",  "triton_policy", "/sys/class/power/triton/cur_policy",
 			"psfeature",   "cancun_is_cm", "NULL",
 			"regulator",       "vreg_bob", "/sys/devices/platform/soc/soc:lrmc/bob_mode";
+		};
+	};
+};
+
+&spmi_bus {
+	qcom,pm8150@0 {
+		qcom,power-on@800 {
+			qcom,s3-debounce = <32>;
+			qcom,s3-src = "kpdpwr-and-resin";
+
+			qcom,pon_1 {
+				/* KPD_PWR_N */
+				status = "ok";
+				qcom,support-reset = <0>;
+			};
+
+			qcom,pon_2 {
+				/* RESIN_N */
+				status = "ok";
+				qcom,support-reset = <0>;
+			};
+
+			qcom,pon_3 {
+				/* KPD_PWR_N AND RESIN_N */
+				status = "ok";
+				qcom,support-reset = <1>;
+				qcom,pon-type = <PON_POWER_ON_TYPE_KPDPWR_RESIN>;
+				qcom,pull-up = <1>;
+				qcom,s1-timer = <6720>;
+				qcom,s2-timer = <2000>;
+				qcom,s2-type = <PON_POWER_OFF_TYPE_DVDD_HARD_RESET>;
+			};
+		};
+	};
+
+	qcom,pm8150b@2 {
+		qcom,power-on@800 {
+			qcom,s3-debounce = <128>;
+			qcom,s3-src = "kpdpwr-and-resin";
 		};
 	};
 };

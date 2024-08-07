@@ -12,7 +12,21 @@
  */
 #include "../../sm8150_common/sm8150_common-pm.dtsi"
 
-&vendor {
+&mtp_batterydata {
+	#include "../../battery_profile/LGE_BLT42_Tocad_4000mAh.dtsi"
+	#include "../../battery_profile/LGE_BLT42_LGC_4000mAh.dtsi"
+};
+
+&soc {
+	lrmc {
+		compatible = "lge,lrmc";
+		bob_min_voltage    = <3920000>;
+		bob_max_voltage    = <4000000>;
+		def_min_voltage    = <3312000>;
+		def_max_voltage    = <4000000>;
+		lrmc_bob_vreg-supply = <&pm8150l_bob>;
+	};
+
 	lge-veneer-psy {
 		charging-time {
 			#address-cells = <1>;
@@ -123,22 +137,6 @@
 			qcom,ki-coeff-med-chg = <400>;
 			qcom,ki-coeff-hi-chg = <400>;
 		};
-	};
-};
-
-&mtp_batterydata {
-	#include "../../battery_profile/LGE_BLT42_Tocad_4000mAh.dtsi"
-	#include "../../battery_profile/LGE_BLT42_LGC_4000mAh.dtsi"
-};
-
-&soc {
-	lrmc {
-		compatible = "lge,lrmc";
-		bob_min_voltage    = <3920000>;
-		bob_max_voltage    = <4000000>;
-		def_min_voltage    = <3312000>;
-		def_max_voltage    = <4000000>;
-		lrmc_bob_vreg-supply = <&pm8150l_bob>;
 	};
 };
 

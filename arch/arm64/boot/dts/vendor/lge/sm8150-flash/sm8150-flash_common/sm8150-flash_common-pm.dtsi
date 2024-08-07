@@ -12,7 +12,7 @@
  */
 #include "../../sm8150_common/sm8150_common-pm.dtsi"
 
-&vendor {
+&soc {
 	lge-veneer-psy {
 		charging-time {
 			#address-cells = <1>;

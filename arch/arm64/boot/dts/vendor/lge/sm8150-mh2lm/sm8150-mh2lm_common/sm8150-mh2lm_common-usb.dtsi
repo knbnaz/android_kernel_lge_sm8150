@@ -39,7 +39,7 @@
  * LGE USB Type-C Dual Display Switch driver
  * Flash H/W rev_o.2 or later is supported.
  */
-&vendor {
+&soc {
       usb_dd_switch: usb_dd_switch {
               compatible = "lge,usb_dd_switch";
               revision = "rev_02...";
@@ -101,7 +101,7 @@
 /*
  * LGE USB Type-C CC/SBU Protection Switch driver
  */
-&vendor {
+&soc {
 	lge_sbu_switch: lge_sbu_switch {
 		compatible = "lge,lge_sbu_switch";
 
@@ -144,7 +144,7 @@
 /*
  * LGE USB UART debugger driver
  */
-&vendor {
+&soc {
 	lge_usb_debugger: lge_usb_debugger {
 		compatible = "lge,usb_debugger";
 
@@ -155,7 +155,7 @@
 /*
  * LGE USB DS2 driver
  */
-&vendor {
+&soc {
 	lge_usb_ds2: lge_usb_ds2 {
 		compatible = "lge,usb_ds2";
 		lge,dd-sw-sel-gpio = <&tlmm 67 0>;
