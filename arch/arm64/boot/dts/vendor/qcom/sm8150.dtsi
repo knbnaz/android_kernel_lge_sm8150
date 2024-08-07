@@ -3143,7 +3143,6 @@
 			<&ipa_virt MASTER_IPA_CORE &ipa_virt SLAVE_IPA_CORE>;
 		interconnect-names = "ipa_to_ebi1", "ipa_to_imem",
 							 "appss_to_ipa", "ipa_core_to_ipa_core";
-		qcom,msm-bus,vectors-KBps =
 		/* No vote */
 		qcom,no-vote =
 		<0 0 0 0 0 0 0 0>;
