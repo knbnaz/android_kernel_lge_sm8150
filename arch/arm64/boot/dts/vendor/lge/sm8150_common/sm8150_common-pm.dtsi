@@ -15,8 +15,8 @@
 #include <dt-bindings/iio/qcom,spmi-vadc.h>
 
 &qupv3_se4_i2c {
-	/delete-node/ &smb1390;
-	/delete-node/ &smb1390_slave;
+	/delete-node/ qcom,smb1390@10;
+	/delete-node/ qcom,smb1390_slave@18;
 };
 
 &soc {
