@@ -81,3 +81,11 @@
 	qcom,hsusb-phy-tune = <0x61 0x43 0x2e 0x03>;
 	qcom,hsusb-phy-tune-host = <0x61 0x43 0x2e 0x03>;
 };
+
+&usb2_phy1 {
+	status = "disabled";
+};
+
+&usb_qmp_phy {
+	status = "disabled";
+};

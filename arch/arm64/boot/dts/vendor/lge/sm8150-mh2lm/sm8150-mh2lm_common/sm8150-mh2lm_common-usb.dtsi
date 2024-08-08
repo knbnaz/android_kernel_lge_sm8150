@@ -89,13 +89,8 @@
 };
 
 &usb2_phy1 {
-	status = "okay";
 	qcom,hsusb-phy-tune = <0x48 0xF8 0x2e 0x03>;
 	qcom,hsusb-phy-tune-host = <0x48 0xF0 0x2e 0x03>;
-};
-
-&usb_qmp_phy {
-	status = "okay";
 };
 
 /*
