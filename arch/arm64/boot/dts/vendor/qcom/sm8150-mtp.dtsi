@@ -12,6 +12,7 @@
 
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/input/input.h>
+#include <dt-bindings/iio/qti_power_supply_iio.h>
 
 #include "sm8150-pmic-overlay.dtsi"
 #include "display/sm8150-sde-display.dtsi"
@@ -313,6 +314,15 @@
 };
 
 &pm8150b_fg {
+	#io-channel-cells = <1>;
+	io-channels = <&pm7250b_charger PSY_IIO_INPUT_CURRENT_LIMITED>,
+		      <&pm7250b_charger PSY_IIO_RECHARGE_SOC>,
+		      <&pm7250b_charger PSY_IIO_FORCE_RECHARGE>,
+		      <&pm7250b_charger PSY_IIO_CHARGE_DONE>,
+	io-channel-names = "input_current_limited",
+			   "recharge_soc",
+			   "force_recharge",
+			   "charge_done";
 	qcom,battery-data = <&mtp_batterydata>;
 	qcom,hold-soc-while-full;
 	qcom,linearize-soc;
@@ -343,6 +353,38 @@
 	cd-gpios = <&tlmm 96 GPIO_ACTIVE_LOW>;
 
 	status = "ok";
+};
+
+&pm8150b_pdphy {
+	#io-channel-cells = <1>;
+	io-channels = <&pm8150b_charger PSY_IIO_PD_ACTIVE>,
+		      <&pm8150b_charger PSY_IIO_TYPEC_CC_ORIENTATION>,
+		      <&pm8150b_charger PSY_IIO_CONNECTOR_TYPE>,
+		      <&pm8150b_charger PSY_IIO_TYPEC_POWER_ROLE>,
+		      <&pm8150b_charger PSY_IIO_PD_USB_SUSPEND_SUPPORTED>,
+		      <&pm8150b_charger PSY_IIO_TYPEC_SRC_RP>,
+		      <&pm8150b_charger PSY_IIO_PD_IN_HARD_RESET>,
+		      <&pm8150b_charger PSY_IIO_PD_CURRENT_MAX>,
+		      <&pm8150b_charger PSY_IIO_PR_SWAP>,
+		      <&pm8150b_charger PSY_IIO_PD_VOLTAGE_MIN>,
+		      <&pm8150b_charger PSY_IIO_PD_VOLTAGE_MAX>,
+		      <&pm8150b_charger PSY_IIO_USB_REAL_TYPE>,
+		      <&pm8150b_charger PSY_IIO_TYPEC_MODE>,
+		      <&pm8150b_charger PSY_IIO_PE_START>;
+	io-channel-names = "pd_active",
+			   "typec_cc_orientation",
+			   "connector_type",
+			   "typec_power_role",
+			   "pd_usb_suspend_supported",
+			   "typec_src_rp",
+			   "pd_in_hard_reset",
+			   "pr_current_max",
+			   "pr_swap",
+			   "pd_voltage_min",
+			   "pd_voltage_max",
+			   "real_type",
+			   "typec_mode",
+			   "pe_start";
 };
 
 &pm8150b_vadc {
@@ -625,13 +667,47 @@
 		      <&pm8150b_vadc ADC5_SBUx>,
 		      <&pm8150b_vadc ADC5_VPH_PWR>,
 		      <&pm8150b_vadc ADC5_CHG_TEMP>,
-		      <&pm8150b_vadc ADC5_USB_IN_V_16>;
+		      <&pm8150b_vadc ADC5_USB_IN_V_16>,
+		      <&pm8150b_fg PSY_IIO_RESISTANCE_ID>,
+		      <&pm8150b_fg PSY_IIO_VOLTAGE_NOW>,
+		      <&pm8150b_fg PSY_IIO_TEMP>,
+		      <&pm8150b_fg PSY_IIO_CAPACITY>,
+		      <&pm8150b_fg PSY_IIO_VOLTAGE_OCV>,
+		      <&pm8150b_fg PSY_IIO_VOLTAGE_AVG>,
+		      <&pm8150b_fg PSY_IIO_DEBUG_BATTERY>,
+		      <&pm8150b_fg PSY_IIO_REAL_CAPACITY>,
+		      <&pm8150b_fg PSY_IIO_CC_SOC>,
+		      <&pm8150b_fg PSY_IIO_CURRENT_NOW>,
+		      <&pm8150b_fg PSY_IIO_VOLTAGE_MAX>,
+		      <&pm8150b_fg PSY_IIO_CHARGE_FULL>,
+		      <&pm8150b_fg PSY_IIO_CHARGE_COUNTER>,
+		      <&pm8150b_fg PSY_IIO_CYCLE_COUNT>,
+		      <&pm8150b_fg PSY_IIO_CHARGE_FULL_DESIGN>,
+		      <&pm8150b_fg PSY_IIO_TIME_TO_FULL_NOW>,
+		      <&pm8150b_fg PSY_IIO_CALIBRATE>;
 	io-channel-names = "mid_voltage",
 			   "usb_in_current",
 			   "sbux_res",
 			   "vph_voltage",
 			   "chg_temp",
-			   "usb_in_voltage";
+			   "usb_in_voltage",
+			   "resistance_id",
+			   "voltage_now",
+			   "temp",
+			   "capacity",
+			   "voltage_ocv",
+			   "voltage_avg",
+			   "debug_battery",
+			   "real_capacity",
+			   "cc_soc",
+			   "current_now",
+			   "voltage_max",
+			   "charge_full",
+			   "charge_counter",
+			   "cycle_count",
+			   "charge_full_design",
+			   "time_to_full_now",
+			   "calibrate";
 	qcom,battery-data = <&mtp_batterydata>;
 	qcom,step-charging-enable;
 	qcom,sw-jeita-enable;
