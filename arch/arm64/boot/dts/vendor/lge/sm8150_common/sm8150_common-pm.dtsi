@@ -369,8 +369,16 @@
 	qcom,fg-esr-timer-dischg-fast = <0 10>;
 	qcom,fg-batt-therm-freq = <8>;
 	qcom,fg-delta-soc-thr = <3>;
-	io-channels = <&pm8150b_vadc ADC5_BAT_ID_100K_PU>;
-	io-channel-names = "bat_id";
+	io-channels = <&pm8150b_vadc ADC5_BAT_ID_100K_PU>,
+			  <&pm8150b_charger PSY_IIO_INPUT_CURRENT_LIMITED>,
+		      <&pm8150b_charger PSY_IIO_RECHARGE_SOC>,
+		      <&pm8150b_charger PSY_IIO_FORCE_RECHARGE>,
+		      <&pm8150b_charger PSY_IIO_CHARGE_DONE>;
+	io-channel-names = "bat_id",
+			   "input_current_limited",
+			   "recharge_soc",
+			   "force_recharge",
+			   "charge_done";
 };
 
 &pm8150b_charger {
@@ -390,13 +398,47 @@
 		<&pm8150b_vadc ADC5_SBUx>,
 		<&pm8150b_vadc ADC5_VPH_PWR>,
 		<&pm8150b_vadc ADC5_CHG_TEMP>,
-		<&pm8150l_vadc ADC5_AMUX_THM2>;
+		<&pm8150l_vadc ADC5_AMUX_THM2>,
+		<&pm8150b_fg PSY_IIO_RESISTANCE_ID>,
+		<&pm8150b_fg PSY_IIO_VOLTAGE_NOW>,
+		<&pm8150b_fg PSY_IIO_TEMP>,
+		<&pm8150b_fg PSY_IIO_CAPACITY>,
+		<&pm8150b_fg PSY_IIO_VOLTAGE_OCV>,
+		<&pm8150b_fg PSY_IIO_VOLTAGE_AVG>,
+		<&pm8150b_fg PSY_IIO_DEBUG_BATTERY>,
+		<&pm8150b_fg PSY_IIO_REAL_CAPACITY>,
+		<&pm8150b_fg PSY_IIO_CC_SOC>,
+		<&pm8150b_fg PSY_IIO_CURRENT_NOW>,
+		<&pm8150b_fg PSY_IIO_VOLTAGE_MAX>,
+		<&pm8150b_fg PSY_IIO_CHARGE_FULL>,
+		<&pm8150b_fg PSY_IIO_CHARGE_COUNTER>,
+		<&pm8150b_fg PSY_IIO_CYCLE_COUNT>,
+		<&pm8150b_fg PSY_IIO_CHARGE_FULL_DESIGN>,
+		<&pm8150b_fg PSY_IIO_TIME_TO_FULL_NOW>,
+		<&pm8150b_fg PSY_IIO_CALIBRATE>;
 	io-channel-names = "mid_voltage",
 		"usb_in_current",
 		"sbux_res",
 		"vph_voltage",
 		"chg_temp",
-		"usb_id";
+		"usb_id",
+		"resistance_id",
+		"voltage_now",
+		"temp",
+		"capacity",
+		"voltage_ocv",
+		"voltage_avg",
+		"debug_battery",
+		"real_capacity",
+		"cc_soc",
+		"current_now",
+		"voltage_max",
+		"charge_full",
+		"charge_counter",
+		"cycle_count",
+		"charge_full_design",
+		"time_to_full_now",
+		"calibrate";
 
 	lge,vconn-boost-en = <&pm8150b_gpios 5 GPIO_ACTIVE_HIGH>;
 	lge-extension-usb {
