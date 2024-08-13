@@ -315,10 +315,10 @@
 
 &pm8150b_fg {
 	#io-channel-cells = <1>;
-	io-channels = <&pm7250b_charger PSY_IIO_INPUT_CURRENT_LIMITED>,
-		      <&pm7250b_charger PSY_IIO_RECHARGE_SOC>,
-		      <&pm7250b_charger PSY_IIO_FORCE_RECHARGE>,
-		      <&pm7250b_charger PSY_IIO_CHARGE_DONE>,
+	io-channels = <&pm8150b_charger PSY_IIO_INPUT_CURRENT_LIMITED>,
+		      <&pm8150b_charger PSY_IIO_RECHARGE_SOC>,
+		      <&pm8150b_charger PSY_IIO_FORCE_RECHARGE>,
+		      <&pm8150b_charger PSY_IIO_CHARGE_DONE>;
 	io-channel-names = "input_current_limited",
 			   "recharge_soc",
 			   "force_recharge",
