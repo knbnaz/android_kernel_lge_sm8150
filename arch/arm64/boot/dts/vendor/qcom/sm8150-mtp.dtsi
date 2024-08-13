@@ -662,6 +662,7 @@
 &pm8150b_charger {
 	qcom,sec-charger-config = <3>;
 	qcom,auto-recharge-soc = <98>;
+	#io-channel-cells = <1>;
 	io-channels = <&pm8150b_vadc ADC5_MID_CHG_DIV6>,
 		      <&pm8150b_vadc ADC5_USB_IN_I>,
 		      <&pm8150b_vadc ADC5_SBUx>,
