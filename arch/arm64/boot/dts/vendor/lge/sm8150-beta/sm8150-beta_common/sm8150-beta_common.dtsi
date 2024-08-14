@@ -66,9 +66,9 @@
 		reg = <0 0x9e400000 0 0x1c00000>;
 	};
 
-	cont_splash_memory: cont_splash_region {
+	cont_splash_memory: splash_region {
 		reg = <0x0 0x9d200000 0x0 0x01200000>;
-		label = "cont_splash_region";
+		label = "splash_region";
 	};
 
 	disp_rdump_memory: disp_rdump_region {
