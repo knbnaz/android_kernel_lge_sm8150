@@ -964,12 +964,21 @@ static const struct adc5_channels adc5_chans_pmic[ADC5_MAX_CHANNEL] = {
 					SCALE_HW_CALIB_DEFAULT)
 	[ADC5_XO_THERM_100K_PU]	= ADC5_CHAN_TEMP("xo_therm", 0,
 					SCALE_HW_CALIB_XOTHERM)
+#if defined(CONFIG_MACH_SM8150_ALPHA) || defined(CONFIG_MACH_SM8150_BETA)
+	[ADC5_BAT_THERM_100K_PU]	= ADC5_CHAN_TEMP("bat_therm_100k_pu", 0,
+					SCALE_HW_CALIB_DEFAULT)
+	[ADC5_BAT_THERM_30K_PU]	= ADC5_CHAN_TEMP("bat_therm_30k_pu", 0,
+					SCALE_HW_CALIB_DEFAULT)
+	[ADC5_BAT_THERM_400K_PU]	= ADC5_CHAN_TEMP("bat_therm_400k_pu", 0,
+					SCALE_HW_CALIB_DEFAULT)
+#else
 	[ADC5_BAT_THERM_100K_PU]	= ADC5_CHAN_TEMP("bat_therm_100k_pu", 0,
 					SCALE_HW_CALIB_BATT_THERM_100K)
 	[ADC5_BAT_THERM_30K_PU]	= ADC5_CHAN_TEMP("bat_therm_30k_pu", 0,
 					SCALE_HW_CALIB_BATT_THERM_30K)
 	[ADC5_BAT_THERM_400K_PU]	= ADC5_CHAN_TEMP("bat_therm_400k_pu", 0,
 					SCALE_HW_CALIB_BATT_THERM_400K)
+#endif
 	[ADC5_BAT_ID_100K_PU]	= ADC5_CHAN_TEMP("bat_id", 0,
 					SCALE_HW_CALIB_DEFAULT)
 	[ADC5_AMUX_THM1_100K_PU] = ADC5_CHAN_TEMP("amux_thm1_100k_pu", 0,
@@ -995,6 +1004,45 @@ static const struct adc5_channels adc5_chans_pmic[ADC5_MAX_CHANNEL] = {
 	[ADC5_GPIO4_100K_PU]	= ADC5_CHAN_TEMP("gpio4_100k_pu", 0,
 					SCALE_HW_CALIB_THERM_100K_PULLUP)
 };
+
+#if defined(CONFIG_MACH_LGE)
+/* For PM8150L/A ADC */
+static const struct adc5_channels adc5_chans_pmic_pm8150l[ADC5_MAX_CHANNEL] = {
+	[ADC5_REF_GND]		= ADC5_CHAN_VOLT("ref_gnd", 0,
+					SCALE_HW_CALIB_DEFAULT)
+	[ADC5_1P25VREF]		= ADC5_CHAN_VOLT("vref_1p25", 0,
+					SCALE_HW_CALIB_DEFAULT)
+	[ADC5_VPH_PWR]		= ADC5_CHAN_VOLT("vph_pwr", 1,
+					SCALE_HW_CALIB_DEFAULT)
+	[ADC5_VBAT_SNS]		= ADC5_CHAN_VOLT("vbat_sns", 1,
+					SCALE_HW_CALIB_DEFAULT)
+	[ADC5_DIE_TEMP]		= ADC5_CHAN_TEMP("die_temp", 0,
+					SCALE_HW_CALIB_PMIC_THERM)
+	[ADC5_USB_IN_I]		= ADC5_CHAN_VOLT("usb_in_i_uv", 0,
+					SCALE_HW_CALIB_DEFAULT)
+	[ADC5_USB_IN_V_16]	= ADC5_CHAN_VOLT("usb_in_v_div_16", 8,
+					SCALE_HW_CALIB_DEFAULT)
+	[ADC5_CHG_TEMP]		= ADC5_CHAN_TEMP("chg_temp", 0,
+					SCALE_HW_CALIB_PM5_CHG_TEMP)
+	/* Charger prescales SBUx and MID_CHG to fit within 1.8V upper unit */
+	[ADC5_SBUx]		= ADC5_CHAN_VOLT("chg_sbux", 1,
+					SCALE_HW_CALIB_DEFAULT)
+	[ADC5_MID_CHG_DIV6]	= ADC5_CHAN_VOLT("chg_mid_chg", 3,
+					SCALE_HW_CALIB_DEFAULT)
+	[ADC5_XO_THERM_100K_PU]	= ADC5_CHAN_TEMP("xo_therm", 0,
+					SCALE_HW_CALIB_XOTHERM)
+	[ADC5_AMUX_THM1_100K_PU] = ADC5_CHAN_VOLT("amux_thm1_100k_pu", 0,
+					SCALE_HW_CALIB_DEFAULT)
+	[ADC5_AMUX_THM2_100K_PU] = ADC5_CHAN_TEMP("amux_thm2_100k_pu", 0,
+					SCALE_HW_CALIB_THERM_100K_PULLUP)
+	[ADC5_AMUX_THM3_100K_PU] = ADC5_CHAN_TEMP("amux_thm3_100k_pu", 0,
+					SCALE_HW_CALIB_THERM_100K_PULLUP)
+	[ADC5_AMUX_THM2]	= ADC5_CHAN_VOLT("amux_thm2", 0,
+					SCALE_HW_CALIB_DEFAULT)
+	[ADC5_PARALLEL_ISENSE]	= ADC5_CHAN_VOLT("parallel_isense", 0,
+					SCALE_HW_CALIB_PM5_CUR)
+};
+#endif
 
 static const struct adc5_channels adc7_chans_pmic[ADC5_MAX_CHANNEL] = {
 	[ADC7_REF_GND]		= ADC5_CHAN_VOLT("ref_gnd", 0,
@@ -1229,6 +1277,24 @@ static const struct adc5_data adc5_data_pmic = {
 				1, 2, 4, 8, 16, 32, 64, 128},
 };
 
+#if defined(CONFIG_MACH_SLGE)
+/* For PM8150L/A ADC */
+static const struct adc5_data adc5_data_pmic_pm8150l = {
+	.name = "pm-adc5-pm8150l",
+	.full_scale_code_volt = 0x70e4,
+	.full_scale_code_cur = 0x2710,
+	.adc_chans = adc5_chans_pmic_pm8150l,
+	.decimation = (unsigned int [ADC5_DECIMATION_SAMPLES_MAX])
+				{250, 420, 840},
+	.hw_settle_1 = (unsigned int [VADC_HW_SETTLE_SAMPLES_MAX])
+				{15, 100, 200, 300, 400, 500, 600, 700,
+				800, 900, 1, 2, 4, 6, 8, 10},
+	.hw_settle_2 = (unsigned int [VADC_HW_SETTLE_SAMPLES_MAX])
+				{15, 100, 200, 300, 400, 500, 600, 700,
+				1, 2, 4, 8, 16, 32, 64, 128},
+};
+#endif
+
 static const struct adc5_data adc7_data_pmic = {
 	.name = "pm-adc7",
 	.full_scale_code_volt = 0x70e4,
@@ -1272,6 +1338,13 @@ static const struct of_device_id adc5_match_table[] = {
 		.compatible = "qcom,spmi-adc5",
 		.data = &adc5_data_pmic,
 	},
+#if defined(CONFIG_MACH_LGE)
+	/* For PM8150L/A ADC */
+	{
+		.compatible = "qcom,spmi-adc5-pm8150l",
+		.data = &adc5_data_pmic_pm8150l,
+	},
+#endif
 	{
 		.compatible = "qcom,spmi-adc7",
 		.data = &adc7_data_pmic,
