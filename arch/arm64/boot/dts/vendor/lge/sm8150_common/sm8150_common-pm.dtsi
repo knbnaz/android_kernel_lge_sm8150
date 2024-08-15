@@ -479,7 +479,7 @@
 };
 
 &pm8150l_vadc {
-	compatible = "qcom,spmi-adc5_pm8150l";
+	compatible = "qcom,spmi-adc5-pm8150l";
 	/delete-node/ pa_therm2;
 	/delete-node/ camera_flash_therm;
 	/delete-node/ skin_msm_therm;
