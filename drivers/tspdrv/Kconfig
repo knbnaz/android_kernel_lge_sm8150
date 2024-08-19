@@ -9,8 +9,6 @@ config TSPDRV
 	default n
 
 source drivers/tspdrv/dw7800/Kconfig
-source drivers/tspdrv/dw7912/Kconfig
 source drivers/tspdrv/a2v/Kconfig
-source drivers/tspdrv/pm8150b/Kconfig
 
 endmenu
