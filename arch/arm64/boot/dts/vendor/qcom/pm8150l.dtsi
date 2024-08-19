@@ -11,7 +11,7 @@
 	qcom,pm8150l@4 {
 		compatible = "qcom,spmi-pmic";
 		reg = <0x4 SPMI_USID>;
-		#address-cells = <2>;
+		#address-cells = <1>;
 		#size-cells = <0>;
 
 		pm8150l_revid: qcom,revid@100 {
