@@ -1277,7 +1277,7 @@ static const struct adc5_data adc5_data_pmic = {
 				1, 2, 4, 8, 16, 32, 64, 128},
 };
 
-#if defined(CONFIG_MACH_SLGE)
+#if defined(CONFIG_MACH_LGE)
 /* For PM8150L/A ADC */
 static const struct adc5_data adc5_data_pmic_pm8150l = {
 	.name = "pm-adc5-pm8150l",
